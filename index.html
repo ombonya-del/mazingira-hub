@@ -115,6 +115,21 @@ nav.tabs a{
 nav.tabs a:hover{ color:var(--text); text-decoration:none; }
 nav.tabs a.on{ color:var(--text); border-bottom-color:var(--ember-hot); }
 
+/* Explore sub-tabs — sit just beneath the primary bar */
+nav.subtabs{
+  position:sticky; top:calc(var(--nav-h) + 43px + env(safe-area-inset-top)); z-index:89;
+  background:var(--panel); border-bottom:1px solid var(--line);
+}
+nav.subtabs[hidden]{ display:none; }
+.subtabs-inner{ display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+.subtabs-inner::-webkit-scrollbar{ display:none; }
+nav.subtabs a{
+  flex:none; color:var(--muted); font-size:.68rem; font-weight:800; letter-spacing:.06em;
+  text-transform:uppercase; padding:10px 12px 8px; border-bottom:2px solid transparent; white-space:nowrap;
+}
+nav.subtabs a:hover{ color:var(--text); text-decoration:none; }
+nav.subtabs a.on{ color:var(--text); border-bottom-color:var(--green); }
+
 .sysstat{ display:none; align-items:center; gap:7px; font-size:.66rem; color:var(--muted-dim); letter-spacing:.08em; text-transform:uppercase; font-weight:700; }
 
 /* persistent COP31 countdown — visible on every tab */
@@ -132,6 +147,8 @@ nav.tabs a.on{ color:var(--text); border-bottom-color:var(--ember-hot); }
    Scoped to main so it never hides the tab links, which also carry data-view. */
 main > [data-view]{ display:none; }
 main > [data-view].view-on{ display:block; }
+/* within Explore, only the selected sub-section shows */
+main > [data-view].view-on.sub-off{ display:none; }
 
 .btn{
   display:inline-flex; align-items:center; justify-content:center; gap:7px;
@@ -909,14 +926,22 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 <nav class="tabs" id="tabbar" aria-label="Primary">
   <div class="wrap tabs-inner">
     <a href="#live"    data-view="live"    class="on">Live</a>
-    <a href="#map"     data-view="map">National map</a>
-    <a href="#sectors" data-view="sectors">Sector gaps</a>
-    <a href="#network" data-view="network">Network</a>
-    <a href="#legal"   data-view="legal">Legal</a>
+    <a href="#explore" data-view="explore">Explore</a>
     <a href="#cop"     data-view="cop">COP31</a>
     <a href="#desk"    data-view="desk">Desk</a>
+    <a href="#events"  data-view="events">Events</a>
     <a href="#voices"  data-view="voices">Voices</a>
     <a href="#ajesasa" data-view="act">Je, Hatua?</a>
+  </div>
+</nav>
+
+<!-- ===================== EXPLORE SUB-TABS (Map · Gaps · Network · Legal) ===================== -->
+<nav class="subtabs" id="exploreSub" aria-label="Explore sections" hidden>
+  <div class="wrap subtabs-inner">
+    <a href="#map"     data-sub="map" class="on">National map</a>
+    <a href="#sectors" data-sub="sectors">Sector gaps</a>
+    <a href="#network" data-sub="network">Network</a>
+    <a href="#legal"   data-sub="legal">Legal</a>
   </div>
 </nav>
 
@@ -1065,7 +1090,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 </section>
 
 <!-- ============================ NATIONAL MAP ============================ -->
-<section class="band" id="map" data-view="map">
+<section class="band" id="map" data-view="explore" data-sub="map">
   <div class="wrap">
     <div class="sec-head">
       <div class="grow">
@@ -1131,7 +1156,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 </section>
 
 <!-- ============================ SECTOR GAPS ============================ -->
-<section class="band" id="sectors" data-view="sectors">
+<section class="band" id="sectors" data-view="explore" data-sub="sectors">
   <div class="wrap">
     <div class="sec-head">
       <div class="grow">
@@ -1199,7 +1224,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 </section>
 
 <!-- ============================ LEGAL ============================ -->
-<section class="band" id="legal" data-view="legal">
+<section class="band" id="legal" data-view="explore" data-sub="legal">
   <div class="wrap">
     <div class="sec-head">
       <div class="grow">
@@ -1240,7 +1265,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 </section>
 
 <!-- ============================ NETWORK ============================ -->
-<section class="band" id="network" data-view="network">
+<section class="band" id="network" data-view="explore" data-sub="network">
   <div class="wrap">
     <div class="sec-head">
       <div class="grow">
@@ -1295,7 +1320,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 </section>
 
 <!-- ============================ EVENTS ============================ -->
-<section class="band" id="events" data-view="desk">
+<section class="band" id="events" data-view="events">
   <div class="wrap">
     <div class="sec-head">
       <div class="grow"><p class="kicker">Convenings &amp; barazas</p><h2>What's coming up</h2></div>
@@ -4069,12 +4094,31 @@ form.addEventListener("submit", function(e){
 /* =================================================================
    TABBED VIEWS — each tab is its own screen, no endless scroll
    ================================================================= */
-var VIEWS = ["live","map","sectors","network","legal","cop","desk","voices","act"];
-/* a hash may point at a section id that lives inside a grouped view */
-var HASH2VIEW = { live:"live", map:"map", sectors:"sectors", network:"network",
-  legal:"legal", cop:"cop", desk:"desk", events:"desk", voices:"voices",
+var VIEWS = ["live","explore","cop","desk","events","voices","act"];
+/* Map / Sector gaps / Network / Legal now live inside the grouped "Explore" view.
+   A hash may point at one of those section ids — route it to Explore and pick the sub. */
+var HASH2VIEW = { live:"live", explore:"explore",
+  map:"explore", sectors:"explore", network:"explore", legal:"explore",
+  cop:"cop", desk:"desk", events:"events", voices:"voices",
   ajesasa:"act", contribute:"act" };
+var HASH2SUB = { map:"map", sectors:"sectors", network:"network", legal:"legal" };
+var EXPLORE_SUBS = ["map","sectors","network","legal"];
+var exploreSub = "map";
 var tabLinks = document.querySelectorAll("nav.tabs a");
+
+/* show only the chosen sub-section within Explore, and paint it lazily */
+function applyExploreSub(){
+  if(EXPLORE_SUBS.indexOf(exploreSub) < 0) exploreSub = "map";
+  document.querySelectorAll('main > [data-view="explore"]').forEach(function(el){
+    el.classList.toggle("sub-off", el.getAttribute("data-sub") !== exploreSub);
+  });
+  document.querySelectorAll("#exploreSub a").forEach(function(a){
+    a.classList.toggle("on", a.getAttribute("data-sub") === exploreSub);
+  });
+  if(exploreSub === "sectors"){ renderMatrix(); renderSectorMap(); }
+  if(exploreSub === "network") renderNetMap();
+  if(exploreSub === "legal" && typeof renderLegalMap === "function") renderLegalMap();
+}
 
 function showView(view, hash){
   if(VIEWS.indexOf(view) < 0) view = "live";
@@ -4082,13 +4126,12 @@ function showView(view, hash){
     el.classList.toggle("view-on", el.getAttribute("data-view") === view);
   });
   tabLinks.forEach(function(a){ a.classList.toggle("on", a.getAttribute("data-view") === view); });
+  var sb = document.getElementById("exploreSub"); if(sb) sb.hidden = (view !== "explore");
+  if(view === "explore") applyExploreSub();
   // move focus/scroll to the top of the new screen
   try { window.scrollTo({ top:0, behavior: reduce ? "auto" : "smooth" }); }
   catch(_){ try { window.scrollTo(0, 0); } catch(__){} }
   if(hash) history.replaceState(null, "", "#" + hash);
-  if(view === "sectors"){ renderMatrix(); renderSectorMap(); }   // first paint is lazy
-  if(view === "network") renderNetMap();
-  if(view === "legal" && typeof renderLegalMap === "function") renderLegalMap();
   if(view === "act" && typeof renderBrief === "function") renderBrief();   // refresh with full sector data
 }
 
@@ -4099,20 +4142,23 @@ document.addEventListener("click", function(e){
   var hash = a.getAttribute("href").slice(1);
   if(!hash || !(hash in HASH2VIEW)) return;      // leave unknown anchors alone
   e.preventDefault();
+  if(hash in HASH2SUB) exploreSub = HASH2SUB[hash];
   showView(HASH2VIEW[hash], hash);
-  if(hash === "contribute" || hash === "events" || hash === "ajesasa"){
+  if(hash === "contribute" || hash === "ajesasa"){
     var el = document.getElementById(hash);
     if(el) setTimeout(function(){ el.scrollIntoView({ behavior: reduce?"auto":"smooth", block:"start" }); }, 40);
   }
 });
 window.addEventListener("hashchange", function(){
   var h = location.hash.slice(1);
+  if(h in HASH2SUB) exploreSub = HASH2SUB[h];
   if(h in HASH2VIEW) showView(HASH2VIEW[h]);
 });
 
 /* initial view from the URL, else Live */
 (function(){
   var h = location.hash.slice(1);
+  if(h in HASH2SUB) exploreSub = HASH2SUB[h];
   showView(h in HASH2VIEW ? HASH2VIEW[h] : "live");
 })();
 
