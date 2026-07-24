@@ -130,6 +130,26 @@ nav.subtabs a{
 nav.subtabs a:hover{ color:var(--text); text-decoration:none; }
 nav.subtabs a.on{ color:var(--text); border-bottom-color:var(--green); }
 
+/* Disinformation watch */
+.di-lead{ color:var(--muted); max-width:72ch; margin:0 0 14px; }
+.di-stats{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.di-chip{ background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:6px 12px; font-size:.74rem; font-weight:700; color:var(--muted); }
+.di-chip b{ color:var(--text); font-weight:900; }
+.di-grid{ display:grid; grid-template-columns:1fr; gap:12px; }
+@media(min-width:760px){ .di-grid{ grid-template-columns:1fr 1fr; } }
+.di-card{ background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--line); border-radius:14px; padding:15px 16px; }
+.di-card.di-false{ border-left-color:#E5625A; } .di-card.di-mis{ border-left-color:#E8B45A; } .di-card.di-miss{ border-left-color:#7FB0D8; } .di-card.di-manip{ border-left-color:#EE9455; }
+.di-top{ display:flex; align-items:center; gap:8px; margin-bottom:9px; }
+.di-verdict{ font-size:.6rem; font-weight:900; letter-spacing:.06em; text-transform:uppercase; padding:3px 9px; border-radius:999px; }
+.di-verdict.vf{ background:#E5625A; color:#180505; } .di-verdict.vm{ background:#E8B45A; color:#231a04; } .di-verdict.vc{ background:#7FB0D8; color:#08131c; } .di-verdict.vp{ background:#EE9455; color:#1a0d03; }
+.di-status{ margin-left:auto; font-size:.6rem; font-weight:900; letter-spacing:.06em; text-transform:uppercase; padding:3px 9px; border-radius:999px; border:1px solid var(--line); }
+.di-status.act{ color:var(--ember); border-color:rgba(242,118,47,.5); } .di-status.mon{ color:var(--muted); } .di-status.deb{ color:var(--green); border-color:rgba(98,199,155,.5); }
+.di-card h3{ font-size:1.04rem; margin:.1em 0 .4em; }
+.di-meta{ font-size:.72rem; color:var(--muted-dim); font-weight:700; margin:0 0 9px; }
+.di-counter{ font-size:.86rem; color:var(--text); margin:0; }
+.di-counter b{ color:var(--green); }
+.di-counter a{ color:var(--green); font-weight:800; white-space:nowrap; }
+
 .sysstat{ display:none; align-items:center; gap:7px; font-size:.66rem; color:var(--muted-dim); letter-spacing:.08em; text-transform:uppercase; font-weight:700; }
 
 /* persistent COP31 countdown — visible on every tab */
@@ -947,6 +967,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <a href="#sectors" data-sub="sectors">Sector gaps</a>
     <a href="#network" data-sub="network">Network</a>
     <a href="#legal"   data-sub="legal">Legal</a>
+    <a href="#disinfo" data-sub="disinfo">Disinfo</a>
   </div>
 </nav>
 
@@ -1311,6 +1332,57 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 </section>
 
 <!-- ============================ DESK ============================ -->
+<section class="band" id="disinfo" data-view="explore" data-sub="disinfo">
+  <div class="wrap">
+    <div class="sec-head"><div class="grow"><p class="kicker">Narrative monitoring</p><h2>Disinformation watch</h2></div></div>
+    <p class="di-lead">False and misleading climate &amp; environment narratives circulating in Kenya — tracked so the coalition can coordinate a response. Public-facing debunks are published on <a href="https://raia.mazingirakenya.org" target="_blank" rel="noopener">raia ↗</a>.</p>
+    <div class="di-stats">
+      <span class="di-chip"><b>4</b> active</span>
+      <span class="di-chip"><b>1</b> monitoring</span>
+      <span class="di-chip"><b>1</b> debunked</span>
+      <span class="di-chip">Reviewed weekly</span>
+    </div>
+    <div class="di-grid">
+      <article class="di-card di-false">
+        <div class="di-top"><span class="di-verdict vf">False</span><span class="di-status act">Active</span></div>
+        <h3>“Climate change is natural — humans aren’t the cause”</h3>
+        <p class="di-meta">WhatsApp, X · trending ↑ · Cross-sector</p>
+        <p class="di-counter"><b>Counter:</b> The warming tracks our fossil-fuel use exactly; every major science academy agrees. <a href="https://raia.mazingirakenya.org" target="_blank" rel="noopener">Debunk on raia →</a></p>
+      </article>
+      <article class="di-card di-mis">
+        <div class="di-top"><span class="di-verdict vm">Misleading</span><span class="di-status act">Active</span></div>
+        <h3>“Kenya is too poor for climate — development first”</h3>
+        <p class="di-meta">Political speeches, talk radio · steady · Cross-sector</p>
+        <p class="di-counter"><b>Counter:</b> For most Kenyans the environment IS the economy; drought and floods already cost billions a year. <a href="https://raia.mazingirakenya.org" target="_blank" rel="noopener">Debunk on raia →</a></p>
+      </article>
+      <article class="di-card di-mis">
+        <div class="di-top"><span class="di-verdict vm">Misleading</span><span class="di-status mon">Monitoring</span></div>
+        <h3>“Carbon credits are free money for communities”</h3>
+        <p class="di-meta">Project sign-up meetings · localised · Land &amp; carbon</p>
+        <p class="di-counter"><b>Counter:</b> Little pay, lost grazing control, decades-long contracts — Kenya’s biggest project was suspended twice. <a href="https://raia.mazingirakenya.org" target="_blank" rel="noopener">Debunk on raia →</a></p>
+      </article>
+      <article class="di-card di-miss">
+        <div class="di-top"><span class="di-verdict vc">Missing context</span><span class="di-status act">Active</span></div>
+        <h3>“The Lamu refinery will make petrol cheap for all”</h3>
+        <p class="di-meta">Post-announcement shares · rising · Oil &amp; gas</p>
+        <p class="di-counter"><b>Counter:</b> Fuel prices follow the global market and owner terms; “60,000 jobs” is a pre-plan promise. <a href="https://raia.mazingirakenya.org" target="_blank" rel="noopener">Debunk on raia →</a></p>
+      </article>
+      <article class="di-card di-false">
+        <div class="di-top"><span class="di-verdict vf">False</span><span class="di-status act">Active</span></div>
+        <h3>“Activists are foreign-funded agents blocking progress”</h3>
+        <p class="di-meta">Coordinated X &amp; Facebook posts · spiking ↑ · Defenders</p>
+        <p class="di-counter"><b>Counter:</b> The defenders are the affected communities themselves; the label is a global silencing tactic. <a href="https://raia.mazingirakenya.org" target="_blank" rel="noopener">Debunk on raia →</a></p>
+      </article>
+      <article class="di-card di-manip">
+        <div class="di-top"><span class="di-verdict vp">Manipulated media</span><span class="di-status deb">Debunked</span></div>
+        <h3>“Viral photo proves the drought/floods are staged”</h3>
+        <p class="di-meta">Recycled images on TikTok, WhatsApp · fading · Water &amp; land</p>
+        <p class="di-counter"><b>Counter:</b> Old/unrelated images relabelled; real events are measured by the met department, satellites and hospitals. <a href="https://raia.mazingirakenya.org" target="_blank" rel="noopener">Debunk on raia →</a></p>
+      </article>
+    </div>
+  </div>
+</section>
+
 <section class="band" id="desk" data-view="desk">
   <div class="wrap">
     <div class="sec-head">
@@ -4103,11 +4175,11 @@ var VIEWS = ["live","explore","cop","desk","events","voices","act"];
 /* Map / Sector gaps / Network / Legal now live inside the grouped "Explore" view.
    A hash may point at one of those section ids — route it to Explore and pick the sub. */
 var HASH2VIEW = { live:"live", explore:"explore",
-  map:"explore", sectors:"explore", network:"explore", legal:"explore",
+  map:"explore", sectors:"explore", network:"explore", legal:"explore", disinfo:"explore",
   cop:"cop", desk:"desk", events:"events", voices:"voices",
   ajesasa:"act", contribute:"act" };
-var HASH2SUB = { map:"map", sectors:"sectors", network:"network", legal:"legal" };
-var EXPLORE_SUBS = ["map","sectors","network","legal"];
+var HASH2SUB = { map:"map", sectors:"sectors", network:"network", legal:"legal", disinfo:"disinfo" };
+var EXPLORE_SUBS = ["map","sectors","network","legal","disinfo"];
 var exploreSub = "map";
 var tabLinks = document.querySelectorAll("nav.tabs a");
 

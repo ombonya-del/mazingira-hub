@@ -187,9 +187,23 @@ main{padding-top:22px}
 .myth-row.reality .lab{background:var(--green);color:#fff}.myth-row.why .lab{background:var(--paper2);color:#7a5a12}.myth-row.where .lab{background:var(--paper2);color:var(--ink-soft)}
 .myth-row.reality p{font-weight:700}
 /* Know & Understand — wider, two columns on desktop */
-.seg{max-width:520px}
+.seg{max-width:660px}
+.seg button{font-size:.8rem;line-height:1.12}
 .learn-grid{display:grid;gap:12px}
 @media(min-width:840px){ .learn-grid{grid-template-columns:1fr 1fr;align-items:start} }
+/* disinformation cards */
+.dcard{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:13px;box-shadow:var(--shadow);padding:15px 16px}
+.dcard.v-false{border-left-color:#C0202A}.dcard.v-mis{border-left-color:#DC9A18}.dcard.v-miss{border-left-color:#2C4B59}.dcard.v-manip{border-left-color:#B4531A}
+.dtop{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+.verdict{font-size:.62rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;color:#fff}
+.verdict.v-false{background:#C0202A}.verdict.v-mis{background:#DC9A18;color:#3a2a00}.verdict.v-miss{background:#2C4B59}.verdict.v-manip{background:#B4531A}
+.dwhere{font-size:.7rem;font-weight:800;color:var(--ink-soft)}
+.dclaim{font-family:"Lora",serif;font-weight:600;font-style:italic;font-size:1.06rem;color:var(--ink);margin:0 0 11px}
+.dlab{font-size:.63rem;font-weight:900;letter-spacing:.07em;text-transform:uppercase;display:inline-block;margin-bottom:3px;padding:2px 8px;border-radius:5px}
+.dlab.bad{background:#FBE3E1;color:#A5121C}.dlab.good{background:#E7F4EC;color:#0A5A3A}
+.drow p{margin:0 0 11px}
+.dtrue{background:var(--paper2);border-radius:10px;padding:10px 12px;font-weight:700}
+.dtrue .dlab{margin-bottom:0;margin-right:5px}
 /* case study / real-life examples */
 .case{margin-top:14px;border-top:1px dashed var(--line);padding-top:14px}
 .case-h{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
@@ -326,7 +340,11 @@ var UI = {
   seeIn:{en:"See it in the news",sw:"Iangalie kwenye habari",sh:"Iangalie kwa news"},
   lensLabel:{en:"Three ways to read it",sw:"Njia tatu za kuelewa",sh:"Njia tatu za kuelewa"},
   caseStudy:{en:"In real life",sw:"Katika uhalisia",sh:"Kwa uhalisia"},
-  readLink:{en:"Read",sw:"Soma",sh:"Soma"}
+  readLink:{en:"Read",sw:"Soma",sh:"Soma"},
+  disinfoTab:{en:"Spot the lie",sw:"Upotoshaji",sh:"Propaganda"},
+  whyBad:{en:"Why it doesn’t hold up",sw:"Kwa nini haisimami",sh:"Kwa nini haishiki"},
+  whatsTrue:{en:"What’s true",sw:"Ukweli",sh:"Ukweli"},
+  spreading:{en:"Spreading on",sw:"Inasambaa",sh:"Inasambaa"}
 };
 var TAB = {
   ninini:{name:{en:"Ni Nini?",sw:"Ni Nini?",sh:"Rada?"}, sub:{en:"What this is about",sw:"Ni kuhusu nini",sh:"Ni kuhusu nini"}},
@@ -647,6 +665,56 @@ var MYTHS = [
   link:"turkana-wind" }
 ];
 
+var VERDICT = {
+  "false":{cls:"v-false", t:{en:"False",sw:"Uongo",sh:"Uongo kabisa"}},
+  misleading:{cls:"v-mis", t:{en:"Misleading",sw:"Inapotosha",sh:"Inapotosha"}},
+  missing:{cls:"v-miss", t:{en:"Missing context",sw:"Muktadha unakosekana",sh:"Hakuna context"}},
+  manipulated:{cls:"v-manip", t:{en:"Manipulated media",sw:"Picha/video imehaririwa",sh:"Media ni fake"}}
+};
+var DISINFO = [
+{ id:"d1", verdict:"false",
+  claim:{en:"Climate change is natural — humans have nothing to do with it.",sw:"Mabadiliko ya tabianchi ni ya asili — binadamu hahusiki.",sh:"Climate change ni ya nature tu — binadamu hahusiki."},
+  where:{en:"WhatsApp & X",sw:"WhatsApp na X",sh:"WhatsApp na X"},
+  why:{en:"The rapid warming of the last century tracks almost exactly with the coal, oil and gas we’ve burned. Every major science academy agrees it is human-caused. Natural cycles are real, but far too slow to explain what we are living through.",
+    sw:"Kuongezeka kwa joto kwa karne iliyopita kunaenda sambamba na makaa, mafuta na gesi tulizochoma. Kila taasisi kuu ya sayansi inakubali ni ya kibinadamu. Mizunguko ya asili ni ya kweli, lakini ni ya polepole mno kuelezea tunachopitia.",
+    sh:"Joto lilivyoongezeka karne iliyopita linaenda sawa na makaa, oil na gesi tumechoma. Kila science academy kuu inakubali ni ya binadamu. Natural cycles ziko, lakini ni slow sana kuexplain hii tunapitia."},
+  truth:{en:"It’s human-caused — which is exactly why cutting fossil fuels works.",sw:"Ni ya kibinadamu — ndio maana kupunguza nishati ya kisukuku kunafanya kazi.",sh:"Ni ya binadamu — ndio maana kupunguza fossil fuels kunawork."} },
+{ id:"d2", verdict:"misleading",
+  claim:{en:"Kenya is too poor to worry about climate — development must come first.",sw:"Kenya ni maskini sana kuhangaikia tabianchi — maendeleo kwanza.",sh:"Kenya ni maskini sana kuworry climate — development kwanza."},
+  where:{en:"Political speeches & talk radio",sw:"Hotuba za kisiasa na redio",sh:"Speeches za siasa na radio"},
+  why:{en:"This is a false choice. For most Kenyans the environment IS the economy — land, water, livestock, fishing, tourism. Drought and floods already cost Kenya billions of shillings a year, so ignoring climate makes us poorer, not richer.",
+    sw:"Hili ni chaguo la uongo. Kwa Wakenya wengi, mazingira NDIO uchumi — ardhi, maji, mifugo, uvuvi, utalii. Ukame na mafuriko tayari vinagharimu Kenya mabilioni kwa mwaka, kwa hivyo kupuuza tabianchi kunatufanya maskini zaidi.",
+    sh:"Hii ni false choice. Kwa Wakenya wengi, mazingira NDIO uchumi — ardhi, maji, mifugo, uvuvi, tourism. Drought na floods zinacost Kenya mabilioni kwa mwaka, so kupuuza climate kunatufanya maskini zaidi."},
+  truth:{en:"Protecting land, water and air is development — not a distraction from it.",sw:"Kulinda ardhi, maji na hewa ni maendeleo — si kizuizi chake.",sh:"Kuprotect ardhi, maji na hewa ni development — si kizuizi."} },
+{ id:"d3", verdict:"misleading",
+  claim:{en:"Carbon credits are free money that makes communities rich.",sw:"Mikopo ya kaboni ni pesa za bure zinazotajirisha jamii.",sh:"Carbon credits ni doo za bure zinatajirisha community."},
+  where:{en:"Project sign-up meetings",sw:"Mikutano ya kujiandikisha",sh:"Meetings za ku-sign up"},
+  why:{en:"Some carbon projects pay communities little while restricting how they use their own land, and buyers use the credits to keep polluting. Kenya’s biggest soil-carbon project was suspended twice and challenged in court over consent.",
+    sw:"Baadhi ya miradi ya kaboni hulipa jamii kidogo huku ikizuia jinsi wanavyotumia ardhi yao, na wanunuzi hutumia mikopo kuendelea kuchafua. Mradi mkubwa zaidi wa kaboni Kenya ulisimamishwa mara mbili na kupingwa mahakamani kuhusu ridhaa.",
+    sh:"Baadhi ya carbon projects hulipa community kidogo huku zikirestrict jinsi wanatumia ardhi yao, na buyers hutumia credits kuendelea kupollute. Project kubwa zaidi ya soil carbon Kenya ilisuspendiwa mara mbili na kuchallengiwa court juu ya consent."},
+  truth:{en:"Read the contract: ask who profits, what you give up, and for how long.",sw:"Soma mkataba: uliza nani ananufaika, unachoacha, na kwa muda gani.",sh:"Soma contract: uliza nani anabenefit, unachoacha, na kwa muda gani."} },
+{ id:"d4", verdict:"missing",
+  claim:{en:"The Lamu refinery will make petrol cheap for every Kenyan.",sw:"Kiwanda cha Lamu kitafanya petroli iwe nafuu kwa kila Mkenya.",sh:"Refinery ya Lamu itafanya petrol iwe cheap kwa kila Mkenya."},
+  where:{en:"Shared after the refinery announcement",sw:"Baada ya tangazo la kiwanda",sh:"Baada ya announcement ya refinery"},
+  why:{en:"A refinery turns crude into fuel — but prices still follow the global oil market and the owner’s business terms, not local goodwill. Big promises like cheap fuel and 60,000 jobs are made before any binding plan exists.",
+    sw:"Kiwanda hugeuza mafuta ghafi kuwa petroli — lakini bei bado hufuata soko la dunia na masharti ya mwenye kiwanda, si huruma ya wenyeji. Ahadi kubwa kama petroli nafuu na ajira 60,000 hutolewa kabla ya mpango wowote thabiti.",
+    sh:"Refinery inageuza crude kuwa fuel — lakini prices bado zinafollow global oil market na terms za owner, si goodwill ya wenyeji. Promises kubwa kama fuel cheap na jobs 60,000 zinatolewa kabla ya plan yoyote binding."},
+  truth:{en:"Ask for the signed numbers before believing the slogan.",sw:"Omba takwimu zilizosainiwa kabla ya kuamini kaulimbiu.",sh:"Omba signed numbers kabla ya kuamini slogan."} },
+{ id:"d5", verdict:"false",
+  claim:{en:"Environmental activists are foreign-funded agents blocking Kenya’s progress.",sw:"Wanaharakati wa mazingira ni mawakala wanaofadhiliwa na wageni wanaozuia maendeleo.",sh:"Wanaharakati wa mazingira ni agents wanafundiwa na wazungu kublock maendeleo."},
+  where:{en:"Coordinated posts on X & Facebook",sw:"Machapisho yaliyoratibiwa X na Facebook",sh:"Coordinated posts kwa X na Facebook"},
+  why:{en:"Most people defending land, water and air are the affected communities themselves — Lamu fishers, Kakamega farmers, Marsabit herders. Labelling them ‘foreign agents’ is a tactic used worldwide to silence inconvenient questions, not an argument about the facts.",
+    sw:"Wengi wanaotetea ardhi, maji na hewa ni jamii zilizoathirika zenyewe — wavuvi wa Lamu, wakulima wa Kakamega, wafugaji wa Marsabit. Kuwaita ‘mawakala wa kigeni’ ni mbinu inayotumika dunia nzima kunyamazisha maswali magumu, si hoja kuhusu ukweli.",
+    sh:"Wengi wanadefend ardhi, maji na hewa ni communities zilizoathirika zenyewe — wavuvi wa Lamu, wakulima wa Kakamega, wafugaji wa Marsabit. Kuwaita ‘foreign agents’ ni tactic inatumika dunia nzima kusilence maswali magumu, si hoja juu ya facts."},
+  truth:{en:"Asking who benefits and who pays is a citizen’s right, not sabotage.",sw:"Kuuliza nani ananufaika na nani analipa ni haki ya raia, si hujuma.",sh:"Kuuliza nani anabenefit na nani analipa ni right ya raia, si sabotage."} },
+{ id:"d6", verdict:"manipulated",
+  claim:{en:"This viral photo proves the drought (or floods) are fake and staged.",sw:"Picha hii inayosambaa inathibitisha ukame (au mafuriko) ni bandia.",sh:"Hii photo inayotrend inaproof drought (ama floods) ni fake."},
+  where:{en:"Recycled images on TikTok & WhatsApp",sw:"Picha za zamani TikTok na WhatsApp",sh:"Recycled images kwa TikTok na WhatsApp"},
+  why:{en:"Old or unrelated photos are often relabelled to claim a disaster is ‘staged’. Meanwhile Kenya’s droughts and floods are measured by the meteorological department, satellites and hospitals — not by a single viral image.",
+    sw:"Picha za zamani au zisizohusiana mara nyingi hupewa maelezo mapya kudai maafa ni ‘bandia’. Wakati huohuo ukame na mafuriko ya Kenya hupimwa na idara ya hali ya hewa, satelaiti na hospitali — si picha moja inayosambaa.",
+    sh:"Photos za zamani ama zisizohusiana mara nyingi zinarelabeliwa kudai disaster ni ‘staged’. Wakati huo drought na floods za Kenya zinapimwa na met department, satellites na hospitali — si image moja inayotrend."},
+  truth:{en:"Check the source and date of an image before you share it.",sw:"Angalia chanzo na tarehe ya picha kabla ya kuisambaza.",sh:"Check source na date ya image kabla ya kuishare."} }
+];
 var AV_COLORS = ["#C0202A","#0C7A4D","#DC9A18","#26262b","#2C4B59"];
 var VOICES = [
 { id:"v1", name:"Amina H.", place:{en:"Lamu",sw:"Lamu",sh:"Lamu"}, type:"video",
@@ -778,12 +846,20 @@ function streamHero(brand){
 function viewLearn(){
   var tab=state.learnTab;
   var seg='<div class="seg" role="tablist"><button role="tab" data-ltab="q" aria-selected="'+(tab==="q")+'">'+esc(L(UI.bigq))+
-    '</button><button role="tab" data-ltab="m" aria-selected="'+(tab==="m")+'">'+esc(L(UI.myths))+'</button></div>';
+    '</button><button role="tab" data-ltab="m" aria-selected="'+(tab==="m")+'">'+esc(L(UI.myths))+
+    '</button><button role="tab" data-ltab="d" aria-selected="'+(tab==="d")+'">'+esc(L(UI.disinfoTab))+'</button></div>';
   var body="";
   if(tab==="q"){
     BIGQ.forEach(function(b){var open=state.openAcc==="q:"+b.id;
       body+='<div class="acc bigq'+(open?" open":"")+'" data-acc="q:'+b.id+'"><button aria-expanded="'+open+'"><span class="q">'+esc(L(b.q))+'</span><span class="plus">+</span></button>'+
         '<div class="panel">'+paras(b.a)+caseHtml(CASES[b.id])+'</div></div>';});
+  } else if(tab==="d"){
+    DISINFO.forEach(function(x){ var v=VERDICT[x.verdict];
+      body+='<div class="dcard '+v.cls+'"><div class="dtop"><span class="verdict '+v.cls+'">'+esc(L(v.t))+'</span>'+
+        '<span class="dwhere">'+esc(L(UI.spreading))+': '+esc(L(x.where))+'</span></div>'+
+        '<p class="dclaim">“'+esc(L(x.claim))+'”</p>'+
+        '<div class="drow"><span class="dlab bad">'+esc(L(UI.whyBad))+'</span><p>'+esc(L(x.why))+'</p></div>'+
+        '<div class="dtrue"><span class="dlab good">'+esc(L(UI.whatsTrue))+'</span>'+esc(L(x.truth))+'</div></div>';});
   } else {
     MYTHS.forEach(function(m){var open=state.openAcc==="m:"+m.id;
       body+='<div class="acc myth'+(open?" open":"")+'" data-acc="m:'+m.id+'"><button aria-expanded="'+open+'"><span class="qmyth">'+esc(L(m.m))+'</span><span class="plus">+</span></button>'+
