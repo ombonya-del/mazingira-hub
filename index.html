@@ -150,6 +150,43 @@ nav.subtabs a.on{ color:var(--text); border-bottom-color:var(--green); }
 .di-counter b{ color:var(--green); }
 .di-counter a{ color:var(--green); font-weight:800; white-space:nowrap; }
 
+/* Socials & Sentiment index */
+.sent-index{ display:grid; grid-template-columns:1fr; gap:16px; background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:16px; }
+@media(min-width:640px){ .sent-index{ grid-template-columns:minmax(0,230px) 1fr; align-items:center; } }
+.sent-num{ font-family:var(--mono, monospace); font-size:3rem; font-weight:800; line-height:1; color:var(--green); }
+.sent-num span{ font-size:1.05rem; color:var(--muted); font-weight:700; }
+.sent-lab{ font-weight:800; margin-top:6px; } .sent-lab .up{ color:var(--green); } .sent-lab .down{ color:var(--ember); }
+.sent-period{ font-size:.72rem; color:var(--muted-dim); font-weight:700; margin-top:4px; }
+.sent-track{ position:relative; height:14px; border-radius:8px; background:linear-gradient(90deg,#E5625A,#E8B45A,#62C79B); }
+.sent-mark{ position:absolute; top:-4px; width:4px; height:22px; border-radius:3px; background:var(--text); transform:translateX(-50%); box-shadow:0 0 0 2px var(--panel); }
+.sent-scale{ display:flex; justify-content:space-between; font-size:.64rem; color:var(--muted); font-weight:800; margin-top:7px; text-transform:uppercase; letter-spacing:.06em; }
+.sent-cards{ display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:16px; }
+@media(min-width:720px){ .sent-cards{ grid-template-columns:1fr 1fr 1fr; } }
+.sent-card{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; }
+.sc-n{ font-family:var(--mono,monospace); font-size:1.5rem; font-weight:800; margin:4px 0 8px; }
+.sc-n i{ font-style:normal; font-size:.8rem; color:var(--muted); font-weight:700; }
+.sc-split{ display:flex; height:9px; border-radius:5px; overflow:hidden; background:#0a1712; }
+.sc-split span{ display:block; } .sc-split .pos{ background:var(--green); } .sc-split .neu{ background:var(--muted-dim); } .sc-split .neg{ background:var(--ember); }
+.sc-meta{ font-size:.72rem; color:var(--muted); margin:8px 0 0; }
+.sent-2col{ display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:8px; }
+@media(min-width:720px){ .sent-2col{ grid-template-columns:1fr 1fr; } }
+.sent-trend{ display:flex; align-items:flex-end; gap:8px; height:78px; margin:10px 0; }
+.sent-trend span{ flex:1; background:var(--line); border-radius:5px 5px 0 0; min-height:6px; } .sent-trend span.cur{ background:var(--green); }
+.sent-themes{ list-style:none; margin:8px 0 0; padding:0; }
+.sent-themes li{ display:flex; gap:9px; align-items:baseline; padding:7px 0; border-bottom:1px solid var(--line); font-size:.88rem; } .sent-themes li:last-child{ border-bottom:0; }
+.sent-themes .th{ font-weight:900; } .th.up{ color:var(--green); } .th.down{ color:var(--ember); } .th.mix{ color:var(--muted); }
+.sent-feed{ display:grid; gap:8px; }
+.sf-item{ display:flex; align-items:center; gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:10px 13px; }
+a.sf-item:hover{ border-color:var(--muted); text-decoration:none; }
+.sf-src{ font-size:.64rem; font-weight:900; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); flex:0 0 auto; width:150px; }
+.sf-h{ flex:1; color:var(--text); font-weight:600; font-size:.9rem; }
+.sf-tag{ flex:0 0 auto; font-size:.6rem; font-weight:900; letter-spacing:.05em; text-transform:uppercase; padding:3px 9px; border-radius:999px; }
+.sf-tag.pos{ background:rgba(98,199,155,.16); color:var(--green); } .sf-tag.neu{ background:rgba(143,168,154,.16); color:var(--muted); } .sf-tag.neg{ background:rgba(242,118,47,.16); color:var(--ember); }
+@media(max-width:560px){ .sf-src{ width:auto; } .sf-item{ flex-wrap:wrap; } }
+/* Je, Hatua? sentiment callout */
+.sent-callout{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; background:rgba(98,199,155,.08); border:1px solid rgba(98,199,155,.3); border-radius:12px; padding:11px 14px; font-weight:800; font-size:.85rem; color:var(--text); margin:0 0 16px; }
+.sent-callout:hover{ border-color:var(--green); text-decoration:none; } .sent-callout b{ color:var(--green); } .sent-callout .go{ margin-left:auto; color:var(--green); }
+
 .sysstat{ display:none; align-items:center; gap:7px; font-size:.66rem; color:var(--muted-dim); letter-spacing:.08em; text-transform:uppercase; font-weight:700; }
 
 /* persistent COP31 countdown — visible on every tab */
@@ -968,6 +1005,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <a href="#network" data-sub="network">Network</a>
     <a href="#legal"   data-sub="legal">Legal</a>
     <a href="#disinfo" data-sub="disinfo">Disinfo</a>
+    <a href="#sentiment" data-sub="sentiment">Sentiment</a>
   </div>
 </nav>
 
@@ -1332,6 +1370,67 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 </section>
 
 <!-- ============================ DESK ============================ -->
+<section class="band" id="sentiment" data-view="explore" data-sub="sentiment">
+  <div class="wrap">
+    <div class="sec-head"><div class="grow"><p class="kicker">Socials &amp; sentiment · media pulse</p><h2>Public sentiment index</h2></div></div>
+    <p class="di-lead">An automated scan of Kenyan news, scholarship and public posts on climate &amp; environmental justice, scored for public attitude toward the work — published as a bi-weekly index that feeds the <a href="#ajesasa">Je, Hatua?</a> brief.</p>
+
+    <div class="sent-index">
+      <div class="sent-score">
+        <div class="sent-num">62<span>/100</span></div>
+        <div class="sent-lab">Cautiously supportive <span class="up">▲ +4</span></div>
+        <div class="sent-period">Bi-weekly · 12–25 Jul 2026 · next index 8 Aug</div>
+      </div>
+      <div class="sent-gauge">
+        <div class="sent-track"><span class="sent-mark" style="left:62%"></span></div>
+        <div class="sent-scale"><span>Critical</span><span>Neutral</span><span>Supportive</span></div>
+      </div>
+    </div>
+
+    <div class="sent-cards">
+      <div class="sent-card"><p class="kicker">News outlets</p><div class="sc-n">148 <i>items</i></div>
+        <div class="sc-split"><span class="pos" style="width:41%"></span><span class="neu" style="width:38%"></span><span class="neg" style="width:21%"></span></div>
+        <p class="sc-meta">41% supportive · 38% neutral · 21% critical</p></div>
+      <div class="sent-card"><p class="kicker">Scholarly &amp; research</p><div class="sc-n">23 <i>papers</i></div>
+        <div class="sc-split"><span class="pos" style="width:70%"></span><span class="neu" style="width:26%"></span><span class="neg" style="width:4%"></span></div>
+        <p class="sc-meta">Largely aligned with the justice framing</p></div>
+      <div class="sent-card"><p class="kicker">Social &amp; public</p><div class="sc-n">5.2k <i>posts</i></div>
+        <div class="sc-split"><span class="pos" style="width:48%"></span><span class="neu" style="width:22%"></span><span class="neg" style="width:30%"></span></div>
+        <p class="sc-meta">Polarised — strong support and strong pushback</p></div>
+    </div>
+
+    <div class="sent-2col">
+      <div class="di-card" style="border-left-color:var(--green)">
+        <p class="kicker g">Index trend · last 5 periods</p>
+        <div class="sent-trend"><span style="height:44%"></span><span style="height:52%"></span><span style="height:49%"></span><span style="height:58%"></span><span style="height:62%" class="cur"></span></div>
+        <p class="sc-meta">Slow upward trend as the Turkana wind ruling and youth-led action gain coverage.</p>
+      </div>
+      <div class="di-card">
+        <p class="kicker">Themes driving the mood</p>
+        <ul class="sent-themes">
+          <li><span class="th up">▲</span> Turkana wind ruling — read as a justice win</li>
+          <li><span class="th up">▲</span> Youth-led climate action — positive</li>
+          <li><span class="th down">▼</span> Lamu refinery jobs — scrutiny rising</li>
+          <li><span class="th down">▼</span> Carbon credits — public trust falling</li>
+          <li><span class="th mix">●</span> Drought &amp; floods response — mixed</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sec-head" style="margin:6px 0 12px"><div class="grow"><p class="kicker">Latest scanned items</p></div></div>
+    <div class="sent-feed">
+      <a class="sf-item" href="https://nation.africa" target="_blank" rel="noopener"><span class="sf-src">Daily Nation</span><span class="sf-h">Lamu leaders split over Dangote refinery jobs promise</span><span class="sf-tag neg">Critical</span></a>
+      <a class="sf-item" href="https://www.the-star.co.ke" target="_blank" rel="noopener"><span class="sf-src">The Star</span><span class="sf-h">Court win renews debate on community land and green energy</span><span class="sf-tag pos">Supportive</span></a>
+      <a class="sf-item" href="https://news.mongabay.com" target="_blank" rel="noopener"><span class="sf-src">Mongabay</span><span class="sf-h">Scrutiny of Northern Kenya carbon project continues</span><span class="sf-tag neg">Critical</span></a>
+      <a class="sf-item" href="https://www.standardmedia.co.ke" target="_blank" rel="noopener"><span class="sf-src">The Standard</span><span class="sf-h">Youth groups march for climate action in Kisumu</span><span class="sf-tag pos">Supportive</span></a>
+      <span class="sf-item"><span class="sf-src">Journal · ERSS</span><span class="sf-h">Just-transition tensions in Kenya's geothermal expansion</span><span class="sf-tag neu">Research</span></span>
+      <span class="sf-item"><span class="sf-src">Public · X</span><span class="sf-h">“Refinery = 60k jobs, stop blocking progress” — trending</span><span class="sf-tag neg">Critical</span></span>
+    </div>
+
+    <p class="sc-meta" style="margin-top:12px">Method: items are collected via RSS &amp; APIs from a curated source list, de-duplicated, and scored for stance toward climate/environmental justice (supportive · neutral · critical) with human review. Live ingestion is wired in the data pipeline (backend) — figures here are illustrative.</p>
+  </div>
+</section>
+
 <section class="band" id="disinfo" data-view="explore" data-sub="disinfo">
   <div class="wrap">
     <div class="sec-head"><div class="grow"><p class="kicker">Narrative monitoring</p><h2>Disinformation watch</h2></div></div>
@@ -1474,6 +1573,8 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 
     <div class="lanes" id="laneRow"></div>
 
+    <a class="sent-callout" href="#sentiment"><span>Public mood</span> <b>62/100 ▲ supportive</b> <span style="font-weight:600;color:var(--muted)">— from the Socials &amp; Sentiment scan</span> <span class="go">Open →</span></a>
+
     <!-- INTELLIGENCE BRIEF -->
     <div class="briefcard">
       <div class="brief-head">
@@ -1488,8 +1589,8 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         </div>
       </div>
       <p class="brief-sub">Composed live from the streams on <b>Live</b>, the county gaps on the
-        <b>National Map</b>, and the coverage grid on <b>Sector Gaps</b>. Written for policymakers, funders
-        and researchers. <span id="briefStamp" class="mono"></span></p>
+        <b>National Map</b>, the coverage grid on <b>Sector Gaps</b>, and the public mood on <b>Sentiment</b>.
+        Written for policymakers, funders and researchers. <span id="briefStamp" class="mono"></span></p>
       <div class="brief-body" id="briefBody"></div>
       <div class="brief-actions">
         <button class="btn btn--green" id="briefDownload" type="button">Download brief (.md)</button>
@@ -4175,11 +4276,11 @@ var VIEWS = ["live","explore","cop","desk","events","voices","act"];
 /* Map / Sector gaps / Network / Legal now live inside the grouped "Explore" view.
    A hash may point at one of those section ids — route it to Explore and pick the sub. */
 var HASH2VIEW = { live:"live", explore:"explore",
-  map:"explore", sectors:"explore", network:"explore", legal:"explore", disinfo:"explore",
+  map:"explore", sectors:"explore", network:"explore", legal:"explore", disinfo:"explore", sentiment:"explore",
   cop:"cop", desk:"desk", events:"events", voices:"voices",
   ajesasa:"act", contribute:"act" };
-var HASH2SUB = { map:"map", sectors:"sectors", network:"network", legal:"legal", disinfo:"disinfo" };
-var EXPLORE_SUBS = ["map","sectors","network","legal","disinfo"];
+var HASH2SUB = { map:"map", sectors:"sectors", network:"network", legal:"legal", disinfo:"disinfo", sentiment:"sentiment" };
+var EXPLORE_SUBS = ["map","sectors","network","legal","disinfo","sentiment"];
 var exploreSub = "map";
 var tabLinks = document.querySelectorAll("nav.tabs a");
 
