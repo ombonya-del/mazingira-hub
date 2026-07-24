@@ -114,6 +114,13 @@ nav.tabs a{
 }
 nav.tabs a:hover{ color:var(--text); text-decoration:none; }
 nav.tabs a.on{ color:var(--text); border-bottom-color:var(--ember-hot); }
+/* Desktop shows the full expanded tabs; mobile shows the consolidated bar + Explore sub-tabs */
+.tabs-desk{ display:none; }
+@media (min-width:860px){
+  .tabs-desk{ display:block; }
+  .tabs-mob{ display:none; }
+  #exploreSub{ display:none !important; }
+}
 
 /* Explore sub-tabs — sit just beneath the primary bar */
 nav.subtabs{
@@ -985,9 +992,28 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 </header>
 
 <!-- ============================ TAB BAR ============================ -->
-<nav class="tabs" id="tabbar" aria-label="Primary">
+<!-- Desktop: full expanded tabs -->
+<nav class="tabs tabs-desk" id="tabbarDesk" aria-label="Primary">
   <div class="wrap tabs-inner">
-    <a href="#live"    data-view="live"    class="on">Live</a>
+    <a href="#live"      data-view="live" class="on">Live</a>
+    <a href="#map"       data-view="explore" data-sub="map">National map</a>
+    <a href="#sectors"   data-view="explore" data-sub="sectors">Sector gaps</a>
+    <a href="#network"   data-view="explore" data-sub="network">Network</a>
+    <a href="#legal"     data-view="explore" data-sub="legal">Legal</a>
+    <a href="#disinfo"   data-view="explore" data-sub="disinfo">Disinfo</a>
+    <a href="#sentiment" data-view="explore" data-sub="sentiment">Sentiment</a>
+    <a href="#cop"       data-view="cop">COP31</a>
+    <a href="#desk"      data-view="desk">Desk</a>
+    <a href="#events"    data-view="events">Events</a>
+    <a href="#voices"    data-view="voices">Voices</a>
+    <a href="#ajesasa"   data-view="act">Je, Hatua?</a>
+  </div>
+</nav>
+
+<!-- Mobile: consolidated (Explore groups Map/Gaps/Network/Legal/Disinfo/Sentiment) -->
+<nav class="tabs tabs-mob" id="tabbarMob" aria-label="Primary">
+  <div class="wrap tabs-inner">
+    <a href="#live"    data-view="live" class="on">Live</a>
     <a href="#explore" data-view="explore">Explore</a>
     <a href="#cop"     data-view="cop">COP31</a>
     <a href="#desk"    data-view="desk">Desk</a>
@@ -4303,7 +4329,10 @@ function showView(view, hash){
   document.querySelectorAll("main > [data-view]").forEach(function(el){
     el.classList.toggle("view-on", el.getAttribute("data-view") === view);
   });
-  tabLinks.forEach(function(a){ a.classList.toggle("on", a.getAttribute("data-view") === view); });
+  tabLinks.forEach(function(a){
+    var sub = a.getAttribute("data-sub");
+    a.classList.toggle("on", sub ? (view === "explore" && sub === exploreSub) : (a.getAttribute("data-view") === view));
+  });
   var sb = document.getElementById("exploreSub"); if(sb) sb.hidden = (view !== "explore");
   if(view === "explore") applyExploreSub();
   // move focus/scroll to the top of the new screen
