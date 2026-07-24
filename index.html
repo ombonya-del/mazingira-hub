@@ -857,7 +857,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 </head>
 <body>
 
-<div class="gate hidden" id="gate" role="dialog" aria-modal="true" aria-label="Preview access">
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-label="Preview access">
   <div class="gate-card">
     <div class="gate-mark">Mazingira<span class="k">Kenya</span></div>
     <h1>Preview access</h1>
@@ -873,6 +873,11 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 (function(){
   var CODE="MAZINGIRA-REVIEW";
   var g=document.getElementById("gate");
+  /* One codebase, two domains: only the review subdomain is gated. The public
+     hub (and any other host) shows the dashboard immediately. Add ?review=1 to
+     any URL to preview the gate. */
+  var gated = /(^|\.)review\./i.test(location.hostname) || /[?&]review\b/.test(location.search);
+  if(!gated){ g.classList.add("hidden"); return; }
   try{ if(sessionStorage.getItem("mzg-preview")==="1"){ g.classList.add("hidden"); return; } }catch(e){}
   var f=document.getElementById("gateForm");
   f.addEventListener("submit", function(ev){
@@ -1610,8 +1615,9 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
       </div>
     </div>
     <div class="foot-bar">
-      <span>Data controller: Community Media Trust, P.O. Box 9190–00300, Kirichwa Road, ADK House 1,
-        Kilimani, Nairobi. Processed under the Kenya Data Protection Act 2019 and, where applicable, the GDPR.</span>
+      <span>Developed under AJWS Grant ID 17252 in support of the development of mazingirakenya.org — to
+        consolidate knowledge-sharing, sector coordination, and public awareness across the climate and
+        environmental justice ecosystem in Kenya. Processed under the Kenya Data Protection Act 2019 and, where applicable, the GDPR.</span>
       <span class="spacer">© <span id="yr"></span> MazingiraKenya</span>
     </div>
   </div>
