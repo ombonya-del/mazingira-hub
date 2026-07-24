@@ -158,6 +158,10 @@ main > [data-view].view-on.sub-off{ display:none; }
 }
 .btn--ember{ background:var(--ember-hot); color:#160B03; }
 .btn--ember:hover{ background:var(--ember); text-decoration:none; }
+/* gateway to the public platform (raia) */
+.btn--public{ background:rgba(98,199,155,.10); border-color:rgba(98,199,155,.45); color:var(--green); text-transform:none; letter-spacing:0; }
+.btn--public:hover{ background:rgba(98,199,155,.18); border-color:var(--green); text-decoration:none; }
+@media (max-width:560px){ .brand-sub{ display:none; } }
 .btn--ghost{ background:transparent; color:var(--text); border-color:var(--line-2); }
 .btn--ghost:hover{ border-color:var(--muted); text-decoration:none; }
 .btn--green{ background:var(--green); color:#062018; }
@@ -918,6 +922,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
       <span class="brand-sub">hub.mazingirakenya.org</span>
     </div>
     <span class="sysstat"><span class="dot" aria-hidden="true"></span><span id="sync">Synced</span></span>
+    <a class="btn btn--public" href="https://raia.mazingirakenya.org" target="_blank" rel="noopener" title="Open raia — the public platform">raia ↗</a>
     <a class="btn btn--ember" href="#contribute">Submit</a>
   </div>
 </header>
