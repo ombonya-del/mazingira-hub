@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin · MazingiraKenya</title>
+<meta name="description" content="Moderation & operations console for the MazingiraKenya Communications Hub.">
+<meta name="theme-color" content="#080F0C">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Nunito+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230E1A15'/%3E%3Ctext x='31' y='45' font-family='Georgia,serif' font-size='34' font-weight='700' text-anchor='middle' fill='%2362C79B'%3EA%3C/text%3E%3Ccircle cx='48' cy='18' r='6' fill='%23F2762F'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#080F0C; --panel:#0E1A15; --panel-2:#12241C; --panel-3:#16302410;
+  --line:#1E3228; --line-2:#254036;
+  --text:#E8F0EA; --muted:#8FA89A; --muted-dim:#5F7A6D;
+  --green:#62C79B; --green-deep:#2E9B6E; --green-ink:#0C3B29;
+  --ember:#F2762F; --ember-soft:#EE9455; --ember-wash:rgba(242,118,47,.12);
+  --red:#E5625A; --red-wash:rgba(229,98,90,.14);
+  --gold:#E8B45A; --amber-wash:rgba(232,180,90,.14);
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  --nav-w:224px; --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:"Nunito Sans",system-ui,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:"Lora",Georgia,serif;margin:0 0 .3em;font-weight:700;line-height:1.2}
+p{margin:0 0 .7em}
+a{color:var(--green);text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+.muted{color:var(--muted)}
+.mono{font-variant-numeric:tabular-nums}
+.kicker{font-size:.64rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-dim)}
+
+/* ---------- access gate ---------- */
+.gate{position:fixed;inset:0;z-index:200;background:radial-gradient(120% 120% at 80% -10%,#123,#080F0C 60%);display:flex;align-items:center;justify-content:center;padding:24px}
+.gate.hidden{display:none}
+.gate .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:30px 26px;max-width:380px;width:100%;text-align:center}
+.gate .lock{width:52px;height:52px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.gate h1{font-size:1.4rem}
+.gate p{color:var(--muted);font-size:.9rem}
+.gate input{width:100%;background:#0a1712;border:1px solid var(--line-2);border-radius:10px;color:var(--text);padding:12px;font-family:inherit;font-size:1rem;margin:14px 0 12px;text-align:center;letter-spacing:.12em}
+.gate button{width:100%;border:0;background:var(--green);color:#04140d;font-weight:900;padding:12px;border-radius:10px;font-size:.95rem}
+.gate .hint{font-size:.72rem;color:var(--muted-dim);margin-top:14px}
+
+/* ---------- shell ---------- */
+.shell{display:none}
+.shell.on{display:block}
+.topbar{position:sticky;top:0;z-index:60;background:rgba(8,15,12,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);height:56px;display:flex;align-items:center;gap:12px;padding:0 16px}
+.brand{display:flex;align-items:center;gap:8px;font-family:"Lora",serif;font-weight:700;font-size:1.06rem}
+.brand .tag{font-size:.6rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--ember);border:1px solid var(--ember);border-radius:5px;padding:2px 6px}
+.who{margin-left:auto;display:flex;align-items:center;gap:10px}
+.avatar{width:30px;height:30px;border-radius:9px;background:var(--green-deep);color:#04140d;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.8rem}
+.who .nm{font-size:.82rem;font-weight:800;line-height:1}
+.who .rl{font-size:.66rem;color:var(--muted)}
+.signout{background:none;border:1px solid var(--line-2);color:var(--muted);border-radius:8px;padding:6px 10px;font-weight:800;font-size:.72rem}
+
+.layout{display:flex;min-height:calc(100vh - 56px)}
+.sidenav{display:none;flex:0 0 var(--nav-w);border-right:1px solid var(--line);padding:16px 12px;position:sticky;top:56px;height:calc(100vh - 56px)}
+.sidenav .grp{font-size:.6rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-dim);margin:8px 10px 6px}
+.sidenav button{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:none;border:0;color:var(--muted);font-weight:800;font-size:.9rem;padding:11px 12px;border-radius:10px;margin-bottom:2px}
+.sidenav button:hover{background:var(--panel);color:var(--text)}
+.sidenav button[aria-current="true"]{background:var(--panel-2);color:var(--text)}
+.sidenav button[aria-current="true"] .ico{color:var(--green)}
+.sidenav .ico{width:18px;height:18px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sidenav .badge{margin-left:auto;background:var(--ember);color:#1a0d03;font-size:.66rem;font-weight:900;border-radius:999px;padding:1px 7px;min-width:20px;text-align:center}
+
+/* mobile top tabs */
+.mtabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:56px;z-index:50;scrollbar-width:none}
+.mtabs::-webkit-scrollbar{display:none}
+.mtabs button{flex:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);font-weight:800;font-size:.74rem;letter-spacing:.04em;text-transform:uppercase;padding:12px 13px 10px;white-space:nowrap}
+.mtabs button[aria-current="true"]{color:var(--text);border-bottom-color:var(--ember)}
+.mtabs .badge{background:var(--ember);color:#1a0d03;font-size:.6rem;font-weight:900;border-radius:999px;padding:0 5px;margin-left:5px}
+
+.main{flex:1;min-width:0;padding:20px 18px 60px;max-width:1080px;margin:0 auto;width:100%}
+.view{animation:fade .22s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.view{animation:none}}
+
+.page-head{display:flex;align-items:flex-end;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.page-head h2{font-size:1.5rem;margin:0}
+.page-head p{margin:0;color:var(--muted);font-size:.9rem}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
+@media(min-width:720px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px}
+.kpi .n{font-family:"Lora",serif;font-size:1.9rem;font-weight:700;line-height:1}
+.kpi .l{font-size:.74rem;color:var(--muted);font-weight:700;margin-top:5px}
+.kpi .d{font-size:.68rem;font-weight:800;margin-top:6px}
+.kpi .d.up{color:var(--green)} .kpi .d.warn{color:var(--ember)}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.panel h3{font-size:1.06rem}
+.sec-title{display:flex;align-items:center;gap:10px;margin:4px 0 12px}
+.sec-title h3{margin:0;font-size:1.06rem}
+.sec-title .rule{flex:1;height:1px;background:var(--line)}
+
+/* filter pills */
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.pill{background:var(--panel);border:1px solid var(--line-2);color:var(--muted);border-radius:999px;padding:7px 13px;font-weight:800;font-size:.78rem}
+.pill[aria-pressed="true"]{background:var(--panel-2);color:var(--text);border-color:var(--green-deep)}
+.pill .c{opacity:.7;margin-left:4px}
+
+/* queue cards */
+.qcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
+.qcard .qtop{display:flex;gap:12px;align-items:flex-start;padding:14px 15px 8px}
+.qcard .qav{width:40px;height:40px;border-radius:11px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-weight:900;color:#04140d}
+.qcard .qwho{flex:1;min-width:0}
+.qcard .qnm{font-weight:900;font-size:.92rem}
+.qcard .qmeta{font-size:.72rem;color:var(--muted);font-weight:700}
+.qcard .qbody{padding:0 15px 10px;font-size:.94rem}
+.qcard .qmedia{margin:0 15px 10px;height:96px;border-radius:10px;background:#0a1712;border:1px dashed var(--line-2);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.76rem;font-weight:800;letter-spacing:.04em}
+.flags{display:flex;flex-wrap:wrap;gap:6px;padding:0 15px 10px}
+.flag{font-size:.66rem;font-weight:900;letter-spacing:.03em;padding:3px 8px;border-radius:999px;border:1px solid}
+.flag.ok{color:var(--green);border-color:var(--green-deep);background:rgba(98,199,155,.08)}
+.flag.warn{color:var(--gold);border-color:var(--gold);background:var(--amber-wash)}
+.flag.bad{color:var(--red);border-color:var(--red);background:var(--red-wash)}
+.qact{display:flex;gap:8px;flex-wrap:wrap;padding:10px 15px 14px;border-top:1px solid var(--line)}
+.btn{border:1px solid var(--line-2);background:var(--panel-2);color:var(--text);border-radius:9px;padding:8px 13px;font-weight:800;font-size:.8rem}
+.btn:hover{border-color:var(--muted)}
+.btn.approve{background:var(--green);color:#04140d;border-color:var(--green)}
+.btn.reject{background:transparent;color:var(--red);border-color:var(--red)}
+.btn.ghost{background:transparent;color:var(--muted)}
+.btn.pub{background:var(--ember);color:#1a0d03;border-color:var(--ember)}
+.btn:disabled{opacity:.5;cursor:default}
+.type-tag{font-size:.62rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line-2);color:var(--muted)}
+.status-tag{font-size:.62rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:999px}
+.st-pending{background:var(--amber-wash);color:var(--gold)} .st-approved{background:rgba(98,199,155,.12);color:var(--green)} .st-rejected{background:var(--red-wash);color:var(--red)} .st-live{background:var(--ember-wash);color:var(--ember-soft)} .st-ready{background:var(--panel-2);color:var(--muted)}
+
+/* table */
+.tbl{width:100%;border-collapse:collapse;font-size:.86rem}
+.tbl th{text-align:left;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-dim);font-weight:900;padding:8px 10px;border-bottom:1px solid var(--line)}
+.tbl td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:hover td{background:var(--panel-2)}
+.tbl .org{font-weight:800}
+.role-sel{background:#0a1712;border:1px solid var(--line-2);color:var(--text);border-radius:7px;padding:5px 8px;font-family:inherit;font-weight:700;font-size:.78rem}
+.toggle{width:40px;height:23px;border-radius:999px;border:1px solid var(--line-2);background:#0a1712;position:relative;cursor:pointer;flex:0 0 auto}
+.toggle::after{content:"";position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:var(--muted);transition:.15s}
+.toggle[aria-pressed="true"]{background:var(--green-deep);border-color:var(--green)}
+.toggle[aria-pressed="true"]::after{left:19px;background:#04140d}
+
+/* content list */
+.crow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.crow:last-child{border-bottom:0}
+.crow .ct{flex:1;min-width:0}
+.crow .ct b{font-weight:800}
+.crow .ct .s{font-size:.74rem;color:var(--muted)}
+.radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--line-2);flex:0 0 auto;cursor:pointer;position:relative}
+.radio[aria-checked="true"]{border-color:var(--gold)}
+.radio[aria-checked="true"]::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--gold)}
+
+/* bar chart */
+.bars{display:flex;flex-direction:column;gap:9px}
+.bar{display:flex;align-items:center;gap:10px;font-size:.8rem}
+.bar .lab{width:78px;color:var(--muted);font-weight:800}
+.bar .track{flex:1;height:14px;background:#0a1712;border-radius:7px;overflow:hidden}
+.bar .fill{height:100%;border-radius:7px}
+.bar .val{width:40px;text-align:right;font-weight:800}
+
+.feed{list-style:none;margin:0;padding:0}
+.feed li{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);font-size:.86rem}
+.feed li:last-child{border-bottom:0}
+.feed .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:0 0 auto}
+.feed .t{color:var(--muted-dim);font-size:.72rem;margin-left:auto;white-space:nowrap;font-weight:700}
+
+/* toast + modal */
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(30px);background:var(--panel-2);border:1px solid var(--green-deep);color:var(--text);padding:11px 18px;border-radius:11px;font-weight:800;font-size:.85rem;box-shadow:var(--shadow);opacity:0;transition:.22s;z-index:120;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:110;display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.on{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line-2);border-radius:16px;max-width:520px;width:100%;box-shadow:var(--shadow);overflow:hidden}
+.modal .mh{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.modal .mh h3{margin:0;font-size:1.1rem}
+.modal .mx{margin-left:auto;background:none;border:0;color:var(--muted);font-size:1.3rem;line-height:1}
+.modal .mb{padding:16px 18px;max-height:60vh;overflow:auto}
+.modal label{display:block;font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 5px}
+.modal input,.modal textarea,.modal select{width:100%;background:#0a1712;border:1px solid var(--line-2);color:var(--text);border-radius:9px;padding:10px;font-family:inherit;font-size:.9rem}
+.modal .mf{padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:9px;justify-content:flex-end}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:6px}
+
+@media(min-width:900px){ .sidenav{display:block} .mtabs{display:none} .main{padding:26px 28px 60px} }
+</style>
+</head>
+<body>
+
+<!-- ACCESS GATE (prototype) -->
+<div class="gate" id="gate">
+  <div class="card">
+    <div class="lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#62C79B" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+    <h1>MazingiraKenya Admin</h1>
+    <p>Moderation &amp; operations console. Authorised coalition staff only.</p>
+    <input id="gcode" type="password" placeholder="Access code" autocomplete="off" aria-label="Access code">
+    <button id="gbtn">Sign in</button>
+    <p class="hint">Prototype gate — real sign-in will use Supabase auth + row-level security. Demo code: <b>demo</b></p>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div class="shell" id="shell">
+  <header class="topbar">
+    <div class="brand">Mazingira<span style="color:var(--green)">Kenya</span> <span class="tag">Admin</span></div>
+    <div class="who">
+      <div style="text-align:right"><div class="nm">A. Mwangi</div><div class="rl">Coalition admin</div></div>
+      <div class="avatar">AM</div>
+      <button class="signout" id="signout">Sign out</button>
+    </div>
+  </header>
+
+  <div class="mtabs" id="mtabs"></div>
+
+  <div class="layout">
+    <nav class="sidenav" id="sidenav" aria-label="Sections"></nav>
+    <main class="main" id="app"></main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
+
+<script>
+/* ============================ MOCK DATA ============================ */
+var NAV = [
+  {id:"overview", label:"Overview", grp:"Console", icon:'<path d="M4 13h6V4H4zM14 20h6v-9h-6zM14 4v4h6V4zM4 20h6v-4H4z"/>'},
+  {id:"moderation", label:"Moderation", grp:"Publishing", icon:'<path d="M20 6 9 17l-5-5"/>', badgeFrom:"pending"},
+  {id:"publishing", label:"Publish to raia", grp:"Publishing", icon:'<path d="M12 19V5M5 12l7-7 7 7"/>', badgeFrom:"ready"},
+  {id:"content", label:"Content", grp:"Manage", icon:'<path d="M4 5h16M4 12h16M4 19h10"/>'},
+  {id:"members", label:"Members", grp:"Manage", icon:'<circle cx="9" cy="8" r="3"/><path d="M4 20a5 5 0 0 1 10 0"/><path d="M16 6a3 3 0 0 1 0 6M14 20a5 5 0 0 1 6-3"/>'}
+];
+
+var SUBMISSIONS = [
+  {id:"s1", type:"video", name:"Amina H.", area:"Lamu", lang:"SW", date:"2m ago", consent:true, minor:false,
+   msg:"Baba yangu alivua maji haya kwa miaka 40. Tulitoa sauti yetu, na Lamu bado inapumua.", status:"pending"},
+  {id:"s2", type:"photo", name:"Brian O.", area:"Dandora, Nairobi", lang:"SH", date:"18m ago", consent:true, minor:true,
+   msg:"Watu wa mtaa wanasort taka na mikono. Kuna watoto kwa hii photo pia.", status:"pending"},
+  {id:"s3", type:"text", name:"Anonymous", area:"Kitui", lang:"EN", date:"41m ago", consent:false, minor:false,
+   msg:"They surveyed our land for the Mui coal blocks again last week. Nobody told the village.", status:"pending"},
+  {id:"s4", type:"audio", name:"Lokiru E.", area:"Marsabit", lang:"SW", date:"1h ago", consent:true, minor:false,
+   msg:"Mitambo ya upepo iko kwa ardhi yetu ya malisho. Tunataka nafasi mezani.", status:"pending"},
+  {id:"s5", type:"text", name:"Wanjiku M.", area:"Ikolomani", lang:"EN", date:"3h ago", consent:true, minor:false,
+   msg:"1,200 families asked to move for the gold mine. We want to be part of progress, not erased.", status:"approved"},
+  {id:"s6", type:"video", name:"Unknown", area:"—", lang:"EN", date:"5h ago", consent:false, minor:false,
+   msg:"[Contains a named police officer and an unverified accusation.]", status:"rejected"}
+];
+
+var PUBLISH = [
+  {id:"p1", source:"Voices", title:"Wanjiku M. — “We want to be part of progress”", target:"raia · Voices wall", status:"ready", by:"—"},
+  {id:"p2", source:"Hub", title:"Dangote Lamu refinery — plain-language brief", target:"raia · In The News · lamu-refinery", status:"ready", by:"—"},
+  {id:"p3", source:"Hub", title:"Lake Turkana wind ruling explainer", target:"raia · Truth · turkana-wind", status:"live", by:"A. Mwangi"},
+  {id:"p4", source:"Voices", title:"Amina H. — Lamu fisher (video)", target:"raia · Voices wall", status:"live", by:"F. Odhiambo"}
+];
+
+var ISSUES = [
+  {id:"lamu-refinery", title:"A $17bn oil refinery is coming to Lamu", status:"Just announced", featured:true},
+  {id:"lamu-coal", title:"The Lamu coal plant that Kenya defeated", status:"Won", featured:false},
+  {id:"western-gold", title:"Gold, guns and eviction in Western Kenya", status:"Active threat", featured:false},
+  {id:"turkana-wind", title:"Lake Turkana wind: green power, contested land", status:"Court-decided", featured:false},
+  {id:"siaya-nuclear", title:"A nuclear plant proposed for the lakeshore", status:"Proposed", featured:false},
+  {id:"coast-plastics", title:"Drowning in plastic: Dandora, Gioto & the coast", status:"Ongoing", featured:false}
+];
+var BIGQ_N = 4, MYTH_N = 8;
+
+var MEMBERS = [
+  {org:"Save Lamu", person:"Fatma Said", role:"Moderator", active:true, seen:"Today"},
+  {org:"LAWA (youth desk)", person:"Kevin Otieno", role:"Contributor", active:true, seen:"Today"},
+  {org:"Community Media Trust", person:"A. Mwangi", role:"Admin", active:true, seen:"Now"},
+  {org:"Natural Justice", person:"Grace Wangui", role:"Editor", active:true, seen:"Yesterday"},
+  {org:"deCOALonize", person:"Omar Elmawi", role:"Editor", active:true, seen:"2d ago"},
+  {org:"Katiba Institute", person:"J. Kamau", role:"Contributor", active:false, seen:"3w ago"}
+];
+
+var ROLES = ["Admin","Editor","Moderator","Contributor"];
+var LANG_STATS = [{k:"Swahili",v:48,c:"var(--green)"},{k:"English",v:34,c:"var(--ember)"},{k:"Sheng",v:18,c:"var(--gold)"}];
+var ACTIVITY = [
+  {c:"var(--green)", t:"Approved Amina H. (Lamu) video", w:"F. Odhiambo · 12m"},
+  {c:"var(--ember)", t:"Published wind-ruling explainer to raia", w:"A. Mwangi · 40m"},
+  {c:"var(--red)", t:"Rejected unverified accusation clip", w:"G. Wangui · 1h"},
+  {c:"var(--gold)", t:"Kevin Otieno (LAWA) added as Contributor", w:"A. Mwangi · 3h"}
+];
+
+/* ============================ HELPERS ============================ */
+var app = document.getElementById("app");
+var state = { view:"overview" };
+var AVCOLORS = {video:"#EE9455", photo:"#62C79B", audio:"#E8B45A", text:"#7FB0D8"};
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function count(status){ return SUBMISSIONS.filter(function(s){return s.status===status;}).length; }
+function pubCount(status){ return PUBLISH.filter(function(p){return p.status===status;}).length; }
+function toast(msg){ var t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove("show");},2000); }
+
+/* ============================ NAV ============================ */
+function renderNav(){
+  var side=document.getElementById("sidenav"), m=document.getElementById("mtabs");
+  var groups=[], seen={};
+  NAV.forEach(function(n){ if(!seen[n.grp]){seen[n.grp]=[];groups.push(n.grp);} seen[n.grp].push(n); });
+  side.innerHTML=groups.map(function(g){
+    return '<div class="grp">'+esc(g)+'</div>'+seen[g].map(navBtn).join("");
+  }).join("");
+  m.innerHTML=NAV.map(function(n){
+    var b=n.badgeFrom?badgeVal(n):0;
+    return '<button data-nav="'+n.id+'" aria-current="'+(state.view===n.id)+'">'+esc(n.label)+(b?'<span class="badge">'+b+'</span>':'')+'</button>';
+  }).join("");
+  bindNav();
+}
+function badgeVal(n){ return n.badgeFrom==="pending"?count("pending"):(n.badgeFrom==="ready"?pubCount("ready"):0); }
+function navBtn(n){
+  var b=n.badgeFrom?badgeVal(n):0;
+  return '<button data-nav="'+n.id+'" aria-current="'+(state.view===n.id)+'">'+
+    '<svg class="ico" viewBox="0 0 24 24">'+n.icon+'</svg>'+esc(n.label)+
+    (b?'<span class="badge">'+b+'</span>':'')+'</button>';
+}
+function bindNav(){
+  document.querySelectorAll("[data-nav]").forEach(function(el){
+    el.addEventListener("click",function(){ state.view=el.getAttribute("data-nav"); render(); });
+  });
+}
+
+/* ============================ RENDER ============================ */
+function render(){
+  renderNav();
+  var v=state.view;
+  if(v==="overview") app.innerHTML=viewOverview();
+  else if(v==="moderation") app.innerHTML=viewModeration();
+  else if(v==="publishing") app.innerHTML=viewPublishing();
+  else if(v==="content") app.innerHTML=viewContent();
+  else if(v==="members") app.innerHTML=viewMembers();
+  bindView();
+  window.scrollTo(0,0);
+}
+
+function viewOverview(){
+  var kpis=[
+    {n:count("pending"), l:"Awaiting moderation", d:"needs review", dc:"warn"},
+    {n:pubCount("ready"), l:"Ready to publish", d:"queued for raia", dc:"up"},
+    {n:MEMBERS.filter(function(m){return m.active;}).length, l:"Active members", d:"across 6 orgs", dc:"up"},
+    {n:"5.7k", l:"raia reach · 7d", d:"+14% vs last week", dc:"up"}
+  ];
+  var maxv=Math.max.apply(null,LANG_STATS.map(function(x){return x.v;}));
+  return '<section class="view"><div class="page-head"><div><h2>Overview</h2><p>Everything waiting on the coalition, at a glance.</p></div></div>'+
+    '<div class="kpis">'+kpis.map(function(k){return '<div class="kpi"><div class="n mono">'+k.n+'</div><div class="l">'+esc(k.l)+'</div><div class="d '+k.dc+'">'+esc(k.d)+'</div></div>';}).join("")+'</div>'+
+    '<div class="panel"><div class="sec-title"><h3>Submissions by language · last 30 days</h3><span class="rule"></span></div>'+
+      '<div class="bars">'+LANG_STATS.map(function(s){return '<div class="bar"><span class="lab">'+esc(s.k)+'</span><span class="track"><span class="fill" style="width:'+Math.round(s.v/maxv*100)+'%;background:'+s.c+'"></span></span><span class="val mono">'+s.v+'%</span></div>';}).join("")+'</div>'+
+      '<p class="muted" style="font-size:.76rem;margin:12px 0 0">Sheng at 18% and climbing — worth commissioning Sheng explainers to match demand.</p></div>'+
+    '<div class="panel"><div class="sec-title"><h3>Recent activity</h3><span class="rule"></span></div>'+
+      '<ul class="feed">'+ACTIVITY.map(function(a){return '<li><span class="dot" style="background:'+a.c+'"></span><span>'+esc(a.t)+'</span><span class="t">'+esc(a.w)+'</span></li>';}).join("")+'</ul></div>'+
+  '</section>';
+}
+
+function viewModeration(){
+  state.modFilter = state.modFilter||"pending";
+  var pills=[["pending","Pending"],["approved","Approved"],["rejected","Rejected"]].map(function(p){
+    return '<button class="pill" data-mod="'+p[0]+'" aria-pressed="'+(state.modFilter===p[0])+'">'+p[1]+'<span class="c mono">'+count(p[0])+'</span></button>';
+  }).join("");
+  var list=SUBMISSIONS.filter(function(s){return s.status===state.modFilter;});
+  var cards=list.length? list.map(subCard).join("") : '<div class="panel muted">Nothing in this queue.</div>';
+  return '<section class="view"><div class="page-head"><div><h2>Moderation</h2><p>Review citizen Voices before anything is published. Check consent and privacy (Kenya DPA 2019).</p></div></div>'+
+    '<div class="pills">'+pills+'</div>'+cards+'</section>';
+}
+function subCard(s){
+  var flags="";
+  flags+= s.consent ? '<span class="flag ok">✓ Consent given</span>' : '<span class="flag bad">✕ No consent</span>';
+  if(s.minor) flags+='<span class="flag warn">⚠ Possible minor — guardian consent</span>';
+  flags+='<span class="flag ok" style="color:var(--muted);border-color:var(--line-2);background:none">'+s.lang+'</span>';
+  var media = s.type==="text" ? "" : '<div class="qmedia">'+s.type.toUpperCase()+' attachment · tap to preview</div>';
+  var acts;
+  if(s.status==="pending"){
+    var canApprove = s.consent && !s.minor;
+    acts='<button class="btn approve" data-act="approve:'+s.id+'"'+(canApprove?'':' disabled title="Resolve consent/privacy first"')+'>Approve</button>'+
+      '<button class="btn ghost" data-act="changes:'+s.id+'">Request changes</button>'+
+      '<button class="btn reject" data-act="reject:'+s.id+'">Reject</button>'+
+      '<button class="btn" data-act="view:'+s.id+'" style="margin-left:auto">Open</button>';
+  } else {
+    acts='<span class="status-tag st-'+s.status+'">'+s.status+'</span>'+
+      (s.status==="approved"?'<button class="btn pub" data-act="queue:'+s.id+'">Send to publish</button>':'')+
+      '<button class="btn ghost" data-act="reopen:'+s.id+'" style="margin-left:auto">Reopen</button>';
+  }
+  return '<div class="qcard"><div class="qtop"><span class="qav" style="background:'+(AVCOLORS[s.type]||"#62C79B")+'">'+esc(s.name.charAt(0))+'</span>'+
+    '<span class="qwho"><span class="qnm">'+esc(s.name)+'</span><span class="qmeta">'+esc(s.area)+' · '+esc(s.date)+'</span></span>'+
+    '<span class="type-tag">'+s.type+'</span></div>'+
+    media+'<div class="qbody">'+esc(s.msg)+'</div><div class="flags">'+flags+'</div>'+
+    '<div class="qact">'+acts+'</div></div>';
+}
+
+function viewPublishing(){
+  var rows=PUBLISH.map(function(p){
+    var act = p.status==="live"
+      ? '<button class="btn ghost" data-pub="unpub:'+p.id+'">Unpublish</button>'
+      : '<button class="btn pub" data-pub="pub:'+p.id+'">Publish to raia</button>';
+    return '<div class="qcard"><div class="qtop"><span class="qwho"><span class="qnm">'+esc(p.title)+'</span>'+
+      '<span class="qmeta">'+esc(p.source)+' → '+esc(p.target)+(p.by&&p.by!=="—"?' · by '+esc(p.by):'')+'</span></span>'+
+      '<span class="status-tag st-'+p.status+'">'+p.status+'</span></div>'+
+      '<div class="qact">'+act+'<span class="muted" style="font-size:.74rem;margin-left:auto;align-self:center">Goes live at raia.mazingirakenya.org after publish</span></div></div>';
+  }).join("");
+  return '<section class="view"><div class="page-head"><div><h2>Publish to raia</h2><p>Approved Voices and adapted hub briefs, queued for the public platform.</p></div></div>'+rows+'</section>';
+}
+
+function viewContent(){
+  var issues=ISSUES.map(function(is){
+    return '<div class="crow"><span class="radio" role="radio" aria-checked="'+is.featured+'" data-feat="'+is.id+'" title="Set as Story of the week"></span>'+
+      '<span class="ct"><b>'+esc(is.title)+'</b><span class="s"> · '+esc(is.status)+(is.featured?' · ★ Featured':'')+'</span></span>'+
+      '<button class="btn ghost" data-edit="issue:'+is.id+'">Edit</button></div>';
+  }).join("");
+  return '<section class="view"><div class="page-head"><div><h2>Content</h2><p>Issues, explainers and the featured story that power raia.</p></div></div>'+
+    '<div class="panel"><div class="sec-title"><h3>Issues · Story of the week</h3><span class="rule"></span></div>'+issues+
+      '<p class="muted" style="font-size:.76rem;margin-top:10px">Pick the circle to set the featured story shown at the top of raia.</p></div>'+
+    '<div class="panel"><div class="sec-title"><h3>Know &amp; Understand</h3><span class="rule"></span></div>'+
+      '<div class="crow"><span class="ct"><b>Big Questions</b><span class="s"> · '+BIGQ_N+' explainers, each with a case study + video</span></span><button class="btn ghost" data-edit="bigq">Manage</button></div>'+
+      '<div class="crow"><span class="ct"><b>Myth-busting</b><span class="s"> · '+MYTH_N+' common mix-ups</span></span><button class="btn ghost" data-edit="myths">Manage</button></div></div>'+
+  '</section>';
+}
+
+function viewMembers(){
+  var rows=MEMBERS.map(function(m,i){
+    return '<tr><td class="org">'+esc(m.org)+'</td><td>'+esc(m.person)+'</td>'+
+      '<td><select class="role-sel" data-role="'+i+'">'+ROLES.map(function(r){return '<option'+(r===m.role?' selected':'')+'>'+r+'</option>';}).join("")+'</select></td>'+
+      '<td class="muted">'+esc(m.seen)+'</td>'+
+      '<td><button class="toggle" role="switch" aria-pressed="'+m.active+'" data-active="'+i+'" aria-label="Active"></button></td></tr>';
+  }).join("");
+  return '<section class="view"><div class="page-head"><div><h2>Members &amp; access</h2><p>Who can submit, moderate and publish — across the coalition.</p></div>'+
+    '<button class="btn approve" id="addMember" style="margin-left:auto">+ Add member</button></div>'+
+    '<div class="panel" style="padding:6px 10px"><table class="tbl"><thead><tr><th>Organisation</th><th>Person</th><th>Role</th><th>Last seen</th><th>Active</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<p class="muted" style="font-size:.76rem">Roles map to permissions: Contributors submit, Moderators review, Editors publish, Admins manage access. Enforced by row-level security once the backend is live.</p></section>';
+}
+
+/* ============================ INTERACTIONS ============================ */
+function bindView(){
+  app.querySelectorAll("[data-mod]").forEach(function(el){ el.addEventListener("click",function(){ state.modFilter=el.getAttribute("data-mod"); render(); }); });
+  app.querySelectorAll("[data-act]").forEach(function(el){ el.addEventListener("click",function(){ modAct(el.getAttribute("data-act")); }); });
+  app.querySelectorAll("[data-pub]").forEach(function(el){ el.addEventListener("click",function(){ pubAct(el.getAttribute("data-pub")); }); });
+  app.querySelectorAll("[data-feat]").forEach(function(el){ el.addEventListener("click",function(){ setFeatured(el.getAttribute("data-feat")); }); });
+  app.querySelectorAll("[data-edit]").forEach(function(el){ el.addEventListener("click",function(){ openEdit(el.getAttribute("data-edit")); }); });
+  app.querySelectorAll("[data-role]").forEach(function(el){ el.addEventListener("change",function(){ MEMBERS[+el.getAttribute("data-role")].role=el.value; toast("Role updated"); }); });
+  app.querySelectorAll("[data-active]").forEach(function(el){ el.addEventListener("click",function(){ var i=+el.getAttribute("data-active"); MEMBERS[i].active=!MEMBERS[i].active; el.setAttribute("aria-pressed",MEMBERS[i].active); toast(MEMBERS[i].active?"Member activated":"Member suspended"); }); });
+  var add=document.getElementById("addMember"); if(add) add.addEventListener("click",openAddMember);
+}
+function subById(id){ for(var i=0;i<SUBMISSIONS.length;i++) if(SUBMISSIONS[i].id===id) return SUBMISSIONS[i]; }
+function modAct(a){
+  var p=a.split(":"), op=p[0], s=subById(p[1]); if(!s&&op!=="view") return;
+  if(op==="approve"){ s.status="approved"; PUBLISH.unshift({id:"pv"+Date.now(),source:"Voices",title:s.name+" — "+s.area,target:"raia · Voices wall",status:"ready",by:"—"}); toast("Approved → sent to publish queue"); render(); }
+  else if(op==="reject"){ s.status="rejected"; toast("Rejected"); render(); }
+  else if(op==="changes"){ toast("Change request noted to contributor"); }
+  else if(op==="reopen"){ s.status="pending"; toast("Reopened for review"); render(); }
+  else if(op==="queue"){ PUBLISH.unshift({id:"pv"+Date.now(),source:"Voices",title:s.name+" — "+s.area,target:"raia · Voices wall",status:"ready",by:"—"}); toast("Queued for publishing"); render(); }
+  else if(op==="view"){ openReview(s); }
+}
+function pubById(id){ for(var i=0;i<PUBLISH.length;i++) if(PUBLISH[i].id===id) return PUBLISH[i]; }
+function pubAct(a){
+  var p=a.split(":"), op=p[0], it=pubById(p[1]); if(!it) return;
+  if(op==="pub"){ it.status="live"; it.by="A. Mwangi"; toast("Published to raia"); render(); }
+  else if(op==="unpub"){ it.status="ready"; it.by="—"; toast("Unpublished"); render(); }
+}
+function setFeatured(id){ ISSUES.forEach(function(is){ is.featured = (is.id===id); }); toast("Featured story updated"); render(); }
+
+/* modal */
+function openModal(html){ document.getElementById("modal").innerHTML=html; document.getElementById("overlay").classList.add("on"); bindModal(); }
+function closeModal(){ document.getElementById("overlay").classList.remove("on"); }
+function bindModal(){
+  var mx=document.querySelector("#modal .mx"); if(mx) mx.addEventListener("click",closeModal);
+  var sv=document.getElementById("modalSave"); if(sv) sv.addEventListener("click",function(){ closeModal(); toast("Saved"); });
+}
+function openReview(s){
+  openModal('<div class="mh"><h3>Review submission</h3><button class="mx">×</button></div><div class="mb">'+
+    '<label>From</label><input value="'+esc(s.name+" · "+s.area)+'" readonly>'+
+    '<label>Type</label><input value="'+esc(s.type)+'" readonly>'+
+    '<label>Message</label><textarea rows="4" readonly>'+esc(s.msg)+'</textarea>'+
+    '<label>Privacy check</label><input value="'+(s.consent?"Consent given":"NO consent on file")+(s.minor?" · possible minor":"")+'" readonly>'+
+    '</div><div class="mf"><button class="btn ghost mx">Close</button><button class="btn approve" id="modalSave">Note review</button></div>');
+}
+function openEdit(what){
+  var t=what.split(":");
+  var title = t[0]==="issue" ? "Edit issue" : (t[0]==="bigq"?"Manage Big Questions":"Manage myths");
+  openModal('<div class="mh"><h3>'+esc(title)+'</h3><button class="mx">×</button></div><div class="mb">'+
+    '<p class="muted" style="font-size:.85rem">In the live console this opens the trilingual editor (English / Swahili / Sheng) for the three streams and the case study.</p>'+
+    '<label>Headline (EN)</label><input value="'+(t[0]==="issue"?esc((ISSUES.filter(function(i){return i.id===t[1];})[0]||{}).title||""):"")+'">'+
+    '<label>Status</label><select><option>Just announced</option><option>Ongoing</option><option>Active threat</option><option>Won</option><option>Proposed</option><option>Court-decided</option></select>'+
+    '</div><div class="mf"><button class="btn ghost mx">Cancel</button><button class="btn approve" id="modalSave">Save</button></div>');
+}
+function openAddMember(){
+  openModal('<div class="mh"><h3>Add member</h3><button class="mx">×</button></div><div class="mb">'+
+    '<label>Organisation</label><input placeholder="e.g. Greenpeace Africa">'+
+    '<label>Person</label><input placeholder="Full name">'+
+    '<label>Role</label><select>'+ROLES.map(function(r){return '<option>'+r+'</option>';}).join("")+'</select>'+
+    '</div><div class="mf"><button class="btn ghost mx">Cancel</button><button class="btn approve" id="modalSave">Send invite</button></div>');
+}
+document.getElementById("overlay").addEventListener("click",function(e){ if(e.target===this) closeModal(); });
+document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeModal(); });
+
+/* ============================ GATE ============================ */
+function unlock(){
+  document.getElementById("gate").classList.add("hidden");
+  document.getElementById("shell").classList.add("on");
+  render();
+}
+document.getElementById("gbtn").addEventListener("click",unlock);
+document.getElementById("gcode").addEventListener("keydown",function(e){ if(e.key==="Enter") unlock(); });
+document.getElementById("signout").addEventListener("click",function(){
+  document.getElementById("shell").classList.remove("on");
+  document.getElementById("gate").classList.remove("hidden");
+  document.getElementById("gcode").value="";
+});
+
+if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
+  window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
+}
+</script>
+</body>
+</html>
