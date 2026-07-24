@@ -1,0 +1,826 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Raia · MazingiraKenya</title>
+<meta name="description" content="Kenya's climate & environmental justice, in everyday language — the news, how it's talked about, and the fuller picture. English, Swahili, Sheng.">
+<meta name="theme-color" content="#15161A">
+<link rel="manifest" href="raia.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,600&family=Nunito+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2315161A'/%3E%3Ctext x='31' y='45' font-family='Georgia,serif' font-size='38' font-weight='700' text-anchor='middle' fill='%23F6EFDD'%3EM%3C/text%3E%3Ccircle cx='48' cy='18' r='6' fill='%23DC9A18'/%3E%3C/svg%3E">
+<style>
+:root{
+  --paper:#FAF6EC; --paper2:#F0E7D4; --card:#FFFFFF;
+  --ink:#15161A; --ink-2:#24262E; --ink-soft:#585549;
+  --cream:#F6EFDD;
+  --red:#C0202A; --red-ink:#A5121C;
+  --green:#0C7A4D; --green-ink:#0A5E3B;
+  --gold:#DC9A18; --gold-2:#F0B93E;
+  --line:#E7DCC4;
+  --shadow:0 1px 2px rgba(20,16,4,.05), 0 8px 22px rgba(20,16,4,.06);
+  --shadow-lg:0 14px 40px rgba(20,16,4,.14);
+  --wrap:1120px; --read:730px; --r:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:"Nunito Sans",system-ui,sans-serif;font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased;padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+h1,h2,h3{font-family:"Lora",Georgia,serif;line-height:1.16;margin:0 0 .35em;font-weight:700;letter-spacing:-.012em}
+p{margin:0 0 .92em}
+a{color:var(--green-ink);text-decoration:none;font-weight:700}
+button{font-family:inherit;cursor:pointer}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 20px}
+.reading{max-width:var(--read);margin:0 auto}
+.muted{color:var(--ink-soft)}
+.overflow-anywhere{overflow-wrap:anywhere}
+.flagbar{height:4px;background:linear-gradient(90deg,var(--ink) 0 25%,var(--red) 25% 50%,var(--green) 50% 75%,var(--gold) 75% 100%)}
+
+/* kicker (clean, no sticker) */
+.k{display:inline-block;font-weight:900;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase}
+.k.news{color:var(--ink-soft)} .k.hearsay{color:var(--red-ink)} .k.truth{color:var(--green-ink)} .k.learn{color:#9a6a06} .k.gold{color:#9a6a06}
+
+/* ---------- top bar + desktop nav ---------- */
+.topbar{position:sticky;top:0;z-index:40;background:var(--ink)}
+.topbar .row{display:flex;align-items:center;gap:14px;height:58px;max-width:var(--wrap);margin:0 auto;padding:0 20px}
+.brand{display:flex;align-items:center;gap:2px;font-family:"Lora",serif;font-weight:700;font-size:1.16rem;color:var(--cream);white-space:nowrap}
+.brand b{color:var(--gold-2)} .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;margin:-9px 0 0 1px}
+.desknav{display:none;gap:3px;margin-left:6px}
+.desknav button{border:0;background:transparent;color:#b7ac93;font-weight:800;font-size:.86rem;padding:8px 12px;border-radius:9px;position:relative}
+.desknav button:hover{color:var(--cream);background:rgba(255,255,255,.06)}
+.desknav button[aria-current="true"]{color:#fff}
+.desknav button[aria-current="true"]::after{content:"";position:absolute;left:12px;right:12px;bottom:2px;height:2.5px;border-radius:3px;background:var(--gold)}
+.langs{margin-left:auto;display:flex;background:rgba(255,255,255,.08);border-radius:999px;padding:3px;gap:2px}
+.langs button{border:0;background:transparent;color:#c6bba1;font-weight:900;font-size:.73rem;letter-spacing:.03em;padding:6px 10px;border-radius:999px;min-width:40px}
+.langs button[aria-pressed="true"]{background:var(--gold);color:#3a2a00}
+
+main{padding-top:22px}
+.view{animation:fade .24s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.view{animation:none}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;background:radial-gradient(120% 130% at 85% -10%, #223 0%, var(--ink) 55%);color:var(--cream);border-radius:22px;overflow:hidden;box-shadow:var(--shadow-lg)}
+.hero .pad{padding:26px 22px 28px}
+.hero-grid{display:grid;gap:22px}
+.hero .eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.hero .eyebrow .badge{font-weight:900;letter-spacing:.04em;background:var(--gold);color:#3a2a00;font-size:.72rem;padding:4px 9px;border-radius:6px}
+.hero .eyebrow .txt{font-size:.8rem;font-weight:800;color:#c6bba1;letter-spacing:.02em}
+.hero h1{font-size:3.1rem;color:#fff;margin:0 0 .1em;line-height:.98;letter-spacing:-.02em}
+.hero h1 .q{color:var(--gold-2)}
+.hero .lede{font-size:1.14rem;color:#EDE4CE;margin:8px 0 0;font-weight:700}
+.hero .lede .mark{background:linear-gradient(transparent 60%, rgba(220,154,24,.5) 60%);padding:0 2px}
+.hero .about{font-size:.96rem;color:#C7BCA2;margin:14px 0 0;max-width:52ch}
+.snav{display:grid;gap:9px}
+.snav button{display:flex;align-items:center;gap:12px;text-align:left;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.13);border-radius:13px;padding:12px 14px;color:#fff;transition:transform .16s, background .16s,border-color .16s;width:100%}
+.snav button:hover{background:rgba(255,255,255,.1);transform:translateX(3px);border-color:rgba(255,255,255,.28)}
+.snav .dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
+.snav .body{flex:1;min-width:0}
+.snav .t{font-weight:800;font-size:.98rem;line-height:1.15}
+.snav .s{font-size:.76rem;color:#c3b89e;font-weight:600}
+.snav .arw{color:#8f856d;font-weight:900}
+.d-news{background:#cdd3da}.d-hearsay{background:var(--red)}.d-truth{background:var(--green)}.d-learn{background:var(--gold)}
+
+/* section head */
+.shead{display:flex;align-items:center;gap:12px;margin:30px 2px 14px}
+.shead h2{font-size:1.32rem;margin:0}
+.shead .rule{flex:1;height:2px;background:var(--line);border-radius:3px}
+
+/* ---------- cards / grid ---------- */
+.grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:620px){.grid{grid-template-columns:1fr 1fr}}
+@media(min-width:980px){.grid{grid-template-columns:1fr 1fr 1fr}}
+.card{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);overflow:hidden;transition:transform .16s, box-shadow .16s, border-color .16s}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:#dccda6}
+.card .accent{height:4px}
+.card .in{padding:16px 17px}
+.card .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+.card h3{font-size:1.16rem;margin:0 0 .3em}
+.card .sum{font-size:.92rem;color:var(--ink-soft);margin:0}
+.a-news{background:var(--ink)}.a-hearsay{background:var(--red)}.a-truth{background:var(--green)}.a-learn{background:var(--gold)}.a-mixed{background:linear-gradient(90deg,var(--ink) 0 33%,var(--red) 33% 66%,var(--green) 66% 100%)}.a-new{background:var(--gold)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:.66rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase;padding:4px 9px;border-radius:999px;border:1px solid}
+.chip.win{background:#E7F4EC;color:#0A5A3A;border-color:#9ecdb4}
+.chip.new{background:#FBF0D6;color:#8A5B00;border-color:var(--gold)}
+.chip.ongoing{background:#FCEEDA;color:#9A5A05;border-color:#e3b877}
+.chip.threat{background:#FBE3E1;color:#A5121C;border-color:#e8a29c}
+.chip.proposed{background:#EEE7D6;color:#5B5138;border-color:#cdbe93}
+.chip.decided{background:#E7EEF2;color:#2C4B59;border-color:#a9c1cc}
+.place{font-size:.78rem;font-weight:800;color:var(--ink-soft)}
+
+/* featured */
+.featured{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-lg);cursor:pointer;transition:transform .16s}
+.featured:hover{transform:translateY(-2px)}
+.featured .ribbon{background:linear-gradient(90deg,var(--gold),var(--gold-2));color:#3a2a00;padding:8px 16px;font-weight:900;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.featured .fg{display:grid;gap:0}
+@media(min-width:820px){.featured .fg{grid-template-columns:1.35fr .9fr}}
+.featured .pad{padding:20px}
+.featured h2{font-size:1.92rem;margin:.12em 0 .34em;line-height:1.08}
+.featured .sum{color:var(--ink-soft);margin:0 0 14px;font-size:1.02rem}
+.featured .aside{background:var(--paper);border-top:1px solid var(--line);padding:18px 20px}
+@media(min-width:820px){.featured .aside{border-top:0;border-left:1px solid var(--line)}}
+.featured .aside .lab{font-size:.68rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+.lensrow{display:flex;flex-direction:column;gap:9px}
+.lenspill{display:flex;align-items:center;gap:9px;font-weight:800;font-size:.9rem}
+.lenspill .dot{width:9px;height:9px;border-radius:50%}
+
+/* ---------- stream landing ---------- */
+.streamhero{position:relative;color:#fff;border-radius:20px;padding:26px 22px;margin-bottom:6px;box-shadow:var(--shadow-lg);overflow:hidden}
+.streamhero.news{background:linear-gradient(120% 120% at 90% -20%,#2c2f38,var(--ink))}
+.streamhero.hearsay{background:linear-gradient(120% 120% at 90% -20%,#d43b42,var(--red))}
+.streamhero.truth{background:linear-gradient(120% 120% at 90% -20%,#12a06a,var(--green))}
+.streamhero.learn{background:linear-gradient(120% 120% at 90% -20%,#f0b93e,var(--gold));color:#3a2a00}
+.streamhero.voices{background:linear-gradient(125% 120% at 88% -10%,#12a06a,var(--ink))}
+.streamhero .eye{font-weight:900;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+.streamhero h1{color:inherit;font-size:2.05rem;margin:6px 0 .16em}
+.streamhero p{margin:0;opacity:.94;font-weight:600;font-size:.98rem;max-width:60ch}
+
+/* ---------- issue detail ---------- */
+.back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--ink);font-weight:900;font-size:.86rem;padding:6px 0;margin-bottom:6px}
+.back:hover{color:var(--green-ink)}
+.issue-head h1{font-size:1.9rem;margin:.18em 0 .42em}
+.issue-meta{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.tabs{display:flex;gap:5px;background:var(--paper2);border-radius:13px;padding:5px;margin:18px 0 2px;position:sticky;top:58px;z-index:20}
+.tabs button{flex:1;border:0;background:transparent;color:var(--ink-soft);font-weight:900;font-size:.76rem;padding:10px 4px;border-radius:9px;line-height:1.14;transition:background .15s,color .15s}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{color:#fff}
+.tabs button[data-lens="happening"][aria-selected="true"]{background:var(--ink)}
+.tabs button[data-lens="narrative"][aria-selected="true"]{background:var(--red)}
+.tabs button[data-lens="gap"][aria-selected="true"]{background:var(--green)}
+.lens-panel{padding:18px 0 2px;font-size:1.05rem}
+.lens-panel .k{margin-bottom:12px}
+.actionbox{border-radius:15px;padding:17px 18px;margin:20px 0 6px;background:var(--ink);color:var(--cream)}
+.actionbox .k{margin-bottom:8px;color:var(--gold-2)}
+.actionbox p{margin:0;font-weight:700;color:#fff}
+.related{margin:18px 0}
+.related .lab{font-size:.7rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px}
+.tagrow{display:flex;flex-wrap:wrap;gap:9px}
+.tag{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:.84rem;font-weight:800;color:var(--ink);transition:border-color .15s,transform .12s}
+.tag:hover{border-color:var(--green);transform:translateY(-1px)}
+.tag::before{content:"?";display:inline-block;margin-right:6px;color:var(--green-ink);font-weight:900}
+.tag.myth::before{content:"!";color:var(--red-ink)}
+.fallback-note{font-size:.74rem;color:var(--ink-soft);background:var(--paper2);border-radius:7px;padding:5px 10px;display:inline-block;margin-bottom:11px;font-weight:700}
+
+/* ---------- learn ---------- */
+.seg{display:flex;gap:5px;background:var(--paper2);border-radius:13px;padding:5px;margin:16px 0 16px}
+.seg button{flex:1;border:0;background:transparent;color:var(--ink-soft);font-weight:900;font-size:.88rem;padding:11px;border-radius:9px;transition:.15s}
+.seg button[aria-selected="true"]{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+.acc{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:13px;box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden;transition:box-shadow .15s}
+.acc.myth{border-left-color:var(--red)}
+.acc:hover{box-shadow:var(--shadow-lg)}
+.acc > button{width:100%;text-align:left;background:none;border:0;padding:16px 17px;display:flex;gap:12px;align-items:flex-start}
+.acc .q{flex:1;font-family:"Lora",serif;font-weight:700;font-size:1.1rem;color:var(--ink)}
+.acc .qmyth{flex:1;font-weight:800;font-size:1.02rem;color:var(--ink);font-style:italic}
+.acc .plus{color:var(--green-ink);font-weight:900;font-size:1.45rem;line-height:1;transition:transform .2s}
+.acc.myth .plus{color:var(--red-ink)}
+.acc.open .plus{transform:rotate(45deg)}
+.acc .panel{padding:0 17px 17px;display:none;font-size:1rem}
+.acc.open .panel{display:block}
+.myth-row{margin:12px 0}
+.myth-row .lab{font-size:.66rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;display:inline-block;margin-bottom:4px;padding:3px 8px;border-radius:5px}
+.myth-row.reality .lab{background:var(--green);color:#fff}.myth-row.why .lab{background:var(--paper2);color:#7a5a12}.myth-row.where .lab{background:var(--paper2);color:var(--ink-soft)}
+.myth-row.reality p{font-weight:700}
+
+/* ---------- voices ---------- */
+.poll{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+.poll h3{font-size:1.14rem;margin:0 0 12px}
+.poll .btns{display:flex;gap:9px;margin-bottom:13px}
+.poll .btns button{flex:1;border:1px solid var(--line);background:var(--paper);border-radius:11px;padding:12px;font-weight:900;font-size:.92rem;transition:.15s}
+.poll .btns button:hover{border-color:var(--ink)}
+.poll .btns button.yes[aria-pressed="true"]{background:var(--green);color:#fff;border-color:var(--green)}
+.poll .btns button.no[aria-pressed="true"]{background:var(--red);color:#fff;border-color:var(--red)}
+.pollbar{height:26px;border-radius:9px;overflow:hidden;display:flex;font-size:.72rem;font-weight:900;color:#fff;border:1px solid var(--line)}
+.pollbar .yy{background:var(--green);display:flex;align-items:center;padding:0 9px;min-width:36px;transition:width .5s ease}
+.pollbar .nn{background:var(--red);display:flex;align-items:center;justify-content:flex-end;padding:0 9px;min-width:36px;flex:1}
+.poll .tot{font-size:.76rem;color:var(--ink-soft);font-weight:700;margin:9px 0 0}
+.share{background:radial-gradient(120% 130% at 90% -10%,#20323a,var(--ink));color:var(--cream);border-radius:16px;padding:18px;margin-bottom:20px;box-shadow:var(--shadow-lg)}
+.share h3{color:#fff;font-size:1.2rem;margin:6px 0 4px}
+.share p.s{margin:0 0 13px;font-size:.86rem;color:#c6bba1}
+.typerow{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.typerow button{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#eadfc6;border-radius:10px;padding:9px 13px;font-weight:800;font-size:.82rem;transition:.15s}
+.typerow button:hover{background:rgba(255,255,255,.12)}
+.typerow button[aria-pressed="true"]{background:var(--gold);color:#3a2a00;border-color:var(--gold)}
+.share textarea,.share input{width:100%;border-radius:11px;border:1px solid rgba(255,255,255,.18);background:#fffdf7;color:var(--ink);padding:12px;font-family:inherit;font-size:.95rem;margin-bottom:10px;resize:vertical}
+.share .rowin{display:flex;gap:10px}
+.consent{display:flex;gap:9px;align-items:flex-start;font-size:.82rem;color:#c6bba1;margin-bottom:12px}
+.consent input{width:auto;flex:0 0 auto;margin:3px 0 0}
+.share .post{width:100%;border:0;background:var(--gold);color:#3a2a00;font-weight:900;font-size:1rem;border-radius:12px;padding:14px;transition:.15s}
+.share .post:hover{background:var(--gold-2)}
+.mediahint{font-size:.78rem;color:#c6bba1;background:rgba(255,255,255,.06);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.voice{background:var(--card);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);margin-bottom:13px;overflow:hidden}
+.voice .vtop{display:flex;gap:11px;align-items:center;padding:14px 15px 9px}
+.avatar{width:42px;height:42px;border-radius:12px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:1.08rem}
+.voice .who{flex:1;min-width:0}.voice .nm{font-weight:900;font-size:.96rem;line-height:1.1}.voice .pl{font-size:.74rem;color:var(--ink-soft);font-weight:700}
+.vtype{font-size:.62rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--paper2);color:var(--ink-soft);border:1px solid var(--line)}
+.voice .media{margin:0 15px;border-radius:12px;height:132px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;letter-spacing:.03em;font-size:.82rem;background:#26262b}
+.voice .media.video{background:linear-gradient(130deg,#2a2a30,#5a1a20)}.voice .media.photo{background:linear-gradient(130deg,#0f3a2a,#26262b)}.voice .media.audio{background:linear-gradient(130deg,#4a3608,#26262b)}
+.voice .msg{padding:12px 15px 6px;font-size:1rem}
+.voice .msg.new{background:#FFFBEE}
+.reacts{display:flex;gap:9px;padding:4px 15px 14px}
+.reacts button{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 13px;font-weight:800;font-size:.85rem;transition:transform .1s,border-color .15s}
+.reacts button:hover{border-color:var(--ink)}.reacts button:active{transform:scale(.93)}
+.reacts .c{font-variant-numeric:tabular-nums}
+.newflag{font-size:.6rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);color:#3a2a00;padding:2px 7px;border-radius:5px;margin-left:7px}
+
+.footer{margin-top:30px;padding:18px 0 6px;border-top:1px solid var(--line);color:var(--ink-soft);font-size:.8rem;font-weight:600}
+
+/* ---------- bottom nav (mobile) ---------- */
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--ink);display:flex;padding-bottom:env(safe-area-inset-bottom);border-top:3px solid var(--gold)}
+.bottomnav button{flex:1;background:none;border:0;padding:8px 2px 7px;color:#9c927b;font-weight:800;font-size:.62rem;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bottomnav button[aria-current="true"]{color:var(--gold-2)}
+.bottomnav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
+
+/* ---------- desktop switch ---------- */
+@media(min-width:920px){
+  .desknav{display:flex}
+  .bottomnav{display:none}
+  body{padding-bottom:34px}
+  main{padding-top:26px}
+  .hero-grid{grid-template-columns:1.55fr 1fr;align-items:start}
+  .hero .pad{padding:34px 34px 36px}
+  .hero h1{font-size:3.5rem}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="row">
+    <div class="brand" aria-label="MazingiraKenya Raia">Mazingira<b>Kenya</b><span class="dot"></span></div>
+    <nav class="desknav" aria-label="Sections">
+      <button data-nav="ninini">Ni Nini?</button>
+      <button data-nav="news">In The News</button>
+      <button data-nav="hearsay">Hearsay</button>
+      <button data-nav="truth">Truth of the Matter</button>
+      <button data-nav="learn">Know &amp; Understand</button>
+      <button data-nav="voices">Voices</button>
+    </nav>
+    <div class="langs" role="group" aria-label="Language / Lugha">
+      <button data-lang="en" aria-pressed="true">ENG</button>
+      <button data-lang="sw" aria-pressed="false">SWA</button>
+      <button data-lang="sh" aria-pressed="false">SHENG</button>
+    </div>
+  </div>
+</header>
+<div class="flagbar"></div>
+
+<main id="app" class="wrap"></main>
+
+<nav class="bottomnav" aria-label="Sections">
+  <button data-nav="ninini" aria-current="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1 .8-1 1.7"/><path d="M12 16.5h.01"/></svg><span data-nk="ninini">Ni Nini</span></button>
+  <button data-nav="news"><svg viewBox="0 0 24 24"><path d="M4 5h13v14H4z"/><path d="M17 8h3v9a2 2 0 0 1-2 2h-1"/><path d="M7 9h7M7 12h7M7 15h4"/></svg><span data-nk="news">News</span></button>
+  <button data-nav="hearsay"><svg viewBox="0 0 24 24"><path d="M20 12a7 7 0 0 1-7 7H8l-4 3v-4a7 7 0 0 1 4-13h5a7 7 0 0 1 7 7Z"/></svg><span data-nk="hearsay">Hearsay</span></button>
+  <button data-nav="truth"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4-3 7-7 9-4-2-7-5-7-9V6l7-3Z"/><path d="M9 12l2 2 4-4"/></svg><span data-nk="truth">Truth</span></button>
+  <button data-nav="learn"><svg viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M7 10.5V15c0 1.5 2.5 3 5 3s5-1.5 5-3v-4.5"/></svg><span data-nk="learn">Learn</span></button>
+  <button data-nav="voices"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 18v3"/></svg><span data-nk="voices">Voices</span></button>
+</nav>
+
+<script>
+/* ============================ DATA ============================ */
+var LANG = (function(){ try{ return localStorage.getItem("raia.lang")||"en"; }catch(e){ return "en"; } })();
+function L(o){ if(!o) return ""; if(typeof o==="string") return o; if(o[LANG]!=null) return o[LANG]; if(LANG==="sh"&&o.sw!=null) return o.sw; return o.en!=null?o.en:""; }
+function isFallback(o){ return o && typeof o==="object" && o[LANG]==null; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function paras(o){ var v=L(o); if(Array.isArray(v)) return v.map(function(p){return "<p>"+esc(p)+"</p>";}).join(""); return "<p>"+esc(v)+"</p>"; }
+
+var UI = {
+  featured:{en:"Story of the week",sw:"Habari ya wiki",sh:"Story ya wiki"},
+  issues:{en:"All the issues",sw:"Masuala yote",sh:"Masuala yote"},
+  open:{en:"Open",sw:"Fungua",sh:"Fungua"},
+  whatNow:{en:"What you can do",sw:"Unachoweza kufanya",sh:"Unachoweza kufanya"},
+  understandMore:{en:"Related — learn more",sw:"Zinazohusiana — jifunze zaidi",sh:"Zinazohusiana — jua zaidi"},
+  back:{en:"Back",sw:"Rudi",sh:"Rudi"},
+  fallback:{en:"",sw:"Not yet in Swahili — shown in English.",sh:"Bado haijawa Sheng — inaonyeshwa kwa lugha nyingine."},
+  bigq:{en:"Big questions",sw:"Maswali makubwa",sh:"Maswali makubwa"},
+  myths:{en:"Common mix-ups",sw:"Mkanganyiko wa kawaida",sh:"Common mix-ups"},
+  seeIn:{en:"See it in the news",sw:"Iangalie kwenye habari",sh:"Iangalie kwa news"},
+  lensLabel:{en:"Three ways to read it",sw:"Njia tatu za kuelewa",sh:"Njia tatu za kuelewa"}
+};
+var TAB = {
+  ninini:{name:{en:"Ni Nini?",sw:"Ni Nini?",sh:"Ni Nini?"}, sub:{en:"What this is about",sw:"Ni kuhusu nini",sh:"Ni kuhusu nini"}},
+  news:{name:{en:"In The News",sw:"Kwenye Habari",sh:"Kwa News"}, sub:{en:"What's happening, in plain language",sw:"Kinachoendelea, kwa lugha rahisi",sh:"Kinachoendelea, kwa lugha ya kawaida"}},
+  hearsay:{name:{en:"Hearsay",sw:"Tetesi",sh:"Story za Mtaa"}, sub:{en:"How it's being talked about",sw:"Jinsi linavyozungumzwa",sh:"Jinsi watu wanavyoongea"}},
+  truth:{name:{en:"Truth of the Matter",sw:"Ukweli Halisi",sh:"Ukweli Wenyewe"}, sub:{en:"The fuller picture, in context",sw:"Picha kamili, katika muktadha",sh:"Picha kamili, kwa context"}},
+  learn:{name:{en:"Know & Understand",sw:"Jua & Elewa",sh:"Jua & Elewa"}, sub:{en:"Big questions, everyday answers",sw:"Maswali makubwa, majibu ya kawaida",sh:"Maswali makubwa, majibu ya kawaida"}},
+  voices:{name:{en:"Voices",sw:"Sauti",sh:"Sauti"}, sub:{en:"The community speaks",sw:"Jamii inasema",sh:"Community inanena"}}
+};
+var NAVSHORT = {
+  ninini:{en:"Ni Nini",sw:"Ni Nini",sh:"Ni Nini"}, news:{en:"News",sw:"Habari",sh:"News"},
+  hearsay:{en:"Hearsay",sw:"Tetesi",sh:"Story"}, truth:{en:"Truth",sw:"Ukweli",sh:"Ukweli"},
+  learn:{en:"Learn",sw:"Jua",sh:"Jua"}, voices:{en:"Voices",sw:"Sauti",sh:"Sauti"}
+};
+var LENS = [
+  {key:"happening", brand:"news",    tab:"news",    dot:"d-news"},
+  {key:"narrative", brand:"hearsay", tab:"hearsay", dot:"d-hearsay"},
+  {key:"gap",       brand:"truth",   tab:"truth",   dot:"d-truth"}
+];
+var STATUS = {
+  new:{cls:"new",t:{en:"Just announced",sw:"Imetangazwa",sh:"Fresh"}},
+  win:{cls:"win",t:{en:"Won",sw:"Ushindi",sh:"Tumeshinda"}},
+  ongoing:{cls:"ongoing",t:{en:"Ongoing",sw:"Inaendelea",sh:"Bado iko"}},
+  threat:{cls:"threat",t:{en:"Active threat",sw:"Tishio",sh:"Hatari"}},
+  proposed:{cls:"proposed",t:{en:"Proposed",sw:"Imependekezwa",sh:"Wanapanga"}},
+  decided:{cls:"decided",t:{en:"Court-decided",sw:"Mahakama imeamua",sh:"Court imeamua"}}
+};
+
+var ISSUES = [
+{ id:"lamu-refinery", featured:true, status:"new", place:{en:"Lamu · Coast",sw:"Lamu · Pwani",sh:"Lamu · Coast"},
+  title:{en:"A $17bn oil refinery is coming to Lamu",
+         sw:"Kiwanda cha kusafisha mafuta cha $17bn kinakuja Lamu",
+         sh:"Refinery ya oil ya $17bn inakuja Lamu"},
+  summary:{en:"In July 2026, the Dangote Group picked Lamu for a 700,000-barrel-a-day oil refinery — East Africa's largest — with a promise of 60,000 jobs.",
+           sw:"Julai 2026, Kundi la Dangote lilichagua Lamu kwa kiwanda cha kusafisha mapipa 700,000 kwa siku — kikubwa zaidi Afrika Mashariki — na ahadi ya ajira 60,000.",
+           sh:"July 2026, Dangote Group walichagua Lamu kwa refinery ya mapipa 700,000 kwa siku — kubwa zaidi East Africa — na promise ya jobs 60,000."},
+  happening:{en:["In July 2026 the Dangote Group — owned by Africa's richest man, Aliko Dangote — announced it had chosen Lamu for a proposed 700,000-barrel-per-day oil refinery and petrochemical complex. At around US$17 billion (Sh2.59 trillion), it would be the largest refinery in East Africa.",
+    "The project was moved from Tanzania to Kenya, and the company says design and engineering have begun, with construction estimated at three to five years. President Ruto has said it will create at least 60,000 jobs and make Kenya a regional energy hub — on the same Lamu coast, a UNESCO World Heritage area, where a coal plant was defeated in 2019."],
+    sw:["Julai 2026 Kundi la Dangote — linalomilikiwa na tajiri mkubwa zaidi Afrika, Aliko Dangote — lilitangaza limechagua Lamu kwa kiwanda cha kusafisha mafuta cha mapipa 700,000 kwa siku pamoja na kiwanda cha petrokemikali. Kwa gharama ya takriban dola bilioni 17 (Sh trilioni 2.59), kingekuwa kikubwa zaidi Afrika Mashariki.",
+    "Mradi ulihamishwa kutoka Tanzania hadi Kenya, na kampuni inasema usanifu na uhandisi umeanza, ujenzi ukikadiriwa miaka mitatu hadi mitano. Rais Ruto amesema utaunda ajira zisizopungua 60,000 na kuifanya Kenya kitovu cha nishati kanda — kwenye pwani ileile ya Lamu, eneo la urithi wa dunia la UNESCO, ambapo mtambo wa makaa ulishindwa 2019."],
+    sh:["July 2026 Dangote Group — inayomilikiwa na tajiri mkubwa zaidi Africa, Aliko Dangote — walitangaza wamechagua Lamu kwa refinery ya mapipa 700,000 kwa siku pamoja na petrochemical complex. Kwa kama dola bilioni 17 (Sh trilioni 2.59), ingekuwa kubwa zaidi East Africa.",
+    "Project ilihamishwa kutoka Tanzania hadi Kenya, na kampuni inasema design na engineering imeanza, construction ikikadiriwa miaka 3 hadi 5. Rais Ruto amesema italeta jobs zisizopungua 60,000 na kufanya Kenya hub ya energy ya region — kwa hiyo hiyo coast ya Lamu, place ya urithi ya UNESCO, ambapo coal plant ilishindwa 2019."]},
+  narrative:{en:["The refinery is being presented as a historic win: 60,000 jobs, fuel security for East Africa, a new industrial hub, and proof that Kenya can attract mega-investment. Backing from Africa's richest man is treated as a seal of approval, and raising concerns is framed as standing in the way of jobs and progress."],
+    sw:["Kiwanda kinawasilishwa kama ushindi wa kihistoria: ajira 60,000, uhakika wa mafuta Afrika Mashariki, kitovu kipya cha viwanda, na uthibitisho kwamba Kenya inaweza kuvutia uwekezaji mkubwa. Kuungwa mkono na tajiri mkubwa zaidi Afrika kunachukuliwa kama muhuri wa idhini, na kutoa wasiwasi kunachorwa kama kuzuia ajira na maendeleo."],
+    sh:["Refinery inawasilishwa kama win ya kihistoria: jobs 60,000, fuel security ya East Africa, hub mpya ya viwanda, na proof Kenya inaweza kuvutia mega-investment. Support ya tajiri mkubwa zaidi Africa inachukuliwa kama stamp ya approval, na kuraise concerns inaonekana kama unazuia jobs na maendeleo."]},
+  gap:{en:["The 60,000-jobs figure is a promise, not yet a plan on paper. Refineries are capital-intensive: most permanent roles are highly specialised, while the big numbers usually describe short-term construction work. It's fair — not anti-development — to ask for the breakdown: how many jobs are permanent, how many go to local residents, and for how long.",
+    "There are bigger questions too, and they deserve honest answers rather than slogans. The refinery would sit beside the UNESCO-listed Lamu seascape and the fishing grounds communities have already gone to court to protect; it raises real concerns about air quality, carbon emissions and 'stranded assets' as the world shifts off oil; and a plant this large could shape the region's fuel market for decades. The point isn't that the project is simply good or bad — it's that a decision this big needs the full facts, the environmental studies, and genuine public participation first. That is a right, and Lamu has used it before."],
+    sw:["Idadi ya ajira 60,000 ni ahadi, bado si mpango ulioandikwa. Viwanda vya kusafisha mafuta vinahitaji mtaji mkubwa: nafasi nyingi za kudumu ni za utaalamu wa hali ya juu, huku idadi kubwa mara nyingi ikimaanisha kazi za ujenzi za muda mfupi. Ni haki — si kupinga maendeleo — kuuliza mchanganuo: ajira ngapi ni za kudumu, ngapi zinaenda kwa wakazi wa eneo, na kwa muda gani.",
+    "Kuna maswali makubwa pia, nayo yanastahili majibu ya kweli badala ya kaulimbiu. Kiwanda kingekaa kando ya bahari ya Lamu iliyoorodheshwa na UNESCO na maeneo ya uvuvi ambayo jamii tayari imeenda mahakamani kuyalinda; kinazua wasiwasi wa hewa safi, uzalishaji wa kaboni na 'mali zilizokwama' huku dunia ikihama kutoka mafuta; na kiwanda kikubwa hivi kinaweza kuunda soko la mafuta la kanda kwa miongo. Suala si kwamba mradi ni mzuri au mbaya tu — ni kwamba uamuzi mkubwa hivi unahitaji ukweli kamili, tafiti za mazingira, na ushirikishwaji wa kweli wa umma kwanza. Hiyo ni haki, na Lamu imeitumia awali."],
+    sh:["Hiyo namba ya jobs 60,000 ni promise, bado si plan iliyoandikwa. Refineries zinahitaji capital kubwa: roles nyingi za permanent ni za utaalam wa juu, na hizo namba kubwa mostly ni construction work ya muda mfupi. Ni sawa — si kupinga maendeleo — kuuliza breakdown: jobs ngapi ni permanent, ngapi zinaenda kwa wakazi wa hapa, na kwa muda gani.",
+    "Kuna maswali makubwa pia, yanadeserve majibu ya kweli badala ya slogans. Refinery ingekaa kando ya seascape ya Lamu iliyo kwa list ya UNESCO na fishing grounds ambazo community tayari walienda court kuprotect; inaraise concerns za hewa, carbon emissions na 'stranded assets' huku dunia ikihama kutoka oil; na plant kubwa hivi inaeza shape fuel market ya region kwa miongo. Point si kwamba project ni nzuri ama mbaya — ni kwamba decision kubwa hivi inahitaji facts kamili, environmental studies, na public participation ya kweli kwanza. Hiyo ni right, na Lamu wameitumia before."]},
+  action:{en:"When you hear '60,000 jobs', ask for the breakdown: how many are permanent, how many local, and for how long? A project this big deserves the full facts and real public participation — and that's your right.",
+    sw:"Unaposikia 'ajira 60,000', omba mchanganuo: ngapi ni za kudumu, ngapi za wenyeji, na kwa muda gani? Mradi mkubwa hivi unastahili ukweli kamili na ushirikishwaji wa kweli wa umma — na hiyo ni haki yako.",
+    sh:"Ukisikia 'jobs 60,000', omba breakdown: ngapi ni permanent, ngapi za wenyeji, na kwa muda gani? Project kubwa hivi inadeserve facts kamili na public participation ya kweli — na hiyo ni right yako."},
+  related:[{t:"myth",id:"oil"},{t:"basic",id:"just-transition"}] },
+
+{ id:"lamu-coal", status:"win", place:{en:"Lamu · Coast",sw:"Lamu · Pwani",sh:"Lamu · Coast"},
+  title:{en:"The Lamu coal plant that Kenya defeated",
+         sw:"Mtambo wa makaa wa Lamu ambao Kenya ilishinda",
+         sh:"Ile coal plant ya Lamu tuliweza kustop"},
+  summary:{en:"A 1,050 MW coal plant was planned beside Lamu Old Town. Communities and courts stopped it — and by 2025 the backers had walked away.",
+           sw:"Mtambo wa makaa wa MW 1,050 ulipangwa kando ya Mji wa Kale wa Lamu. Jamii na mahakama zikaukomesha — na kufikia 2025 wafadhili walikuwa wamejitoa.",
+           sh:"Coal plant ya 1,050 MW ilikuwa ipangwe kando ya Lamu Old Town. Community na court zikaistop — na kufikia 2025 wenye pesa wakawacha."},
+  happening:{en:["In 2013 the government approved a 1,050-megawatt coal-fired power plant at Kwasasi, near Lamu Old Town — a UNESCO World Heritage site — to be built by Amu Power with financing from Chinese and other foreign lenders.",
+    "Lamu residents, fishers and the Save Lamu coalition challenged it. In June 2019 the National Environment Tribunal cancelled the plant's licence, ruling the environmental study inadequate and the public participation a sham. Financing collapsed, and by 2025 the last backers had pulled out. The plant was never built."],
+    sw:["Mwaka 2013 serikali iliidhinisha mtambo wa umeme wa makaa wa MW 1,050 huko Kwasasi, karibu na Mji wa Kale wa Lamu — eneo la urithi wa dunia la UNESCO — ujengwe na Amu Power kwa ufadhili kutoka China na wakopeshaji wengine wa kigeni.",
+    "Wakazi wa Lamu, wavuvi na muungano wa Save Lamu waliupinga. Mnamo Juni 2019 Baraza la Kitaifa la Mazingira lilifuta leseni ya mtambo, likisema utafiti wa mazingira haukutosha na ushirikishwaji wa umma ulikuwa wa uongo. Ufadhili ukaanguka, na kufikia 2025 wafadhili wa mwisho walikuwa wamejitoa. Mtambo haukujengwa kamwe."],
+    sh:["2013 serikali iliapprove coal plant ya MW 1,050 huko Kwasasi, karibu na Lamu Old Town — place ya urithi ya UNESCO — ijengwe na Amu Power, pesa ikitoka China na wakopeshaji wa nje.",
+    "Watu wa Lamu, wavuvi na Save Lamu wakapinga. June 2019 Environment Tribunal ikacancel leseni, ikisema EIA haikutosha na public participation ilikuwa ya kubuni. Pesa ikaisha, na kufikia 2025 wenye pesa wa mwisho wakawacha. Plant haikujengwa kabisa."]},
+  narrative:{en:["The plant was sold as the answer to Kenya's power needs: cheap, reliable 'baseload' electricity to industrialise the country. Officials argued that coal is efficient, affordable energy — the fuel that built China, Germany and America — and that it was unfair for the West to deny Africa the same path. Amu Power promised thousands of jobs and a modern Lamu."],
+    sw:["Mtambo uliuzwa kama jibu la mahitaji ya umeme ya Kenya: umeme wa bei nafuu na wa kutegemewa wa kuendeleza viwanda. Maafisa walisema makaa ni nishati bora na nafuu — mafuta yaliyojenga China, Ujerumani na Amerika — na kwamba si haki Magharibi kunyima Afrika njia hiyo hiyo. Amu Power iliahidi maelfu ya ajira na Lamu ya kisasa."],
+    sh:["Plant iliuzwa kama solution ya umeme ya Kenya: power ya bei poa, ya kutegemewa, ya kuindustrialize nchi. Serikali ikasema coal ni efficient na cheap — ndio ilijenga China, Germany na America — na si fair Magharibi wakatae Africa hiyo njia. Amu Power ikapromise majobo elfu na Lamu ya kisasa."]},
+  gap:{en:["Here's what that pitch left out. Kenya has almost no coal — the plant would have burned imported coal, tying our power bills to a shipped-in fuel and a foreign loan. Kenya's grid was already more than 80% renewable (geothermal, hydro, wind); the country didn't need coal 'baseload', and the plant would have become the single biggest source of climate pollution in Kenya.",
+    "The 'the West built on coal' argument leaves out that those same countries are now shutting coal down as fast as they can. The promised jobs were few and mostly for outside experts, while Lamu's fishers would have lived with the ash and warm water for good. The real win: ordinary people used the law — real public participation and a UNESCO-protected coast — to shape a project the powerful had already signed. The same tools protect the next place."],
+    sw:["Hiki ndicho ujumbe huo uliacha. Kenya haina makaa kwa wingi — mtambo ungechoma makaa yaliyoagizwa nje, ukifunga bili zetu za umeme kwenye mafuta ya kuletwa na mkopo wa kigeni. Gridi ya Kenya ilikuwa tayari zaidi ya 80% nishati mbadala (jotoardhi, maji, upepo); nchi haikuhitaji makaa, na mtambo ungekuwa chanzo kikubwa zaidi cha uchafuzi wa tabianchi nchini.",
+    "Hoja ya 'Magharibi walijengwa na makaa' inaacha kwamba nchi hizo hizo sasa zinafunga makaa haraka iwezekanavyo. Ajira zilizoahidiwa zilikuwa chache na hasa za wataalamu wa nje, huku wavuvi wa Lamu wakiachwa na majivu na maji ya moto milele. Ushindi halisi: watu wa kawaida walitumia sheria — ushirikishwaji wa kweli na pwani inayolindwa na UNESCO — kuunda upya mradi ambao wenye nguvu walikuwa wamesaini. Zana hizo hizo zinalinda mahali panapofuata."],
+    sh:["Hii ndio hiyo pitch iliacha. Kenya haina coal — plant ingechoma coal ya kuimport, ikifunga bills zetu kwa fuel ya kuletwa na loan ya nje. Grid ya Kenya ilikuwa tayari zaidi ya 80% renewable (geothermal, maji, upepo); hatukuneed coal, na plant ingekuwa chanzo kikubwa cha pollution ya climate Kenya.",
+    "Hiyo story ya 'Magharibi walitumia coal' inaacha ati hao hao sasa wanastop coal haraka. Hizo jobs zilikuwa kidogo, mostly za wataalam wa nje, na wavuvi wa Lamu wangebaki na majivu na maji moto milele. Win ya kweli: watu wa kawaida walitumia sheria — public participation ya kweli na coast inaprotectiwa na UNESCO. Hizo tools zinaprotect place inayofuata."]},
+  action:{en:"Lamu proves it can be done. Know the two tools that shaped it: your right to real public participation, and protected land. Share this with anyone who thinks coal was 'lost jobs'.",
+    sw:"Lamu inathibitisha inawezekana. Fahamu zana mbili zilizosaidia: haki yako ya ushirikishwaji wa kweli, na ardhi inayolindwa. Shiriki hii na yeyote anayefikiri makaa yalikuwa 'ajira zilizopotea'.",
+    sh:"Lamu inaproof inawezekana. Jua hizo tools mbili: right yako ya public participation ya kweli, na ardhi inayoprotectiwa. Share na mtu yeyote anafikiri coal ilikuwa 'jobs zimepotea'."},
+  related:[{t:"basic",id:"climate-justice"},{t:"myth",id:"coal"}] },
+
+{ id:"lamu-oil", status:"ongoing", place:{en:"Lamu / Turkana",sw:"Lamu / Turkana",sh:"Lamu / Turkana"},
+  title:{en:"Oil, the Lamu port and the LAPSSET promise",
+         sw:"Mafuta, bandari ya Lamu na ahadi ya LAPSSET",
+         sh:"Oil, bandari ya Lamu na ile promise ya LAPSSET"},
+  summary:{en:"A mega-port and pipeline promise to turn oil into prosperity for Kenya's poorest regions. The fishers and herders are still waiting.",
+           sw:"Bandari kubwa na bomba vinaahidi kugeuza mafuta kuwa ustawi kwa maeneo maskini zaidi ya Kenya. Wavuvi na wafugaji bado wanasubiri.",
+           sh:"Bandari kubwa na pipeline zinapromise kugeuza oil kuwa utajiri kwa maeneo maskini za Kenya. Wavuvi na wafugaji bado wanangoja."},
+  happening:{en:["LAPSSET — the Lamu Port–South Sudan–Ethiopia Transport corridor — is a mega-project: a 32-berth port at Lamu plus roads, a railway and an oil pipeline meant to carry crude from the Turkana oil fields to the coast. The first berths at Lamu are built and operating.",
+    "Lamu fishers went to court over lost fishing grounds and won compensation of about 1.76 billion shillings in 2018. In Turkana, oil development has repeatedly stalled over land, revenue-sharing and transport disputes, and full-scale export has yet to happen."],
+    sw:["LAPSSET — korido ya Usafiri ya Bandari ya Lamu–Sudan Kusini–Ethiopia — ni mradi mkubwa: bandari ya vituo 32 huko Lamu pamoja na barabara, reli na bomba la mafuta la kubeba mafuta ghafi kutoka mashamba ya Turkana hadi pwani. Vituo vya kwanza vya Lamu vimejengwa na vinafanya kazi.",
+    "Wavuvi wa Lamu walienda mahakamani kuhusu maeneo ya uvuvi yaliyopotea na wakashinda fidia ya takriban shilingi bilioni 1.76 mwaka 2018. Huko Turkana, uendelezaji wa mafuta umekwama mara kwa mara kutokana na migogoro ya ardhi, mgawanyo wa mapato na usafiri, na usafirishaji kamili bado haujafanyika."],
+    sh:["LAPSSET — corridor ya Lamu Port–South Sudan–Ethiopia — ni mega-project: bandari ya berths 32 Lamu pamoja na barabara, reli na pipeline ya oil ya kubeba crude kutoka Turkana oil fields hadi coast. Berths za kwanza za Lamu zimejengwa, zinafanya kazi.",
+    "Wavuvi wa Lamu walienda court juu ya fishing grounds zilizopotea, wakashinda compensation ya kama shilingi bilioni 1.76 mwaka 2018. Turkana, oil imestall mara nyingi juu ya ardhi, revenue-sharing na transport, na export kamili bado haijafika."]},
+  narrative:{en:["The corridor is sold as transformation for Kenya's forgotten north and coast: oil money, a world-class port, jobs, roads and cities rising in the desert. 'Oil will lift the region out of poverty' is the headline; opposing it is framed as standing against development — and against your own community's future."],
+    sw:["Korido inauzwa kama mageuzi kwa kaskazini na pwani iliyosahaulika ya Kenya: pesa za mafuta, bandari ya kiwango cha juu, ajira, barabara na miji ikichipuka jangwani. 'Mafuta yatatoa eneo kwenye umaskini' ndiyo kichwa cha habari; kuupinga kunachorwa kama kupinga maendeleo — na mustakabali wa jamii yako mwenyewe."],
+    sh:["Corridor inauzwa kama transformation ya north na coast iliyosahauliwa: doo za oil, bandari ya world-class, majobo, barabara na miji ikijengeka jangwani. 'Oil itatoa region kwa umaskini' ndio headline; kupinga inaonekana kama unapinga maendeleo — na future ya community yako."]},
+  gap:{en:["Oil is capital-intensive, not labour-intensive. A finished pipeline and an automated port employ very few people, and the skilled jobs go to expatriates and outside contractors — the region gets construction work that ends when the building does. Meanwhile the land taken for the corridor is pastoralist and fisher land, often held communally with contested or no titles, and the fishing grounds that already feed Lamu can be damaged for good.",
+    "'Resource-rich, people-poor' is a pattern across Africa, not bad luck: oil revenue is volatile and easily lost to debt and leakage. The Lamu fishers' court win points to the honest questions to ask of any 'oil will save us' promise — who exactly gets the jobs, who loses the land and sea, and what happens to us when the oil runs out?"],
+    sw:["Mafuta yanahitaji mtaji mkubwa, si wafanyakazi wengi. Bomba lililokamilika na bandari ya kiotomatiki huajiri watu wachache sana, na kazi za ujuzi huenda kwa wageni na wakandarasi wa nje — eneo hupata kazi za ujenzi zinazoisha ujenzi ukiisha. Wakati huohuo ardhi iliyochukuliwa kwa korido ni ya wafugaji na wavuvi, mara nyingi ya jamii yenye hati zenye mgogoro au bila hati, na maeneo ya uvuvi yanayolisha Lamu yanaweza kuharibiwa milele.",
+    "'Tajiri wa maliasili, maskini wa watu' ni mtindo barani Afrika, si bahati mbaya: mapato ya mafuta hubadilikabadilika na hupotea kwa deni na uvujaji. Ushindi wa mahakama wa wavuvi wa Lamu unaelekeza kwenye maswali ya kweli ya kuuliza kila ahadi ya 'mafuta yatatuokoa' — ni nani hasa anapata ajira, ni nani anapoteza ardhi na bahari, na itakuwaje kwetu mafuta yakiisha?"],
+    sh:["Oil inahitaji capital kubwa, si watu wengi. Pipeline iliyokamilika na port ya automated inaajiri watu wachache sana, na skilled jobs zinaenda kwa expats na contractors wa nje — region inapata construction work inayoisha ujenzi ukiisha. Na ardhi iliyochukuliwa kwa corridor ni ya wafugaji na wavuvi, mostly ya community bila title deeds clear, na fishing grounds zinazolisha Lamu zinaeza haribika kabisa.",
+    "'Resource-rich, people-poor' ni pattern kote Africa, si bahati mbaya: doo za oil zinabadilika na zinapotea kwa madeni na wizi. Win ya court ya wavuvi wa Lamu inaonyesha maswali ya kweli kwa kila promise ya 'oil itatuokoa' — ni nani anapata jobs, ni nani anapoteza ardhi na bahari, na itakuaje kwetu oil ikiisha?"]},
+  action:{en:"Before the next 'oil = jobs' promise, ask three things: who gets the jobs, who loses the land and sea, and what's the plan when the oil runs out?",
+    sw:"Kabla ya ahadi ijayo ya 'mafuta = ajira', uliza mambo matatu: nani anapata ajira, nani anapoteza ardhi na bahari, na mpango ni upi mafuta yakiisha?",
+    sh:"Kabla ya promise ingine ya 'oil = jobs', uliza vitu tatu: nani anapata jobs, nani anapoteza ardhi na bahari, na plan ni gani oil ikiisha?"},
+  related:[{t:"myth",id:"oil"},{t:"basic",id:"climate-justice"}] },
+
+{ id:"western-gold", status:"threat", place:{en:"Kakamega / Siaya",sw:"Kakamega / Siaya",sh:"Kakamega / Siaya"},
+  title:{en:"Gold, guns and eviction in Western Kenya",
+         sw:"Dhahabu, bunduki na kufukuzwa Magharibi mwa Kenya",
+         sh:"Dhahabu, bunduki na eviction Western Kenya"},
+  summary:{en:"A British company is opening a huge gold mine at Ikolomani. In 2026, protests over evictions turned deadly.",
+           sw:"Kampuni ya Uingereza inafungua mgodi mkubwa wa dhahabu Ikolomani. Mwaka 2026, maandamano dhidi ya kufukuzwa yaligeuka mabaya.",
+           sh:"Kampuni ya wazungu inachimba dhahabu Ikolomani. 2026, maandamano juu ya eviction yakawa deadly."},
+  happening:{en:["Shanta Gold, a British-owned company, is developing large gold deposits in Western Kenya — at Ikolomani in Kakamega and around Gem-Ramula in Siaya. Roughly 1,200 households face relocation.",
+    "In 2026, protests against forced evictions at Gem-Ramula turned deadly when police opened fire, killing residents. The deposits are valued in the hundreds of billions of shillings."],
+    sw:["Shanta Gold, kampuni inayomilikiwa na Waingereza, inaendeleza mashapo makubwa ya dhahabu Magharibi mwa Kenya — huko Ikolomani (Kakamega) na maeneo ya Gem-Ramula (Siaya). Takriban kaya 1,200 zinakabiliwa na kuhamishwa.",
+    "Mwaka 2026, maandamano dhidi ya kufukuzwa kwa nguvu Gem-Ramula yaligeuka mabaya polisi walipofyatua risasi, wakiua wakazi. Mashapo haya yanakadiriwa kufikia mamia ya mabilioni ya shilingi."]},
+  narrative:{en:["Officials and the company frame the mines as a treasure that will bring jobs, roads and development to Western Kenya. Newspapers headline a 'Sh683 billion gold treasure'. The story: this is progress, and the protesters are blocking it."],
+    sw:["Maafisa na kampuni wanachora migodi kama hazina itakayoleta ajira, barabara na maendeleo Magharibi. Magazeti yanaandika 'hazina ya dhahabu ya Sh683 bilioni'. Hadithi: huu ni maendeleo, na waandamanaji wanauzuia."]},
+  gap:{en:["What the treasure headlines leave out: the gold is exported, the profit goes to shareholders abroad, and the real jobs are few and short-term. The land taken is ancestral and the titles are contested. It echoes Lamu coal and the Mui Basin — a big foreign project, thin consultation, and the community paying with their land and this time their lives.",
+    "The question worth asking of the 'treasure' story: who owns the minerals under community land, and who gets to decide? The encouraging part is that the same law that shaped the Lamu decision — real public participation and protected community land — applies here too."],
+    sw:["Kile vichwa vya 'hazina' vinaacha: dhahabu inasafirishwa nje, faida inaenda kwa wenye hisa ng'ambo, na ajira halisi ni chache na za muda. Ardhi inayochukuliwa ni ya asili na hati zina mgogoro. Inafanana na makaa ya Lamu na Bonde la Mui — mradi mkubwa wa kigeni, ushauri hafifu, jamii inalipa kwa ardhi na safari hii kwa maisha.",
+    "Swali la kuuliza kwenye 'hazina': nani anamiliki madini chini ya ardhi ya jamii, na nani anaamua? Jambo la kutia moyo ni kwamba sheria ileile iliyosaidia uamuzi wa Lamu — ushirikishwaji wa kweli na ardhi ya jamii iliyolindwa — inatumika hapa pia."]},
+  action:{en:"Know your land rights: community land is legally protected, and minerals need real consent. The Lamu playbook works here.",
+    sw:"Fahamu haki zako za ardhi: ardhi ya jamii inalindwa kisheria, na madini yanahitaji ridhaa ya kweli. Mkakati wa Lamu unafanya kazi hapa."},
+  related:[{t:"myth",id:"mining"},{t:"basic",id:"climate-justice"}] },
+
+{ id:"turkana-wind", status:"decided", place:{en:"Marsabit",sw:"Marsabit",sh:"Marsabit"},
+  title:{en:"Lake Turkana wind: green power, contested land",
+         sw:"Upepo wa Ziwa Turkana: nishati safi, ardhi yenye mgogoro",
+         sh:"Upepo wa Lake Turkana: green power, ardhi yenye mgogoro"},
+  summary:{en:"Africa's biggest wind farm powers the grid — but sits on land the local community says was taken without consent.",
+           sw:"Shamba kubwa zaidi la upepo Afrika linazalisha umeme — lakini liko kwenye ardhi jamii inasema ilichukuliwa bila ridhaa.",
+           sh:"Wind farm kubwa zaidi Africa inazalisha power — lakini iko kwa ardhi community inasema ilichukuliwa bila consent."},
+  happening:{en:["The Lake Turkana Wind Power project in Marsabit is the largest wind farm in Africa, feeding clean power into Kenya's grid. But the 150,000 acres it sits on is community land, and local Indigenous groups went to court arguing it was allocated without their consent.",
+    "In 2021 the Environment and Land Court ruled the land allocation irregular and unlawful, and ordered the process regularised — a landmark judgment, even as the turbines keep turning."],
+    sw:["Mradi wa Nishati ya Upepo wa Ziwa Turkana huko Marsabit ndio shamba kubwa zaidi la upepo barani Afrika, likipeleka nishati safi kwenye gridi ya Kenya. Lakini ekari 150,000 unazokaa ni ardhi ya jamii, na makundi ya asili ya wenyeji walienda mahakamani wakisema iligawiwa bila ridhaa yao.",
+    "Mwaka 2021 Mahakama ya Mazingira na Ardhi iliamua ugawaji wa ardhi haukuwa halali, na ikaamuru mchakato urekebishwe — hukumu ya kihistoria, hata mitambo ikiendelea kuzunguka."]},
+  narrative:{en:["The project is celebrated as a climate success story — proof that Kenya leads Africa on renewables, clean jobs and green investment. In that story, worrying about who owned the land looks like getting in the way of saving the planet."],
+    sw:["Mradi unasherehekewa kama hadithi ya mafanikio ya tabianchi — uthibitisho kwamba Kenya inaongoza Afrika kwa nishati mbadala, ajira safi na uwekezaji wa kijani. Katika hadithi hiyo, kuhangaikia nani alimiliki ardhi kunaonekana kama kuzuia kuokoa dunia."]},
+  gap:{en:["'Green' does not automatically mean 'just'. A renewable project can still take community land without proper consent, and moving pastoralists for climate-friendly power is still displacement. The court agreed: the land process was unlawful, even though the electricity is clean.",
+    "This is the heart of climate justice — how we move off fossil fuels matters as much as that we do. A just transition means the communities who host green projects share the benefits and give real consent, not just carry the cost so the grid can call itself clean."],
+    sw:["'Kijani' haimaanishi moja kwa moja 'haki'. Mradi wa nishati mbadala bado unaweza kuchukua ardhi ya jamii bila ridhaa sahihi, na kuwahamisha wafugaji kwa ajili ya nishati rafiki wa tabianchi bado ni kuhamishwa. Mahakama ilikubali: mchakato wa ardhi haukuwa halali, hata kama umeme ni safi.",
+    "Hii ndio kiini cha haki ya tabianchi — jinsi tunavyoacha nishati ya kisukuku ni muhimu kama vile kuiacha. Mpito wa haki unamaanisha jamii zinazokaribisha miradi ya kijani zinashiriki manufaa na kutoa ridhaa ya kweli, si kubeba tu gharama ili gridi ijiite safi."]},
+  action:{en:"'Green' isn't a free pass. Ask whether the community consented and shares the benefit — that's what makes a transition just.",
+    sw:"'Kijani' si kibali cha bure. Uliza kama jamii iliridhia na inashiriki manufaa — ndicho kinachofanya mpito uwe wa haki."},
+  related:[{t:"myth",id:"renewable"},{t:"basic",id:"just-transition"}] },
+
+{ id:"coast-plastics", status:"ongoing", place:{en:"Nairobi · Nakuru · Coast",sw:"Nairobi · Nakuru · Pwani",sh:"Nairobi · Nakuru · Coast"},
+  title:{en:"Drowning in plastic: Dandora, Gioto and the coast",
+         sw:"Kuzama kwenye plastiki: Dandora, Gioto na pwani",
+         sh:"Kuzama kwa plastiki: Dandora, Gioto na coast"},
+  summary:{en:"Kenya banned plastic bags — yet the dumpsites keep growing, and waste-pickers carry the health cost.",
+           sw:"Kenya ilipiga marufuku mifuko ya plastiki — lakini madampo yanaendelea kukua, na wakusanya taka wanabeba gharama ya afya.",
+           sh:"Kenya ilipiga ban mifuko ya plastiki — lakini madampo bado yanakua, na wakusanya taka wanabeba cost ya afya."},
+  happening:{en:["Kenya banned single-use plastic bags in 2017 and barred single-use plastics from protected areas in 2020 — among the strongest plastic laws in Africa. Yet Dandora (Nairobi), Gioto (Nakuru) and coastal dumpsites keep growing, fed by packaging, sachets and imported waste.",
+    "Thousands of people, many of them women and children, sort this waste by hand for a living — breathing smoke and handling hazardous material with no protection."]},
+  narrative:{en:["The story told is one of success and personal responsibility: Kenya 'solved' plastic with a tough bag ban, and what's left is just a litter problem — people being dirty, communities failing to clean up."]},
+  gap:{en:["A bag ban doesn't touch the flood of sachets, PET bottles and multinational packaging that has no return system, or the used plastic shipped in from rich countries. Blaming 'dirty communities' leaves out the producers who make single-use plastic the cheapest option and take no responsibility for its end.",
+    "The waste-pickers of Dandora are not the problem — they are doing the recycling the system won't. Real solutions bring in producers (make them responsible for their packaging), not just the poorest people at the end of the chain."]},
+  action:{en:"Next time you hear 'just don't litter', ask who makes the sachet — and who is paid to clean it up.",
+    sw:"Wakati mwingine unaposikia 'msitupe taka ovyo', uliza nani anatengeneza sachet — na nani analipwa kuisafisha."},
+  related:[{t:"basic",id:"climate-justice"}] },
+
+{ id:"siaya-nuclear", status:"proposed", place:{en:"Siaya · Lake Victoria",sw:"Siaya · Ziwa Victoria",sh:"Siaya · Lake Victoria"},
+  title:{en:"A nuclear plant proposed for the lakeshore",
+         sw:"Mtambo wa nyuklia unapendekezwa kando ya ziwa",
+         sh:"Nuclear plant inapendekezwa kando ya ziwa"},
+  summary:{en:"Kenya is planning a 2,000 MW nuclear plant at Bondo, Siaya — targeting power by 2034. Site studies are underway.",
+           sw:"Kenya inapanga mtambo wa nyuklia wa MW 2,000 huko Bondo, Siaya — ikilenga umeme ifikapo 2034. Utafiti wa eneo unaendelea.",
+           sh:"Kenya inapanga nuclear plant ya MW 2,000 huko Bondo, Siaya — ikilenga power ifikapo 2034. Site studies zinaendelea."},
+  happening:{en:["Kenya is planning its first nuclear power plant — a roughly 2,000-megawatt station at Bondo in Siaya, on Lake Victoria, estimated at around Sh500 billion. The government set a target of first power by 2034, with site studies and public consultations underway in 2026.",
+    "County leaders have backed the project, but many residents say they have had little real information or consultation so far."],
+    sw:["Kenya inapanga mtambo wake wa kwanza wa nyuklia — kituo cha takriban MW 2,000 huko Bondo, Siaya, kando ya Ziwa Victoria, kinachokadiriwa kufikia Sh bilioni 500. Serikali imeweka lengo la umeme wa kwanza ifikapo 2034, huku tafiti za eneo na mashauriano ya umma yakiendelea 2026.",
+    "Viongozi wa kaunti wameuunga mkono mradi, lakini wakazi wengi wanasema wamepata taarifa au mashauriano kidogo hadi sasa."]},
+  narrative:{en:["Nuclear is presented as clean, modern, high-tech baseload power — proof that Kenya is joining the big leagues, with jobs, industry and prestige to follow."],
+    sw:["Nyuklia inawasilishwa kama nishati safi, ya kisasa, ya teknolojia ya juu — uthibitisho kwamba Kenya inajiunga na mataifa makubwa, ikifuatiwa na ajira, viwanda na heshima."]},
+  gap:{en:["'Clean' skips the hard parts: where the radioactive waste goes for thousands of years, what a lakeside accident would mean for Lake Victoria's fishery and the millions who depend on it, and whether a project this expensive is the right bet when Kenya's cheap geothermal and solar are nowhere near tapped out.",
+    "The pattern to watch is the familiar one: a huge project decided far away, arriving with thin consultation. The useful response isn't a reflex yes or no — it's asking for the information and the genuine say the law entitles you to, before anything is built."],
+    sw:["'Safi' inaruka sehemu ngumu: taka za mionzi zinaenda wapi kwa maelfu ya miaka, ajali ya kando ya ziwa ingemaanisha nini kwa uvuvi wa Ziwa Victoria na mamilioni wanaoutegemea, na kama mradi wa gharama hii ni chaguo sahihi wakati jotoardhi na jua nafuu za Kenya hazijatumika kikamilifu.",
+    "Mtindo wa kuangalia ni uleule: mradi mkubwa unaoamuliwa mbali, ukija na mashauriano hafifu. Jibu la maana si ndio au hapana wa haraka — ni kuomba taarifa na sauti ya kweli sheria inayokupa, kabla ya kujenga chochote."]},
+  action:{en:"A project this big needs your informed consent, not just an announcement. Ask for the full information first.",
+    sw:"Mradi mkubwa hivi unahitaji ridhaa yako ya taarifa, si tangazo tu. Omba taarifa kamili kwanza."},
+  related:[{t:"basic",id:"just-transition"},{t:"myth",id:"renewable"}] }
+];
+
+var BIGQ = [
+{ id:"climate-change",
+  q:{en:"What is climate change — and why is Kenya hit hard when we barely caused it?",
+     sw:"Mabadiliko ya tabianchi ni nini — na kwa nini Kenya inaathirika sana ilhali hatukuyasababisha?",
+     sh:"Climate change ni nini — na kwa nini Kenya inaumia sana ilhali si sisi tulisababisha?"},
+  a:{en:["You've felt it: the rains no longer come when the old calendar says they should. Long rains fail, then floods wash the roads away; the seasons your grandparents could name have stopped behaving. That's climate change — the planet heating up because the world burned too much coal, oil and gas.",
+    "Kenya added almost none of that pollution, but we sit on the front line: drought in the north kills livestock, floods hit the lake basin, harvests fail. That mismatch — least blame, worst hit — is why the next question, justice, matters so much."],
+    sw:["Umeyahisi: mvua hazinyeshi tena zinapopaswa kulingana na kalenda ya zamani. Mvua ndefu zinakosa, kisha mafuriko yanasomba barabara; misimu ambayo babu zako wangeitaja imeacha kuwa ya kawaida. Hayo ni mabadiliko ya tabianchi — dunia inapata joto kwa sababu ulimwengu ulichoma makaa, mafuta na gesi kupita kiasi.",
+    "Kenya haikuchangia karibu chochote kwa uchafuzi huo, lakini tuko mstari wa mbele: ukame kaskazini unaua mifugo, mafuriko yanapiga eneo la ziwa, mavuno yanashindwa. Kutolingana huko — lawama ndogo, athari kubwa — ndiyo maana swali linalofuata, haki, ni muhimu sana."]} },
+{ id:"climate-justice",
+  q:{en:"What does climate justice mean?",sw:"Haki ya tabianchi ina maana gani?",sh:"Climate justice ina maana gani?"},
+  a:{en:["Climate change was caused mostly by rich countries that burned coal and oil for a hundred years to get wealthy. But it's poor communities — who burned almost nothing — who suffer first and worst: the herder in Marsabit burying cattle killed by drought, the family in Budalangi flooded out again.",
+    "Climate justice is fairness applied to that: those who caused the crisis should help fix it, and the people living it should have a real say in how. It isn't charity or aid — it's fairness. When you're told to 'adapt' to failing rains or move for a 'green' project, climate justice is the idea that says who should pay, and that your consent and your land count."],
+    sw:["Mabadiliko ya tabianchi yalisababishwa zaidi na nchi tajiri zilizochoma makaa na mafuta kwa miaka mia moja ili kutajirika. Lakini ni jamii maskini — zilizochoma karibu chochote — ndizo zinateseka kwanza na zaidi: mfugaji Marsabit anazika ng'ombe waliouawa na ukame, familia Budalangi imefurikwa tena.",
+    "Haki ya tabianchi ni usawa kwa hilo: waliosababisha janga wasaidie kulirekebisha, na wanaoliishi wawe na sauti ya kweli jinsi gani. Si sadaka wala msaada — ni usawa. Unapoambiwa 'ujimudu' mvua zinazokosa au uhame kwa mradi wa 'kijani', haki ya tabianchi ndiyo wazo linalosema nani alipe, na kwamba ridhaa yako na ardhi yako vinahesabika."],
+    sh:["Climate change ilisababishwa zaidi na hizo nchi za matajiri zilichoma makaa na oil kwa miaka mob wapate doo. Lakini ni sisi wa mashinani — hatujachoma kitu — ndio tunahangaika kwanza na zaidi: mfugaji Marsabit anazika ng'ombe zimeuawa na ukame, family Budalangi imefurikwa tena.",
+    "Climate justice ni fairness kwa hiyo: waliharibu wasaidie kurekebisha, na sisi tunaoumia tuwe na say ya kweli aje. Si msaada — ni fairness. Ukiambiwa 'adapt' kwa mvua zinakosa ama uhame kwa project ya 'green', climate justice ndio wazo linasema nani alipe, na consent yako na ardhi yako zinacount."]} },
+{ id:"carbon-credits",
+  q:{en:"What are carbon credits?",sw:"Mikopo ya kaboni ni nini?",sh:"Carbon credits ni nini?"},
+  a:{en:["A carbon credit is a permit that says one tonne of climate-heating gas was stopped or removed somewhere. Rich companies buy these credits so they can keep polluting while claiming to be 'net zero' or 'carbon neutral'.",
+    "Often the 'somewhere' is community land in northern Kenya — grasslands signed up to carbon projects. The promise is money for communities; the reality is often that outsiders profit, pastoralists lose control of grazing, and the polluter keeps polluting. The useful question is always: who really benefits, and who signed away the use of your land?"],
+    sw:["Mkopo wa kaboni ni kibali kinachosema tani moja ya gesi inayopasha joto tabianchi ilizuiwa au kuondolewa mahali fulani. Makampuni tajiri hununua vibali hivi ili waendelee kuchafua huku wakidai kuwa 'sifuri halisi' au 'hawana kaboni'.",
+    "Mara nyingi 'mahali fulani' ni ardhi ya jamii kaskazini mwa Kenya — nyanda zilizoandikishwa kwenye miradi ya kaboni. Ahadi ni pesa kwa jamii; uhalisia mara nyingi ni kwamba wageni wananufaika, wafugaji wanapoteza udhibiti wa malisho, na mchafuzi anaendelea kuchafua. Swali la maana daima ni: nani hasa ananufaika, na nani alisaini kuachia matumizi ya ardhi yako?"]} },
+{ id:"just-transition",
+  q:{en:"What is a 'just transition'?",sw:"'Mpito wa haki' ni nini?",sh:"'Just transition' ni nini?"},
+  a:{en:["The world has to move off coal, oil and gas. A 'just transition' means doing that in a way that doesn't dump the cost on workers and communities who had the least to do with the problem — retraining people, protecting livelihoods, and sharing the benefits of clean energy.",
+    "It's the difference between a green project that takes a community's land without consent, and one the community actually owns a stake in. For Kenya, a just transition is the whole point: we can build clean power and still get it wrong if the people who host it carry the cost and get none of the gain."],
+    sw:["Dunia lazima iache makaa, mafuta na gesi. 'Mpito wa haki' unamaanisha kufanya hivyo kwa njia isiyotupa gharama kwa wafanyakazi na jamii ambao hawakuchangia tatizo — kuwafunza watu upya, kulinda maisha, na kushiriki manufaa ya nishati safi.",
+    "Ni tofauti kati ya mradi wa kijani unaochukua ardhi ya jamii bila ridhaa, na ule ambao jamii inamiliki sehemu yake. Kwa Kenya, mpito wa haki ndio lengo lenyewe: tunaweza kujenga nishati safi na bado tukakosea ikiwa wanaoukaribisha wanabeba gharama bila kupata manufaa."]} }
+];
+
+var MYTHS = [
+{ id:"mining",
+  m:{en:"“Mining and coal bring jobs and development.”",sw:"“Uchimbaji na makaa vinaleta ajira na maendeleo.”",sh:"“Mining na coal zinaleta majobo na development.”"},
+  reality:{en:"The real jobs are few, short-term, and often go to outsiders with the skills. The mineral and the profit are exported. What stays is the open pit, the poisoned water and the lost land.",
+    sw:"Ajira halisi ni chache, za muda, na mara nyingi zinaenda kwa wageni wenye ujuzi. Madini na faida vinasafirishwa nje. Kinachobaki ni shimo wazi, maji yenye sumu na ardhi iliyopotea."},
+  why:{en:"The company and the officials approving it need public support, so 'jobs and development' becomes the headline — the easiest promise to make and the hardest to check.",
+    sw:"Kampuni na maafisa wanaoidhinisha wanahitaji uungwaji mkono, kwa hivyo 'ajira na maendeleo' huwa kichwa cha habari — ahadi rahisi kutoa na ngumu kuthibitisha."},
+  where:{en:"Western Kenya gold (Shanta Gold); the Mui Basin coal concessions.",sw:"Dhahabu ya Magharibi (Shanta Gold); mashapo ya makaa ya Bonde la Mui."},
+  link:"western-gold" },
+{ id:"coal",
+  m:{en:"“Coal is cheap, efficient energy — the developed world runs on it.”",sw:"“Makaa ni nishati nafuu na bora — dunia iliyoendelea inayategemea.”",sh:"“Coal ni power cheap na efficient — dunia iliyoendelea inaitumia.”"},
+  reality:{en:"Kenya has almost no coal, so the Lamu plant would have burned imported coal — tying our power bills to a shipped-in fuel and a foreign loan. Kenya's grid is already over 80% renewable, and the plant would have been the country's single biggest source of climate pollution. The 'developed world' is now shutting coal down.",
+    sw:"Kenya haina makaa kwa wingi, kwa hivyo mtambo wa Lamu ungechoma makaa ya kuagizwa — ukifunga bili zetu za umeme kwa mafuta ya kuletwa na mkopo wa kigeni. Gridi ya Kenya tayari ni zaidi ya 80% nishati mbadala, na mtambo ungekuwa chanzo kikubwa zaidi cha uchafuzi wa tabianchi nchini. Dunia 'iliyoendelea' sasa inafunga makaa."},
+  why:{en:"'Cheap and efficient' is coal's oldest slogan, and 'the West did it' turns a bad deal into a fairness argument. It served the lenders, the coal importers and the politicians.",
+    sw:"'Nafuu na bora' ni kaulimbiu ya zamani ya makaa, na 'Magharibi walifanya' hugeuza mpango mbaya kuwa hoja ya haki. Ilinufaisha wakopeshaji, waagizaji wa makaa na wanasiasa."},
+  where:{en:"The Lamu coal plant — defeated in 2019, abandoned by 2025.",sw:"Mtambo wa makaa wa Lamu — ulishindwa 2019, ukaachwa 2025."},
+  link:"lamu-coal" },
+{ id:"oil",
+  m:{en:"“Oil brings jobs and lifts a whole region out of poverty.”",sw:"“Mafuta yanaleta ajira na kutoa eneo lote kwenye umaskini.”",sh:"“Oil inaleta majobo na kutoa region yote kwa umaskini.”"},
+  reality:{en:"Oil is capital-intensive, not labour-intensive: a finished pipeline or refinery employs relatively few permanent people, and skilled work often goes to expatriates. The land taken is pastoralist and fisher land with contested titles, and revenue is volatile and easily lost to debt. 'Resource-rich, people-poor' is a pattern, not bad luck.",
+    sw:"Mafuta yanahitaji mtaji mkubwa, si wafanyakazi wengi: bomba au kiwanda kilichokamilika huajiri watu wachache wa kudumu, na kazi za ujuzi mara nyingi huenda kwa wageni. Ardhi inayochukuliwa ni ya wafugaji na wavuvi yenye hati za mgogoro, na mapato hubadilikabadilika na hupotea kwa deni. 'Tajiri wa maliasili, maskini wa watu' ni mtindo, si bahati mbaya."},
+  why:{en:"A region that needs opportunity is offered a big promise, and 'jobs' is the word that ends debate. Ask for the breakdown — permanent vs temporary, local vs imported — before it's counted as settled.",
+    sw:"Eneo linalohitaji fursa hupewa ahadi kubwa, na 'ajira' ndilo neno linalomaliza mjadala. Omba mchanganuo — za kudumu dhidi ya za muda, za wenyeji dhidi ya za kuletwa — kabla halijahesabiwa kama limekwisha."},
+  where:{en:"Dangote's Lamu refinery; Lamu port & LAPSSET; Turkana oil.",sw:"Kiwanda cha Dangote Lamu; bandari ya Lamu na LAPSSET; mafuta ya Turkana."},
+  link:"lamu-refinery" },
+{ id:"climate-rich",
+  m:{en:"“Climate change is a rich-country problem, not ours.”",sw:"“Mabadiliko ya tabianchi ni tatizo la nchi tajiri, si letu.”",sh:"“Climate change ni shida ya nchi za matajiri, si yetu.”"},
+  reality:{en:"Kenya is among the hardest hit on earth — drought in the north, floods in the lake basin, failing harvests — while having caused almost none of the pollution.",
+    sw:"Kenya ni miongoni mwa walioathirika zaidi duniani — ukame kaskazini, mafuriko eneo la ziwa, mavuno yanayoshindwa — ilhali haikusababisha karibu uchafuzi wowote."},
+  why:{en:"It feels distant and technical, and 'development first' messaging suggests the environment is a luxury for later.",
+    sw:"Linaonekana la mbali na la kiufundi, na ujumbe wa 'maendeleo kwanza' unadokeza mazingira ni anasa ya baadaye."},
+  where:{en:"Drought in Marsabit and Turkana; floods in Budalangi; every failed planting season.",sw:"Ukame Marsabit na Turkana; mafuriko Budalangi; kila msimu wa kupanda unaoshindwa."},
+  link:"climate-change" },
+{ id:"carbon",
+  m:{en:"“Carbon credits help the planet and pay communities.”",sw:"“Mikopo ya kaboni inasaidia dunia na kulipa jamii.”",sh:"“Carbon credits zinasaidia dunia na kulipa community.”"},
+  reality:{en:"They often let rich polluters keep polluting while claiming to be 'net zero', and the community land signed up for the credits can mean lost grazing control for little real money.",
+    sw:"Mara nyingi inaruhusu wachafuzi tajiri kuendelea kuchafua huku wakidai 'sifuri halisi', na ardhi ya jamii iliyoandikishwa inaweza kumaanisha kupoteza udhibiti wa malisho kwa pesa kidogo halisi."},
+  why:{en:"It sounds like a win-win, and the paperwork is complex enough that few can check who actually benefits.",
+    sw:"Inasikika kama ushindi kwa pande zote, na karatasi zake ni ngumu kiasi kwamba wachache wanaweza kuthibitisha nani ananufaika."},
+  where:{en:"Rangeland carbon projects across northern Kenya's community conservancies.",sw:"Miradi ya kaboni ya malisho katika hifadhi za jamii kaskazini mwa Kenya."},
+  link:null },
+{ id:"renewable",
+  m:{en:"“Renewable energy is automatically green and fair.”",sw:"“Nishati mbadala ni ya kijani na ya haki moja kwa moja.”",sh:"“Renewable energy ni green na fair moja kwa moja.”"},
+  reality:{en:"A wind or solar project can still take community land without consent. At Lake Turkana, a court ruled the land for Africa's biggest wind farm was allocated unlawfully — the power is clean, but the process wasn't.",
+    sw:"Mradi wa upepo au jua bado unaweza kuchukua ardhi ya jamii bila ridhaa. Ziwa Turkana, mahakama iliamua ardhi ya shamba kubwa zaidi la upepo Afrika iligawiwa kinyume cha sheria — umeme ni safi, lakini mchakato haukuwa."},
+  why:{en:"'Green' feels unarguably good, so it's easy to forget to ask who consented and who benefits.",
+    sw:"'Kijani' inaonekana njema bila ubishi, kwa hivyo ni rahisi kusahau kuuliza nani aliridhia na nani ananufaika."},
+  where:{en:"Lake Turkana Wind Power; the proposed nuclear plant at Siaya.",sw:"Nishati ya Upepo ya Ziwa Turkana; pendekezo la nyuklia Siaya."},
+  link:"turkana-wind" }
+];
+
+var AV_COLORS = ["#C0202A","#0C7A4D","#DC9A18","#26262b","#2C4B59"];
+var VOICES = [
+{ id:"v1", name:"Amina H.", place:{en:"Lamu",sw:"Lamu",sh:"Lamu"}, type:"video",
+  msg:{en:"My father fished these waters for 40 years. When they said 'coal will bring jobs', we asked — whose jobs? We had our say, and Lamu still breathes.",
+    sw:"Baba yangu alivua maji haya kwa miaka 40. Waliposema 'makaa yataleta ajira', tuliuliza — ajira za nani? Tulitoa sauti yetu, na Lamu bado inapumua.",
+    sh:"Mzee wangu alivua hapa kwa miaka 40. Waliposema 'coal italeta jobs', tukauliza — jobs za nani? Tulitoa say yetu, na Lamu bado inapumua."},
+  react:{fire:214,heart:98,angry:12} },
+{ id:"v2", name:"Brian O.", place:{en:"Dandora, Nairobi",sw:"Dandora, Nairobi",sh:"Dandora, Nairobi"}, type:"photo",
+  msg:{en:"They tell us 'don't litter'. Come see who makes the sachets we sort by hand all day. Let's talk about that too.",
+    sw:"Wanatuambia 'msitupe taka'. Njooni muone nani anatengeneza sachets tunazopanga kwa mikono kutwa nzima. Tuzungumzie hilo pia.",
+    sh:"Wanatuambia 'msitupe taka'. Kujeni muone nani anatengeneza hizo sachets tunasort na mikono whole day. Tuongee hiyo pia."},
+  react:{fire:167,heart:74,angry:41} },
+{ id:"v3", name:"Lokiru E.", place:{en:"Marsabit",sw:"Marsabit",sh:"Marsabit"}, type:"audio",
+  msg:{en:"The turbines turn on our grazing land. Clean power, yes — but we want a seat at the table. Green should also mean fair.",
+    sw:"Mitambo inazunguka kwenye ardhi yetu ya malisho. Nishati safi, ndio — lakini tunataka nafasi mezani. Kijani kiwe pia haki.",
+    sh:"Turbines zinazunguka kwa ardhi yetu ya malisho. Clean power, sawa — lakini tunataka seat kwa meza. Green iwe pia fair."},
+  react:{fire:132,heart:120,angry:28} },
+{ id:"v4", name:"Wanjiku M.", place:{en:"Ikolomani, Kakamega",sw:"Ikolomani, Kakamega",sh:"Ikolomani, Kakamega"}, type:"text",
+  msg:{en:"1,200 families asked to move for gold that leaves the country. We are not against progress — we want to be part of it.",
+    sw:"Kaya 1,200 zimeombwa zihame kwa ajili ya dhahabu inayoondoka nchini. Hatupingi maendeleo — tunataka kuwa sehemu yake.",
+    sh:"Familia 1,200 zimeombwa zihame kwa dhahabu inaondoka nchi. Hatupingi maendeleo — tunataka kuwa part yake."},
+  react:{fire:301,heart:156,angry:63} },
+{ id:"v5", name:"DJ Sgeorge", place:{en:"Kisumu",sw:"Kisumu",sh:"Kisumu"}, type:"text",
+  msg:{en:"Every 'oil = jobs' promise sounds the same. Fair question to ask: who actually gets those jobs, and for how long?",
+    sw:"Kila ahadi ya 'mafuta = ajira' inafanana. Swali la haki: nani hasa anapata hizo ajira, na kwa muda gani?",
+    sh:"Kila promise ya 'oil = jobs' inasikika sawa. Swali la haki: ni nani anapata hizo jobs kweli, na kwa muda gani?"},
+  react:{fire:189,heart:52,angry:9} }
+];
+var POLL = { q:{en:"In your area, has climate change hit your water, land or harvest?",
+  sw:"Katika eneo lako, je mabadiliko ya tabianchi yameathiri maji, ardhi au mavuno yako?",
+  sh:"Kwa area yako, je climate change imeaffect maji, ardhi ama mavuno yako?"}, yes:1284, no:206, voted:null };
+var TYPES = {
+  video:{en:"🎥 Video",sw:"🎥 Video",sh:"🎥 Video"}, photo:{en:"📷 Photo",sw:"📷 Picha",sh:"📷 Photo"},
+  audio:{en:"🎙 Audio",sw:"🎙 Sauti",sh:"🎙 Audio"}, text:{en:"✍️ Text",sw:"✍️ Maandishi",sh:"✍️ Text"}
+};
+
+/* ============================ ROUTER + RENDER ============================ */
+var state = { view:"ninini", id:null, lens:"happening", learnTab:"q", openAcc:null, shareType:"text" };
+var app = document.getElementById("app");
+function issueById(id){ for(var i=0;i<ISSUES.length;i++) if(ISSUES[i].id===id) return ISSUES[i]; return null; }
+function statusChip(s){ var st=STATUS[s]; return '<span class="chip '+st.cls+'">'+esc(L(st.t))+'</span>'; }
+function brandName(b){ return L(TAB[b].name); }
+
+function render(){
+  var v=state.view;
+  if(v==="ninini") app.innerHTML=viewNiNini();
+  else if(v==="issue") app.innerHTML=viewIssue();
+  else if(v==="news") app.innerHTML=viewStream("happening","news");
+  else if(v==="hearsay") app.innerHTML=viewStream("narrative","hearsay");
+  else if(v==="truth") app.innerHTML=viewStream("gap","truth");
+  else if(v==="learn") app.innerHTML=viewLearn();
+  else if(v==="voices") app.innerHTML=viewVoices();
+  updateChrome(); window.scrollTo(0,0); bind();
+}
+
+function viewNiNini(){
+  var f=null; for(var i=0;i<ISSUES.length;i++) if(ISSUES[i].featured){f=ISSUES[i];break;}
+  var snav=[["news","d-news"],["hearsay","d-hearsay"],["truth","d-truth"],["learn","d-learn"]].map(function(p){
+    return '<button data-nav="'+p[0]+'"><span class="dot '+p[1]+'"></span><span class="body"><span class="t">'+esc(brandName(p[0]))+'</span><span class="s">'+esc(L(TAB[p[0]].sub))+'</span></span><span class="arw">→</span></button>';
+  }).join("");
+  return '<section class="view">'+
+    '<div class="hero"><div class="pad"><div class="hero-grid">'+
+      '<div><div class="eyebrow"><span class="badge">RAIA</span><span class="txt">'+esc(L({en:"MazingiraKenya · the public platform",sw:"MazingiraKenya · jukwaa la umma",sh:"MazingiraKenya · platform ya public"}))+'</span></div>'+
+        '<h1>Ni Nini<span class="q">?</span></h1>'+
+        '<p class="lede">'+esc(L({en:"Kenya’s climate & environmental justice, ",sw:"Haki ya tabianchi na mazingira Kenya, ",sh:"Climate & environmental justice ya Kenya, "}))+
+          '<span class="mark">'+esc(L({en:"in everyday language",sw:"kwa lugha ya kawaida",sh:"kwa lugha ya kawaida"}))+'</span>.</p>'+
+        '<p class="about">'+esc(L({
+          en:"Words like ‘carbon credits’, ‘just transition’ and ‘EIA’ are shaping the future of our land, water and air — but they’re buried in jargon. Raia puts the story in plain Kenyan language: the news, how it’s being talked about, and the fuller picture — so you can follow it, and see where you fit in.",
+          sw:"Maneno kama ‘mikopo ya kaboni’, ‘mpito wa haki’ na ‘EIA’ yanaunda mustakabali wa ardhi, maji na hewa yetu — lakini yamezama kwenye lugha ngumu. Raia inaweka hadithi kwa lugha rahisi ya Kikenya: habari, jinsi inavyozungumzwa, na picha kamili — ili uifuate, na uone unapoingia.",
+          sh:"Maneno kama ‘carbon credits’, ‘just transition’ na ‘EIA’ yanashape future ya ardhi, maji na hewa yetu — lakini yamezama kwa jargon. Raia inaweka story kwa lugha ya kawaida: habari, jinsi inavyoongewa, na picha kamili — ili uifollow, na uone unapofit."}))+'</p></div>'+
+      '<div><div class="snav">'+snav+'</div></div>'+
+    '</div></div></div>'+
+    '<div class="shead"><h2>'+esc(L(UI.featured))+'</h2><span class="rule"></span></div>'+
+    featuredCard(f)+
+    '<div class="shead"><h2>'+esc(L(UI.issues))+'</h2><span class="rule"></span></div>'+
+    '<div class="grid">'+ISSUES.filter(function(x){return !x.featured;}).map(function(is){return issueCard(is,"mixed",L(is.summary));}).join("")+'</div>'+
+    footer()+
+  '</section>';
+}
+function featuredCard(f){
+  return '<button class="featured" data-open="'+f.id+'"><div class="ribbon">★ '+esc(L(UI.featured))+'</div><div class="fg">'+
+    '<div class="pad"><div class="meta" style="display:flex;gap:8px;align-items:center;margin-bottom:9px">'+statusChip(f.status)+'<span class="place">'+esc(L(f.place))+'</span></div>'+
+      '<h2>'+esc(L(f.title))+'</h2><p class="sum">'+esc(L(f.summary))+'</p></div>'+
+    '<div class="aside"><div class="lab">'+esc(L(UI.lensLabel))+'</div><div class="lensrow">'+
+      LENS.map(function(l){return '<span class="lenspill"><span class="dot '+l.dot+'"></span>'+esc(brandName(l.brand))+'</span>';}).join("")+
+    '</div></div></div></button>';
+}
+function issueCard(is,accent,sumtext){
+  return '<button class="card" data-open="'+is.id+'"><span class="accent a-'+accent+'"></span><span class="in">'+
+    '<span class="meta">'+statusChip(is.status)+'<span class="place">'+esc(L(is.place))+'</span></span>'+
+    '<h3>'+esc(L(is.title))+'</h3><p class="sum">'+esc(sumtext)+'</p></span></button>';
+}
+
+function viewIssue(){
+  var is=issueById(state.id); if(!is) return viewNiNini();
+  var lens=state.lens, lo; for(var i=0;i<LENS.length;i++) if(LENS[i].key===lens) lo=LENS[i];
+  var tabs='<div class="tabs" role="tablist">'+LENS.map(function(l){
+    return '<button role="tab" data-lens="'+l.key+'" aria-selected="'+(l.key===lens)+'">'+esc(brandName(l.brand))+'</button>';
+  }).join("")+'</div>';
+  var content=is[lens];
+  var note=isFallback(content)?'<span class="fallback-note">'+esc(L(UI.fallback))+'</span>':"";
+  var panel='<div class="lens-panel"><span class="k '+lo.brand+'">'+esc(L(TAB[lo.tab].sub))+'</span>'+note+paras(content)+'</div>';
+  var rel="";
+  if(is.related&&is.related.length){
+    rel='<div class="related"><div class="lab">'+esc(L(UI.understandMore))+'</div><div class="tagrow">'+
+      is.related.map(function(r){var label=r.t==="basic"?bigqLabel(r.id):mythLabel(r.id);
+        return '<button class="tag '+(r.t==="myth"?"myth":"")+'" data-rel="'+r.t+':'+r.id+'">'+esc(label)+'</button>';}).join("")+
+      '</div></div>';
+  }
+  return '<section class="view reading">'+
+    '<button class="back" data-back="1">← '+esc(L(UI.back))+'</button>'+
+    '<div class="issue-head"><div class="issue-meta">'+statusChip(is.status)+'<span class="place">'+esc(L(is.place))+'</span></div>'+
+    '<h1>'+esc(L(is.title))+'</h1></div>'+tabs+panel+
+    '<div class="actionbox"><span class="k gold">'+esc(L(UI.whatNow))+'</span><p>'+esc(L(is.action))+'</p></div>'+rel+
+  '</section>';
+}
+function bigqLabel(id){ for(var i=0;i<BIGQ.length;i++) if(BIGQ[i].id===id) return L(BIGQ[i].q); return id; }
+function mythLabel(id){ for(var i=0;i<MYTHS.length;i++) if(MYTHS[i].id===id) return L(MYTHS[i].m).replace(/[“”"]/g,""); return id; }
+
+function viewStream(lens,brand){
+  var cards=ISSUES.map(function(is){ var c=is[lens]; var v=L(c); var first=Array.isArray(v)?v[0]:v; return issueCard(is,brand,first); }).join("");
+  return '<section class="view">'+streamHero(brand)+'<div class="grid" style="margin-top:16px">'+cards+'</div>'+footer()+'</section>';
+}
+function streamHero(brand){
+  return '<div class="streamhero '+brand+'"><div class="eye">'+esc(L({en:"Stream",sw:"Mkondo",sh:"Stream"}))+'</div>'+
+    '<h1>'+esc(brandName(brand))+'</h1><p>'+esc(L(TAB[brand].sub))+'</p></div>';
+}
+
+function viewLearn(){
+  var tab=state.learnTab;
+  var seg='<div class="seg" role="tablist"><button role="tab" data-ltab="q" aria-selected="'+(tab==="q")+'">'+esc(L(UI.bigq))+
+    '</button><button role="tab" data-ltab="m" aria-selected="'+(tab==="m")+'">'+esc(L(UI.myths))+'</button></div>';
+  var body="";
+  if(tab==="q"){
+    BIGQ.forEach(function(b){var open=state.openAcc==="q:"+b.id;
+      body+='<div class="acc bigq'+(open?" open":"")+'" data-acc="q:'+b.id+'"><button aria-expanded="'+open+'"><span class="q">'+esc(L(b.q))+'</span><span class="plus">+</span></button>'+
+        '<div class="panel">'+paras(b.a)+'</div></div>';});
+  } else {
+    MYTHS.forEach(function(m){var open=state.openAcc==="m:"+m.id;
+      body+='<div class="acc myth'+(open?" open":"")+'" data-acc="m:'+m.id+'"><button aria-expanded="'+open+'"><span class="qmyth">'+esc(L(m.m))+'</span><span class="plus">+</span></button>'+
+        '<div class="panel">'+
+          '<div class="myth-row reality"><span class="lab">'+esc(realityLab())+'</span>'+paras(m.reality)+'</div>'+
+          '<div class="myth-row why"><span class="lab">'+esc(whyLab())+'</span><p>'+esc(L(m.why))+'</p></div>'+
+          '<div class="myth-row where"><span class="lab">'+esc(whereLab())+'</span><p>'+esc(L(m.where))+
+            (m.link?' · <a data-open="'+m.link+'" href="javascript:void 0">'+esc(L(UI.seeIn))+' →</a>':'')+'</p></div>'+
+        '</div></div>';});
+  }
+  return '<section class="view">'+streamHero("learn")+'<div class="reading" style="margin-top:16px">'+seg+body+'</div>'+footer()+'</section>';
+}
+function realityLab(){ return L({en:"The reality",sw:"Uhalisia",sh:"Ukweli"}); }
+function whyLab(){ return L({en:"Why it spreads",sw:"Kwa nini imeenea",sh:"Kwa nini imeenea"}); }
+function whereLab(){ return L({en:"Where you see it",sw:"Unakoiona",sh:"Unakoiona"}); }
+
+function viewVoices(){
+  var wall=VOICES.map(voiceCard).join("");
+  return '<section class="view"><div class="reading">'+streamHero("voices")+pollCard()+shareCard()+
+    '<div class="shead"><h2>'+esc(L({en:"On the wall",sw:"Ukutani",sh:"Kwa wall"}))+'</h2><span class="rule"></span></div>'+
+    '<div id="wall">'+wall+'</div>'+footer()+'</div></section>';
+}
+function pollCard(){
+  var tot=POLL.yes+POLL.no, yp=Math.round(POLL.yes/tot*100), np=100-yp;
+  return '<div class="poll" style="margin-top:16px"><h3>'+esc(L(POLL.q))+'</h3>'+
+    '<div class="btns"><button class="yes" data-poll="yes" aria-pressed="'+(POLL.voted==="yes")+'">'+esc(L({en:"Yes, it has",sw:"Ndio, imeathiri",sh:"Ndio, imeaffect"}))+'</button>'+
+      '<button class="no" data-poll="no" aria-pressed="'+(POLL.voted==="no")+'">'+esc(L({en:"Not yet",sw:"Bado",sh:"Bado"}))+'</button></div>'+
+    '<div class="pollbar"><span class="yy" style="width:'+yp+'%">'+yp+'%</span><span class="nn">'+np+'%</span></div>'+
+    '<p class="tot">'+tot.toLocaleString()+' '+esc(L({en:"neighbours have answered",sw:"majirani wamejibu",sh:"majirani wamejibu"}))+'</p></div>';
+}
+function shareCard(){
+  var types=Object.keys(TYPES).map(function(t){ return '<button data-stype="'+t+'" aria-pressed="'+(state.shareType===t)+'">'+esc(L(TYPES[t]))+'</button>'; }).join("");
+  var hint = state.shareType!=="text"
+    ? '<div class="mediahint">'+esc(L({en:"On the live app you’ll attach your file here. For this preview, add a caption below.",sw:"Kwenye app halisi utaambatanisha faili yako hapa. Kwa onyesho hili, ongeza maelezo hapa chini.",sh:"Kwa app ya kweli utaattach file yako hapa. Kwa preview hii, andika caption chini."}))+'</div>' : '';
+  return '<div class="share"><span class="k gold" style="color:var(--gold-2)">'+esc(L({en:"Add your voice",sw:"Ongeza sauti yako",sh:"Ongeza voice yako"}))+'</span>'+
+    '<h3>'+esc(L({en:"Been there? Say it.",sw:"Umeshuhudia? Sema.",sh:"Umeshuhudia? Nena."}))+'</h3>'+
+    '<p class="s">'+esc(L({en:"Photos, video, audio or words — from your area. Published only after moderation and your consent.",sw:"Picha, video, sauti au maneno — kutoka eneo lako. Huchapishwa tu baada ya ukaguzi na ridhaa yako.",sh:"Picha, video, audio ama maneno — kutoka area yako. Inapublishiwa tu baada ya moderation na consent yako."}))+'</p>'+
+    '<div class="typerow">'+types+'</div>'+hint+
+    '<textarea id="vmsg" rows="3" placeholder="'+esc(L({en:"What’s happening where you are?",sw:"Nini kinaendelea uliko?",sh:"Nini inaendelea uliko?"}))+'"></textarea>'+
+    '<div class="rowin"><input id="vname" placeholder="'+esc(L({en:"Name / alias",sw:"Jina / lakabu",sh:"Jina / alias"}))+'"><input id="vplace" placeholder="'+esc(L({en:"Area",sw:"Eneo",sh:"Area"}))+'"></div>'+
+    '<label class="consent"><input type="checkbox" id="vconsent"><span>'+esc(L({en:"I agree this may be published, per the Privacy Policy.",sw:"Ninakubali hii ichapishwe, kulingana na Sera ya Faragha.",sh:"Nakubali hii ipublishiwe, per Privacy Policy."}))+'</span></label>'+
+    '<button class="post" id="vpost">'+esc(L({en:"Post to the wall",sw:"Chapisha ukutani",sh:"Post kwa wall"}))+'</button></div>';
+}
+function voiceCard(v){
+  var initial=v.name.charAt(0).toUpperCase();
+  var color=AV_COLORS[(v.name.charCodeAt(0))%AV_COLORS.length];
+  var mediaHtml = v.type==="text" ? "" : '<div class="media '+v.type+'">'+esc(L(TYPES[v.type]).replace(/^[^ ]+ /,''))+' · '+esc(L({en:"tap to play",sw:"gusa kucheza",sh:"gusa kuplay"}))+'</div>';
+  var newflag = v.isNew?'<span class="newflag">'+esc(L({en:"You",sw:"Wewe",sh:"Wewe"}))+'</span>':'';
+  return '<div class="voice" data-vid="'+v.id+'"><div class="vtop"><span class="avatar" style="background:'+color+'">'+esc(initial)+'</span>'+
+    '<span class="who"><span class="nm">'+esc(v.name)+newflag+'</span><span class="pl">'+esc(L(v.place))+'</span></span>'+
+    '<span class="vtype">'+esc(L(TYPES[v.type]))+'</span></div>'+mediaHtml+
+    '<p class="msg'+(v.isNew?' new':'')+'">'+esc(L(v.msg))+'</p>'+
+    '<div class="reacts"><button data-react="fire">🔥 <span class="c">'+v.react.fire+'</span></button>'+
+      '<button data-react="heart">💚 <span class="c">'+v.react.heart+'</span></button>'+
+      '<button data-react="angry">😠 <span class="c">'+v.react.angry+'</span></button></div></div>';
+}
+
+function footer(){
+  return '<div class="footer overflow-anywhere"><p>'+esc(L({
+    en:"MazingiraKenya · Raia — the people’s platform for climate & environmental justice in Kenya.",
+    sw:"MazingiraKenya · Raia — jukwaa la wananchi la haki ya tabianchi na mazingira Kenya.",
+    sh:"MazingiraKenya · Raia — platform ya wananchi ya climate & environmental justice Kenya."}))+'</p>'+
+    '<p>Developed under AJWS Grant ID 17252. Processed under the Kenya Data Protection Act 2019 and, where applicable, the GDPR. <a href="raia-privacy.html">Privacy</a></p></div>';
+}
+
+function updateChrome(){
+  document.querySelectorAll(".bottomnav button, .desknav button").forEach(function(b){
+    var n=b.getAttribute("data-nav"); b.setAttribute("aria-current",(n===state.view)?"true":"false");
+  });
+  document.querySelectorAll(".bottomnav [data-nk]").forEach(function(sp){ sp.textContent=L(NAVSHORT[sp.getAttribute("data-nk")]); });
+  document.querySelectorAll(".desknav button").forEach(function(b){ b.textContent=L(TAB[b.getAttribute("data-nav")].name); });
+  document.querySelectorAll(".langs button").forEach(function(b){ b.setAttribute("aria-pressed",b.getAttribute("data-lang")===LANG?"true":"false"); });
+  document.documentElement.lang = LANG==="en"?"en":"sw";
+}
+
+function bind(){
+  app.querySelectorAll("[data-open]").forEach(function(el){ el.addEventListener("click",function(){ openIssue(el.getAttribute("data-open")); }); });
+  app.querySelectorAll("[data-back]").forEach(function(el){ el.addEventListener("click",function(){ go("ninini"); }); });
+  app.querySelectorAll("[data-nav]").forEach(function(el){ el.addEventListener("click",function(){ go(el.getAttribute("data-nav")); }); });
+  app.querySelectorAll(".tabs [data-lens]").forEach(function(el){ el.addEventListener("click",function(){ state.lens=el.getAttribute("data-lens"); render(); }); });
+  app.querySelectorAll("[data-ltab]").forEach(function(el){ el.addEventListener("click",function(){ state.learnTab=el.getAttribute("data-ltab"); state.openAcc=null; render(); }); });
+  app.querySelectorAll("[data-acc]").forEach(function(el){ el.querySelector("button").addEventListener("click",function(){ var k=el.getAttribute("data-acc"); state.openAcc=(state.openAcc===k)?null:k; render(); }); });
+  app.querySelectorAll("[data-rel]").forEach(function(el){ el.addEventListener("click",function(){ var p=el.getAttribute("data-rel").split(":"); state.learnTab=(p[0]==="basic")?"q":"m"; state.openAcc=((p[0]==="basic")?"q:":"m:")+p[1]; go("learn"); }); });
+  app.querySelectorAll("[data-poll]").forEach(function(el){ el.addEventListener("click",function(){ votePoll(el.getAttribute("data-poll")); }); });
+  app.querySelectorAll("[data-stype]").forEach(function(el){ el.addEventListener("click",function(){ state.shareType=el.getAttribute("data-stype"); render(); }); });
+  var post=document.getElementById("vpost"); if(post) post.addEventListener("click",postVoice);
+  app.querySelectorAll(".voice").forEach(function(vc){
+    vc.querySelectorAll("[data-react]").forEach(function(btn){
+      btn.addEventListener("click",function(){ var id=vc.getAttribute("data-vid"), r=btn.getAttribute("data-react");
+        for(var i=0;i<VOICES.length;i++) if(VOICES[i].id===id){ VOICES[i].react[r]++; btn.querySelector(".c").textContent=VOICES[i].react[r]; break; } });
+    });
+  });
+}
+function votePoll(choice){ if(POLL.voted===choice) return; if(POLL.voted){ POLL[POLL.voted]--; } POLL[choice]++; POLL.voted=choice; render(); }
+function postVoice(){
+  var msg=(document.getElementById("vmsg").value||"").trim();
+  var consent=document.getElementById("vconsent").checked;
+  var pb=document.getElementById("vpost");
+  if(!msg||!consent){ pb.textContent=L({en:"Add a message + tick consent",sw:"Ongeza ujumbe + kubali",sh:"Ongeza message + kubali"});
+    setTimeout(function(){ pb.textContent=L({en:"Post to the wall",sw:"Chapisha ukutani",sh:"Post kwa wall"}); },1600); return; }
+  var name=(document.getElementById("vname").value||"").trim()||L({en:"Anonymous",sw:"Bila jina",sh:"Anon"});
+  var place=(document.getElementById("vplace").value||"").trim()||L({en:"Kenya",sw:"Kenya",sh:"Kenya"});
+  VOICES.unshift({ id:"u"+Date.now(), name:name, place:place, type:state.shareType, msg:msg, react:{fire:0,heart:0,angry:0}, isNew:true });
+  state.shareType="text"; render();
+}
+function openIssue(id){ state.id=id; state.lens="happening"; state.view="issue"; render(); }
+function go(v){ state.view=v; render(); }
+
+document.querySelectorAll(".bottomnav button, .desknav button").forEach(function(b){ b.addEventListener("click",function(){ go(b.getAttribute("data-nav")); }); });
+document.querySelectorAll(".langs button").forEach(function(b){ b.addEventListener("click",function(){ LANG=b.getAttribute("data-lang"); try{localStorage.setItem("raia.lang",LANG);}catch(e){} render(); }); });
+
+render();
+if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
+  window.addEventListener("load",function(){ navigator.serviceWorker.register("raia-sw.js").catch(function(){}); });
+}
+</script>
+</body>
+</html>
