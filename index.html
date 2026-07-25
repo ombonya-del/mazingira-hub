@@ -90,7 +90,7 @@ header.top{
   border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top);
 }
 .top-inner{ height:var(--nav-h); display:flex; align-items:center; gap:14px; }
-.brand{ display:flex; align-items:baseline; gap:8px; margin-right:auto; min-width:0; }
+.brand{ display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:1px; margin-right:auto; min-width:0; }
 .brand-mark{
   font-family:Lora, serif; font-size:1.14rem; font-weight:700; color:var(--text);
   letter-spacing:-.02em; white-space:nowrap;
@@ -134,8 +134,8 @@ nav.tabs.tabs-desk{ display:none; }
   nav.tabs.tabs-mob .tabs-inner{ display:flex; width:100%; gap:0; overflow:visible; }
   nav.tabs.tabs-mob a{
     flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:2px;
-    padding:7px 1px 6px; border-bottom:0 !important; font-size:.52rem; letter-spacing:0; line-height:1.1;
-    text-transform:none; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    padding:7px 1px 6px; border-bottom:0 !important; font-size:.5rem; font-weight:800; letter-spacing:.02em; line-height:1.1;
+    text-transform:uppercase; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   nav.tabs.tabs-mob a span{ max-width:100%; overflow:hidden; text-overflow:ellipsis; }
   nav.tabs.tabs-mob a .ico{ width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
@@ -247,7 +247,9 @@ main > [data-view].view-on.sub-off{ display:none; }
 /* gateway to the public platform (raia) */
 .btn--public{ background:rgba(98,199,155,.10); border-color:rgba(98,199,155,.45); color:var(--green); text-transform:none; letter-spacing:0; }
 .btn--public:hover{ background:rgba(98,199,155,.18); border-color:var(--green); text-decoration:none; }
-@media (max-width:560px){ .brand-sub{ display:none; } }
+/* compact, less-prominent header actions */
+.top-inner .btn{ padding:7px 11px; font-size:.64rem; }
+@media (max-width:560px){ .top-inner .btn{ padding:6px 9px; font-size:.6rem; letter-spacing:.06em; } }
 .btn--ghost{ background:transparent; color:var(--text); border-color:var(--line-2); }
 .btn--ghost:hover{ border-color:var(--muted); text-decoration:none; }
 .btn--green{ background:var(--green); color:#062018; }
@@ -1016,7 +1018,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
   <div class="wrap top-inner">
     <div class="brand">
       <span class="brand-mark">Mazingira<span class="k">Kenya</span></span>
-      <span class="brand-sub">hub.mazingirakenya.org</span>
+      <span class="brand-sub">Comms Hub</span>
     </div>
     <span class="sysstat"><span class="dot" aria-hidden="true"></span><span id="sync">Synced</span></span>
     <a class="btn btn--public" href="https://raia.mazingirakenya.org" target="_blank" rel="noopener" title="Open raia — the public platform">raia ↗</a>
@@ -1096,7 +1098,6 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
   <div class="wrap">
     <div class="deck-top">
       <div class="grow" style="flex:1; min-width:260px">
-        <p class="kicker">MazingiraKenya Communications Hub · sector coordination dashboard</p>
         <h1>Extractive pressure and civil society response, county by county.</h1>
       </div>
       <p class="deck-vision">“A one stop shop that can let you know in a heartbeat what the climate justice ecosystem looks like — and is essentially a call to action.”</p>
@@ -1912,9 +1913,8 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
       </div>
     </div>
     <div class="foot-bar">
-      <span>Developed under AJWS Grant ID 17252 in support of the development of mazingirakenya.org — to
-        consolidate knowledge-sharing, sector coordination, and public awareness across the climate and
-        environmental justice ecosystem in Kenya. Processed under the Kenya Data Protection Act 2019 and, where applicable, the GDPR.</span>
+      <span>Developed under AJWS Grant ID 17252 to consolidate knowledge sharing, sector coordination
+        and public awareness across the climate and environmental justice ecosystem in Kenya.</span>
       <span class="spacer">© <span id="yr"></span> MazingiraKenya</span>
     </div>
   </div>
