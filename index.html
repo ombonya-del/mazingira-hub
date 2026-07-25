@@ -115,10 +115,13 @@ nav.tabs a{
 nav.tabs a:hover{ color:var(--text); text-decoration:none; }
 nav.tabs a.on{ color:var(--text); border-bottom-color:var(--ember-hot); }
 /* Desktop shows the full expanded tabs; mobile shows the consolidated bar + Explore sub-tabs */
-.tabs-desk{ display:none; }
+/* NOTE: a generic `.tabs{display:flex}` widget rule exists lower in this file (used by
+   in-page tab groups like #deskTabs). Our nav bars also carry class `tabs`, so these
+   responsive rules are scoped `nav.tabs.tabs-*` to out-specify it and actually hide one bar. */
+nav.tabs.tabs-desk{ display:none; }
 @media (min-width:860px){
-  .tabs-desk{ display:block; }
-  .tabs-mob{ display:none; }
+  nav.tabs.tabs-desk{ display:block; }
+  nav.tabs.tabs-mob{ display:none; }
   #exploreSub{ display:none !important; }
 }
 
