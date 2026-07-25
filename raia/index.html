@@ -204,6 +204,8 @@ main{padding-top:22px}
 .drow p{margin:0 0 11px}
 .dtrue{background:var(--paper2);border-radius:10px;padding:10px 12px;font-weight:700}
 .dtrue .dlab{margin-bottom:0;margin-right:5px}
+.dsrc{margin:10px 0 0}
+.dsrc a{font-size:.8rem;font-weight:800;color:var(--green-ink)}
 /* case study / real-life examples */
 .case{margin-top:14px;border-top:1px dashed var(--line);padding-top:14px}
 .case-h{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
@@ -344,7 +346,8 @@ var UI = {
   disinfoTab:{en:"Spot the lie",sw:"Upotoshaji",sh:"Propaganda"},
   whyBad:{en:"Why it doesn’t hold up",sw:"Kwa nini haisimami",sh:"Kwa nini haishiki"},
   whatsTrue:{en:"What’s true",sw:"Ukweli",sh:"Ukweli"},
-  spreading:{en:"Spreading on",sw:"Inasambaa",sh:"Inasambaa"}
+  spreading:{en:"Spreading on",sw:"Inasambaa",sh:"Inasambaa"},
+  factcheck:{en:"See the fact-check",sw:"Ona uhakiki",sh:"Ona fact-check"}
 };
 var TAB = {
   ninini:{name:{en:"Ni Nini?",sw:"Ni Nini?",sh:"Rada?"}, sub:{en:"What this is about",sw:"Ni kuhusu nini",sh:"Ni kuhusu nini"}},
@@ -715,6 +718,12 @@ var DISINFO = [
     sh:"Photos za zamani ama zisizohusiana mara nyingi zinarelabeliwa kudai disaster ni ‘staged’. Wakati huo drought na floods za Kenya zinapimwa na met department, satellites na hospitali — si image moja inayotrend."},
   truth:{en:"Check the source and date of an image before you share it.",sw:"Angalia chanzo na tarehe ya picha kabla ya kuisambaza.",sh:"Check source na date ya image kabla ya kuishare."} }
 ];
+var DISINFO_SRC = {
+  d1:{u:"https://pesacheck.org/false-this-study-does-not-confirm-human-emissions-have-zero-impact-on-climate-change/", s:"PesaCheck"},
+  d2:{u:"https://www.aciafrica.org/news/21531/faith-groups-in-kenya-urged-to-debunk-myths-promoting-fossil-fuels", s:"350Africa"},
+  d3:{u:"https://africauncensored.online/blog/2025/06/13/carbon-credits-a-climate-financing-solution-for-kenya/", s:"Africa Uncensored"},
+  d4:{u:"https://nation.africa/kenya/climate/climate-environmental-activists-reject-dangote-s-proposed-sh2-2-trillion-lamu-oil-refinery-project--5526536", s:"Daily Nation"}
+};
 var AV_COLORS = ["#C0202A","#0C7A4D","#DC9A18","#26262b","#2C4B59"];
 var VOICES = [
 { id:"v1", name:"Amina H.", place:{en:"Lamu",sw:"Lamu",sh:"Lamu"}, type:"video",
@@ -854,12 +863,14 @@ function viewLearn(){
       body+='<div class="acc bigq'+(open?" open":"")+'" data-acc="q:'+b.id+'"><button aria-expanded="'+open+'"><span class="q">'+esc(L(b.q))+'</span><span class="plus">+</span></button>'+
         '<div class="panel">'+paras(b.a)+caseHtml(CASES[b.id])+'</div></div>';});
   } else if(tab==="d"){
-    DISINFO.forEach(function(x){ var v=VERDICT[x.verdict];
+    DISINFO.forEach(function(x){ var v=VERDICT[x.verdict]; var src=DISINFO_SRC[x.id];
       body+='<div class="dcard '+v.cls+'"><div class="dtop"><span class="verdict '+v.cls+'">'+esc(L(v.t))+'</span>'+
         '<span class="dwhere">'+esc(L(UI.spreading))+': '+esc(L(x.where))+'</span></div>'+
         '<p class="dclaim">“'+esc(L(x.claim))+'”</p>'+
         '<div class="drow"><span class="dlab bad">'+esc(L(UI.whyBad))+'</span><p>'+esc(L(x.why))+'</p></div>'+
-        '<div class="dtrue"><span class="dlab good">'+esc(L(UI.whatsTrue))+'</span>'+esc(L(x.truth))+'</div></div>';});
+        '<div class="dtrue"><span class="dlab good">'+esc(L(UI.whatsTrue))+'</span>'+esc(L(x.truth))+'</div>'+
+        (src?'<p class="dsrc"><a href="'+esc(src.u)+'" target="_blank" rel="noopener noreferrer">'+esc(L(UI.factcheck))+' · '+esc(src.s)+' ↗</a></p>':'')+
+        '</div>';});
   } else {
     MYTHS.forEach(function(m){var open=state.openAcc==="m:"+m.id;
       body+='<div class="acc myth'+(open?" open":"")+'" data-acc="m:'+m.id+'"><button aria-expanded="'+open+'"><span class="qmyth">'+esc(L(m.m))+'</span><span class="plus">+</span></button>'+
