@@ -216,7 +216,7 @@ button{font-family:inherit;cursor:pointer}
     <p>Moderation &amp; operations console. Authorised coalition staff only.</p>
     <input id="gcode" type="password" placeholder="Access code" autocomplete="off" aria-label="Access code">
     <button id="gbtn">Sign in</button>
-    <p class="hint">Prototype gate — real sign-in will use Supabase auth + row-level security. Demo code: <b>demo</b></p>
+    <p class="hint">Authorised coalition staff only. Production sign-in uses Supabase Auth + access control.</p>
   </div>
 </div>
 
@@ -573,19 +573,41 @@ function openAddMember(){
 document.getElementById("overlay").addEventListener("click",function(e){ if(e.target===this) closeModal(); });
 document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeModal(); });
 
-/* ============================ GATE ============================ */
-function unlock(){
+/* ============================ GATE (prototype) ============================
+   Client-side placeholder ONLY — not real security. Production perimeter =
+   access control in front of admin.mazingirakenya.org + Supabase Auth (magic-link)
+   with the members-table role check. See ADMIN-ACCESS-PROTOCOL.md. */
+var GATE_CODE = "deCOAL-2026";           // change here; replaced by real auth at launch
+var gateTries = 0;
+function gateMsg(m){ var h=document.querySelector(".gate .hint"); if(h){ h.textContent=m; h.style.color="#E5625A"; } }
+function showConsole(){
   document.getElementById("gate").classList.add("hidden");
   document.getElementById("shell").classList.add("on");
   render();
 }
+function unlock(){
+  var lockedUntil = +(sessionStorage.getItem("mzk_lock")||0);
+  if(Date.now() < lockedUntil){ gateMsg("Too many attempts — wait a minute."); return; }
+  var v = (document.getElementById("gcode").value||"").trim();
+  if(v !== GATE_CODE){
+    gateTries++;
+    if(gateTries >= 5){ try{ sessionStorage.setItem("mzk_lock", Date.now()+60000); }catch(e){} gateTries=0; gateMsg("Locked for 1 minute."); }
+    else gateMsg("Incorrect code.");
+    document.getElementById("gcode").value="";
+    return;
+  }
+  try{ sessionStorage.setItem("mzk_auth","1"); }catch(e){}
+  showConsole();
+}
 document.getElementById("gbtn").addEventListener("click",unlock);
 document.getElementById("gcode").addEventListener("keydown",function(e){ if(e.key==="Enter") unlock(); });
 document.getElementById("signout").addEventListener("click",function(){
+  try{ sessionStorage.removeItem("mzk_auth"); }catch(e){}
   document.getElementById("shell").classList.remove("on");
   document.getElementById("gate").classList.remove("hidden");
   document.getElementById("gcode").value="";
 });
+try{ if(sessionStorage.getItem("mzk_auth")==="1") showConsole(); }catch(e){}
 
 if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
   window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
