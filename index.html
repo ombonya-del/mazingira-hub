@@ -142,9 +142,12 @@ nav.tabs.tabs-desk{ display:none; }
   nav.tabs.tabs-mob a .ico{ width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
   nav.tabs.tabs-mob a.on{ color:var(--green); }
   body{ padding-bottom:calc(53px + env(safe-area-inset-bottom)); }
-  /* keep the Road-to-COP31 bar and the Explore sub-tabs pinned while the page scrolls */
-  a.copbar{ position:sticky; top:calc(var(--nav-h) + env(safe-area-inset-top)); z-index:88; }
-  nav.subtabs{ top:calc(var(--nav-h) + 36px + env(safe-area-inset-top)); }
+  /* pin the Road-to-COP31 bar, then the Explore sub-tabs FLUSH beneath it — copbar has a fixed
+     height so the sub-tabs offset is exact and no content bleeds through a gap */
+  a.copbar{ position:sticky; top:calc(var(--nav-h) + env(safe-area-inset-top)); z-index:88; height:36px; }
+  nav.subtabs#exploreSub{ position:sticky; top:calc(var(--nav-h) + 36px + env(safe-area-inset-top)); z-index:88; }
+  nav.subtabs#exploreSub .subtabs-inner{ overflow-x:visible; }
+  nav.subtabs#exploreSub a{ flex:1 1 0; min-width:0; text-align:center; white-space:nowrap; font-size:.6rem; letter-spacing:.01em; padding:9px 2px 7px; }
 }
 
 /* Explore sub-tabs — sit just beneath the primary bar */
@@ -1118,8 +1121,8 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 <!-- ===================== EXPLORE SUB-TABS (Map · Gaps · Network · Legal) ===================== -->
 <nav class="subtabs" id="exploreSub" aria-label="Explore sections" hidden>
   <div class="wrap subtabs-inner">
-    <a href="#map"     data-sub="map" class="on">National map</a>
-    <a href="#sectors" data-sub="sectors">Sector gaps</a>
+    <a href="#map"     data-sub="map" class="on">Map</a>
+    <a href="#sectors" data-sub="sectors">Gaps</a>
     <a href="#network" data-sub="network">Network</a>
     <a href="#legal"   data-sub="legal">Legal</a>
     <a href="#sentiment" data-sub="sentiment">Sentiment</a>
