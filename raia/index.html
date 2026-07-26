@@ -227,6 +227,13 @@ main{padding-top:22px}
 .lie-debunk .drow p{margin:0 0 11px}
 .lie-debunk .dtrue{background:var(--card)}
 .lp-embed{margin:12px 0 4px}
+.dsrc-card{display:flex;align-items:center;gap:11px;margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:8px;text-decoration:none}
+.dsrc-card:hover{border-color:var(--green-ink)}
+.dsrc-thumb{width:60px;height:60px;object-fit:cover;border-radius:8px;flex:0 0 auto;background:var(--paper2)}
+.dsrc-thumb.noimg{display:grid;place-items:center;font-size:1.3rem}
+.dsrc-meta{display:flex;flex-direction:column;line-height:1.3;min-width:0}
+.dsrc-meta b{font-size:.9rem;color:var(--ink)}
+.dsrc-meta>span{font-size:.78rem;color:var(--green-ink);font-weight:800}
 /* case study / real-life examples */
 .case{margin-top:14px;border-top:1px dashed var(--line);padding-top:14px}
 .case-h{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
@@ -741,9 +748,11 @@ var DISINFO = [
 ];
 var DISINFO_SRC = {
   d1:{u:"https://pesacheck.org/false-this-study-does-not-confirm-human-emissions-have-zero-impact-on-climate-change/", s:"PesaCheck"},
-  d2:{u:"https://www.aciafrica.org/news/21531/faith-groups-in-kenya-urged-to-debunk-myths-promoting-fossil-fuels", s:"350Africa"},
-  d3:{u:"https://africauncensored.online/blog/2025/06/13/carbon-credits-a-climate-financing-solution-for-kenya/", s:"Africa Uncensored"},
-  d4:{u:"https://nation.africa/kenya/climate/climate-environmental-activists-reject-dangote-s-proposed-sh2-2-trillion-lamu-oil-refinery-project--5526536", s:"Daily Nation"}
+  d2:{u:"https://www.aciafrica.org/news/21531/faith-groups-in-kenya-urged-to-debunk-myths-promoting-fossil-fuels", s:"ACI Africa", thumb:"https://www.aciafrica.org/images/aci-africa-news-photos-2026-04-30t185932_1777572538.jpg?w=1200&format=jpeg"},
+  d3:{u:"https://africauncensored.online/blog/2025/06/13/carbon-credits-a-climate-financing-solution-for-kenya/", s:"Africa Uncensored", thumb:"https://africauncensored.online/wp-content/uploads/2025/04/32644652496_ecc39ff11f_o-scaled.jpg"},
+  d4:{u:"https://nation.africa/kenya/climate/climate-environmental-activists-reject-dangote-s-proposed-sh2-2-trillion-lamu-oil-refinery-project--5526536", s:"Daily Nation"},
+  d5:{u:"https://nation.africa/kenya/climate/climate-environmental-activists-reject-dangote-s-proposed-sh2-2-trillion-lamu-oil-refinery-project--5526536", s:"Daily Nation"},
+  d6:{u:"https://pesacheck.org/false-this-image-does-not-depict-flooding-in-bungoma-county-kenya-e24e83a34d2f", s:"PesaCheck"}
 };
 /* How each lie is circulating — drives the post-style card. `video` is a real, verified
    "fuller picture" clip that tap-loads (YouTube = a real live embed). Social-post embeds
@@ -917,7 +926,7 @@ function viewLearn(){
           '<div class="drow"><span class="dlab bad">'+esc(L(UI.whyBad))+'</span><p>'+esc(L(x.why))+'</p></div>'+
           '<div class="dtrue"><span class="dlab good">'+esc(L(UI.whatsTrue))+'</span>'+esc(L(x.truth))+'</div>'+
           media+
-          (src?'<p class="dsrc"><a href="'+esc(src.u)+'" target="_blank" rel="noopener noreferrer">'+esc(L(UI.factcheck))+' · '+esc(src.s)+' ↗</a></p>':'')+
+          (src?'<a class="dsrc-card" href="'+esc(src.u)+'" target="_blank" rel="noopener noreferrer">'+(src.thumb?'<img class="dsrc-thumb" src="'+esc(src.thumb)+'" alt="" loading="lazy">':'<span class="dsrc-thumb noimg">🔗</span>')+'<span class="dsrc-meta"><b>'+esc(L(UI.factcheck))+'</b><span>'+esc(src.s)+' ↗</span></span></a>':'')+
         '</div>'+
       '</article>';});
   } else {

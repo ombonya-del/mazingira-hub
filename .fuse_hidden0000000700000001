@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0A1512">
 <link rel="manifest" href="/manifest.webmanifest">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -142,9 +141,7 @@ nav.tabs.tabs-desk{ display:none; }
   nav.tabs.tabs-mob a .ico{ width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
   nav.tabs.tabs-mob a.on{ color:var(--green); }
   body{ padding-bottom:calc(53px + env(safe-area-inset-bottom)); }
-  /* keep the Road-to-COP31 bar and the Explore sub-tabs pinned while the page scrolls */
-  a.copbar{ position:sticky; top:calc(var(--nav-h) + env(safe-area-inset-top)); z-index:88; }
-  nav.subtabs{ top:calc(var(--nav-h) + 36px + env(safe-area-inset-top)); }
+  nav.subtabs{ top:calc(var(--nav-h) + env(safe-area-inset-top)); }
 }
 
 /* Explore sub-tabs — sit just beneath the primary bar */
@@ -218,46 +215,6 @@ a.sf-item:hover{ border-color:var(--muted); text-decoration:none; }
 /* Je, Hatua? sentiment callout */
 .sent-callout{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; background:rgba(98,199,155,.08); border:1px solid rgba(98,199,155,.3); border-radius:12px; padding:11px 14px; font-weight:800; font-size:.85rem; color:var(--text); margin:0 0 16px; }
 .sent-callout:hover{ border-color:var(--green); text-decoration:none; } .sent-callout b{ color:var(--green); } .sent-callout .go{ margin-left:auto; color:var(--green); }
-/* Sentiment internal tabs (Media pulse / Classic disinfo / Narrative disinfo) */
-.sent-seg{ display:inline-flex; gap:4px; flex-wrap:wrap; border:1px solid var(--line); border-radius:11px; padding:4px; background:var(--panel); margin-bottom:18px; }
-.sent-seg button{ border:0; background:transparent; color:var(--muted); font-family:inherit; font-weight:800; font-size:.78rem; letter-spacing:.02em; padding:8px 14px; border-radius:8px; cursor:pointer; white-space:nowrap; }
-.sent-seg button:hover{ color:var(--text); }
-.sent-seg button[aria-pressed="true"]{ background:var(--ember-hot); color:#160B03; }
-.spanel[hidden]{ display:none; }
-/* Narrative disinfo cards (live social flags with inline rebuttals) */
-.nd-grid{ display:grid; grid-template-columns:1fr; gap:12px; }
-@media(min-width:760px){ .nd-grid{ grid-template-columns:1fr 1fr; } }
-.nd-card{ background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--line); border-radius:14px; padding:15px 16px; }
-.nd-card.vf{ border-left-color:#E5625A; } .nd-card.vm{ border-left-color:#E8B45A; } .nd-card.vp{ border-left-color:#EE9455; } .nd-card.vc{ border-left-color:#7FB0D8; }
-.nd-top{ display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
-.nd-plat{ font-size:.62rem; font-weight:900; letter-spacing:.03em; padding:3px 8px; border-radius:6px; color:#fff; }
-.nd-plat.x{ background:#0b0b0b; border:1px solid #333; } .nd-plat.tiktok{ background:#0b0b0b; border:1px solid #333; } .nd-plat.fb{ background:#1b4a9c; } .nd-plat.wa{ background:#128C7E; }
-.nd-time{ font-size:.7rem; color:var(--muted-dim); font-weight:700; }
-.nd-flag{ margin-left:auto; font-size:.6rem; font-weight:900; letter-spacing:.05em; text-transform:uppercase; padding:3px 9px; border-radius:999px; }
-.nd-flag.vf{ background:#E5625A; color:#180505; } .nd-flag.vm{ background:#E8B45A; color:#231a04; } .nd-flag.vp{ background:#EE9455; color:#1a0d03; } .nd-flag.vc{ background:#7FB0D8; color:#08131c; }
-.nd-claim{ margin:0 0 8px; padding:11px 13px; background:#0a1712; border-left:3px solid var(--muted-dim); border-radius:0 8px 8px 0; font-style:italic; color:var(--text); font-size:.9rem; line-height:1.5; }
-.nd-viewpost{ display:inline-flex; align-items:baseline; gap:6px; font-size:.72rem; font-weight:800; color:#7FB0D8; margin:0 0 11px; }
-.nd-viewpost span{ font-size:.62rem; font-weight:700; color:var(--muted-dim); font-style:normal; }
-.nd-viewpost:hover{ text-decoration:underline; }
-.nd-debunk .nd-lab{ display:inline-block; font-size:.62rem; font-weight:900; letter-spacing:.07em; text-transform:uppercase; color:#04140d; background:var(--green); padding:2px 8px; border-radius:5px; margin-bottom:6px; }
-.nd-debunk p{ margin:0; font-size:.9rem; }
-/* narrative: embedded-post look */
-.nd-embed{ background:#0a1712; border:1px solid var(--line); border-radius:12px; padding:12px 13px; margin:0 0 11px; }
-.nd-eh{ display:flex; align-items:center; gap:9px; margin:0 0 10px; padding-bottom:9px; border-bottom:1px solid var(--line); }
-.nd-av{ width:30px; height:30px; border-radius:50%; display:grid; place-items:center; font-weight:900; font-size:.95rem; color:#fff; flex:0 0 auto; }
-.nd-av.x{ background:#0b0b0b; border:1px solid #333; } .nd-av.tiktok{ background:#0b0b0b; border:1px solid #333; color:#25F4EE; } .nd-av.fb{ background:#1b4a9c; } .nd-av.wa{ background:#128C7E; }
-.nd-who{ display:flex; flex-direction:column; line-height:1.25; min-width:0; }
-.nd-who b{ font-size:.82rem; color:var(--text); }
-.nd-who span{ font-size:.66rem; color:var(--muted-dim); font-weight:700; }
-.nd-etext{ margin:0 0 10px; font-size:.92rem; line-height:1.5; color:var(--text); }
-.nd-efoot{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; padding-top:9px; border-top:1px solid var(--line); }
-.nd-eng{ font-size:.72rem; color:var(--muted-dim); font-weight:700; letter-spacing:.02em; }
-.nd-viewpost{ display:inline-flex; align-items:baseline; gap:6px; font-size:.72rem; font-weight:800; color:#7FB0D8; margin:0; }
-.nd-viewpost span{ font-size:.62rem; font-weight:700; color:var(--muted-dim); }
-.nd-viewpost:hover{ text-decoration:underline; }
-.nd-flagline{ margin:0 0 9px; }
-.nd-flagline .nd-flag{ margin-left:0; }
-.modal-actions{ display:flex; gap:9px; justify-content:flex-end; padding:14px 20px; border-top:1px solid var(--line); flex-wrap:wrap; }
 
 .sysstat{ display:none; align-items:center; gap:7px; font-size:.66rem; color:var(--muted-dim); letter-spacing:.08em; text-transform:uppercase; font-weight:700; }
 
@@ -952,7 +909,7 @@ table.matrix tbody th{
 /* ---------- persistent COP31 countdown strip (every tab) ---------- */
 a.copbar{
   display:flex; align-items:center; gap:10px; padding:7px 16px;
-  background:linear-gradient(90deg, rgba(238,148,85,.14), rgba(238,148,85,.05)), var(--bg);
+  background:linear-gradient(90deg, rgba(238,148,85,.14), rgba(238,148,85,.05));
   border-bottom:1px solid var(--line); color:var(--text); white-space:nowrap; overflow-x:auto;
   scrollbar-width:none;
 }
@@ -1017,7 +974,6 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 .gate.shake .gate-card{ animation:shk .4s; }
 @keyframes shk{ 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -1079,6 +1035,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <a href="#sectors"   data-view="explore" data-sub="sectors">Sector gaps</a>
     <a href="#network"   data-view="explore" data-sub="network">Network</a>
     <a href="#legal"     data-view="explore" data-sub="legal">Legal</a>
+    <a href="#disinfo"   data-view="explore" data-sub="disinfo">Disinfo</a>
     <a href="#sentiment" data-view="explore" data-sub="sentiment">Sentiment</a>
     <a href="#cop"       data-view="cop">COP31</a>
     <a href="#desk"      data-view="desk">Desk</a>
@@ -1101,7 +1058,19 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
   </div>
 </nav>
 
-<!-- ============================ COP31 COUNTDOWN (persistent, pinned under header) ============================ -->
+<!-- ===================== EXPLORE SUB-TABS (Map · Gaps · Network · Legal) ===================== -->
+<nav class="subtabs" id="exploreSub" aria-label="Explore sections" hidden>
+  <div class="wrap subtabs-inner">
+    <a href="#map"     data-sub="map" class="on">National map</a>
+    <a href="#sectors" data-sub="sectors">Sector gaps</a>
+    <a href="#network" data-sub="network">Network</a>
+    <a href="#legal"   data-sub="legal">Legal</a>
+    <a href="#disinfo" data-sub="disinfo">Disinfo</a>
+    <a href="#sentiment" data-sub="sentiment">Sentiment</a>
+  </div>
+</nav>
+
+<!-- ============================ COP31 COUNTDOWN (persistent) ============================ -->
 <a class="copbar" href="#cop" aria-label="Countdown to COP31 — open the tracker">
   <span class="cb-dot" aria-hidden="true"></span>
   <span class="cb-lab">Road to COP31</span>
@@ -1114,17 +1083,6 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
   </span>
   <span class="cb-go">Open →</span>
 </a>
-
-<!-- ===================== EXPLORE SUB-TABS (Map · Gaps · Network · Legal) ===================== -->
-<nav class="subtabs" id="exploreSub" aria-label="Explore sections" hidden>
-  <div class="wrap subtabs-inner">
-    <a href="#map"     data-sub="map" class="on">National map</a>
-    <a href="#sectors" data-sub="sectors">Sector gaps</a>
-    <a href="#network" data-sub="network">Network</a>
-    <a href="#legal"   data-sub="legal">Legal</a>
-    <a href="#sentiment" data-sub="sentiment">Sentiment</a>
-  </div>
-</nav>
 
 <main>
 
@@ -1474,14 +1432,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 <!-- ============================ DESK ============================ -->
 <section class="band" id="sentiment" data-view="explore" data-sub="sentiment">
   <div class="wrap">
-    <div class="sec-head"><div class="grow"><p class="kicker">Socials &amp; sentiment · narrative intelligence</p><h2>Sentiment &amp; disinformation</h2></div></div>
-    <div class="sent-seg" id="sentSeg" role="tablist" aria-label="Sentiment views">
-      <button type="button" data-spanel="pulse" aria-pressed="true">Media pulse</button>
-      <button type="button" data-spanel="classic" aria-pressed="false">Classic disinfo</button>
-      <button type="button" data-spanel="narrative" aria-pressed="false">Narrative disinfo</button>
-    </div>
-
-    <div id="sp-pulse" class="spanel">
+    <div class="sec-head"><div class="grow"><p class="kicker">Socials &amp; sentiment · media pulse</p><h2>Public sentiment index</h2></div></div>
     <p class="di-lead">An automated scan of Kenyan news, scholarship and public posts on climate &amp; environmental justice, scored for public attitude toward the work — published as a bi-weekly index that feeds the <a href="#ajesasa">Je, Hatua?</a> brief.</p>
 
     <div class="sent-index">
@@ -1539,10 +1490,13 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     </div>
 
     <p class="sc-meta" style="margin-top:12px">The items above are real, drawn from public Kenyan and international coverage (July 2026) — click any to read the source. At scale this runs automatically via RSS &amp; APIs from a curated source list, de-duplicated and stance-scored (supportive · neutral · critical) with human review; the aggregate index and counts are indicative until the automated scanner is connected.</p>
-    </div><!-- /sp-pulse -->
+  </div>
+</section>
 
-    <div id="sp-classic" class="spanel" hidden>
-    <p class="di-lead">The recurring, <b>slow-moving</b> disinformation types — the evergreen myth narratives — with debunks anchored to public fact-checks (PesaCheck, Africa Uncensored). These spread over months; the fast, live version is under <b>Narrative disinfo</b>. Public debunks on <a href="https://raia.mazingirakenya.org" target="_blank" rel="noopener">raia ↗</a>.</p>
+<section class="band" id="disinfo" data-view="explore" data-sub="disinfo">
+  <div class="wrap">
+    <div class="sec-head"><div class="grow"><p class="kicker">Narrative monitoring</p><h2>Disinformation watch</h2></div></div>
+    <p class="di-lead">False and misleading climate &amp; environment narratives circulating in Kenya — compiled from public fact-checks (PesaCheck, Africa Uncensored) and monitoring, so the coalition can coordinate a response. Public-facing debunks are published on <a href="https://raia.mazingirakenya.org" target="_blank" rel="noopener">raia ↗</a>.</p>
     <div class="di-stats">
       <span class="di-chip"><b>4</b> active</span>
       <span class="di-chip"><b>1</b> monitoring</span>
@@ -1572,7 +1526,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         <div class="di-top"><span class="di-verdict vc">Missing context</span><span class="di-status act">Active</span></div>
         <h3>“The Lamu refinery will make petrol cheap for all”</h3>
         <p class="di-meta">Post-announcement shares · rising · Oil &amp; gas</p>
-        <p class="di-counter"><b>Counter:</b> Fuel prices follow the global market and owner terms; "60,000 jobs" is a pre-plan promise. <a href="https://raia.mazingirakenya.org" target="_blank" rel="noopener">Debunk on raia →</a> · <a href="https://nation.africa/kenya/climate/climate-environmental-activists-reject-dangote-s-proposed-sh2-2-trillion-lamu-oil-refinery-project--5526536" target="_blank" rel="noopener noreferrer">Context: Daily Nation ↗</a></p>
+        <p class=”di-counter”><b>Counter:</b> Fuel prices follow the global market and owner terms; “60,000 jobs” is a pre-plan promise. <a href=”https://raia.mazingirakenya.org” target=”_blank” rel=”noopener”>Debunk on raia →</a> · <a href=”https://nation.africa/kenya/climate/climate-environmental-activists-reject-dangote-s-proposed-sh2-2-trillion-lamu-oil-refinery-project--5526536” target=”_blank” rel=”noopener noreferrer”>Context: Daily Nation ↗</a></p>
       </article>
       <article class="di-card di-false">
         <div class="di-top"><span class="di-verdict vf">False</span><span class="di-status act">Active</span></div>
@@ -1587,69 +1541,6 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         <p class="di-counter"><b>Counter:</b> Old/unrelated images relabelled; real events are measured by the met department, satellites and hospitals. <a href="https://raia.mazingirakenya.org" target="_blank" rel="noopener">Debunk on raia →</a></p>
       </article>
     </div>
-    </div><!-- /sp-classic -->
-
-    <div id="sp-narrative" class="spanel" hidden>
-    <p class="di-lead">Live, <b>fast-moving</b> disinformation as it surfaces on social media — the context-specific, bad-faith framings used to discredit real science, real impacts, and the communities defending land and water. Each post is flagged and rebutted <b>inline</b>; tap <b>View full post</b> to open it in <a href="https://raia.mazingirakenya.org" target="_blank" rel="noopener">raia ↗</a> with the debunk attached, so the correction travels with the claim. Drafting &amp; verification happen in the admin console.</p>
-    <div class="di-stats"><span class="di-chip"><b>6</b> flagged this week</span><span class="di-chip">Rebutted inline</span><span class="di-chip">Opens in raia</span></div>
-    <div class="nd-grid">
-      <article class="nd-card vf">
-        <div class="nd-embed">
-          <div class="nd-eh"><span class="nd-av x">𝕏</span><div class="nd-who"><b>Circulating on X</b><span>~12k reposts · 3h ago · trending ↑</span></div></div>
-          <p class="nd-etext">"The 'activists' fighting the Lamu refinery are funded by foreign oil companies that don't want Africa to refine its own fuel. This is sabotage, not environmentalism."</p>
-          <div class="nd-efoot"><span class="nd-eng">↻ 12k · ♥ 34k · 💬 2.1k</span><a class="nd-viewpost" href="https://raia.mazingirakenya.org/#lie/d5" target="_blank" rel="noopener noreferrer">🔗 View original <span>in raia</span> →</a></div>
-        </div>
-        <div class="nd-flagline"><span class="nd-flag vf">Bad-faith framing</span></div>
-        <div class="nd-debunk"><span class="nd-lab">↳ Coalition rebuttal</span><p>The opposition is led by Lamu's own fishers, Save Lamu and Greenpeace Africa — the same communities that stopped the coal plant. Attacking who's asking sidesteps the real questions: the UNESCO seascape, imported crude, and where the "60,000 jobs" figure comes from.</p></div>
-      </article>
-      <article class="nd-card vm">
-        <div class="nd-embed">
-          <div class="nd-eh"><span class="nd-av tiktok">♪</span><div class="nd-who"><b>Circulating on TikTok</b><span>41k views · yesterday</span></div></div>
-          <p class="nd-etext">"Kenya is already 90% renewable, so this refinery is just extra clean development. Greenpeace just wants Africans to stay poor and in the dark."</p>
-          <div class="nd-efoot"><span class="nd-eng">▶ 41k · ♥ 8.2k · 💬 903</span><a class="nd-viewpost" href="https://raia.mazingirakenya.org/#lie/d2" target="_blank" rel="noopener noreferrer">🔗 View original <span>in raia</span> →</a></div>
-        </div>
-        <div class="nd-flagline"><span class="nd-flag vm">Bait-and-switch</span></div>
-        <div class="nd-debunk"><span class="nd-lab">↳ Coalition rebuttal</span><p>Correct that the grid is 90%+ renewable — which is exactly why a fossil refinery adds nothing to household power. It's built for export and regional fuel markets, not your lights. "Poor and in the dark" is a slogan, not a consequence of asking for the environmental study.</p></div>
-      </article>
-      <article class="nd-card vc">
-        <div class="nd-embed">
-          <div class="nd-eh"><span class="nd-av fb">f</span><div class="nd-who"><b>Circulating on Facebook</b><span>shared 3.2k times</span></div></div>
-          <p class="nd-etext">"Anyone questioning carbon credits is blocking millions in climate finance for poor communities. Do you want them to stay poor?"</p>
-          <div class="nd-efoot"><span class="nd-eng">↻ 3.2k · ♥ 5.1k · 💬 1.4k</span><a class="nd-viewpost" href="https://raia.mazingirakenya.org/#lie/d3" target="_blank" rel="noopener noreferrer">🔗 View original <span>in raia</span> →</a></div>
-        </div>
-        <div class="nd-flagline"><span class="nd-flag vc">False dilemma</span></div>
-        <div class="nd-debunk"><span class="nd-lab">↳ Coalition rebuttal</span><p>Communities aren't rejecting climate finance — they're rejecting specific deals that pay little, restrict grazing for decades, and were signed without consent. Fixing consent and benefit-sharing protects the finance; Kenya's own courts and regulator have flagged the same gaps.</p></div>
-      </article>
-      <article class="nd-card vf">
-        <div class="nd-embed">
-          <div class="nd-eh"><span class="nd-av wa">✆</span><div class="nd-who"><b>Forwarded on WhatsApp</b><span>forwarded widely · no public source</span></div></div>
-          <p class="nd-etext">"A leaked report shows the 2023 drought was just normal El Niño, not climate change. The scientists exaggerated it for funding."</p>
-          <div class="nd-efoot"><span class="nd-eng">↪ forwarded many times</span><a class="nd-viewpost" href="https://raia.mazingirakenya.org/#lie/d1" target="_blank" rel="noopener noreferrer">🔗 View original <span>in raia</span> →</a></div>
-        </div>
-        <div class="nd-flagline"><span class="nd-flag vf">Science denial</span></div>
-        <div class="nd-debunk"><span class="nd-lab">↳ Coalition rebuttal</span><p>There is no such report. Kenya's droughts are measured by the Meteorological Department, satellites and hospital records — five consecutive failed seasons (2020–23) sits far outside normal El Niño swings. "Scientists lie for money" is the oldest denial script, and it never comes with a source.</p></div>
-      </article>
-      <article class="nd-card vf">
-        <div class="nd-embed">
-          <div class="nd-eh"><span class="nd-av x">𝕏</span><div class="nd-who"><b>Circulating on X</b><span>spiking after the shootings</span></div></div>
-          <p class="nd-etext">"The Gem-Ramula 'land protests' were staged by NGOs paying people to riot against a project that would bring jobs."</p>
-          <div class="nd-efoot"><span class="nd-eng">↻ 6.7k · ♥ 9.1k · 💬 3.3k</span><a class="nd-viewpost" href="https://raia.mazingirakenya.org/#lie/d5" target="_blank" rel="noopener noreferrer">🔗 View original <span>in raia</span> →</a></div>
-        </div>
-        <div class="nd-flagline"><span class="nd-flag vf">Defender smear</span></div>
-        <div class="nd-debunk"><span class="nd-lab">↳ Coalition rebuttal</span><p>Those were residents facing eviction for the Shanta Gold mine; the police shootings were reported across mainstream Kenyan media. "Paid rioters" is a standard tactic to delegitimise communities defending their land — and to change the subject from the deaths.</p></div>
-      </article>
-      <article class="nd-card vp">
-        <div class="nd-embed">
-          <div class="nd-eh"><span class="nd-av tiktok">♪</span><div class="nd-who"><b>Circulating on TikTok</b><span>22k views · re-uploaded</span></div></div>
-          <p class="nd-etext">"This photo proves the 'climate floods' are staged to attract foreign aid money."</p>
-          <div class="nd-efoot"><span class="nd-eng">▶ 22k · ♥ 4.4k · 💬 781</span><a class="nd-viewpost" href="https://raia.mazingirakenya.org/#lie/d6" target="_blank" rel="noopener noreferrer">🔗 View original <span>in raia</span> →</a></div>
-        </div>
-        <div class="nd-flagline"><span class="nd-flag vp">Manipulated media</span></div>
-        <div class="nd-debunk"><span class="nd-lab">↳ Coalition rebuttal</span><p>A reverse-image search dates this photo to an unrelated 2019 event. Relabelling old images to claim disasters are "staged" is a recurring visual-disinfo pattern — always check an image's origin and date before sharing.</p></div>
-      </article>
-    </div>
-
-    </div><!-- /sp-narrative -->
   </div>
 </section>
 
@@ -3404,61 +3295,6 @@ renderEvents();
 
 function hubToast(m){ var t=document.getElementById("hubToast"); if(!t) return; t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove("show"); },2200); }
 
-/* Sentiment ⇄ disinfo internal tabs (Media pulse / Classic / Narrative) */
-(function(){
-  var seg=document.getElementById("sentSeg"); if(!seg) return;
-  var keys=["pulse","classic","narrative"];
-  seg.addEventListener("click",function(e){
-    var b=e.target.closest ? e.target.closest("button[data-spanel]") : null; if(!b) return;
-    var key=b.getAttribute("data-spanel");
-    seg.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", x===b?"true":"false"); });
-    keys.forEach(function(k){ var p=document.getElementById("sp-"+k); if(p) p.hidden=(k!==key); });
-  });
-})();
-
-/* Narrative disinfo cards are static; the AI draft → verify → publish-to-raia workflow now lives in the admin console. */
-
-/* Supabase — live sentiment feed, static list stays as fallback */
-(function(){
-  var URL="https://uueemckdoozsuowcqkhl.supabase.co";
-  var KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA";
-  if(!window.supabase || !window.supabase.createClient) return;
-  var sb; try{ sb=window.supabase.createClient(URL,KEY); }catch(e){ return; }
-  window.MZ_SB=sb; // reused by later reads
-  sb.from("sentiment_items").select("source,title,url,stance").order("published_at",{ascending:false}).limit(8)
-    .then(function(res){
-      var data=res&&res.data; if(!data||!data.length) return;   // no rows yet → keep the static feed
-      var wrap=document.querySelector(".sent-feed"); if(!wrap) return;
-      var tag={supportive:"pos",neutral:"neu",critical:"neg"};
-      wrap.innerHTML=data.map(function(i){
-        return '<a class="sf-item" href="'+escE(i.url||"#")+'" target="_blank" rel="noopener noreferrer"><span class="sf-src">'+escE(i.source||"")+'</span><span class="sf-h">'+escE(i.title||"")+'</span><span class="sf-tag '+(tag[i.stance]||"neu")+'">'+escE(i.stance||"")+'</span></a>';
-      }).join("");
-      var note=document.querySelector("#sp-pulse .sc-meta"); if(note) note.textContent="● Live from Supabase — "+data.length+" items from the scanner. "+note.textContent;
-    }, function(){ /* offline / not set up yet → keep static */ });
-})();
-
-/* ---- Live data from Supabase (anon key is public — protected by row-level security) ---- */
-var SB = (window.supabase && window.supabase.createClient)
-  ? window.supabase.createClient(
-      "https://uueemckdoozsuowcqkhl.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA")
-  : null;
-(async function(){
-  if(!SB) return;                                  // CDN blocked / offline → keep in-file content
-  try{
-    var r = await SB.from("sentiment_items").select("source,title,url,stance").order("published_at",{ascending:false}).limit(8);
-    if(r.error || !r.data || !r.data.length) return;   // empty table → keep in-file fallback
-    var map={supportive:"pos",neutral:"neu",critical:"neg"};
-    var html = r.data.map(function(i){
-      return '<a class="sf-item" href="'+escE(i.url)+'" target="_blank" rel="noopener noreferrer">'+
-        '<span class="sf-src">'+escE(i.source)+'</span><span class="sf-h">'+escE(i.title)+'</span>'+
-        '<span class="sf-tag '+(map[i.stance]||"neu")+'">'+escE(i.stance||"neutral")+'</span></a>';
-    }).join("");
-    var feed=document.querySelector("#sp-pulse .sent-feed"); if(feed) feed.innerHTML=html;
-    var kick=document.querySelector('#sp-pulse .sec-head .kicker'); if(kick) kick.textContent="Latest scanned items · live from Supabase";
-  }catch(e){ /* keep in-file fallback */ }
-})();
-
 /* Create-event modal */
 (function(){
   var overlay=document.getElementById("eventModal"); if(!overlay) return;
@@ -4574,8 +4410,8 @@ var HASH2VIEW = { live:"live", explore:"explore",
   map:"explore", sectors:"explore", network:"explore", legal:"explore", disinfo:"explore", sentiment:"explore",
   cop:"cop", desk:"desk", events:"events", voices:"voices",
   ajesasa:"act", contribute:"act" };
-var HASH2SUB = { map:"map", sectors:"sectors", network:"network", legal:"legal", disinfo:"sentiment", sentiment:"sentiment" };
-var EXPLORE_SUBS = ["map","sectors","network","legal","sentiment"];
+var HASH2SUB = { map:"map", sectors:"sectors", network:"network", legal:"legal", disinfo:"disinfo", sentiment:"sentiment" };
+var EXPLORE_SUBS = ["map","sectors","network","legal","disinfo","sentiment"];
 var exploreSub = "map";
 var tabLinks = document.querySelectorAll("nav.tabs a");
 
