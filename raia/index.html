@@ -49,7 +49,7 @@ button{font-family:inherit;cursor:pointer}
 .brand{display:flex;align-items:center;gap:2px;font-family:"Lora",serif;font-weight:700;font-size:1.16rem;color:var(--cream);white-space:nowrap}
 .brand b{color:var(--gold-2)} .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;margin:-9px 0 0 1px}
 .desknav{display:none;gap:3px;margin-left:6px}
-.desknav button{border:0;background:transparent;color:#b7ac93;font-weight:800;font-size:.86rem;padding:8px 12px;border-radius:9px;position:relative}
+.desknav button{border:0;background:transparent;color:#d3c9af;font-weight:800;font-size:.86rem;padding:8px 12px;border-radius:9px;position:relative}
 .desknav button:hover{color:var(--cream);background:rgba(255,255,255,.06)}
 .desknav button[aria-current="true"]{color:#fff}
 .desknav button[aria-current="true"]::after{content:"";position:absolute;left:12px;right:12px;bottom:2px;height:2.5px;border-radius:3px;background:var(--gold)}
@@ -130,13 +130,15 @@ main{padding-top:22px}
 /* ---------- stream landing ---------- */
 .streamhero{position:relative;color:#fff;border-radius:20px;padding:26px 22px;margin-bottom:6px;box-shadow:var(--shadow-lg);overflow:hidden}
 .streamhero.news{background:linear-gradient(120% 120% at 90% -20%,#2c2f38,var(--ink))}
-.streamhero.hearsay{background:linear-gradient(120% 120% at 90% -20%,#d43b42,var(--red))}
-.streamhero.truth{background:linear-gradient(120% 120% at 90% -20%,#12a06a,var(--green))}
-.streamhero.learn{background:linear-gradient(120% 120% at 90% -20%,#f0b93e,var(--gold));color:#3a2a00}
-.streamhero.voices{background:linear-gradient(125% 120% at 88% -10%,#12a06a,var(--ink))}
-.streamhero .eye{font-weight:900;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
-.streamhero h1{color:inherit;font-size:2.05rem;margin:6px 0 .16em}
-.streamhero p{margin:0;opacity:.94;font-weight:600;font-size:.98rem;max-width:60ch}
+.streamhero.hearsay{background:linear-gradient(120% 120% at 90% -20%,#C0202A,#7d1218)}
+.streamhero.truth{background:linear-gradient(120% 120% at 90% -20%,#0C7A4D,#064a2d)}
+.streamhero.learn{background:linear-gradient(120% 120% at 90% -20%,#e0a721,#9a6a06);color:#2a1e00}
+.streamhero.voices{background:linear-gradient(125% 120% at 88% -10%,#0C7A4D,var(--ink))}
+.streamhero .eye{font-weight:900;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;opacity:.95}
+.streamhero h1{color:inherit;font-size:2.05rem;margin:6px 0 .16em;text-shadow:0 1px 3px rgba(0,0,0,.3)}
+.streamhero.learn h1{text-shadow:none}
+.streamhero p{margin:0;opacity:1;font-weight:600;font-size:.98rem;max-width:60ch;text-shadow:0 1px 2px rgba(0,0,0,.22)}
+.streamhero.learn p{text-shadow:none}
 
 /* ---------- issue detail ---------- */
 .back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--ink);font-weight:900;font-size:.86rem;padding:6px 0;margin-bottom:6px}
@@ -206,6 +208,25 @@ main{padding-top:22px}
 .dtrue .dlab{margin-bottom:0;margin-right:5px}
 .dsrc{margin:10px 0 0}
 .dsrc a{font-size:.8rem;font-weight:800;color:var(--green-ink)}
+/* visual "spot the lie" post cards — the lie is seen, then debunked */
+.lie{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:15px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
+.lie.v-false{border-left-color:#C0202A}.lie.v-mis{border-left-color:#DC9A18}.lie.v-miss{border-left-color:#2C4B59}.lie.v-manip{border-left-color:#B4531A}
+.lie.flash{animation:lieflash 1.4s ease}
+@keyframes lieflash{0%,100%{box-shadow:var(--shadow)}30%{box-shadow:0 0 0 3px var(--gold)}}
+.lp-head{display:flex;align-items:center;gap:10px;padding:13px 14px 0}
+.lp-av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:1.05rem;color:#fff;flex:0 0 auto}
+.lp-av.x{background:#0b0b0b}.lp-av.tiktok{background:#0b0b0b;color:#25F4EE}.lp-av.fb{background:#1b4a9c}.lp-av.wa{background:#128C7E}.lp-av.radio{background:#5a4633}
+.lp-who{min-width:0;line-height:1.24}
+.lp-who b{display:block;font-size:.92rem;color:var(--ink)}
+.lp-who span{font-size:.72rem;color:var(--ink-soft);font-weight:700;overflow-wrap:anywhere}
+.lp-body{position:relative;padding:11px 14px 14px}
+.lp-text{font-family:"Lora",serif;font-weight:600;font-style:italic;font-size:1.12rem;line-height:1.45;color:var(--ink);margin:0;padding-right:92px}
+.lp-stamp{position:absolute;top:8px;right:12px;font-weight:900;font-size:.8rem;letter-spacing:.03em;text-transform:uppercase;color:#fff;padding:6px 11px;border-radius:8px;transform:rotate(5deg);box-shadow:0 3px 10px rgba(0,0,0,.22);border:2px solid rgba(255,255,255,.82)}
+.lp-stamp.v-false{background:#C0202A}.lp-stamp.v-mis{background:#DC9A18;color:#3a2a00}.lp-stamp.v-miss{background:#2C4B59}.lp-stamp.v-manip{background:#B4531A}
+.lie-debunk{background:var(--paper2);border-top:1px solid var(--line);padding:14px}
+.lie-debunk .drow p{margin:0 0 11px}
+.lie-debunk .dtrue{background:var(--card)}
+.lp-embed{margin:12px 0 4px}
 /* case study / real-life examples */
 .case{margin-top:14px;border-top:1px dashed var(--line);padding-top:14px}
 .case-h{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
@@ -271,7 +292,7 @@ main{padding-top:22px}
 
 /* ---------- bottom nav (mobile) ---------- */
 .bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--ink);display:flex;padding-bottom:env(safe-area-inset-bottom);border-top:3px solid var(--gold)}
-.bottomnav button{flex:1;background:none;border:0;padding:8px 2px 7px;color:#9c927b;font-weight:800;font-size:.62rem;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bottomnav button{flex:1;background:none;border:0;padding:8px 2px 7px;color:#bdb094;font-weight:800;font-size:.62rem;display:flex;flex-direction:column;align-items:center;gap:3px}
 .bottomnav button[aria-current="true"]{color:var(--gold-2)}
 .bottomnav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
@@ -724,6 +745,20 @@ var DISINFO_SRC = {
   d3:{u:"https://africauncensored.online/blog/2025/06/13/carbon-credits-a-climate-financing-solution-for-kenya/", s:"Africa Uncensored"},
   d4:{u:"https://nation.africa/kenya/climate/climate-environmental-activists-reject-dangote-s-proposed-sh2-2-trillion-lamu-oil-refinery-project--5526536", s:"Daily Nation"}
 };
+/* How each lie is circulating — drives the post-style card. `video` is a real, verified
+   "fuller picture" clip that tap-loads (YouTube = a real live embed). Social-post embeds
+   (X/TikTok/FB) load the scanner's captured, human-verified URL via `post` when present —
+   we don't hand-pick unverified real posts (misattribution risk). */
+var PLAT_GLYPH = { x:"𝕏", tiktok:"♪", fb:"f", wa:"✆", radio:"📻" };
+var PLAT_NAME = { x:"X", tiktok:"TikTok", fb:"Facebook", wa:"WhatsApp", radio:"Talk radio" };
+var LIE_POST = {
+  d1:{plat:"x",  who:{en:"Circulating on X",sw:"Inazunguka X",sh:"Kwa X"}, eng:"3.1k reposts · 8.4k likes"},
+  d2:{plat:"radio", who:{en:"Talk radio & rally speeches",sw:"Redio na hotuba",sh:"Radio na speeches"}, eng:"On-air phone-ins"},
+  d3:{plat:"wa", who:{en:"Sign-up meetings & WhatsApp",sw:"Mikutano na WhatsApp",sh:"Meetings na WhatsApp"}, eng:"Forwarded widely"},
+  d4:{plat:"fb", who:{en:"Circulating on Facebook",sw:"Inazunguka Facebook",sh:"Kwa Facebook"}, eng:"Shared 3.2k times", video:"UtI7OMaJh7M", videoBy:"NTV Kenya"},
+  d5:{plat:"x",  who:{en:"Coordinated on X & Facebook",sw:"X na Facebook",sh:"X na Facebook"}, eng:"~9k reposts · trending", video:"cOyGmA3yR3k", videoBy:"Elizabeth Wathuti"},
+  d6:{plat:"tiktok", who:{en:"Recycled on TikTok",sw:"TikTok",sh:"TikTok"}, eng:"22k views · re-uploaded"}
+};
 var AV_COLORS = ["#C0202A","#0C7A4D","#DC9A18","#26262b","#2C4B59"];
 var VOICES = [
 { id:"v1", name:"Amina H.", place:{en:"Lamu",sw:"Lamu",sh:"Lamu"}, type:"video",
@@ -863,14 +898,28 @@ function viewLearn(){
       body+='<div class="acc bigq'+(open?" open":"")+'" data-acc="q:'+b.id+'"><button aria-expanded="'+open+'"><span class="q">'+esc(L(b.q))+'</span><span class="plus">+</span></button>'+
         '<div class="panel">'+paras(b.a)+caseHtml(CASES[b.id])+'</div></div>';});
   } else if(tab==="d"){
-    DISINFO.forEach(function(x){ var v=VERDICT[x.verdict]; var src=DISINFO_SRC[x.id];
-      body+='<div class="dcard '+v.cls+'"><div class="dtop"><span class="verdict '+v.cls+'">'+esc(L(v.t))+'</span>'+
-        '<span class="dwhere">'+esc(L(UI.spreading))+': '+esc(L(x.where))+'</span></div>'+
-        '<p class="dclaim">“'+esc(L(x.claim))+'”</p>'+
-        '<div class="drow"><span class="dlab bad">'+esc(L(UI.whyBad))+'</span><p>'+esc(L(x.why))+'</p></div>'+
-        '<div class="dtrue"><span class="dlab good">'+esc(L(UI.whatsTrue))+'</span>'+esc(L(x.truth))+'</div>'+
-        (src?'<p class="dsrc"><a href="'+esc(src.u)+'" target="_blank" rel="noopener noreferrer">'+esc(L(UI.factcheck))+' · '+esc(src.s)+' ↗</a></p>':'')+
-        '</div>';});
+    DISINFO.forEach(function(x){ var v=VERDICT[x.verdict]; var src=DISINFO_SRC[x.id]; var p=LIE_POST[x.id]||{}; var av=p.plat||"x";
+      var media="";
+      if(p.video){
+        media='<div class="ytwrap lp-embed" data-yt="'+esc(p.video)+'">'+
+          '<img class="ytthumb" src="https://i.ytimg.com/vi/'+esc(p.video)+'/hqdefault.jpg" alt="" loading="lazy">'+
+          '<button class="ytplay" data-yt="'+esc(p.video)+'" aria-label="'+esc(L({en:"Play video",sw:"Cheza video",sh:"Play video"}))+'"></button></div>'+
+          '<p class="vidcap">'+esc(L({en:"Watch: the fuller picture",sw:"Tazama: picha kamili",sh:"Watch: picha kamili"}))+(p.videoBy?' · '+esc(p.videoBy):'')+
+          ' · <a href="https://www.youtube.com/watch?v='+esc(p.video)+'" target="_blank" rel="noopener noreferrer">YouTube ↗</a></p>';
+      }
+      body+='<article class="lie '+v.cls+'" id="lie-'+x.id+'">'+
+        '<div class="lp-head"><span class="lp-av '+av+'">'+(PLAT_GLYPH[av]||"•")+'</span>'+
+          '<div class="lp-who"><b>'+esc(L(p.who||{en:"Circulating online"}))+'</b>'+
+            '<span>'+esc(L(UI.spreading))+': '+esc(L(x.where))+(p.eng?' · '+esc(p.eng):'')+'</span></div></div>'+
+        '<div class="lp-body"><p class="lp-text">“'+esc(L(x.claim))+'”</p>'+
+          '<span class="lp-stamp '+v.cls+'">'+esc(L(v.t))+'</span></div>'+
+        '<div class="lie-debunk">'+
+          '<div class="drow"><span class="dlab bad">'+esc(L(UI.whyBad))+'</span><p>'+esc(L(x.why))+'</p></div>'+
+          '<div class="dtrue"><span class="dlab good">'+esc(L(UI.whatsTrue))+'</span>'+esc(L(x.truth))+'</div>'+
+          media+
+          (src?'<p class="dsrc"><a href="'+esc(src.u)+'" target="_blank" rel="noopener noreferrer">'+esc(L(UI.factcheck))+' · '+esc(src.s)+' ↗</a></p>':'')+
+        '</div>'+
+      '</article>';});
   } else {
     MYTHS.forEach(function(m){var open=state.openAcc==="m:"+m.id;
       body+='<div class="acc myth'+(open?" open":"")+'" data-acc="m:'+m.id+'"><button aria-expanded="'+open+'"><span class="qmyth">'+esc(L(m.m))+'</span><span class="plus">+</span></button>'+
@@ -1005,7 +1054,20 @@ function go(v){ state.view=v; render(); }
 document.querySelectorAll(".bottomnav button, .desknav button").forEach(function(b){ b.addEventListener("click",function(){ go(b.getAttribute("data-nav")); }); });
 document.querySelectorAll(".langs button").forEach(function(b){ b.addEventListener("click",function(){ LANG=b.getAttribute("data-lang"); try{localStorage.setItem("raia.lang",LANG);}catch(e){} render(); }); });
 
-render();
+/* Deep-link: #lie or #lie/<id> opens the "Spot the lie" feed (from the hub's "View full post"). */
+function applyHash(scroll){
+  var h=(location.hash||"").replace(/^#/,"");
+  if(h==="lie"||h.indexOf("lie/")===0){
+    state.view="learn"; state.learnTab="d"; render();
+    var id=h.indexOf("lie/")===0?h.slice(4):"";
+    if(id){ var el=document.getElementById("lie-"+id); if(el){ el.scrollIntoView({behavior:scroll?"smooth":"auto",block:"start"}); el.classList.add("flash"); } }
+    return true;
+  }
+  return false;
+}
+window.addEventListener("hashchange",function(){ applyHash(true); });
+
+if(!applyHash(false)) render();
 if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
   window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
 }
