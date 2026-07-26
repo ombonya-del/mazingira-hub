@@ -182,6 +182,26 @@ button{font-family:inherit;cursor:pointer}
 .modal input,.modal textarea,.modal select{width:100%;background:#0a1712;border:1px solid var(--line-2);color:var(--text);border-radius:9px;padding:10px;font-family:inherit;font-size:.9rem}
 .modal .mf{padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:9px;justify-content:flex-end}
 :focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:6px}
+/* narrative disinfo queue */
+.ndpipe{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 14px;font-size:.62rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.ndpipe .np{padding:5px 10px;border-radius:999px;border:1px solid var(--line-2);color:var(--muted);background:var(--panel)}
+.ndpipe .np.ai{border-color:#7FB0D8;color:#7FB0D8} .ndpipe .np.hum{border-color:var(--ember);color:var(--ember-soft)} .ndpipe .np.live{border-color:var(--green);color:var(--green)}
+.ndpipe .npa{color:var(--muted)}
+.nd-vf-edge{border-left:4px solid #E5625A} .nd-vm-edge{border-left:4px solid #E8B45A} .nd-vp-edge{border-left:4px solid #EE9455} .nd-vc-edge{border-left:4px solid #7FB0D8}
+.type-tag.nd-vf{background:#E5625A;color:#180505;border-color:#E5625A} .type-tag.nd-vm{background:#E8B45A;color:#231a04;border-color:#E8B45A} .type-tag.nd-vp{background:#EE9455;color:#1a0d03;border-color:#EE9455} .type-tag.nd-vc{background:#7FB0D8;color:#08131c;border-color:#7FB0D8}
+.nd-quote{margin:2px 0 12px;padding:11px 13px;background:#0a1712;border-left:3px solid var(--line-2);border-radius:0 8px 8px 0;font-style:italic;color:var(--text);font-size:.9rem;line-height:1.5}
+.ndr-draft{border-left:3px solid var(--green);background:rgba(98,199,155,.06);border-radius:0 8px 8px 0;padding:11px 13px;margin:0 0 10px}
+.ndr-draft .ndr-lab{display:inline-block;margin-bottom:6px;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#7FB0D8}
+.ndr-draft p{margin:0;font-size:.9rem;line-height:1.5}
+.ndr-meta{font-size:.78rem;color:var(--muted);margin:6px 0 0} .ndr-meta b{color:var(--text)}
+.ndshare{margin-top:12px;border:1px solid var(--green);border-radius:12px;overflow:hidden}
+.ndshare-h{background:var(--green);color:#04140d;font-weight:900;font-size:.66rem;letter-spacing:.04em;text-transform:uppercase;padding:7px 13px}
+.ndshare-b{padding:13px}
+.ndshare-flag{display:inline-block;font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;background:#E5625A;color:#180505;padding:3px 9px;border-radius:999px;margin-bottom:7px}
+.ndshare-b p{margin:0 0 10px;font-size:.9rem;line-height:1.5}
+.ndshare-btns{display:flex;gap:7px;flex-wrap:wrap}
+.ndshare-btn{font-size:.72rem;font-weight:800;border:1px solid var(--line-2);border-radius:8px;padding:6px 11px;color:var(--text);background:var(--panel)}
+.ndshare-btn.x{background:#0b0b0b;color:#fff;border-color:#333} .ndshare-btn.wa{background:#128C7E;color:#fff;border-color:#128C7E}
 
 @media(min-width:900px){ .sidenav{display:block} .mtabs{display:none} .main{padding:26px 28px 60px} }
 </style>
@@ -227,6 +247,7 @@ button{font-family:inherit;cursor:pointer}
 var NAV = [
   {id:"overview", label:"Overview", grp:"Console", icon:'<path d="M4 13h6V4H4zM14 20h6v-9h-6zM14 4v4h6V4zM4 20h6v-4H4z"/>'},
   {id:"moderation", label:"Moderation", grp:"Publishing", icon:'<path d="M20 6 9 17l-5-5"/>', badgeFrom:"pending"},
+  {id:"narrative", label:"Narrative disinfo", grp:"Publishing", icon:'<path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/><path d="M12 8v4M12 15h.01"/>', badgeFrom:"ndpending"},
   {id:"publishing", label:"Publish to raia", grp:"Publishing", icon:'<path d="M12 19V5M5 12l7-7 7 7"/>', badgeFrom:"ready"},
   {id:"content", label:"Content", grp:"Manage", icon:'<path d="M4 5h16M4 12h16M4 19h10"/>'},
   {id:"members", label:"Members", grp:"Manage", icon:'<circle cx="9" cy="8" r="3"/><path d="M4 20a5 5 0 0 1 10 0"/><path d="M16 6a3 3 0 0 1 0 6M14 20a5 5 0 0 1 6-3"/>'}
@@ -252,6 +273,25 @@ var PUBLISH = [
   {id:"p2", source:"Hub", title:"Dangote Lamu refinery — plain-language brief", target:"raia · In The News · lamu-refinery", status:"ready", by:"—"},
   {id:"p3", source:"Hub", title:"Lake Turkana wind ruling explainer", target:"raia · Truth · turkana-wind", status:"live", by:"A. Mwangi"},
   {id:"p4", source:"Voices", title:"Amina H. — Lamu fisher (video)", target:"raia · Voices wall", status:"live", by:"F. Odhiambo"}
+];
+
+var NARR = [
+  {id:"n1", platform:"X", handle:"Circulating on X", meta:"~12k reposts · 3h ago · trending ↑", type:"Bad-faith framing", tone:"vf",
+   claim:"The 'activists' fighting the Lamu refinery are funded by foreign oil companies that don't want Africa to refine its own fuel. This is sabotage, not environmentalism.",
+   draft:"The opposition is led by Lamu's own fishers, Save Lamu and Greenpeace Africa — the same communities that stopped the coal plant. Attacking who's asking sidesteps the real questions: the UNESCO seascape, imported crude, and where the \"60,000 jobs\" figure comes from.",
+   sources:"Save Lamu (issue file) · Bloomberg — Lamu ecosystem · Daily Nation — activists reject refinery", conf:"High", risk:"Standard", status:"pending"},
+  {id:"n2", platform:"TT", handle:"Circulating on TikTok", meta:"41k views · yesterday", type:"Bait-and-switch", tone:"vm",
+   claim:"Kenya is already 90% renewable, so this refinery is just extra clean development. Greenpeace just wants Africans to stay poor and in the dark.",
+   draft:"The grid is 90%+ renewable — which is exactly why a fossil refinery adds nothing to household power. It's built for export and regional fuel markets, not your lights. \"Poor and in the dark\" is a slogan, not a consequence of asking for the environmental study.",
+   sources:"EPRA generation mix · issue file: lamu-refinery", conf:"High", risk:"Standard", status:"pending"},
+  {id:"n3", platform:"X", handle:"Circulating on X", meta:"spiking after the shootings", type:"Defender smear", tone:"vf",
+   claim:"The Gem-Ramula 'land protests' were staged by NGOs paying people to riot against a project that would bring jobs.",
+   draft:"Those were residents facing eviction for the Shanta Gold mine; the police shootings were reported across mainstream Kenyan media. \"Paid rioters\" is a standard tactic to delegitimise communities defending their land.",
+   sources:"issue file: western-gold · national press reports", conf:"Medium", risk:"Sensitive", status:"pending"},
+  {id:"n4", platform:"FB", handle:"Circulating on Facebook", meta:"shared 3.2k times", type:"False dilemma", tone:"vc",
+   claim:"Anyone questioning carbon credits is blocking millions in climate finance for poor communities.",
+   draft:"Communities aren't rejecting climate finance — they're rejecting specific deals that pay little, restrict grazing for decades, and were signed without consent. Fixing consent and benefit-sharing protects the finance.",
+   sources:"issue file: carbon-credits · regulator statements", conf:"High", risk:"Standard", status:"published"}
 ];
 
 var ISSUES = [
@@ -305,7 +345,7 @@ function renderNav(){
   }).join("");
   bindNav();
 }
-function badgeVal(n){ return n.badgeFrom==="pending"?count("pending"):(n.badgeFrom==="ready"?pubCount("ready"):0); }
+function badgeVal(n){ return n.badgeFrom==="pending"?count("pending"):(n.badgeFrom==="ready"?pubCount("ready"):(n.badgeFrom==="ndpending"?ndCount("pending"):0)); }
 function navBtn(n){
   var b=n.badgeFrom?badgeVal(n):0;
   return '<button data-nav="'+n.id+'" aria-current="'+(state.view===n.id)+'">'+
@@ -324,6 +364,7 @@ function render(){
   var v=state.view;
   if(v==="overview") app.innerHTML=viewOverview();
   else if(v==="moderation") app.innerHTML=viewModeration();
+  else if(v==="narrative") app.innerHTML=viewNarrative();
   else if(v==="publishing") app.innerHTML=viewPublishing();
   else if(v==="content") app.innerHTML=viewContent();
   else if(v==="members") app.innerHTML=viewMembers();
@@ -397,6 +438,48 @@ function viewPublishing(){
   return '<section class="view"><div class="page-head"><div><h2>Publish to raia</h2><p>Approved Voices and adapted hub briefs, queued for the public platform.</p></div></div>'+rows+'</section>';
 }
 
+function ndCount(st){ return NARR.filter(function(n){return n.status===st;}).length; }
+function ndById(id){ for(var i=0;i<NARR.length;i++) if(NARR[i].id===id) return NARR[i]; }
+function viewNarrative(){
+  state.ndFilter = state.ndFilter||"pending";
+  var pipe='<div class="ndpipe"><span class="np">Scanner</span><span class="npa">→</span><span class="np ai">Claude draft</span><span class="npa">→</span><span class="np hum">Human verify</span><span class="npa">→</span><span class="np live">On raia · shareable</span></div>';
+  var pills=[["pending","AI drafts · to verify"],["published","Published to raia"]].map(function(p){
+    return '<button class="pill" data-nd="'+p[0]+'" aria-pressed="'+(state.ndFilter===p[0])+'">'+p[1]+'<span class="c mono">'+ndCount(p[0])+'</span></button>';
+  }).join("");
+  var list=NARR.filter(function(n){return n.status===state.ndFilter;});
+  var cards=list.length? list.map(ndCard).join("") : '<div class="panel muted">Nothing in this queue.</div>';
+  return '<section class="view"><div class="page-head"><div><h2>Narrative disinfo</h2><p>Fast-moving social-media framings flagged by the scanner. Claude drafts a rebuttal grounded only in the coalition\'s own evidence; a moderator verifies before it publishes to raia. Nothing is auto-published — sensitive claims need an editor.</p></div></div>'+
+    pipe+'<div class="pills">'+pills+'</div>'+cards+'</section>';
+}
+function ndCard(n){
+  var head='<div class="qtop"><span class="qav" style="background:#0b0b0b;border:1px solid #333;color:#fff">'+esc(n.platform)+'</span>'+
+    '<span class="qwho"><span class="qnm">'+esc(n.handle)+'</span><span class="qmeta">'+esc(n.meta)+'</span></span>'+
+    '<span class="type-tag nd-'+n.tone+'">'+esc(n.type)+'</span></div>';
+  var post='<div class="nd-quote">"'+esc(n.claim)+'"</div>';
+  if(n.status==="pending"){
+    var sensitive = n.risk==="Sensitive";
+    var body='<div class="ndr-draft"><span class="ndr-lab">🤖 Claude draft · grounded, cite-only</span><p>'+esc(n.draft)+'</p></div>'+
+      '<p class="ndr-meta"><b>Sources used:</b> '+esc(n.sources)+'</p>'+
+      '<p class="ndr-meta">Grounding confidence: <b>'+esc(n.conf)+'</b> · Risk tier: <b>'+esc(n.risk)+'</b>'+(sensitive?' — names a death/allegation, so it needs an <b>editor</b> sign-off before publish':' — auto-eligible; you have the final say')+'</p>';
+    var acts='<div class="qact"><button class="btn reject" data-nda="reject:'+n.id+'">Reject</button>'+
+      '<button class="btn ghost" data-nda="edit:'+n.id+'">Edit draft</button>'+
+      '<button class="btn approve" data-nda="approve:'+n.id+'">'+(sensitive?'Approve (editor)':'Approve &amp; publish')+'</button></div>';
+    return '<div class="qcard nd-'+n.tone+'-edge">'+head+post+body+acts+'</div>';
+  }
+  var share='<div class="ndshare"><div class="ndshare-h">📣 Live on raia · shareable by the public</div>'+
+    '<div class="ndshare-b"><span class="ndshare-flag">Debunked · '+esc(n.type)+'</span><p>'+esc(n.draft)+'</p>'+
+    '<div class="ndshare-btns"><span class="ndshare-btn x">Share on X</span><span class="ndshare-btn wa">WhatsApp</span><span class="ndshare-btn cp">Copy</span></div></div></div>';
+  return '<div class="qcard nd-'+n.tone+'-edge">'+head+post+'<span class="status-tag st-live">on raia</span>'+share+'</div>';
+}
+function ndAct(a){
+  var p=a.split(":"), op=p[0], n=ndById(p[1]); if(!n) return;
+  if(op==="approve"){ n.status="published"; state.ndFilter="published";
+    PUBLISH.unshift({id:"nd"+Date.now(),source:"Narrative desk",title:"Debunk — "+n.type+" ("+n.platform+")",target:"raia · Truth · shareable card",status:"live",by:"A. Mwangi"});
+    toast("Verified → live on raia & shareable"); render(); }
+  else if(op==="reject"){ NARR.splice(NARR.indexOf(n),1); toast("Rejected — not published"); render(); }
+  else if(op==="edit"){ toast("Edit the draft inline, then approve"); }
+}
+
 function viewContent(){
   var issues=ISSUES.map(function(is){
     return '<div class="crow"><span class="radio" role="radio" aria-checked="'+is.featured+'" data-feat="'+is.id+'" title="Set as Story of the week"></span>'+
@@ -428,6 +511,8 @@ function viewMembers(){
 /* ============================ INTERACTIONS ============================ */
 function bindView(){
   app.querySelectorAll("[data-mod]").forEach(function(el){ el.addEventListener("click",function(){ state.modFilter=el.getAttribute("data-mod"); render(); }); });
+  app.querySelectorAll("[data-nd]").forEach(function(el){ el.addEventListener("click",function(){ state.ndFilter=el.getAttribute("data-nd"); render(); }); });
+  app.querySelectorAll("[data-nda]").forEach(function(el){ el.addEventListener("click",function(){ ndAct(el.getAttribute("data-nda")); }); });
   app.querySelectorAll("[data-act]").forEach(function(el){ el.addEventListener("click",function(){ modAct(el.getAttribute("data-act")); }); });
   app.querySelectorAll("[data-pub]").forEach(function(el){ el.addEventListener("click",function(){ pubAct(el.getAttribute("data-pub")); }); });
   app.querySelectorAll("[data-feat]").forEach(function(el){ el.addEventListener("click",function(){ setFeatured(el.getAttribute("data-feat")); }); });
