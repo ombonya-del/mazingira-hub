@@ -2,7 +2,7 @@
    Offline-first for a low-bandwidth public audience. Bump CACHE to force an update.
    Note: privacy.html is a real static page — it is served directly, never via
    the app shell (see the navigate handler's denylist). */
-const CACHE = "raia-v9";
+const CACHE = "raia-v10";
 const SHELL = [
   "./", "./index.html", "./manifest.webmanifest",
   "./icon-192.png", "./icon-512.png"
