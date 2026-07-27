@@ -141,18 +141,22 @@ nav.tabs.tabs-desk{ display:none; }
   nav.tabs.tabs-mob a span{ max-width:100%; overflow:hidden; text-overflow:ellipsis; }
   nav.tabs.tabs-mob a .ico{ width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
   nav.tabs.tabs-mob a.on{ color:var(--green); }
-  body{ padding-bottom:calc(68px + env(safe-area-inset-bottom)); }
+  /* bottom nav: fixed height, content reserve matched to it, and a backdrop that fills the
+     safe-area / any sub-pixel gap below the bar so no page content ever shows beneath it */
   nav.tabs.tabs-mob{ background:var(--panel); }
+  nav.tabs.tabs-mob .tabs-inner{ min-height:54px; align-items:center; }
+  nav.tabs.tabs-mob::after{ content:""; position:absolute; left:0; right:0; top:100%; height:60vh; background:var(--panel); pointer-events:none; }
+  body{ padding-bottom:calc(56px + env(safe-area-inset-bottom)); }
   /* pin the Road-to-COP31 bar, then the Explore sub-tabs FLUSH beneath it — copbar has a fixed
      height so the sub-tabs offset is exact and no content bleeds through a gap */
   a.copbar{ position:sticky; top:calc(var(--nav-h) + env(safe-area-inset-top)); z-index:88; height:36px; }
   nav.subtabs#exploreSub{ position:sticky; top:calc(var(--nav-h) + 36px + env(safe-area-inset-top)); z-index:88; }
   nav.subtabs#exploreSub .subtabs-inner{ overflow-x:visible; }
   nav.subtabs#exploreSub a{ flex:1 1 0; min-width:0; text-align:center; white-space:nowrap; font-size:.6rem; letter-spacing:.01em; padding:9px 2px 7px; }
-  /* Sentiment segmented control: one line, buttons hug their text so padding stays even
-     (no big gap beside "Media pulse", no squeeze on "Narrative disinfo") */
-  .sent-seg{ display:flex; flex-wrap:nowrap; gap:3px; max-width:100%; }
-  .sent-seg button{ flex:0 1 auto; padding:8px 9px; font-size:.6rem; white-space:nowrap; }
+  /* Sentiment segmented control: one line, buttons hug their text so padding stays even.
+     ID selector so it beats the later base `.sent-seg{flex-wrap:wrap}` rule. */
+  #sentSeg{ display:flex !important; flex-wrap:nowrap !important; gap:3px; max-width:100%; }
+  #sentSeg button{ flex:0 1 auto; padding:8px 8px; font-size:.58rem; white-space:nowrap; }
 }
 
 /* Explore sub-tabs — sit just beneath the primary bar */
