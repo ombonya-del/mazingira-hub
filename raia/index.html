@@ -28,7 +28,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{background:var(--paper);color:var(--ink);font-family:"Nunito Sans",system-ui,sans-serif;font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased;padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+body{background:radial-gradient(1100px 620px at 100% -8%, rgba(220,154,24,.14), transparent 55%), radial-gradient(1000px 580px at -6% 102%, rgba(12,122,77,.11), transparent 55%), radial-gradient(900px 520px at 50% 40%, rgba(192,32,42,.05), transparent 60%), var(--paper);background-attachment:fixed;color:var(--ink);font-family:"Nunito Sans",system-ui,sans-serif;font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased;padding-bottom:calc(72px + env(safe-area-inset-bottom))}
 h1,h2,h3{font-family:"Lora",Georgia,serif;line-height:1.16;margin:0 0 .35em;font-weight:700;letter-spacing:-.012em}
 p{margin:0 0 .92em}
 a{color:var(--green-ink);text-decoration:none;font-weight:700}
@@ -129,11 +129,11 @@ main{padding-top:22px}
 
 /* ---------- stream landing ---------- */
 .streamhero{position:relative;color:#fff;border-radius:20px;padding:26px 22px;margin-bottom:6px;box-shadow:var(--shadow-lg);overflow:hidden}
-.streamhero.news{background:linear-gradient(120% 120% at 90% -20%,#2c2f38,var(--ink))}
-.streamhero.hearsay{background:linear-gradient(120% 120% at 90% -20%,#C0202A,#7d1218)}
-.streamhero.truth{background:linear-gradient(120% 120% at 90% -20%,#0C7A4D,#064a2d)}
-.streamhero.learn{background:linear-gradient(120% 120% at 90% -20%,#e0a721,#9a6a06);color:#2a1e00}
-.streamhero.voices{background:linear-gradient(125% 120% at 88% -10%,#0C7A4D,var(--ink))}
+.streamhero.news{background:radial-gradient(120% 120% at 90% -20%,#2c2f38,var(--ink))}
+.streamhero.hearsay{background:radial-gradient(120% 120% at 90% -20%,#C0202A,#7d1218)}
+.streamhero.truth{background:radial-gradient(120% 120% at 90% -20%,#0C7A4D,#064a2d)}
+.streamhero.learn{background:radial-gradient(120% 120% at 90% -20%,#e0a721,#9a6a06);color:#2a1e00}
+.streamhero.voices{background:radial-gradient(125% 120% at 88% -10%,#0C7A4D,var(--ink))}
 .streamhero .eye{font-weight:900;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;opacity:.95}
 .streamhero h1{color:inherit;font-size:2.05rem;margin:6px 0 .16em;text-shadow:0 1px 3px rgba(0,0,0,.3)}
 .streamhero.learn h1{text-shadow:none}
@@ -227,6 +227,8 @@ main{padding-top:22px}
 .lie-debunk .drow p{margin:0 0 11px}
 .lie-debunk .dtrue{background:var(--card)}
 .lie-intro{font-weight:800;color:var(--ink-soft);margin:2px 0 12px;font-size:.95rem}
+.lie-backhub{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;font-weight:900;font-size:.85rem;padding:10px 16px;border-radius:999px;margin:0 0 12px;text-decoration:none;box-shadow:var(--shadow)}
+.lie-backhub:hover{background:var(--green-ink);color:#fff}
 .lp-embed{margin:12px 0 4px}
 .dsrc-card{display:flex;align-items:center;gap:11px;margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:8px;text-decoration:none}
 .dsrc-card:hover{border-color:var(--green-ink)}
@@ -909,8 +911,8 @@ function viewLearn(){
         '<div class="panel">'+paras(b.a)+caseHtml(CASES[b.id])+'</div></div>';});
   } else if(tab==="d"){
     var _list = state.focusLie ? DISINFO.filter(function(z){return z.id===state.focusLie;}) : DISINFO;
-    if(state.focusLie && _list.length){ body+='<button class="back" data-lieall="1">← '+esc(L({en:"See all fact-checks",sw:"Ona uhakiki wote",sh:"Ona fact-checks zote"}))+'</button>'+
-      '<p class="lie-intro">'+esc(L({en:"The actual post, and why it doesn't hold up:",sw:"Chapisho lenyewe, na kwa nini haisimami:",sh:"Post yenyewe, na kwa nini haishiki:"}))+'</p>'; }
+    if(state.focusLie && _list.length){ body+='<a class="lie-backhub" href="https://hub.mazingirakenya.org/#narrative">← '+esc(L({en:"Back to Narrative Disinfo (hub)",sw:"Rudi Narrative Disinfo (hub)",sh:"Rudi Narrative Disinfo (hub)"}))+'</a>'+
+      '<p class="lie-intro">'+esc(L({en:"The actual post, and why it doesn't hold up",sw:"Chapisho lenyewe, na kwa nini haisimami",sh:"Post yenyewe, na kwa nini haishiki"}))+' · <a data-lieall="1" href="javascript:void 0">'+esc(L({en:"see all fact-checks",sw:"ona uhakiki wote",sh:"ona fact-checks zote"}))+' →</a></p>'; }
     _list.forEach(function(x){ var v=VERDICT[x.verdict]; var src=DISINFO_SRC[x.id]; var p=LIE_POST[x.id]||{}; var av=p.plat||"x";
       var media="";
       if(p.video){

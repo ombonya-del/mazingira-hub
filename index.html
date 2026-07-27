@@ -141,7 +141,8 @@ nav.tabs.tabs-desk{ display:none; }
   nav.tabs.tabs-mob a span{ max-width:100%; overflow:hidden; text-overflow:ellipsis; }
   nav.tabs.tabs-mob a .ico{ width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
   nav.tabs.tabs-mob a.on{ color:var(--green); }
-  body{ padding-bottom:calc(53px + env(safe-area-inset-bottom)); }
+  body{ padding-bottom:calc(68px + env(safe-area-inset-bottom)); }
+  nav.tabs.tabs-mob{ background:var(--panel); }
   /* pin the Road-to-COP31 bar, then the Explore sub-tabs FLUSH beneath it — copbar has a fixed
      height so the sub-tabs offset is exact and no content bleeds through a gap */
   a.copbar{ position:sticky; top:calc(var(--nav-h) + env(safe-area-inset-top)); z-index:88; height:36px; }
@@ -3439,11 +3440,14 @@ function hubToast(m){ var t=document.getElementById("hubToast"); if(!t) return; 
 (function(){
   var seg=document.getElementById("sentSeg"); if(!seg) return;
   var keys=["pulse","classic","narrative"];
+  function set(key){
+    seg.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", x.getAttribute("data-spanel")===key?"true":"false"); });
+    keys.forEach(function(k){ var p=document.getElementById("sp-"+k); if(p) p.hidden=(k!==key); });
+  }
+  window.MZ_showSent=set;
   seg.addEventListener("click",function(e){
     var b=e.target.closest ? e.target.closest("button[data-spanel]") : null; if(!b) return;
-    var key=b.getAttribute("data-spanel");
-    seg.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", x===b?"true":"false"); });
-    keys.forEach(function(k){ var p=document.getElementById("sp-"+k); if(p) p.hidden=(k!==key); });
+    set(b.getAttribute("data-spanel"));
   });
 })();
 
@@ -4602,10 +4606,10 @@ var VIEWS = ["live","explore","cop","desk","events","voices","act"];
 /* Map / Sector gaps / Network / Legal now live inside the grouped "Explore" view.
    A hash may point at one of those section ids — route it to Explore and pick the sub. */
 var HASH2VIEW = { live:"live", explore:"explore",
-  map:"explore", sectors:"explore", network:"explore", legal:"explore", disinfo:"explore", sentiment:"explore",
+  map:"explore", sectors:"explore", network:"explore", legal:"explore", disinfo:"explore", sentiment:"explore", narrative:"explore",
   cop:"cop", desk:"desk", events:"events", voices:"voices",
   ajesasa:"act", contribute:"act" };
-var HASH2SUB = { map:"map", sectors:"sectors", network:"network", legal:"legal", disinfo:"sentiment", sentiment:"sentiment" };
+var HASH2SUB = { map:"map", sectors:"sectors", network:"network", legal:"legal", disinfo:"sentiment", sentiment:"sentiment", narrative:"sentiment" };
 var EXPLORE_SUBS = ["map","sectors","network","legal","sentiment"];
 var exploreSub = "map";
 var tabLinks = document.querySelectorAll("nav.tabs a");
@@ -4656,10 +4660,18 @@ document.addEventListener("click", function(e){
     if(el) setTimeout(function(){ el.scrollIntoView({ behavior: reduce?"auto":"smooth", block:"start" }); }, 40);
   }
 });
+function mzNarrativeMaybe(h){
+  if(h === "narrative" && window.MZ_showSent){
+    window.MZ_showSent("narrative");
+    var el = document.getElementById("sentiment");
+    if(el) setTimeout(function(){ try{ el.scrollIntoView({ behavior: reduce?"auto":"smooth", block:"start" }); }catch(_){} }, 90);
+  }
+}
 window.addEventListener("hashchange", function(){
   var h = location.hash.slice(1);
   if(h in HASH2SUB) exploreSub = HASH2SUB[h];
   if(h in HASH2VIEW) showView(HASH2VIEW[h]);
+  mzNarrativeMaybe(h);
 });
 
 /* initial view from the URL, else Live */
@@ -4667,6 +4679,7 @@ window.addEventListener("hashchange", function(){
   var h = location.hash.slice(1);
   if(h in HASH2SUB) exploreSub = HASH2SUB[h];
   showView(h in HASH2VIEW ? HASH2VIEW[h] : "live");
+  mzNarrativeMaybe(h);
 })();
 
 /* =================================================================
