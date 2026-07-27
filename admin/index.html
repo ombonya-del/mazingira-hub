@@ -610,7 +610,11 @@ document.getElementById("signout").addEventListener("click",function(){
 try{ if(sessionStorage.getItem("mzk_auth")==="1") showConsole(); }catch(e){}
 
 if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
-  window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("sw.js").catch(function(){});
+    var reloaded=false;
+    navigator.serviceWorker.addEventListener("controllerchange",function(){ if(reloaded) return; reloaded=true; window.location.reload(); });
+  });
 }
 </script>
 </body>

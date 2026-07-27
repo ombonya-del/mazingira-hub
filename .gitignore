@@ -1,0 +1,3 @@
+
+# FUSE mount temp files
+.fuse_hidden*

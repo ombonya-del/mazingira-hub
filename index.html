@@ -148,6 +148,9 @@ nav.tabs.tabs-desk{ display:none; }
   nav.subtabs#exploreSub{ position:sticky; top:calc(var(--nav-h) + 36px + env(safe-area-inset-top)); z-index:88; }
   nav.subtabs#exploreSub .subtabs-inner{ overflow-x:visible; }
   nav.subtabs#exploreSub a{ flex:1 1 0; min-width:0; text-align:center; white-space:nowrap; font-size:.6rem; letter-spacing:.01em; padding:9px 2px 7px; }
+  /* Sentiment segmented control: all three on one line, no stacking */
+  .sent-seg{ display:flex; width:100%; flex-wrap:nowrap; gap:3px; }
+  .sent-seg button{ flex:1 1 0; min-width:0; padding:9px 3px; font-size:.62rem; text-align:center; }
 }
 
 /* Explore sub-tabs — sit just beneath the primary bar */
@@ -260,6 +263,13 @@ a.sf-item:hover{ border-color:var(--muted); text-decoration:none; }
 .nd-viewpost:hover{ text-decoration:underline; }
 .nd-flagline{ margin:0 0 9px; }
 .nd-flagline .nd-flag{ margin-left:0; }
+/* post media (video thumbnail) inside the embed, like a real post */
+.nd-media{ position:relative; display:block; margin:0 0 11px; border-radius:10px; overflow:hidden; aspect-ratio:16/9; background:#000; }
+.nd-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+.nd-media .nd-play{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:46px; height:46px; border-radius:50%; background:rgba(238,148,85,.95); display:grid; place-items:center; box-shadow:0 4px 14px rgba(0,0,0,.4); transition:transform .15s; }
+.nd-media .nd-play::before{ content:"►"; color:#fff; font-size:1rem; margin-left:3px; }
+.nd-media:hover .nd-play{ transform:translate(-50%,-50%) scale(1.08); }
+.nd-media .nd-mcap{ position:absolute; left:0; right:0; bottom:0; padding:14px 10px 6px; font-size:.66rem; font-weight:800; letter-spacing:.02em; color:#fff; background:linear-gradient(transparent, rgba(0,0,0,.8)); }
 .modal-actions{ display:flex; gap:9px; justify-content:flex-end; padding:14px 20px; border-top:1px solid var(--line); flex-wrap:wrap; }
 
 .sysstat{ display:none; align-items:center; gap:7px; font-size:.66rem; color:var(--muted-dim); letter-spacing:.08em; text-transform:uppercase; font-weight:700; }
@@ -1600,6 +1610,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         <div class="nd-embed">
           <div class="nd-eh"><span class="nd-av x">𝕏</span><div class="nd-who"><b>Circulating on X</b><span>~12k reposts · 3h ago · trending ↑</span></div></div>
           <p class="nd-etext">"The 'activists' fighting the Lamu refinery are funded by foreign oil companies that don't want Africa to refine its own fuel. This is sabotage, not environmentalism."</p>
+          <a class="nd-media" href="https://www.youtube.com/watch?v=UtI7OMaJh7M" target="_blank" rel="noopener noreferrer"><img src="https://i.ytimg.com/vi/UtI7OMaJh7M/hqdefault.jpg" alt="" loading="lazy"><span class="nd-play" aria-hidden="true"></span><span class="nd-mcap">▶ NTV Kenya · Lamu</span></a>
           <div class="nd-efoot"><span class="nd-eng">↻ 12k · ♥ 34k · 💬 2.1k</span><a class="nd-viewpost" href="https://raia.mazingirakenya.org/#lie/d5" target="_blank" rel="noopener noreferrer">🔗 View original <span>in raia</span> →</a></div>
         </div>
         <div class="nd-flagline"><span class="nd-flag vf">Bad-faith framing</span></div>
@@ -1609,6 +1620,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         <div class="nd-embed">
           <div class="nd-eh"><span class="nd-av tiktok">♪</span><div class="nd-who"><b>Circulating on TikTok</b><span>41k views · yesterday</span></div></div>
           <p class="nd-etext">"Kenya is already 90% renewable, so this refinery is just extra clean development. Greenpeace just wants Africans to stay poor and in the dark."</p>
+          <a class="nd-media" href="https://www.youtube.com/watch?v=vMSGSoJ3L6M" target="_blank" rel="noopener noreferrer"><img src="https://i.ytimg.com/vi/vMSGSoJ3L6M/hqdefault.jpg" alt="" loading="lazy"><span class="nd-play" aria-hidden="true"></span><span class="nd-mcap">▶ Olkaria geothermal</span></a>
           <div class="nd-efoot"><span class="nd-eng">▶ 41k · ♥ 8.2k · 💬 903</span><a class="nd-viewpost" href="https://raia.mazingirakenya.org/#lie/d2" target="_blank" rel="noopener noreferrer">🔗 View original <span>in raia</span> →</a></div>
         </div>
         <div class="nd-flagline"><span class="nd-flag vm">Bait-and-switch</span></div>
@@ -1618,6 +1630,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         <div class="nd-embed">
           <div class="nd-eh"><span class="nd-av fb">f</span><div class="nd-who"><b>Circulating on Facebook</b><span>shared 3.2k times</span></div></div>
           <p class="nd-etext">"Anyone questioning carbon credits is blocking millions in climate finance for poor communities. Do you want them to stay poor?"</p>
+          <a class="nd-media" href="https://www.youtube.com/watch?v=cOyGmA3yR3k" target="_blank" rel="noopener noreferrer"><img src="https://i.ytimg.com/vi/cOyGmA3yR3k/hqdefault.jpg" alt="" loading="lazy"><span class="nd-play" aria-hidden="true"></span><span class="nd-mcap">▶ Elizabeth Wathuti</span></a>
           <div class="nd-efoot"><span class="nd-eng">↻ 3.2k · ♥ 5.1k · 💬 1.4k</span><a class="nd-viewpost" href="https://raia.mazingirakenya.org/#lie/d3" target="_blank" rel="noopener noreferrer">🔗 View original <span>in raia</span> →</a></div>
         </div>
         <div class="nd-flagline"><span class="nd-flag vc">False dilemma</span></div>
@@ -1627,6 +1640,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         <div class="nd-embed">
           <div class="nd-eh"><span class="nd-av wa">✆</span><div class="nd-who"><b>Forwarded on WhatsApp</b><span>forwarded widely · no public source</span></div></div>
           <p class="nd-etext">"A leaked report shows the 2023 drought was just normal El Niño, not climate change. The scientists exaggerated it for funding."</p>
+          <a class="nd-media" href="https://www.youtube.com/watch?v=RMZxCf6jCHE" target="_blank" rel="noopener noreferrer"><img src="https://i.ytimg.com/vi/RMZxCf6jCHE/hqdefault.jpg" alt="" loading="lazy"><span class="nd-play" aria-hidden="true"></span><span class="nd-mcap">▶ ONE · climate</span></a>
           <div class="nd-efoot"><span class="nd-eng">↪ forwarded many times</span><a class="nd-viewpost" href="https://raia.mazingirakenya.org/#lie/d1" target="_blank" rel="noopener noreferrer">🔗 View original <span>in raia</span> →</a></div>
         </div>
         <div class="nd-flagline"><span class="nd-flag vf">Science denial</span></div>
@@ -1636,6 +1650,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         <div class="nd-embed">
           <div class="nd-eh"><span class="nd-av x">𝕏</span><div class="nd-who"><b>Circulating on X</b><span>spiking after the shootings</span></div></div>
           <p class="nd-etext">"The Gem-Ramula 'land protests' were staged by NGOs paying people to riot against a project that would bring jobs."</p>
+          <a class="nd-media" href="https://www.youtube.com/watch?v=BzwKXJRB7vU" target="_blank" rel="noopener noreferrer"><img src="https://i.ytimg.com/vi/BzwKXJRB7vU/hqdefault.jpg" alt="" loading="lazy"><span class="nd-play" aria-hidden="true"></span><span class="nd-mcap">▶ Ramula · real footage</span></a>
           <div class="nd-efoot"><span class="nd-eng">↻ 6.7k · ♥ 9.1k · 💬 3.3k</span><a class="nd-viewpost" href="https://raia.mazingirakenya.org/#lie/d5" target="_blank" rel="noopener noreferrer">🔗 View original <span>in raia</span> →</a></div>
         </div>
         <div class="nd-flagline"><span class="nd-flag vf">Defender smear</span></div>
@@ -1645,6 +1660,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         <div class="nd-embed">
           <div class="nd-eh"><span class="nd-av tiktok">♪</span><div class="nd-who"><b>Circulating on TikTok</b><span>22k views · re-uploaded</span></div></div>
           <p class="nd-etext">"This photo proves the 'climate floods' are staged to attract foreign aid money."</p>
+          <a class="nd-media" href="https://www.youtube.com/watch?v=S_0-FI0ex3Y" target="_blank" rel="noopener noreferrer"><img src="https://i.ytimg.com/vi/S_0-FI0ex3Y/hqdefault.jpg" alt="" loading="lazy"><span class="nd-play" aria-hidden="true"></span><span class="nd-mcap">▶ Nairobi floods · real</span></a>
           <div class="nd-efoot"><span class="nd-eng">▶ 22k · ♥ 4.4k · 💬 781</span><a class="nd-viewpost" href="https://raia.mazingirakenya.org/#lie/d6" target="_blank" rel="noopener noreferrer">🔗 View original <span>in raia</span> →</a></div>
         </div>
         <div class="nd-flagline"><span class="nd-flag vp">Manipulated media</span></div>
