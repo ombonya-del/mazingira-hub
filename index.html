@@ -148,9 +148,10 @@ nav.tabs.tabs-desk{ display:none; }
   nav.subtabs#exploreSub{ position:sticky; top:calc(var(--nav-h) + 36px + env(safe-area-inset-top)); z-index:88; }
   nav.subtabs#exploreSub .subtabs-inner{ overflow-x:visible; }
   nav.subtabs#exploreSub a{ flex:1 1 0; min-width:0; text-align:center; white-space:nowrap; font-size:.6rem; letter-spacing:.01em; padding:9px 2px 7px; }
-  /* Sentiment segmented control: all three on one line, no stacking */
-  .sent-seg{ display:flex; width:100%; flex-wrap:nowrap; gap:3px; }
-  .sent-seg button{ flex:1 1 0; min-width:0; padding:9px 3px; font-size:.62rem; text-align:center; }
+  /* Sentiment segmented control: one line, buttons hug their text so padding stays even
+     (no big gap beside "Media pulse", no squeeze on "Narrative disinfo") */
+  .sent-seg{ display:flex; flex-wrap:nowrap; gap:3px; max-width:100%; }
+  .sent-seg button{ flex:0 1 auto; padding:8px 9px; font-size:.6rem; white-space:nowrap; }
 }
 
 /* Explore sub-tabs — sit just beneath the primary bar */
@@ -1542,6 +1543,8 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <div class="sec-head" style="margin:6px 0 12px"><div class="grow"><p class="kicker">Latest scanned items</p></div></div>
     <div class="sent-feed">
       <a class="sf-item" href="https://nation.africa/kenya/climate/climate-environmental-activists-reject-dangote-s-proposed-sh2-2-trillion-lamu-oil-refinery-project--5526536" target="_blank" rel="noopener noreferrer"><span class="sf-src">Daily Nation</span><span class="sf-h">Climate activists reject Dangote's Sh2.2tn Lamu oil refinery</span><span class="sf-tag pos">Supportive</span></a>
+      <a class="sf-item" href="https://news.mongabay.com/short-article/2026/05/kenyan-agency-responds-to-protests-rejecting-proposed-nuclear-power-plant-near-lake-victoria/" target="_blank" rel="noopener noreferrer"><span class="sf-src">Mongabay</span><span class="sf-h">Agency responds to protests over proposed Siaya nuclear plant</span><span class="sf-tag pos">Supportive</span></a>
+      <a class="sf-item" href="https://www.the-star.co.ke/news/2026-05-21-sakwa-residents-protest-proposed-nuclear-plant" target="_blank" rel="noopener noreferrer"><span class="sf-src">The Star</span><span class="sf-h">Tensions rise in Sakwa, Bondo as residents protest nuclear plant</span><span class="sf-tag pos">Supportive</span></a>
       <a class="sf-item" href="https://www.climatechangenews.com/2026/07/15/campaigners-oppose-dangotes-planned-kenya-refinery-over-climate-and-ecological-risks/" target="_blank" rel="noopener noreferrer"><span class="sf-src">Climate Home News</span><span class="sf-h">Campaigners oppose Dangote refinery over climate &amp; ecological risks</span><span class="sf-tag pos">Supportive</span></a>
       <a class="sf-item" href="https://www.the-star.co.ke/news/2026-02-17-kenya-unveils-africas-first-national-carbon-registry" target="_blank" rel="noopener noreferrer"><span class="sf-src">The Star</span><span class="sf-h">Kenya unveils Africa's first national carbon registry</span><span class="sf-tag neu">Neutral</span></a>
       <a class="sf-item" href="https://nation.africa/kenya/climate/carbon-credits-government-gamble-communities-rejecting-5453972" target="_blank" rel="noopener noreferrer"><span class="sf-src">Daily Nation</span><span class="sf-h">Carbon credits: the gamble communities are rejecting</span><span class="sf-tag pos">Supportive</span></a>
@@ -1552,6 +1555,15 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     </div>
 
     <p class="sc-meta" style="margin-top:12px">The items above are real, drawn from public Kenyan and international coverage (July 2026) — click any to read the source. At scale this runs automatically via RSS &amp; APIs from a curated source list, de-duplicated and stance-scored (supportive · neutral · critical) with human review; the aggregate index and counts are indicative until the automated scanner is connected.</p>
+
+    <div class="sec-head" style="margin:18px 0 12px"><div class="grow"><p class="kicker">Community pulse · from X</p></div></div>
+    <div class="sent-feed">
+      <a class="sf-item" href="https://x.com/_James041/status/2081074050361675961" target="_blank" rel="noopener noreferrer"><span class="sf-src">@_James041</span><span class="sf-h">Public-participation event for the Siaya nuclear plant (Sakwa, Bondo) turned into a protest</span><span class="sf-tag pos">Community</span></a>
+      <a class="sf-item" href="https://x.com/deCOALonize/status/2080262892172009546" target="_blank" rel="noopener noreferrer"><span class="sf-src">@deCOALonize</span><span class="sf-h">deCOALonize on public participation in Kenya's energy decisions</span><span class="sf-tag pos">Coalition</span></a>
+      <a class="sf-item" href="https://x.com/DefendersKE/status/2080270965003448549" target="_blank" rel="noopener noreferrer"><span class="sf-src">@DefendersKE</span><span class="sf-h">Strengthening regional solidarity for environmental &amp; climate justice</span><span class="sf-tag pos">Defenders</span></a>
+      <a class="sf-item" href="https://x.com/katibainstitute/status/2080201266194727036" target="_blank" rel="noopener noreferrer"><span class="sf-src">@katibainstitute</span><span class="sf-h">Kenya's forest law battle: conservation or a threat to protected lands?</span><span class="sf-tag neu">Legal</span></a>
+    </div>
+    <p class="sc-meta" style="margin-top:10px">Curated from the coalition's <b>CoalHub</b> bookmarks on X. The live scanner will pull and stance-score these automatically.</p>
     </div><!-- /sp-pulse -->
 
     <div id="sp-classic" class="spanel" hidden>
@@ -2097,7 +2109,7 @@ var C = [
  {n:"Embu",cx:4,ry:5,s:{o:0,c:0,m:1,w:4,l:3,e:4},r:1,note:"Seven Forks dam cascade; displacement and flow alteration."},
  {n:"Kitui",cx:5,ry:5,s:{o:0,c:5,m:3,w:3,l:3,e:0},r:4,orgs:["deCOALonize","Katiba Institute"],note:"Mui Basin coal concessions — the largest remaining coal proposal in Kenya. Sand harvesting conflicts."},
 
- {n:"Siaya",cx:0,ry:6,s:{o:0,c:0,m:4,w:4,l:2,e:0},r:2,note:"Gem-Ramula gold: forced evictions, two killed April 2026, homes burned. Proposed nuclear plant at Luanda Kotieno. Lake Victoria pollution."},
+ {n:"Siaya",cx:0,ry:6,s:{o:0,c:0,m:4,w:4,l:2,e:0},r:2,note:"Gem-Ramula gold: forced evictions, two killed April 2026, homes burned. Proposed 2,000MW nuclear plant at Bondo (Sakwa), on Lake Victoria — protests over consultation. Lake Victoria pollution."},
  {n:"Vihiga",cx:1,ry:6,s:{o:0,c:0,m:4,w:2,l:2,e:0},r:1,note:"Gold-mining tensions spilling from Ikolomani; contested land acquisition. Quarrying on limited land."},
  {n:"Bomet",cx:2,ry:6,s:{o:0,c:0,m:1,w:3,l:4,e:0},r:1,note:"Mau forest excision."},
  {n:"Kiambu",cx:3,ry:6,s:{o:0,c:0,m:3,w:4,l:3,e:0},r:2,note:"Quarrying; river pollution; rapid land conversion."},

@@ -226,6 +226,7 @@ main{padding-top:22px}
 .lie-debunk{background:var(--paper2);border-top:1px solid var(--line);padding:14px}
 .lie-debunk .drow p{margin:0 0 11px}
 .lie-debunk .dtrue{background:var(--card)}
+.lie-intro{font-weight:800;color:var(--ink-soft);margin:2px 0 12px;font-size:.95rem}
 .lp-embed{margin:12px 0 4px}
 .dsrc-card{display:flex;align-items:center;gap:11px;margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:8px;text-decoration:none}
 .dsrc-card:hover{border-color:var(--green-ink)}
@@ -761,12 +762,12 @@ var DISINFO_SRC = {
 var PLAT_GLYPH = { x:"𝕏", tiktok:"♪", fb:"f", wa:"✆", radio:"📻" };
 var PLAT_NAME = { x:"X", tiktok:"TikTok", fb:"Facebook", wa:"WhatsApp", radio:"Talk radio" };
 var LIE_POST = {
-  d1:{plat:"x",  who:{en:"Circulating on X",sw:"Inazunguka X",sh:"Kwa X"}, eng:"3.1k reposts · 8.4k likes"},
-  d2:{plat:"radio", who:{en:"Talk radio & rally speeches",sw:"Redio na hotuba",sh:"Radio na speeches"}, eng:"On-air phone-ins"},
-  d3:{plat:"wa", who:{en:"Sign-up meetings & WhatsApp",sw:"Mikutano na WhatsApp",sh:"Meetings na WhatsApp"}, eng:"Forwarded widely"},
+  d1:{plat:"x",  who:{en:"Circulating on X",sw:"Inazunguka X",sh:"Kwa X"}, eng:"3.1k reposts · 8.4k likes", video:"RMZxCf6jCHE", videoBy:"ONE"},
+  d2:{plat:"radio", who:{en:"Talk radio & rally speeches",sw:"Redio na hotuba",sh:"Radio na speeches"}, eng:"On-air phone-ins", video:"vMSGSoJ3L6M", videoBy:"Olkaria geothermal"},
+  d3:{plat:"wa", who:{en:"Sign-up meetings & WhatsApp",sw:"Mikutano na WhatsApp",sh:"Meetings na WhatsApp"}, eng:"Forwarded widely", video:"cOyGmA3yR3k", videoBy:"Elizabeth Wathuti"},
   d4:{plat:"fb", who:{en:"Circulating on Facebook",sw:"Inazunguka Facebook",sh:"Kwa Facebook"}, eng:"Shared 3.2k times", video:"UtI7OMaJh7M", videoBy:"NTV Kenya"},
-  d5:{plat:"x",  who:{en:"Coordinated on X & Facebook",sw:"X na Facebook",sh:"X na Facebook"}, eng:"~9k reposts · trending", video:"cOyGmA3yR3k", videoBy:"Elizabeth Wathuti"},
-  d6:{plat:"tiktok", who:{en:"Recycled on TikTok",sw:"TikTok",sh:"TikTok"}, eng:"22k views · re-uploaded"}
+  d5:{plat:"x",  who:{en:"Coordinated on X & Facebook",sw:"X na Facebook",sh:"X na Facebook"}, eng:"~9k reposts · trending", video:"BzwKXJRB7vU", videoBy:"Ramula · real footage"},
+  d6:{plat:"tiktok", who:{en:"Recycled on TikTok",sw:"TikTok",sh:"TikTok"}, eng:"22k views · re-uploaded", video:"S_0-FI0ex3Y", videoBy:"Nairobi floods · real"}
 };
 var AV_COLORS = ["#C0202A","#0C7A4D","#DC9A18","#26262b","#2C4B59"];
 var VOICES = [
@@ -907,7 +908,10 @@ function viewLearn(){
       body+='<div class="acc bigq'+(open?" open":"")+'" data-acc="q:'+b.id+'"><button aria-expanded="'+open+'"><span class="q">'+esc(L(b.q))+'</span><span class="plus">+</span></button>'+
         '<div class="panel">'+paras(b.a)+caseHtml(CASES[b.id])+'</div></div>';});
   } else if(tab==="d"){
-    DISINFO.forEach(function(x){ var v=VERDICT[x.verdict]; var src=DISINFO_SRC[x.id]; var p=LIE_POST[x.id]||{}; var av=p.plat||"x";
+    var _list = state.focusLie ? DISINFO.filter(function(z){return z.id===state.focusLie;}) : DISINFO;
+    if(state.focusLie && _list.length){ body+='<button class="back" data-lieall="1">← '+esc(L({en:"See all fact-checks",sw:"Ona uhakiki wote",sh:"Ona fact-checks zote"}))+'</button>'+
+      '<p class="lie-intro">'+esc(L({en:"The actual post, and why it doesn't hold up:",sw:"Chapisho lenyewe, na kwa nini haisimami:",sh:"Post yenyewe, na kwa nini haishiki:"}))+'</p>'; }
+    _list.forEach(function(x){ var v=VERDICT[x.verdict]; var src=DISINFO_SRC[x.id]; var p=LIE_POST[x.id]||{}; var av=p.plat||"x";
       var media="";
       if(p.video){
         media='<div class="ytwrap lp-embed" data-yt="'+esc(p.video)+'">'+
@@ -1032,7 +1036,8 @@ function bind(){
   app.querySelectorAll("[data-back]").forEach(function(el){ el.addEventListener("click",function(){ go("ninini"); }); });
   app.querySelectorAll("[data-nav]").forEach(function(el){ el.addEventListener("click",function(){ go(el.getAttribute("data-nav")); }); });
   app.querySelectorAll(".tabs [data-lens]").forEach(function(el){ el.addEventListener("click",function(){ state.lens=el.getAttribute("data-lens"); render(); }); });
-  app.querySelectorAll("[data-ltab]").forEach(function(el){ el.addEventListener("click",function(){ state.learnTab=el.getAttribute("data-ltab"); state.openAcc=null; render(); }); });
+  app.querySelectorAll("[data-ltab]").forEach(function(el){ el.addEventListener("click",function(){ state.learnTab=el.getAttribute("data-ltab"); state.openAcc=null; state.focusLie=null; render(); }); });
+  app.querySelectorAll("[data-lieall]").forEach(function(el){ el.addEventListener("click",function(){ state.focusLie=null; if(location.hash) history.replaceState(null,"",location.pathname); render(); }); });
   app.querySelectorAll("[data-acc]").forEach(function(el){ el.querySelector("button").addEventListener("click",function(){ var k=el.getAttribute("data-acc"); state.openAcc=(state.openAcc===k)?null:k; render(); }); });
   app.querySelectorAll("[data-rel]").forEach(function(el){ el.addEventListener("click",function(){ var p=el.getAttribute("data-rel").split(":"); state.learnTab=(p[0]==="basic")?"q":"m"; state.openAcc=((p[0]==="basic")?"q:":"m:")+p[1]; go("learn"); }); });
   app.querySelectorAll("[data-poll]").forEach(function(el){ el.addEventListener("click",function(){ votePoll(el.getAttribute("data-poll")); }); });
@@ -1067,8 +1072,8 @@ document.querySelectorAll(".langs button").forEach(function(b){ b.addEventListen
 function applyHash(scroll){
   var h=(location.hash||"").replace(/^#/,"");
   if(h==="lie"||h.indexOf("lie/")===0){
-    state.view="learn"; state.learnTab="d"; render();
     var id=h.indexOf("lie/")===0?h.slice(4):"";
+    state.view="learn"; state.learnTab="d"; state.focusLie=id||null; render();
     if(id){ var el=document.getElementById("lie-"+id); if(el){ el.scrollIntoView({behavior:scroll?"smooth":"auto",block:"start"}); el.classList.add("flash"); } }
     return true;
   }
