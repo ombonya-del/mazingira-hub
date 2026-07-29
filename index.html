@@ -28,6 +28,7 @@
   --bg:       #080F0C;
   --panel:    #0E1A15;
   --panel-2:  #13241D;
+  --chrome:   #1C3A2C;
   --panel-3:  #182E25;
   --line:     #22392E;
   --line-2:   #2E4A3C;
@@ -87,8 +88,8 @@ a:hover{ text-decoration:underline; }
 
 /* ============================ HEADER ============================ */
 header.top{
-  position:sticky; top:0; z-index:100; background:var(--panel);
-  border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top);
+  position:sticky; top:0; z-index:100; background:var(--chrome);
+  border-bottom:1px solid var(--green); padding-top:env(safe-area-inset-top);
 }
 .top-inner{ height:var(--nav-h); display:flex; align-items:center; gap:14px; }
 .brand{ display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:1px; margin-right:auto; min-width:0; }
@@ -129,7 +130,7 @@ nav.tabs.tabs-desk{ display:none; }
 @media (max-width:859px){
   nav.tabs.tabs-mob{
     position:fixed; left:0; right:0; bottom:0; top:auto; z-index:95;
-    border-top:1px solid var(--line); border-bottom:0; background:var(--panel);
+    border-top:1px solid var(--green); border-bottom:0; background:var(--chrome);
     padding-bottom:env(safe-area-inset-bottom); box-shadow:0 -6px 20px rgba(0,0,0,.3);
   }
   nav.tabs.tabs-mob .tabs-inner{ display:flex; width:100%; gap:0; overflow:visible; }
@@ -143,9 +144,9 @@ nav.tabs.tabs-desk{ display:none; }
   nav.tabs.tabs-mob a.on{ color:var(--green); }
   /* bottom nav: fixed height, content reserve matched to it, and a backdrop that fills the
      safe-area / any sub-pixel gap below the bar so no page content ever shows beneath it */
-  nav.tabs.tabs-mob{ background:var(--panel); }
+  nav.tabs.tabs-mob{ background:var(--chrome); }
   nav.tabs.tabs-mob .tabs-inner{ min-height:54px; align-items:center; }
-  nav.tabs.tabs-mob::after{ content:""; position:absolute; left:0; right:0; top:100%; height:60vh; background:var(--panel); pointer-events:none; }
+  nav.tabs.tabs-mob::after{ content:""; position:absolute; left:0; right:0; top:100%; height:60vh; background:var(--chrome); pointer-events:none; }
   body{ padding-bottom:calc(56px + env(safe-area-inset-bottom)); }
   /* pin the Road-to-COP31 bar, then the Explore sub-tabs FLUSH beneath it — copbar has a fixed
      height so the sub-tabs offset is exact and no content bleeds through a gap */
