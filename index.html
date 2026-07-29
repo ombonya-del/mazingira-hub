@@ -131,7 +131,7 @@ nav.tabs.tabs-desk{ display:none; }
   nav.tabs.tabs-mob{
     position:fixed; left:0; right:0; bottom:0; top:auto; z-index:95;
     border-top:1px solid var(--green); border-bottom:0; background:var(--chrome);
-    padding-bottom:env(safe-area-inset-bottom); box-shadow:0 -6px 20px rgba(0,0,0,.3);
+    padding-bottom:0; box-shadow:0 -6px 20px rgba(0,0,0,.3);
   }
   nav.tabs.tabs-mob .tabs-inner{ display:flex; width:100%; gap:0; overflow:visible; }
   nav.tabs.tabs-mob a{
@@ -145,9 +145,8 @@ nav.tabs.tabs-desk{ display:none; }
   /* bottom nav: fixed height, content reserve matched to it, and a backdrop that fills the
      safe-area / any sub-pixel gap below the bar so no page content ever shows beneath it */
   nav.tabs.tabs-mob{ background:var(--chrome); }
-  nav.tabs.tabs-mob .tabs-inner{ min-height:54px; align-items:center; }
-  nav.tabs.tabs-mob::after{ content:""; position:absolute; left:0; right:0; top:100%; height:60vh; background:var(--chrome); pointer-events:none; }
-  body{ padding-bottom:calc(56px + env(safe-area-inset-bottom)); }
+  nav.tabs.tabs-mob .tabs-inner{ align-items:center; }
+  body{ padding-bottom:50px; }
   /* pin the Road-to-COP31 bar, then the Explore sub-tabs FLUSH beneath it — copbar has a fixed
      height so the sub-tabs offset is exact and no content bleeds through a gap */
   a.copbar{ position:sticky; top:calc(var(--nav-h) + env(safe-area-inset-top)); z-index:88; height:36px; }
