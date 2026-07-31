@@ -1550,6 +1550,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
       <a class="sf-item" href="https://nation.africa/kenya/climate/climate-environmental-activists-reject-dangote-s-proposed-sh2-2-trillion-lamu-oil-refinery-project--5526536" target="_blank" rel="noopener noreferrer"><span class="sf-src">Daily Nation</span><span class="sf-h">Climate activists reject Dangote's Sh2.2tn Lamu oil refinery</span><span class="sf-tag pos">Supportive</span></a>
       <a class="sf-item" href="https://news.mongabay.com/short-article/2026/05/kenyan-agency-responds-to-protests-rejecting-proposed-nuclear-power-plant-near-lake-victoria/" target="_blank" rel="noopener noreferrer"><span class="sf-src">Mongabay</span><span class="sf-h">Agency responds to protests over proposed Siaya nuclear plant</span><span class="sf-tag pos">Supportive</span></a>
       <a class="sf-item" href="https://www.the-star.co.ke/news/2026-05-21-sakwa-residents-protest-proposed-nuclear-plant" target="_blank" rel="noopener noreferrer"><span class="sf-src">The Star</span><span class="sf-h">Tensions rise in Sakwa, Bondo as residents protest nuclear plant</span><span class="sf-tag pos">Supportive</span></a>
+      <a class="sf-item" href="https://www.the-star.co.ke/counties/rift-valley/2026-02-25-state-moves-to-unlock-samburus-strategic-chromite-deposits" target="_blank" rel="noopener noreferrer"><span class="sf-src">The Star</span><span class="sf-h">Government moves to unlock Samburu's strategic chromite deposits</span><span class="sf-tag neu">Neutral</span></a>
       <a class="sf-item" href="https://www.climatechangenews.com/2026/07/15/campaigners-oppose-dangotes-planned-kenya-refinery-over-climate-and-ecological-risks/" target="_blank" rel="noopener noreferrer"><span class="sf-src">Climate Home News</span><span class="sf-h">Campaigners oppose Dangote refinery over climate &amp; ecological risks</span><span class="sf-tag pos">Supportive</span></a>
       <a class="sf-item" href="https://www.the-star.co.ke/news/2026-02-17-kenya-unveils-africas-first-national-carbon-registry" target="_blank" rel="noopener noreferrer"><span class="sf-src">The Star</span><span class="sf-h">Kenya unveils Africa's first national carbon registry</span><span class="sf-tag neu">Neutral</span></a>
       <a class="sf-item" href="https://nation.africa/kenya/climate/carbon-credits-government-gamble-communities-rejecting-5453972" target="_blank" rel="noopener noreferrer"><span class="sf-src">Daily Nation</span><span class="sf-h">Carbon credits: the gamble communities are rejecting</span><span class="sf-tag pos">Supportive</span></a>
@@ -2081,11 +2082,11 @@ var reduce = typeof window.matchMedia === "function" &&
    ================================================================= */
 var C = [
  {n:"Turkana",cx:1,ry:0,s:{o:5,c:0,m:2,w:4,l:2,e:3},r:4,orgs:["Friends of Lake Turkana"],note:"Lokichar oil basin; falling lake levels and upstream dam impacts; wind corridor."},
- {n:"Marsabit",cx:3,ry:0,s:{o:1,c:0,m:1,w:3,l:2,e:4},r:2,note:"Large wind development; Chalbi water stress; contested community land."},
+ {n:"Marsabit",cx:3,ry:0,s:{o:1,c:0,m:4,w:3,l:4,e:4},r:3,orgs:["Community Land Management Committees (Marsabit)"],note:"Hillo/Dabel gold rush — 10,000+ artisanal miners in 59 cooperatives, deadly gang clashes and ~70 mining blocks quietly licensed; confirmed copper, nickel, chromite and coltan. ~300 residents suing BP and the State over toxic drilling waste (Sirius-1, Chalbi-3) in the Environment and Land Court; communities registering ancestral land under the Community Land Act. Chalbi water stress; contested wind-corridor land."},
  {n:"Mandera",cx:5,ry:0,s:{o:2,c:0,m:1,w:4,l:1,e:0},r:1,note:"Exploration blocks; severe and worsening water scarcity."},
 
  {n:"West Pokot",cx:1,ry:1,s:{o:1,c:0,m:3,w:2,l:3,e:0},r:1,note:"Gold and gemstone workings; rangeland degradation."},
- {n:"Samburu",cx:3,ry:1,s:{o:1,c:0,m:2,w:3,l:4,e:1},r:2,note:"Conservancy land tenure disputes; water access conflict."},
+ {n:"Samburu",cx:3,ry:1,s:{o:1,c:0,m:4,w:3,l:4,e:1},r:2,note:"Strategic chromite EOIs at Wamba and Kang'ura (2026); coltan at Nachola; copper/nickel at Suiyan; Rotor Systems' 114km² gold prospecting bid. Draft Minerals Policy public-participation forums with local leaders underway. Conservancy land-tenure disputes and water-access conflict."},
  {n:"Wajir",cx:4,ry:1,s:{o:2,c:0,m:1,w:5,l:1,e:0},r:1,note:"Aquifer depletion and unregulated drilling; exploration blocks."},
 
  {n:"Trans Nzoia",cx:0,ry:2,s:{o:0,c:0,m:1,w:2,l:3,e:0},r:1,note:"Mt Elgon forest encroachment."},
@@ -2224,6 +2225,9 @@ function src(c){ return source==="radar" ? c.rad : source==="combined" ? c.comb 
 /* Radar signals — replaced by radar/data/radar_signals.json when served. */
 var RADAR_SIGNALS = [
  {ts:2,  co:["Kitui"],        se:["c","m"], r:true,  t:"Court halts Mui Basin coal concession pending judicial review", s:"GNews · environment courts"},
+ {ts:3,  co:["Marsabit"],     se:["m","w"], r:true,  t:"~300 Marsabit residents sue BP and the State over toxic drilling waste (Sirius-1, Chalbi-3) contaminating water", s:"Environment & Land Court"},
+ {ts:5,  co:["Marsabit"],     se:["m","l"], r:true,  t:"Dabel/Moyale protests over ~70 gold blocks mapped without consent; communities register land under the Community Land Act", s:"GNews · minerals & land"},
+ {ts:7,  co:["Samburu"],      se:["m"],     r:false, t:"Ministry invites EOIs for strategic chromite at Wamba & Kang'ura; Rotor Systems files 114km² gold prospecting bid", s:"Ministry of Mining · EOIs"},
  {ts:4,  co:["Kwale"],        se:["m","w"], r:true,  t:"Tailings discharge near titanium operation alarms Msambweni residents", s:"GNews · minerals"},
  {ts:6,  co:["Makueni"],      se:["m"],     r:false, t:"Night sand harvesting continues despite county ban", s:"GNews · sand harvesting"},
  {ts:9,  co:["Elgeyo-Marakwet"], se:["m"],  r:false, t:"Fluorspar operations resume in Kerio Valley", s:"GNews · minerals"},
@@ -2247,6 +2251,10 @@ var STREAMS = [
   { id:"extract", nm:"Extractive activity", accent:"e", prov:"radar", base:38, spark:[3,5,4,7,6,9,8,11,10,13,12,15],
     pool:[
       "New prospecting licence lodged over <b>Kerio Valley</b> fluorspar block",
+      "Deadly clashes force shutdown of 13 <b>Hillo</b> gold sites, Marsabit; 10,000+ miners in 59 cooperatives",
+      "Strategic chromite EOIs opened at <b>Wamba &amp; Kang'ura</b>, Samburu",
+      "Rotor Systems files 114km² gold prospecting bid over <b>Samburu</b>",
+      "~70 gold blocks mapped without consent spark protests in <b>Dabel/Moyale</b>, Marsabit",
       "Seismic survey vessel reported off <b>Lamu</b> archipelago",
       "Quarry expansion notice published for <b>Machakos</b>",
       "Titanium sands tailings discharge reported, <b>Kwale</b>",
