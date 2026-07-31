@@ -2670,9 +2670,9 @@ var RES=[
  ['Mui Basin coalfield',265,318,'coal','Kitui','~400Mt reserve; 21-year concession disputed and stalled.','Fenxi Mui Mining Co (Shanxi Fenxi + Great Lakes)','stalled'],
  ['Lamu coal plant site',410,389,'coal','Lamu','Environmental licence permanently revoked, Oct 2025.','Amu Power Co','revoked'],
  ['Base Titanium / Kwale sands',330,498,'mineral','Kwale','Titanium sands; ore depleted Dec 2024, now closure &amp; rehabilitation.','Base Resources (exited)','closed'],
- ['Kerio Valley fluorspar',104,232,'mineral','Elgeyo-Marakwet','Fluorspar workings; escarpment degradation.','Kenya Fluorspar Co (intermittent)','stalled'],
- ['Migori gold belt',36,321,'mineral','Migori','Artisanal gold; mercury and cyanide exposure.','Artisanal &amp; small-scale miners','operating'],
- ['Taita gemstone &amp; iron',268,453,'mineral','Taita Taveta','Gemstone and iron workings; water conflict with estates.','Small-scale &amp; licensed miners','operating'],
+ ['Kimwarer fluorspar revival',104,232,'mineral','Elgeyo-Marakwet','25-yr Kimwarer concession (2025–50); plant rebuild by China\'s Mizztech underway; landowners\' KSh9bn compensation battle backed by county leaders.','Sofax Fluorspar (Fujax UK); govt 15% stake','operating'],
+ ['Migori Greenstone Belt gold',36,321,'mineral','Migori','2,000+ artisanal miners (Macalder, Osiri, Mikeyi); H-Nuo Kenya dug secret tunnels under Kitere homes; July 2026 crackdown; mercury/cyanide exposure.','ASM SACCOs; H-Nuo Kenya; Red Rock / Mid Migori','operating'],
+ ['Kishushe iron &amp; Tsavorite',268,453,'mineral','Taita Taveta','Kishushe Ranching pulled Samruddha\'s consent over a Sh150m royalty default; 158 of 161 firms found unlicensed; Tsavorite value-added at the Voi Gemstone Centre.','Samruddha &amp; Wanjala (iron); ASM gemstones','stalled'],
  ['Magadi soda ash',143,366,'mineral','Kajiado','Soda ash extraction on the Rift lake bed.','Tata Chemicals Magadi','operating'],
  ['Busia gold',18,240,'mineral','Busia','Artisanal gold; mercury exposure.','Artisanal miners','operating'],
  ['Homa Bay gold',34,294,'mineral','Homa Bay','Artisanal workings near the lake shore.','Artisanal miners','operating'],
@@ -2714,7 +2714,16 @@ var RES=[
  ['Dandora dumpsite',179,332,'plastic','Nairobi','Nairobi&#39;s main dumpsite; plastic and toxic waste burning affecting nearby settlements.','Nairobi City County','operating'],
  ['Gioto dumpsite',131,280,'plastic','Nakuru','Open dumpsite; plastic waste and leachate into the Rift lakes catchment.','Nakuru County','operating'],
  ['Kibarani / Mombasa marine plastic',342,481,'plastic','Mombasa','Coastal and marine plastic pollution; former Kibarani dumpsite rehabilitation.','Mombasa County / KMA','operating'],
- ['Kisumu lakeshore plastic',53,270,'plastic','Kisumu','Plastic waste into Lake Victoria; Nyalenda and lakeshore settlements.','Kisumu County','operating']
+ ['Kisumu lakeshore plastic',53,270,'plastic','Kisumu','Plastic waste into Lake Victoria; Nyalenda and lakeshore settlements.','Kisumu County','operating'],
+ ['Hillo / Dabel gold (Moyale)',220,108,'mineral','Marsabit','10,000+ artisanal miners in 59 cooperatives; deadly gang clashes; ~70 blocks licensed without consent. ~300 residents suing BP over toxic drilling waste.','State-vetted cooperatives; private firms','operating'],
+ ['Wamba &amp; Kang\'ura chromite',193,197,'mineral','Samburu','Strategic chromite EOIs (2026); Nachola coltan; copper/nickel at Suiyan; Rotor Systems 114km² gold prospecting bid.','Ministry EOIs; Rotor Systems Ltd','proposed'],
+ ['Kom-Durte gold (Merti)',279,214,'mineral','Isiolo','Volatile gold rush; GSU shuts sites as disturbed areas; Duse sapphires; river-sand stripping dries wells; 98%-purity limestone untapped.','Artisanal miners; external mechanizers','stalled'],
+ ['Balambala–Dadaab gypsum',378,294,'mineral','Garissa','Gypsum belt under a 2023 security ban after clan clashes; illegal mining persists; ELC bars permits on unregistered land.','No formal licence (banned); illegal operators','stalled'],
+ ['Sebit clinker (limestone)',81,175,'mineral','West Pokot','Sh29bn clinker plant on local limestone; violent gold-pit clashes and the Romos Hills collapse (15 dead); county in a licence war with the Ministry.','Cemtech Ltd (Devki / Simba Cement)','operating'],
+ ['Tiaty &amp; Kapturo diatomite',123,232,'mineral','Baringo','Large-scale diatomite; ruby, garnet &amp; tourmaline at Mogotio; artisanal gold in Tiaty.','Licensed foreign &amp; local diatomite firms','operating'],
+ ['Gilgil diatomite &amp; pozzolana',131,293,'mineral','Nakuru','Diatomite (ADIL, China\'s Chuanshan) and pozzolana quarrying; hanging-homes and quarry-dust protests; Endorois ELC win on consent.','ADIL; Chuanshan; Devki &amp; Bamburi','operating'],
+ ['Kilimapesa gold (Lolgorien)',101,335,'mineral','Narok','Kenya\'s largest established gold mine, 30km from the Mara; July 2026 crackdown arrested foreign operators.','Kilimapesa / Kengold','operating'],
+ ['Sindo &amp; Ndhiwa gold',27,297,'mineral','Homa Bay','Gold rush at Rang\'wa Hills &amp; Ndhiwa; Spirit Mining (US-linked) exploration blocks; barter-economy outcry; NEMA shutdowns.','Spirit Mining Kenya Ltd; artisanal miners','operating']
 ];
 
 var LINES=[
@@ -3908,7 +3917,11 @@ var ORGS = [
   { n:"Clean Up Kenya",                      sec:["p"],             reg:"national" },
   { n:"Flipflopi Project",                   sec:["p","w"],         reg:["Coast","Nyanza"] },
   { n:"Watamu Marine Association",           sec:["p","w"],         reg:["Coast"] },
-  { n:"Kenya Plastics Pact (civil-society members)", sec:["p"],     reg:"national" }
+  { n:"Kenya Plastics Pact (civil-society members)", sec:["p"],     reg:"national" },
+  { n:"Kishushe Ranching Cooperative Society", sec:["m","l"],       reg:["Coast"] },
+  { n:"Pastoralist Alliance for Resilience (Isiolo)", sec:["m","l","w"], reg:["Eastern"] },
+  { n:"Macalder Mine SACCO",                 sec:["m"],             reg:["Nyanza"] },
+  { n:"Endorois Welfare Council",            sec:["m","l","w"],     reg:["Rift Valley"] }
   /* The three funders (AJWS, FIMI Ayni Fund, Africa Climate Fund) finance response;
      they are not themselves ground responders, so they are deliberately left out of
      the coverage counts — they appear on the map and in the funding chains only. */
