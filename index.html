@@ -1563,7 +1563,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <p class="sc-meta" style="margin-top:12px">The items above are real, drawn from public Kenyan and international coverage (July 2026) — click any to read the source. At scale this runs automatically via RSS &amp; APIs from a curated source list, de-duplicated and stance-scored (supportive · neutral · critical) with human review; the aggregate index and counts are indicative until the automated scanner is connected.</p>
 
     <div class="sec-head" style="margin:18px 0 12px"><div class="grow"><p class="kicker">Community pulse · from X</p></div></div>
-    <div class="sent-feed">
+    <div class="sent-feed" id="communityPulse">
       <a class="sf-item" href="https://x.com/_James041/status/2083079212148117824" target="_blank" rel="noopener noreferrer"><span class="sf-src">@_James041</span><span class="sf-h">17 arrested in Bondo after raising divergent views on the proposed nuclear plant</span><span class="sf-tag pos">Defenders</span></a>
       <a class="sf-item" href="https://x.com/NyakundiReport/status/2082923338985562222" target="_blank" rel="noopener noreferrer"><span class="sf-src">@NyakundiReport</span><span class="sf-h">Roysambu residents demand NEMA action over toxic chemical waste dumping</span><span class="sf-tag pos">Waste</span></a>
       <a class="sf-item" href="https://x.com/Njeriwaridi/status/2082808818098962501" target="_blank" rel="noopener noreferrer"><span class="sf-src">@Njeriwaridi</span><span class="sf-h">Insider view: Kenya has lagged badly on energy-sector investment</span><span class="sf-tag neu">Energy</span></a>
@@ -1622,7 +1622,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 
     <div id="sp-narrative" class="spanel" hidden>
     <p class="di-lead">Live, <b>fast-moving</b> disinformation as it surfaces on social media — the context-specific, bad-faith framings used to discredit real science, real impacts, and the communities defending land and water. Each post is flagged and rebutted <b>inline</b>; tap <b>View full post</b> to open it in <a href="https://raia.mazingirakenya.org" target="_blank" rel="noopener">raia ↗</a> with the debunk attached, so the correction travels with the claim. Drafting &amp; verification happen in the admin console.</p>
-    <div class="di-stats"><span class="di-chip"><b>6</b> flagged this week</span><span class="di-chip">Rebutted inline</span><span class="di-chip">Opens in raia</span></div>
+    <div class="di-stats"><span class="di-chip"><b>6</b> flagged this week</span><span class="di-chip">Rebutted inline</span><span class="di-chip">Opens in raia</span><span class="di-chip">● Auto-scanned weekly</span></div>
     <div class="nd-grid">
       <article class="nd-card vf">
         <div class="nd-embed">
@@ -2569,7 +2569,7 @@ var gapIndex      = Math.round(meanGap * 180);   // scaled to a 0–100 style in
 
 countUp(document.getElementById("kpiPressure"), pressureCount);
 countUp(document.getElementById("kpiGap"), noResponse);
-countUp(document.getElementById("kpiLegal"), 9);
+countUp(document.getElementById("kpiLegal"), LEGAL.length);
 countUp(document.getElementById("kpiReports"), 342, 1300);
 countUp(document.getElementById("gapIdx"), gapIndex, 1200);
 
@@ -2589,6 +2589,15 @@ STREAMS.forEach(function(s){
     tickItems.push('<span class="tick-item"><span class="tick-cat '+(s.accent==="g"?"g":"")+'">'+s.nm+'</span>'+p+'</span>');
   });
 });
+/* Community pulse rides the ticker too — pulled live from the "Community pulse · from X"
+   block, so it refreshes automatically whenever the CoalHub scan updates it. */
+(function(){
+  var cp=document.getElementById("communityPulse"); if(!cp) return;
+  Array.prototype.slice.call(cp.querySelectorAll(".sf-item")).forEach(function(a){
+    var h=(a.querySelector(".sf-h")||{}).textContent||""; var src=(a.querySelector(".sf-src")||{}).textContent||"";
+    if(h) tickItems.push('<span class="tick-item"><span class="tick-cat g">Community · '+src+'</span>'+h+'</span>');
+  });
+})();
 tickItems.sort(function(){ return Math.random()-.5; });
 document.getElementById("tickTrack").innerHTML = tickItems.join("") + tickItems.join("");
 
