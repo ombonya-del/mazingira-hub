@@ -129,7 +129,7 @@ nav.tabs.tabs-desk{ display:none; }
 /* Mobile: the consolidated nav becomes a fixed bottom bar with icons */
 @media (max-width:859px){
   nav.tabs.tabs-mob{
-    position:fixed; left:0; right:0; bottom:0; top:auto; z-index:95;
+    position:fixed; left:0; right:0; bottom:env(safe-area-inset-bottom, 0px); top:auto; z-index:95;
     border-top:1px solid var(--green); border-bottom:0; background:var(--chrome);
     padding-bottom:0; box-shadow:0 -6px 20px rgba(0,0,0,.3);
   }
@@ -146,7 +146,7 @@ nav.tabs.tabs-desk{ display:none; }
      safe-area / any sub-pixel gap below the bar so no page content ever shows beneath it */
   nav.tabs.tabs-mob{ background:var(--chrome); }
   nav.tabs.tabs-mob .tabs-inner{ align-items:center; }
-  body{ padding-bottom:50px; }
+  body{ padding-bottom:calc(50px + env(safe-area-inset-bottom, 0px)); }
   /* pin the Road-to-COP31 bar, then the Explore sub-tabs FLUSH beneath it — copbar has a fixed
      height so the sub-tabs offset is exact and no content bleeds through a gap */
   a.copbar{ position:sticky; top:calc(var(--nav-h) + env(safe-area-inset-top)); z-index:88; height:36px; }
