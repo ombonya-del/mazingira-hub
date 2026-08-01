@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0A1512">
 <link rel="manifest" href="/manifest.webmanifest">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -4927,6 +4927,29 @@ if("serviceWorker" in navigator){
         var el=document.getElementById("pwaInstall"); if(el) el.remove(); }); });
     bar.appendChild(a);
   });
+})();
+</script>
+<script>
+/* TEMP DIAGNOSTIC — remove after debugging the bottom-nav band */
+(function(){
+  function probe(side){
+    var d=document.createElement('div');
+    d.style.cssText='position:fixed;'+side+':0;left:-9999px;width:1px;height:env(safe-area-inset-'+side+',0px);';
+    document.body.appendChild(d); var h=d.getBoundingClientRect().height; d.remove(); return Math.round(h);
+  }
+  function draw(){
+    var sab=probe('bottom'), sat=probe('top');
+    var nav=document.querySelector('nav.tabs.tabs-mob');
+    var navGap = nav ? Math.round(window.innerHeight - nav.getBoundingClientRect().bottom) : '?';
+    var navH = nav ? Math.round(nav.getBoundingClientRect().height) : '?';
+    var t=document.getElementById('diagTag')||document.createElement('div');
+    t.id='diagTag';
+    t.textContent='DIAG v43 · inset-bottom '+sab+' · inset-top '+sat+' · navH '+navH+' · navGap '+navGap+' · vh '+window.innerHeight;
+    t.style.cssText='position:fixed;top:56px;left:50%;transform:translateX(-50%);z-index:99999;background:#B4531A;color:#fff;font:800 12px/1.35 system-ui,sans-serif;padding:7px 11px;border-radius:9px;box-shadow:0 6px 16px rgba(0,0,0,.45);pointer-events:none;white-space:nowrap;max-width:96vw;overflow:hidden;text-overflow:ellipsis;';
+    if(!t.parentNode) document.body.appendChild(t);
+  }
+  window.addEventListener('load', function(){ setTimeout(draw,300); });
+  window.addEventListener('resize', draw);
 })();
 </script>
 </body>
