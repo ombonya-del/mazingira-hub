@@ -242,7 +242,12 @@ a.sf-item:hover{ border-color:var(--muted); text-decoration:none; }
 .sf-h{ flex:1; color:var(--text); font-weight:600; font-size:.9rem; }
 .sf-tag{ flex:0 0 auto; font-size:.6rem; font-weight:900; letter-spacing:.05em; text-transform:uppercase; padding:3px 9px; border-radius:999px; }
 .sf-tag.pos{ background:rgba(98,199,155,.16); color:var(--green); } .sf-tag.neu{ background:rgba(143,168,154,.16); color:var(--muted); } .sf-tag.neg{ background:rgba(242,118,47,.16); color:var(--ember); }
-@media(max-width:560px){ .sf-src{ width:auto; } .sf-item{ flex-wrap:wrap; } }
+@media(max-width:560px){
+  .sf-item{ flex-wrap:wrap; align-items:baseline; gap:3px 8px; padding:9px 12px; }
+  .sf-h{ order:0; flex:1 1 100%; font-size:.82rem; line-height:1.35; font-weight:700; }
+  .sf-src{ order:1; width:auto; font-size:.58rem; color:var(--muted); }
+  .sf-tag{ order:2; font-size:.54rem; padding:2px 8px; }
+}
 /* Community Pulse — MOTD-style embed cards of real, attributable posts (no rebuttal) */
 .pulse-feed{ display:grid; gap:11px; }
 .pulse-card{ display:block; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 15px; text-decoration:none; transition:border-color .15s; }
