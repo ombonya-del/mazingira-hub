@@ -284,8 +284,16 @@ a.sf-item:hover{ border-color:var(--muted); text-decoration:none; }
 .xorig-toggle{ border:0; background:transparent; color:#7FB0D8; font-family:inherit; font-weight:800; font-size:.72rem; cursor:pointer; padding:0; white-space:nowrap; flex:0 0 auto; }
 .xorig-toggle:hover{ text-decoration:underline; }
 .xorig-toggle:disabled{ color:var(--muted); cursor:default; text-decoration:none; }
-.xorig-embed{ margin-top:11px; }
-.xorig-embed .twitter-tweet{ margin:0 auto !important; }
+.xorig-embed{ margin-top:11px; max-width:100%; overflow-x:hidden; }
+.xorig-embed .twitter-tweet{ margin:0 auto !important; max-width:100% !important; }
+.xorig-embed iframe{ max-width:100% !important; }
+/* Keep every Pulse card inside the viewport — no horizontal leak */
+.pulse-feed{ min-width:0; }
+.pulse-card{ min-width:0; max-width:100%; overflow:hidden; }
+.pc-head{ min-width:0; }
+.pc-eng{ min-width:0; overflow-wrap:anywhere; }
+.pc-tag{ overflow:hidden; text-overflow:ellipsis; }
+@media(max-width:560px){ .pc-head{ flex-wrap:wrap; } .pc-tag{ max-width:100%; white-space:normal; } }
 /* Je, Hatua? sentiment callout */
 .sent-callout{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; background:rgba(98,199,155,.08); border:1px solid rgba(98,199,155,.3); border-radius:12px; padding:11px 14px; font-weight:800; font-size:.85rem; color:var(--text); margin:0 0 16px; }
 .sent-callout:hover{ border-color:var(--green); text-decoration:none; } .sent-callout b{ color:var(--green); } .sent-callout .go{ margin-left:auto; color:var(--green); }
