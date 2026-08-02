@@ -243,6 +243,24 @@ a.sf-item:hover{ border-color:var(--muted); text-decoration:none; }
 .sf-tag{ flex:0 0 auto; font-size:.6rem; font-weight:900; letter-spacing:.05em; text-transform:uppercase; padding:3px 9px; border-radius:999px; }
 .sf-tag.pos{ background:rgba(98,199,155,.16); color:var(--green); } .sf-tag.neu{ background:rgba(143,168,154,.16); color:var(--muted); } .sf-tag.neg{ background:rgba(242,118,47,.16); color:var(--ember); }
 @media(max-width:560px){ .sf-src{ width:auto; } .sf-item{ flex-wrap:wrap; } }
+/* Community Pulse — MOTD-style embed cards of real, attributable posts (no rebuttal) */
+.pulse-feed{ display:grid; gap:11px; }
+.pulse-card{ display:block; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 15px; text-decoration:none; transition:border-color .15s; }
+.pulse-card:hover{ border-color:var(--muted); text-decoration:none; }
+.pc-head{ display:flex; align-items:center; gap:10px; margin:0 0 9px; }
+.pc-av{ width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-weight:900; font-size:1rem; flex:0 0 auto; }
+.pc-av.x{ background:#0b0b0b; border:1px solid #333; color:#fff; }
+.pc-who{ display:flex; flex-direction:column; line-height:1.25; min-width:0; flex:1; }
+.pc-who b{ color:var(--text); font-size:.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pc-who span{ color:var(--muted); font-size:.72rem; font-weight:700; }
+.pc-tag{ font-size:.58rem; font-weight:900; letter-spacing:.04em; text-transform:uppercase; padding:3px 9px; border-radius:999px; background:var(--panel-2); color:var(--muted); flex:0 0 auto; white-space:nowrap; }
+.pc-tag.bondo{ background:rgba(229,98,90,.16); color:#E5625A; }
+.pc-tag.waste{ background:rgba(232,180,90,.16); color:#E8B45A; }
+.pc-tag.energy{ background:rgba(127,176,216,.16); color:#7FB0D8; }
+.pc-text{ margin:0 0 11px; font-size:.9rem; line-height:1.5; color:var(--text); white-space:pre-line; display:-webkit-box; -webkit-line-clamp:7; -webkit-box-orient:vertical; overflow:hidden; }
+.pc-foot{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:9px; border-top:1px solid var(--line); }
+.pc-eng{ font-size:.72rem; color:var(--muted-dim); font-weight:700; letter-spacing:.02em; }
+.pc-view{ font-size:.72rem; font-weight:800; color:#7FB0D8; flex:0 0 auto; }
 /* Je, Hatua? sentiment callout */
 .sent-callout{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; background:rgba(98,199,155,.08); border:1px solid rgba(98,199,155,.3); border-radius:12px; padding:11px 14px; font-weight:800; font-size:.85rem; color:var(--text); margin:0 0 16px; }
 .sent-callout:hover{ border-color:var(--green); text-decoration:none; } .sent-callout b{ color:var(--green); } .sent-callout .go{ margin-left:auto; color:var(--green); }
@@ -1594,14 +1612,30 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 
     <p class="sc-meta" style="margin-top:12px">The items above are real, drawn from public Kenyan and international coverage (July 2026) — click any to read the source. At scale this runs automatically via RSS &amp; APIs from a curated source list, de-duplicated and stance-scored (supportive · neutral · critical) with human review; the aggregate index and counts are indicative until the automated scanner is connected.</p>
 
-    <div class="sec-head" style="margin:18px 0 12px"><div class="grow"><p class="kicker">Community pulse · from X</p></div></div>
-    <div class="sent-feed" id="communityPulse">
-      <a class="sf-item" href="https://x.com/_James041/status/2083079212148117824" target="_blank" rel="noopener noreferrer"><span class="sf-src">@_James041</span><span class="sf-h">17 arrested in Bondo after raising divergent views on the proposed nuclear plant</span><span class="sf-tag pos">Defenders</span></a>
-      <a class="sf-item" href="https://x.com/NyakundiReport/status/2082923338985562222" target="_blank" rel="noopener noreferrer"><span class="sf-src">@NyakundiReport</span><span class="sf-h">Roysambu residents demand NEMA action over toxic chemical waste dumping</span><span class="sf-tag pos">Waste</span></a>
-      <a class="sf-item" href="https://x.com/Njeriwaridi/status/2082808818098962501" target="_blank" rel="noopener noreferrer"><span class="sf-src">@Njeriwaridi</span><span class="sf-h">Insider view: Kenya has lagged badly on energy-sector investment</span><span class="sf-tag neu">Energy</span></a>
-      <a class="sf-item" href="https://x.com/Philosopher254/status/1939236484319428786" target="_blank" rel="noopener noreferrer"><span class="sf-src">@Philosopher254</span><span class="sf-h">A nuclear plant needs a 30km habitation-free radius — Bondo siting questioned</span><span class="sf-tag neu">Nuclear</span></a>
+    <div class="sec-head" style="margin:18px 0 12px"><div class="grow"><p class="kicker">Community pulse · live from X</p></div></div>
+    <div class="pulse-feed" id="communityPulse">
+      <a class="pulse-card" href="https://x.com/_James041/status/2083079212148117824" target="_blank" rel="noopener noreferrer">
+        <div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>I am Chege</b><span>@_James041 · 31 Jul 2026</span></div><span class="pc-tag bondo">Bondo · Nuclear</span></div>
+        <p class="pc-text">After being profiled for raising divergent views concerning the proposed Nuclear Power Plant in Bondo, seventeen innocent people were illegally arrested and detained at Bondo Police Station with no charges. The abductors have filed a Miscellaneous Application at the Chief Magistrates Court seeking to detain the 17 in the name of investigating TERRORISM ACTS. Since when did raising divergent opinion become a terrorism act? #FreeBondoYouths</p>
+        <div class="pc-foot"><span class="pc-eng">↻ 78 · ♥ 135 · 👁 8.4k</span><span class="pc-view">View on X ↗</span></div>
+      </a>
+      <a class="pulse-card" href="https://x.com/_James041/status/2081242115309281327" target="_blank" rel="noopener noreferrer">
+        <div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>I am Chege</b><span>@_James041 · 26 Jul 2026</span></div><span class="pc-tag bondo">Bondo · Nuclear</span></div>
+        <p class="pc-text">Tumbocrats from Siaya are so quiet when innocent people are being profiled and shot for having divergent views. The people are raising important environmental and health issues related to the proposed Nuclear Power Plant and they are only asking to be heard.</p>
+        <div class="pc-foot"><span class="pc-eng">↻ 49 · ♥ 123 · 👁 2.7k</span><span class="pc-view">View on X ↗</span></div>
+      </a>
+      <a class="pulse-card" href="https://x.com/NyakundiReport/status/2082923338985562222" target="_blank" rel="noopener noreferrer">
+        <div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>Nyakundi Report</b><span>@NyakundiReport · 30 Jul 2026</span></div><span class="pc-tag waste">Waste</span></div>
+        <p class="pc-text">Roysambu Residents Demand NEMA Action Over Toxic Chemical Waste Dumping. Residents have raised alarm over unknown individuals dumping hazardous chemical waste — possibly from an illegal factory — that releases toxic fumes at night, leaving them fearing for their health. They are calling on NEMA and the Ministry of Environment to investigate the source and act.</p>
+        <div class="pc-foot"><span class="pc-eng">↻ 28 · ♥ 56 · 👁 5.6k</span><span class="pc-view">View on X ↗</span></div>
+      </a>
+      <a class="pulse-card" href="https://x.com/Njeriwaridi/status/2082808818098962501" target="_blank" rel="noopener noreferrer">
+        <div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>Njeri Waridi</b><span>@Njeriwaridi · 30 Jul 2026</span></div><span class="pc-tag energy">Energy</span></div>
+        <p class="pc-text">I recall someone working within the energy sector saying that Kenya has lagged behind significantly in energy-sector investment, and it's starting to catch up with us. Slowly, generators &amp; solar power are becoming the norm.</p>
+        <div class="pc-foot"><span class="pc-eng">↻ 8 · ♥ 9 · 👁 4.2k</span><span class="pc-view">View on X ↗</span></div>
+      </a>
     </div>
-    <p class="sc-meta" style="margin-top:10px">Curated from the coalition's <b>CoalHub</b> bookmarks on X. The live scanner will pull and stance-score these automatically.</p>
+    <p class="sc-meta" style="margin-top:10px">Real posts curated from the coalition's <b>CoalHub</b> bookmarks on X — actual events caught across platforms, tap any to open the original. The live scanner keeps this refreshed automatically.</p>
     </div><!-- /sp-pulse -->
 
     <div id="sp-classic" class="spanel" hidden>
@@ -2630,9 +2664,11 @@ STREAMS.forEach(function(s){
    block, so it refreshes automatically whenever the CoalHub scan updates it. */
 (function(){
   var cp=document.getElementById("communityPulse"); if(!cp) return;
-  Array.prototype.slice.call(cp.querySelectorAll(".sf-item")).forEach(function(a){
-    var h=(a.querySelector(".sf-h")||{}).textContent||""; var src=(a.querySelector(".sf-src")||{}).textContent||"";
-    if(h) tickItems.push('<span class="tick-item"><span class="tick-cat g">Community · '+src+'</span>'+h+'</span>');
+  Array.prototype.slice.call(cp.querySelectorAll(".pulse-card")).forEach(function(a){
+    var who=(a.querySelector(".pc-who span")||{}).textContent||""; var handle=who.split("·")[0].trim();
+    var t=((a.querySelector(".pc-text")||{}).textContent||"").replace(/\s+/g," ").trim();
+    if(t.length>92) t=t.slice(0,92)+"…";
+    if(t) tickItems.push('<span class="tick-item"><span class="tick-cat g">Community · '+handle+'</span>'+t+'</span>');
   });
 })();
 tickItems.sort(function(){ return Math.random()-.5; });
