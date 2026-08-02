@@ -594,9 +594,12 @@ function viewUpload(){
       '<div style="margin-top:12px"><button class="btn pub" data-pub-form="disinfo">Publish to Disinfo</button> <button class="btn ghost" type="button" data-clear="disinfo">Clear</button></div>'+
       '<p class="muted upl-msg" style="font-size:.8rem;margin:10px 0 0"></p>'+
     '</div></div>';
+  var pending='<div class="panel"><div class="sec-title"><h3>Pending review · disinfo scanner drafts</h3><span class="rule"></span></div>'+
+    '<p class="muted" style="font-size:.8rem;margin:0 0 10px">The weekly scanner proposes flagged posts here as drafts. Nothing is public until you Publish.</p>'+
+    '<div id="uplDrafts"><p class="muted" style="font-size:.82rem">Loading…</p></div></div>';
   return '<section class="view">'+head+
     '<div class="panel"><p class="muted" style="font-size:.82rem;margin:0">Signed in as <b>'+esc(authUser.email||"")+'</b> · <a href="#" id="uplSignOut" style="color:var(--gold)">sign out</a> · <a href="#" id="uplWho" style="color:var(--gold)">check my access</a> <span id="uplWhoMsg" style="font-size:.78rem"></span></p></div>'+
-    pulseF+disF+'</section>';
+    pulseF+disF+pending+'</section>';
 }
 
 function uplSaveDraft(form){ var key=form.getAttribute("data-draft"); if(!key)return; var o={}; form.querySelectorAll("[data-f]").forEach(function(el){ if(el.type==="file")return; o[el.getAttribute("data-f")]=el.value; }); try{ localStorage.setItem(key,JSON.stringify(o)); }catch(e){} }
@@ -625,6 +628,26 @@ function bindUpload(){
   });
   document.querySelectorAll("[data-clear]").forEach(function(b){ b.addEventListener("click",function(){ var form=b.closest(".upl-form"); uplClearForm(form); var m=form.querySelector(".upl-msg"); if(m){ m.style.color=""; m.textContent="Cleared."; } }); });
   document.querySelectorAll("[data-pub-form]").forEach(function(btn){ btn.addEventListener("click",function(){ publishUpload(btn); }); });
+  uplLoadDrafts();
+}
+
+function uplLoadDrafts(){
+  var host=document.getElementById("uplDrafts"); if(!host||!ASB) return;
+  ASB.from("disinfo_items").select("*").eq("published",false).order("created_at",{ascending:false}).then(function(r){
+    if(r.error){ host.innerHTML='<p class="muted" style="font-size:.82rem;color:#E5625A">Can\'t load drafts: '+esc(r.error.message)+'</p>'; return; }
+    var d=r.data||[];
+    if(!d.length){ host.innerHTML='<p class="muted" style="font-size:.82rem">No drafts waiting.</p>'; return; }
+    host.innerHTML=d.map(function(i){
+      return '<div class="panel" style="margin:0 0 10px;background:#0a1712">'+
+        '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><b style="font-size:.85rem">'+esc(i.name||i.handle||"Circulating on X")+' <span class="muted" style="font-weight:600">'+esc(i.handle||"")+(i.posted_at?" · "+esc(i.posted_at):"")+'</span></b><span class="muted" style="font-size:.72rem">'+esc(i.verdict||"")+'</span></div>'+
+        '<p style="font-size:.85rem;margin:8px 0">"'+esc(i.body||"")+'"</p>'+
+        '<p class="muted" style="font-size:.8rem;margin:0 0 8px"><b>Rebuttal:</b> '+esc(i.rebuttal||"")+'</p>'+
+        '<div><button class="btn approve" data-draft-pub="'+i.id+'">Publish</button> <button class="btn reject" data-draft-del="'+i.id+'">Discard</button>'+(i.tweet_url?' <a class="btn ghost" href="'+esc(i.tweet_url)+'" target="_blank" rel="noopener noreferrer">View post</a>':'')+'</div>'+
+      '</div>';
+    }).join("");
+    host.querySelectorAll("[data-draft-pub]").forEach(function(b){ b.addEventListener("click",function(){ b.disabled=true; ASB.from("disinfo_items").update({published:true}).eq("id",b.getAttribute("data-draft-pub")).then(function(r){ if(r.error){ b.disabled=false; toast("Publish failed: "+r.error.message); return; } toast("Published to the live desk"); uplLoadDrafts(); }); }); });
+    host.querySelectorAll("[data-draft-del]").forEach(function(b){ b.addEventListener("click",function(){ b.disabled=true; ASB.from("disinfo_items").delete().eq("id",b.getAttribute("data-draft-del")).then(function(r){ if(r.error){ b.disabled=false; toast("Discard failed: "+r.error.message); return; } toast("Draft discarded"); uplLoadDrafts(); }); }); });
+  });
 }
 
 function publishUpload(btn){
