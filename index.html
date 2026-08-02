@@ -130,6 +130,7 @@ nav.tabs.tabs-desk{ display:none; }
 @media (max-width:859px){
   nav.tabs.tabs-mob{
     position:fixed; left:0; right:0; bottom:0; top:auto; z-index:95;
+    margin:0 !important; overflow:visible !important;   /* kill generic .tabs{margin-bottom:6px;overflow-x:auto} leak — that 6px was the gap */
     border-top:1px solid var(--green); border-bottom:0; background:var(--chrome);
     padding-bottom:0; box-shadow:0 -6px 20px rgba(0,0,0,.3);
   }
