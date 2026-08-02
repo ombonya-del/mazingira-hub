@@ -3708,6 +3708,51 @@ var SB = (window.supabase && window.supabase.createClient)
   }catch(e){ /* keep in-file fallback */ }
 })();
 
+/* ---- Manual uploads: Community Pulse + Narrative Disinfo from Supabase ----
+   Newest published rows are prepended to the built-in feed and the list is trimmed
+   to 6; if the tables are empty or unreachable, the in-file cards stay as the fallback. */
+(function(){
+  var sb = window.MZ_SB || (typeof SB!=="undefined" && SB); if(!sb) return;
+  function tc(c){ return c ? (" "+String(c).replace(/[^a-z0-9_-]/gi,"")) : ""; }
+  function vc(v){ return /^(vf|vm|vc|vp)$/.test(v)?v:"vf"; }
+
+  sb.from("pulse_items").select("*").eq("published",true).order("created_at",{ascending:false}).limit(6)
+    .then(function(res){
+      var d=res&&res.data; if(!d||!d.length) return;
+      var feed=document.getElementById("communityPulse"); if(!feed) return;
+      feed.insertAdjacentHTML("afterbegin", d.map(function(i){
+        return '<div class="pulse-card">'
+          +'<div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>'+escE(i.name||i.handle||"")+'</b><span>'+escE(i.handle||"")+(i.posted_at?" · "+escE(i.posted_at):"")+'</span></div>'
+          +(i.tag?'<span class="pc-tag'+tc(i.tag_class)+'">'+escE(i.tag)+'</span>':'')+'</div>'
+          +'<p class="pc-text">'+escE(i.body||"")+'</p>'
+          +'<div class="pc-foot"><span class="pc-eng">'+escE(i.eng||"")+'</span>'
+          +(i.tweet_url?'<button class="xorig-toggle" type="button" data-tweet="'+escE(i.tweet_url)+'">View original →</button>':'')+'</div>'
+          +'<div class="xorig-embed" hidden></div></div>';
+      }).join(""));
+      while(feed.children.length>6) feed.removeChild(feed.lastElementChild);
+    }, function(){});
+
+  sb.from("disinfo_items").select("*").eq("published",true).order("created_at",{ascending:false}).limit(6)
+    .then(function(res){
+      var d=res&&res.data; if(!d||!d.length) return;
+      var grid=document.querySelector("#sp-narrative .nd-grid"); if(!grid) return;
+      grid.insertAdjacentHTML("afterbegin", d.map(function(i){ var cls=vc(i.verdict_class);
+        return '<article class="nd-card '+cls+'">'
+          +'<div class="nd-embed">'
+          +'<div class="nd-eh"><span class="nd-av x">𝕏</span><div class="nd-who"><b>'+escE(i.name||i.handle||"Circulating on X")+'</b><span>'+escE(i.handle||"")+(i.posted_at?" · "+escE(i.posted_at):"")+'</span></div></div>'
+          +'<p class="nd-etext">"'+escE(i.body||"")+'"</p>'
+          +'<div class="nd-efoot"><span class="nd-eng">'+escE(i.eng||"")+'</span>'
+          +(i.tweet_url?'<button class="xorig-toggle" type="button" data-tweet="'+escE(i.tweet_url)+'">View original →</button>':'')+'</div>'
+          +(i.tweet_url?'<div class="xorig-embed" hidden></div>':'')
+          +'</div>'
+          +'<div class="nd-flagline"><span class="nd-flag '+cls+'">'+escE(i.verdict||"")+'</span></div>'
+          +'<div class="nd-debunk"><span class="nd-lab">↳ Coalition rebuttal</span><p>'+escE(i.rebuttal||"")+'</p></div>'
+          +'</article>';
+      }).join(""));
+      while(grid.children.length>6) grid.removeChild(grid.lastElementChild);
+    }, function(){});
+})();
+
 /* Create-event modal */
 (function(){
   var overlay=document.getElementById("eventModal"); if(!overlay) return;
@@ -5007,21 +5052,21 @@ document.querySelectorAll(".ytwrap .ytplay").forEach(function(btn){
     s.src="https://platform.twitter.com/widgets.js"; s.onload=function(){ cb(); }; s.onerror=function(){ cb(true); };
     document.head.appendChild(s);
   }
-  document.querySelectorAll(".xorig-toggle").forEach(function(btn){
-    btn.addEventListener("click", function(e){
-      e.preventDefault();
-      var card=btn.closest(".pulse-card, .nd-card"); if(!card) return;
-      var host=card.querySelector(".xorig-embed"), url=btn.getAttribute("data-tweet");
-      if(!host||!url) return;
-      if(host.getAttribute("data-loaded")==="1"){ host.hidden=!host.hidden; btn.textContent=host.hidden?"View original →":"Hide original ▲"; return; }
-      btn.textContent="Loading…"; btn.disabled=true;
-      var bq=document.createElement("blockquote"); bq.className="twitter-tweet"; bq.setAttribute("data-theme","dark"); bq.setAttribute("data-dnt","true");
-      var a=document.createElement("a"); a.href=url; bq.appendChild(a); host.innerHTML=""; host.appendChild(bq); host.hidden=false;
-      widgets(function(failed){
-        btn.disabled=false;
-        if(failed || !(window.twttr&&window.twttr.widgets)){ btn.textContent="Open on X ↗"; host.hidden=true; return; }
-        window.twttr.widgets.load(host).then(function(){ host.setAttribute("data-loaded","1"); btn.textContent="Hide original ▲"; });
-      });
+  /* delegated so it also works for cards rendered later from Supabase */
+  document.addEventListener("click", function(e){
+    var btn=e.target.closest && e.target.closest(".xorig-toggle"); if(!btn) return;
+    e.preventDefault();
+    var card=btn.closest(".pulse-card, .nd-card"); if(!card) return;
+    var host=card.querySelector(".xorig-embed"), url=btn.getAttribute("data-tweet");
+    if(!host||!url) return;
+    if(host.getAttribute("data-loaded")==="1"){ host.hidden=!host.hidden; btn.textContent=host.hidden?"View original →":"Hide original ▲"; return; }
+    btn.textContent="Loading…"; btn.disabled=true;
+    var bq=document.createElement("blockquote"); bq.className="twitter-tweet"; bq.setAttribute("data-theme","dark"); bq.setAttribute("data-dnt","true");
+    var a=document.createElement("a"); a.href=url; bq.appendChild(a); host.innerHTML=""; host.appendChild(bq); host.hidden=false;
+    widgets(function(failed){
+      btn.disabled=false;
+      if(failed || !(window.twttr&&window.twttr.widgets)){ btn.textContent="Open on X ↗"; host.hidden=true; return; }
+      window.twttr.widgets.load(host).then(function(){ host.setAttribute("data-loaded","1"); btn.textContent="Hide original ▲"; });
     });
   });
 })();
