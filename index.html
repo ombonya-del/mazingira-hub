@@ -129,9 +129,16 @@ nav.tabs.tabs-desk{ display:none; }
 /* Mobile: the consolidated nav becomes a fixed bottom bar with icons */
 @media (max-width:859px){
   nav.tabs.tabs-mob{
-    position:fixed; left:0; right:0; bottom:env(safe-area-inset-bottom, 0px); top:auto; z-index:95;
+    position:fixed; left:0; right:0; bottom:0; top:auto; z-index:95;
     border-top:1px solid var(--green); border-bottom:0; background:var(--chrome);
     padding-bottom:0; box-shadow:0 -6px 20px rgba(0,0,0,.3);
+  }
+  /* Browser tab: a fixed bottom:0 bar can float a few px up (mobile Chrome quirk),
+     letting page content peek beneath it. This backdrop extends the bar's own colour
+     downward to cover that sliver so nothing shows below the bar. */
+  nav.tabs.tabs-mob::after{
+    content:""; position:absolute; left:0; right:0; top:100%; height:24px;
+    background:var(--chrome);
   }
   nav.tabs.tabs-mob .tabs-inner{ display:flex; width:100%; gap:0; overflow:visible; }
   nav.tabs.tabs-mob a{
@@ -146,7 +153,15 @@ nav.tabs.tabs-desk{ display:none; }
      safe-area / any sub-pixel gap below the bar so no page content ever shows beneath it */
   nav.tabs.tabs-mob{ background:var(--chrome); }
   nav.tabs.tabs-mob .tabs-inner{ align-items:center; }
-  body{ padding-bottom:calc(50px + env(safe-area-inset-bottom, 0px)); }
+  body{ padding-bottom:50px; }
+  /* Installed PWA (standalone): the OS draws an edge-to-edge system bar, so the safe-area
+     inset is real. Lift the whole bar to sit exactly on top of it (icons flush above the bar)
+     and drop the tab backdrop so the bar's green never bleeds into the system-bar zone. */
+  @media (display-mode: standalone){
+    nav.tabs.tabs-mob{ bottom:env(safe-area-inset-bottom, 0px); }
+    nav.tabs.tabs-mob::after{ display:none; }
+    body{ padding-bottom:calc(50px + env(safe-area-inset-bottom, 0px)); }
+  }
   /* pin the Road-to-COP31 bar, then the Explore sub-tabs FLUSH beneath it — copbar has a fixed
      height so the sub-tabs offset is exact and no content bleeds through a gap */
   a.copbar{ position:sticky; top:calc(var(--nav-h) + env(safe-area-inset-top)); z-index:88; height:36px; }
@@ -4927,29 +4942,6 @@ if("serviceWorker" in navigator){
         var el=document.getElementById("pwaInstall"); if(el) el.remove(); }); });
     bar.appendChild(a);
   });
-})();
-</script>
-<script>
-/* TEMP DIAGNOSTIC — remove after debugging the bottom-nav band */
-(function(){
-  function probe(side){
-    var d=document.createElement('div');
-    d.style.cssText='position:fixed;'+side+':0;left:-9999px;width:1px;height:env(safe-area-inset-'+side+',0px);';
-    document.body.appendChild(d); var h=d.getBoundingClientRect().height; d.remove(); return Math.round(h);
-  }
-  function draw(){
-    var sab=probe('bottom'), sat=probe('top');
-    var nav=document.querySelector('nav.tabs.tabs-mob');
-    var navGap = nav ? Math.round(window.innerHeight - nav.getBoundingClientRect().bottom) : '?';
-    var navH = nav ? Math.round(nav.getBoundingClientRect().height) : '?';
-    var t=document.getElementById('diagTag')||document.createElement('div');
-    t.id='diagTag';
-    t.textContent='DIAG v43 · inset-bottom '+sab+' · inset-top '+sat+' · navH '+navH+' · navGap '+navGap+' · vh '+window.innerHeight;
-    t.style.cssText='position:fixed;top:56px;left:50%;transform:translateX(-50%);z-index:99999;background:#B4531A;color:#fff;font:800 12px/1.35 system-ui,sans-serif;padding:7px 11px;border-radius:9px;box-shadow:0 6px 16px rgba(0,0,0,.45);pointer-events:none;white-space:nowrap;max-width:96vw;overflow:hidden;text-overflow:ellipsis;';
-    if(!t.parentNode) document.body.appendChild(t);
-  }
-  window.addEventListener('load', function(){ setTimeout(draw,300); });
-  window.addEventListener('resize', draw);
 })();
 </script>
 </body>
