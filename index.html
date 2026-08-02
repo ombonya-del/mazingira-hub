@@ -262,12 +262,11 @@ a.sf-item:hover{ border-color:var(--muted); text-decoration:none; }
 .pc-eng{ font-size:.72rem; color:var(--muted-dim); font-weight:700; letter-spacing:.02em; }
 .pc-view{ font-size:.72rem; font-weight:800; color:#7FB0D8; flex:0 0 auto; text-decoration:none; }
 .pc-view:hover{ text-decoration:underline; }
-.pc-actions{ display:flex; align-items:center; gap:14px; flex:0 0 auto; }
-.pc-load{ border:0; background:transparent; color:var(--ember-hot); font-family:inherit; font-weight:800; font-size:.72rem; cursor:pointer; padding:0; white-space:nowrap; }
-.pc-load:hover{ text-decoration:underline; }
-.pc-load:disabled{ color:var(--muted); cursor:default; text-decoration:none; }
-.pc-embed{ margin-top:2px; min-height:0; }
-.pc-embed .twitter-tweet{ margin:0 auto !important; }
+.pc-media{ position:relative; display:block; margin:0 0 11px; border-radius:10px; overflow:hidden; aspect-ratio:16/9; background:#000; }
+.pc-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+.pc-play{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:48px; height:48px; border-radius:50%; background:rgba(238,148,85,.96); display:grid; place-items:center; box-shadow:0 6px 18px rgba(0,0,0,.45); }
+.pc-play::before{ content:"►"; color:#180d03; font-size:1rem; font-weight:900; margin-left:3px; }
+.pc-mcap{ position:absolute; left:0; right:0; bottom:0; padding:14px 10px 6px; font-size:.62rem; font-weight:800; letter-spacing:.02em; color:#fff; background:linear-gradient(transparent, rgba(0,0,0,.78)); }
 /* Je, Hatua? sentiment callout */
 .sent-callout{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; background:rgba(98,199,155,.08); border:1px solid rgba(98,199,155,.3); border-radius:12px; padding:11px 14px; font-weight:800; font-size:.85rem; color:var(--text); margin:0 0 16px; }
 .sent-callout:hover{ border-color:var(--green); text-decoration:none; } .sent-callout b{ color:var(--green); } .sent-callout .go{ margin-left:auto; color:var(--green); }
@@ -1621,38 +1620,28 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 
     <div class="sec-head" style="margin:18px 0 12px"><div class="grow"><p class="kicker">Community pulse · live from X</p></div></div>
     <div class="pulse-feed" id="communityPulse">
-      <div class="pulse-card" data-tweet="https://twitter.com/_James041/status/2083079212148117824">
-        <div class="pc-body">
-          <div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>I am Chege</b><span>@_James041 · 31 Jul 2026</span></div><span class="pc-tag bondo">Bondo · Nuclear</span></div>
-          <p class="pc-text">After being profiled for raising divergent views concerning the proposed Nuclear Power Plant in Bondo, seventeen innocent people were illegally arrested and detained at Bondo Police Station with no charges. The abductors have filed a Miscellaneous Application at the Chief Magistrates Court seeking to detain the 17 in the name of investigating TERRORISM ACTS. Since when did raising divergent opinion become a terrorism act? #FreeBondoYouths</p>
-          <div class="pc-foot"><span class="pc-eng">↻ 78 · ♥ 135 · 👁 8.4k</span><span class="pc-actions"><button class="pc-load" type="button">▶ Show full post</button><a class="pc-view" href="https://x.com/_James041/status/2083079212148117824" target="_blank" rel="noopener noreferrer">View on X ↗</a></span></div>
-        </div>
-        <div class="pc-embed" hidden></div>
-      </div>
-      <div class="pulse-card" data-tweet="https://twitter.com/_James041/status/2081242115309281327">
-        <div class="pc-body">
-          <div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>I am Chege</b><span>@_James041 · 26 Jul 2026</span></div><span class="pc-tag bondo">Bondo · Nuclear</span></div>
-          <p class="pc-text">Tumbocrats from Siaya are so quiet when innocent people are being profiled and shot for having divergent views. The people are raising important environmental and health issues related to the proposed Nuclear Power Plant and they are only asking to be heard.</p>
-          <div class="pc-foot"><span class="pc-eng">↻ 49 · ♥ 123 · 👁 2.7k</span><span class="pc-actions"><button class="pc-load" type="button">▶ Show post + media</button><a class="pc-view" href="https://x.com/_James041/status/2081242115309281327" target="_blank" rel="noopener noreferrer">View on X ↗</a></span></div>
-        </div>
-        <div class="pc-embed" hidden></div>
-      </div>
-      <div class="pulse-card" data-tweet="https://twitter.com/NyakundiReport/status/2082923338985562222">
-        <div class="pc-body">
-          <div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>Nyakundi Report</b><span>@NyakundiReport · 30 Jul 2026</span></div><span class="pc-tag waste">Waste</span></div>
-          <p class="pc-text">Roysambu Residents Demand NEMA Action Over Toxic Chemical Waste Dumping. Residents have raised alarm over unknown individuals dumping hazardous chemical waste — possibly from an illegal factory — that releases toxic fumes at night, leaving them fearing for their health. They are calling on NEMA and the Ministry of Environment to investigate the source and act.</p>
-          <div class="pc-foot"><span class="pc-eng">↻ 28 · ♥ 56 · 👁 5.6k</span><span class="pc-actions"><button class="pc-load" type="button">▶ Show post + media</button><a class="pc-view" href="https://x.com/NyakundiReport/status/2082923338985562222" target="_blank" rel="noopener noreferrer">View on X ↗</a></span></div>
-        </div>
-        <div class="pc-embed" hidden></div>
-      </div>
-      <div class="pulse-card" data-tweet="https://twitter.com/Njeriwaridi/status/2082808818098962501">
-        <div class="pc-body">
-          <div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>Njeri Waridi</b><span>@Njeriwaridi · 30 Jul 2026</span></div><span class="pc-tag energy">Energy</span></div>
-          <p class="pc-text">I recall someone working within the energy sector saying that Kenya has lagged behind significantly in energy-sector investment, and it's starting to catch up with us. Slowly, generators &amp; solar power are becoming the norm.</p>
-          <div class="pc-foot"><span class="pc-eng">↻ 8 · ♥ 9 · 👁 4.2k</span><span class="pc-actions"><button class="pc-load" type="button">▶ Show full post</button><a class="pc-view" href="https://x.com/Njeriwaridi/status/2082808818098962501" target="_blank" rel="noopener noreferrer">View on X ↗</a></span></div>
-        </div>
-        <div class="pc-embed" hidden></div>
-      </div>
+      <a class="pulse-card" href="https://x.com/_James041/status/2083079212148117824" target="_blank" rel="noopener noreferrer">
+        <div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>I am Chege</b><span>@_James041 · 31 Jul 2026</span></div><span class="pc-tag bondo">Bondo · Nuclear</span></div>
+        <p class="pc-text">After being profiled for raising divergent views concerning the proposed Nuclear Power Plant in Bondo, seventeen innocent people were illegally arrested and detained at Bondo Police Station with no charges. The abductors have filed a Miscellaneous Application at the Chief Magistrates Court seeking to detain the 17 in the name of investigating TERRORISM ACTS. Since when did raising divergent opinion become a terrorism act? #FreeBondoYouths</p>
+        <div class="pc-foot"><span class="pc-eng">↻ 78 · ♥ 135 · 👁 8.4k</span><span class="pc-view">View on X ↗</span></div>
+      </a>
+      <a class="pulse-card" href="https://x.com/_James041/status/2081242115309281327" target="_blank" rel="noopener noreferrer">
+        <div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>I am Chege</b><span>@_James041 · 26 Jul 2026</span></div><span class="pc-tag bondo">Bondo · Nuclear</span></div>
+        <p class="pc-text">Tumbocrats from Siaya are so quiet when innocent people are being profiled and shot for having divergent views. The people are raising important environmental and health issues related to the proposed Nuclear Power Plant and they are only asking to be heard.</p>
+        <span class="pc-media"><img src="https://pbs.twimg.com/amplify_video_thumb/2081242053845901312/img/5KkZV7pzB2mk4z4r.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="pc-play"></span><span class="pc-mcap">▶ Video · watch on X</span></span>
+        <div class="pc-foot"><span class="pc-eng">↻ 49 · ♥ 123 · 👁 2.7k</span><span class="pc-view">View on X ↗</span></div>
+      </a>
+      <a class="pulse-card" href="https://x.com/NyakundiReport/status/2082923338985562222" target="_blank" rel="noopener noreferrer">
+        <div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>Nyakundi Report</b><span>@NyakundiReport · 30 Jul 2026</span></div><span class="pc-tag waste">Waste</span></div>
+        <p class="pc-text">Roysambu Residents Demand NEMA Action Over Toxic Chemical Waste Dumping. Residents have raised alarm over unknown individuals dumping hazardous chemical waste — possibly from an illegal factory — that releases toxic fumes at night, leaving them fearing for their health. They are calling on NEMA and the Ministry of Environment to investigate the source and act.</p>
+        <span class="pc-media"><img src="https://pbs.twimg.com/amplify_video_thumb/2082920134583226368/img/8bSzjVej5pMS2KUa.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="pc-play"></span><span class="pc-mcap">▶ Video · watch on X</span></span>
+        <div class="pc-foot"><span class="pc-eng">↻ 28 · ♥ 56 · 👁 5.6k</span><span class="pc-view">View on X ↗</span></div>
+      </a>
+      <a class="pulse-card" href="https://x.com/Njeriwaridi/status/2082808818098962501" target="_blank" rel="noopener noreferrer">
+        <div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>Njeri Waridi</b><span>@Njeriwaridi · 30 Jul 2026</span></div><span class="pc-tag energy">Energy</span></div>
+        <p class="pc-text">I recall someone working within the energy sector saying that Kenya has lagged behind significantly in energy-sector investment, and it's starting to catch up with us. Slowly, generators &amp; solar power are becoming the norm.</p>
+        <div class="pc-foot"><span class="pc-eng">↻ 8 · ♥ 9 · 👁 4.2k</span><span class="pc-view">View on X ↗</span></div>
+      </a>
     </div>
     <p class="sc-meta" style="margin-top:10px">Real posts curated from the coalition's <b>CoalHub</b> bookmarks on X — actual events caught across platforms, tap any to open the original. The live scanner keeps this refreshed automatically.</p>
     </div><!-- /sp-pulse -->
@@ -4998,35 +4987,13 @@ document.querySelectorAll(".ytwrap .ytplay").forEach(function(btn){
     wrap.innerHTML='<iframe src="https://www.youtube.com/embed/'+id+'?autoplay=1&rel=0&playsinline=1" title="video" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>';
   });
 });
-/* Community Pulse: privacy-by-default — the real X post (with its image/video) loads only when
-   the user taps "Show post". No third-party script runs until then. */
-(function(){
-  function loadWidgets(cb){
-    if(window.twttr && window.twttr.widgets) return cb();
-    var ex=document.getElementById("twitter-wjs");
-    if(ex){ var t=setInterval(function(){ if(window.twttr&&window.twttr.widgets){ clearInterval(t); cb(); } },200); return; }
-    var s=document.createElement("script"); s.id="twitter-wjs"; s.async=true; s.charset="utf-8";
-    s.src="https://platform.twitter.com/widgets.js"; s.onload=cb;
-    s.onerror=function(){ cb(true); }; document.head.appendChild(s);
-  }
-  document.querySelectorAll(".pulse-card .pc-load").forEach(function(btn){
-    btn.addEventListener("click", function(){
-      var card=btn.closest(".pulse-card"); if(!card) return;
-      var url=card.getAttribute("data-tweet");
-      var body=card.querySelector(".pc-body"), host=card.querySelector(".pc-embed");
-      if(!url||!host) return;
-      btn.textContent="Loading…"; btn.disabled=true;
-      var bq=document.createElement("blockquote"); bq.className="twitter-tweet";
-      bq.setAttribute("data-theme","dark"); bq.setAttribute("data-dnt","true");
-      var a=document.createElement("a"); a.href=url; bq.appendChild(a);
-      host.innerHTML=""; host.appendChild(bq); host.hidden=false;
-      loadWidgets(function(failed){
-        if(failed || !(window.twttr&&window.twttr.widgets)){ btn.textContent="Couldn't load — open on X ↗"; btn.disabled=false; host.hidden=true; return; }
-        window.twttr.widgets.load(host).then(function(){ if(body) body.hidden=true; });
-      });
-    });
-  });
-})();
+/* Community Pulse: self-contained media (X CDN thumbnail, no third-party script). Hide any
+   thumbnail that fails to load so the card still reads cleanly. */
+document.querySelectorAll(".pulse-card .pc-media img").forEach(function(img){
+  var hide=function(){ var m=img.closest(".pc-media"); if(m) m.style.display="none"; };
+  img.addEventListener("error", hide);
+  if(img.complete && img.naturalWidth===0) hide();
+});
 </script>
 
 <script>
