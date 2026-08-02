@@ -257,6 +257,18 @@ a.sf-item:hover{ border-color:var(--muted); text-decoration:none; }
 .pc-tag.bondo{ background:rgba(229,98,90,.16); color:#E5625A; }
 .pc-tag.waste{ background:rgba(232,180,90,.16); color:#E8B45A; }
 .pc-tag.energy{ background:rgba(127,176,216,.16); color:#7FB0D8; }
+.pc-tag.nuclear{ background:rgba(229,98,90,.16); color:#E5625A; }
+.pc-tag.coal{ background:rgba(150,150,160,.18); color:#c2c6cf; }
+.pc-tag.oil{ background:rgba(40,40,46,.6); color:#cfd2da; }
+.pc-tag.minerals{ background:rgba(200,150,70,.18); color:#d9a55a; }
+.pc-tag.water{ background:rgba(90,160,216,.16); color:#7FB0D8; }
+.pc-tag.land{ background:rgba(120,185,120,.16); color:#8fce8f; }
+.pc-tag.forest{ background:rgba(60,170,110,.18); color:#3FB984; }
+.pc-tag.wildlife{ background:rgba(216,170,90,.16); color:#e0b45a; }
+.pc-tag.plastics{ background:rgba(150,120,205,.18); color:#b79ae0; }
+.pc-tag.carbon{ background:rgba(127,176,216,.16); color:#9ec6e6; }
+.pc-shot{ display:block; margin:0 0 11px; border-radius:10px; overflow:hidden; border:1px solid var(--line); }
+.pc-shot img{ display:block; width:100%; max-height:340px; object-fit:cover; }
 .pc-text{ margin:0 0 11px; font-size:.9rem; line-height:1.5; color:var(--text); white-space:pre-line; display:-webkit-box; -webkit-line-clamp:7; -webkit-box-orient:vertical; overflow:hidden; }
 .pc-foot{ display:flex; align-items:center; justify-content:space-between; gap:8px 10px; flex-wrap:wrap; padding-top:9px; border-top:1px solid var(--line); }
 .pc-eng{ font-size:.72rem; color:var(--muted-dim); font-weight:700; letter-spacing:.02em; }
@@ -3725,6 +3737,7 @@ var SB = (window.supabase && window.supabase.createClient)
           +'<div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>'+escE(i.name||i.handle||"")+'</b><span>'+escE(i.handle||"")+(i.posted_at?" · "+escE(i.posted_at):"")+'</span></div>'
           +(i.tag?'<span class="pc-tag'+tc(i.tag_class)+'">'+escE(i.tag)+'</span>':'')+'</div>'
           +'<p class="pc-text">'+escE(i.body||"")+'</p>'
+          +(i.media_url?'<a class="pc-shot" href="'+escE(i.tweet_url||i.media_url)+'" target="_blank" rel="noopener noreferrer"><img src="'+escE(i.media_url)+'" alt="" loading="lazy"></a>':'')
           +'<div class="pc-foot"><span class="pc-eng">'+escE(i.eng||"")+'</span>'
           +(i.tweet_url?'<button class="xorig-toggle" type="button" data-tweet="'+escE(i.tweet_url)+'">View original →</button>':'')+'</div>'
           +'<div class="xorig-embed" hidden></div></div>';
@@ -3741,6 +3754,7 @@ var SB = (window.supabase && window.supabase.createClient)
           +'<div class="nd-embed">'
           +'<div class="nd-eh"><span class="nd-av x">𝕏</span><div class="nd-who"><b>'+escE(i.name||i.handle||"Circulating on X")+'</b><span>'+escE(i.handle||"")+(i.posted_at?" · "+escE(i.posted_at):"")+'</span></div></div>'
           +'<p class="nd-etext">"'+escE(i.body||"")+'"</p>'
+          +(i.media_url?'<a class="pc-shot" href="'+escE(i.tweet_url||i.media_url)+'" target="_blank" rel="noopener noreferrer"><img src="'+escE(i.media_url)+'" alt="" loading="lazy"></a>':'')
           +'<div class="nd-efoot"><span class="nd-eng">'+escE(i.eng||"")+'</span>'
           +(i.tweet_url?'<button class="xorig-toggle" type="button" data-tweet="'+escE(i.tweet_url)+'">View original →</button>':'')+'</div>'
           +(i.tweet_url?'<div class="xorig-embed" hidden></div>':'')

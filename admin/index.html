@@ -183,6 +183,9 @@ button{font-family:inherit;cursor:pointer}
 .upl-form label{display:block;font-size:.72rem;font-weight:800;color:var(--muted);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.04em}
 .upl-form input,.upl-form textarea,.upl-form select{width:100%;background:#0a1712;border:1px solid var(--line-2);color:var(--text);border-radius:9px;padding:10px;font-family:inherit;font-size:.9rem}
 .upl-form textarea{resize:vertical}
+.eng-slots{display:flex;gap:10px}
+.eng-slots span{flex:1;display:flex;flex-direction:column}
+.eng-slots small{font-size:.66rem;font-weight:800;color:var(--muted);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.04em}
 .modal .mf{padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:9px;justify-content:flex-end}
 :focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:6px}
 /* narrative disinfo queue */
@@ -540,8 +543,13 @@ if(ASB){
   ASB.auth.onAuthStateChange(function(_e,session){ authUser=session?session.user:null; if(state.view==="upload") render(); });
 }
 
+/* sector tags for the Pulse — label → colour class matching the hub */
+var UPL_SECTORS=[["Coal","coal"],["Oil & Gas","oil"],["Minerals","minerals"],["Nuclear","nuclear"],["Bondo · Nuclear","nuclear"],["Water","water"],["Land","land"],["Forests","forest"],["Wildlife","wildlife"],["Plastics","plastics"],["Carbon credits","carbon"],["Energy","energy"],["Waste","waste"]];
+function uplSectorOpts(){ return UPL_SECTORS.map(function(s){return '<option value="'+s[1]+'">'+esc(s[0])+'</option>';}).join(""); }
+function uplFmtN(v){ var n=parseInt(v,10); if(isNaN(n))return ""; if(n>=1000){ var k=n/1000; return (k>=100?Math.round(k):(k.toFixed(1).replace(/\.0$/,"")))+"k"; } return String(n); }
+function uplFmtDate(v){ if(!v)return ""; var p=String(v).split("-"); if(p.length!==3)return v; var m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; return ("0"+(+p[2])).slice(-2)+" "+(m[(+p[1])-1]||"")+" "+p[0]; }
 function viewUpload(){
-  var head='<div class="page-head"><div><h2>Manual upload</h2><p>Publish a real post to the <b>Community Pulse</b> or <b>Narrative Disinfo</b> desk — it appears at the top of the live feed on the next load.</p></div></div>';
+  var head='<div class="page-head"><div><h2>Manual upload</h2><p>Publish a real post to the <b>Community Pulse</b> or <b>Narrative Disinfo</b> desk — it appears at the top of the live feed on the next load. Drafts save as you type.</p></div></div>';
   if(!ASB) return '<section class="view">'+head+'<div class="panel"><p class="muted">The Supabase library did not load (offline?). Reconnect and reopen.</p></div></section>';
   if(!authUser){
     return '<section class="view">'+head+
@@ -553,37 +561,47 @@ function viewUpload(){
         '<p id="uplAuthMsg" class="muted" style="font-size:.8rem;margin:10px 0 0"></p>'+
       '</div></div></section>';
   }
+  var engSlots='<label>Engagement</label><div class="eng-slots">'+
+    '<span><small>Reposts</small><input type="number" min="0" data-f="reposts"></span>'+
+    '<span><small>Likes</small><input type="number" min="0" data-f="likes"></span>'+
+    '<span><small>Reach / views</small><input type="number" min="0" data-f="reach"></span></div>';
   var pulseF='<div class="panel"><div class="sec-title"><h3>&rarr; Community Pulse</h3><span class="rule"></span></div>'+
-    '<div class="upl-form" data-form="pulse">'+
+    '<div class="upl-form" data-form="pulse" data-draft="mzk_draft_pulse">'+
       '<label>X post URL *</label><input data-f="tweet_url" placeholder="https://x.com/handle/status/…">'+
       '<label>Display name</label><input data-f="name" placeholder="Nyakundi Report">'+
       '<label>@handle *</label><input data-f="handle" placeholder="@handle">'+
-      '<label>Date shown</label><input data-f="posted_at" placeholder="02 Aug 2026">'+
+      '<label>Date</label><input type="date" data-f="date">'+
       '<label>Post text *</label><textarea data-f="body" rows="3" placeholder="Verbatim post text"></textarea>'+
-      '<label>Engagement</label><input data-f="eng" placeholder="↻ 78 · ♥ 135 · 👁 8.4k">'+
-      '<label>Tag</label><input data-f="tag" placeholder="Bondo · Nuclear / Waste / Energy / Land">'+
-      '<label>Tag colour</label><select data-f="tag_class"><option value="">default grey</option><option value="bondo">bondo · red</option><option value="waste">waste · amber</option><option value="energy">energy · blue</option></select>'+
-      '<button class="btn pub" data-pub-form="pulse" style="margin-top:12px">Publish to Pulse</button>'+
+      '<label>Sector</label><select data-f="tag_sector">'+uplSectorOpts()+'</select>'+
+      '<label>Tag detail (optional)</label><input data-f="tag_detail" placeholder="e.g. Gold · Migori">'+
+      engSlots+
+      '<label>Image (optional)</label><input type="file" accept="image/*" data-f="media">'+
+      '<div style="margin-top:12px"><button class="btn pub" data-pub-form="pulse">Publish to Pulse</button> <button class="btn ghost" type="button" data-clear="pulse">Clear</button></div>'+
       '<p class="muted upl-msg" style="font-size:.8rem;margin:10px 0 0"></p>'+
     '</div></div>';
   var disF='<div class="panel"><div class="sec-title"><h3>&rarr; Narrative Disinfo</h3><span class="rule"></span></div>'+
-    '<div class="upl-form" data-form="disinfo">'+
+    '<div class="upl-form" data-form="disinfo" data-draft="mzk_draft_disinfo">'+
       '<label>X post URL</label><input data-f="tweet_url" placeholder="https://x.com/handle/status/…">'+
       '<label>Display name</label><input data-f="name" placeholder="Account name">'+
       '<label>@handle</label><input data-f="handle" placeholder="@handle">'+
-      '<label>Date shown</label><input data-f="posted_at" placeholder="14 Jul 2026">'+
+      '<label>Date</label><input type="date" data-f="date">'+
       '<label>Flagged claim, verbatim *</label><textarea data-f="body" rows="3"></textarea>'+
-      '<label>Engagement</label><input data-f="eng" placeholder="↻ 30 · ♥ 63 · 👁 1.8k">'+
+      engSlots+
       '<label>Verdict *</label><select data-f="verdict"><option>Bad-faith framing</option><option>Bait-and-switch</option><option>False dilemma</option><option>Science denial</option><option>Defender smear</option><option>Manipulated media</option></select>'+
       '<label>Verdict colour *</label><select data-f="verdict_class"><option value="vf">red · bad-faith / denial / smear</option><option value="vm">amber · bait-and-switch</option><option value="vc">blue · false dilemma</option><option value="vp">orange · manipulated media</option></select>'+
       '<label>Coalition rebuttal *</label><textarea data-f="rebuttal" rows="4"></textarea>'+
-      '<button class="btn pub" data-pub-form="disinfo" style="margin-top:12px">Publish to Disinfo</button>'+
+      '<label>Image (optional)</label><input type="file" accept="image/*" data-f="media">'+
+      '<div style="margin-top:12px"><button class="btn pub" data-pub-form="disinfo">Publish to Disinfo</button> <button class="btn ghost" type="button" data-clear="disinfo">Clear</button></div>'+
       '<p class="muted upl-msg" style="font-size:.8rem;margin:10px 0 0"></p>'+
     '</div></div>';
   return '<section class="view">'+head+
-    '<div class="panel"><p class="muted" style="font-size:.82rem;margin:0">Signed in as <b>'+esc(authUser.email||"")+'</b> · <a href="#" id="uplSignOut" style="color:var(--gold)">sign out</a></p></div>'+
+    '<div class="panel"><p class="muted" style="font-size:.82rem;margin:0">Signed in as <b>'+esc(authUser.email||"")+'</b> · <a href="#" id="uplSignOut" style="color:var(--gold)">sign out</a> · <a href="#" id="uplWho" style="color:var(--gold)">check my access</a> <span id="uplWhoMsg" style="font-size:.78rem"></span></p></div>'+
     pulseF+disF+'</section>';
 }
+
+function uplSaveDraft(form){ var key=form.getAttribute("data-draft"); if(!key)return; var o={}; form.querySelectorAll("[data-f]").forEach(function(el){ if(el.type==="file")return; o[el.getAttribute("data-f")]=el.value; }); try{ localStorage.setItem(key,JSON.stringify(o)); }catch(e){} }
+function uplRestoreDraft(form){ var key=form.getAttribute("data-draft"); if(!key)return; var o; try{ o=JSON.parse(localStorage.getItem(key)||"null"); }catch(e){} if(!o)return; form.querySelectorAll("[data-f]").forEach(function(el){ if(el.type!=="file"&&o[el.getAttribute("data-f")]!=null) el.value=o[el.getAttribute("data-f")]; }); }
+function uplClearForm(form){ var key=form.getAttribute("data-draft"); if(key){ try{ localStorage.removeItem(key); }catch(e){} } form.querySelectorAll("[data-f]").forEach(function(el){ if(el.tagName==="SELECT") el.selectedIndex=0; else el.value=""; }); }
 
 function bindUpload(){
   if(state.view!=="upload" || !ASB) return;
@@ -597,24 +615,49 @@ function bindUpload(){
   });
   var out=document.getElementById("uplSignOut");
   if(out) out.addEventListener("click",function(e){ e.preventDefault(); ASB.auth.signOut(); });
-  document.querySelectorAll("[data-pub-form]").forEach(function(btn){
-    btn.addEventListener("click",function(){
-      var which=btn.getAttribute("data-pub-form"), form=btn.closest(".upl-form"), msg=form.querySelector(".upl-msg"), row={};
-      form.querySelectorAll("[data-f]").forEach(function(el){ var v=(el.value||"").trim(); if(v) row[el.getAttribute("data-f")]=v; });
-      if(row.tweet_url) row.tweet_url=row.tweet_url.replace("://x.com/","://twitter.com/").split("?")[0];
-      var table=which==="pulse"?"pulse_items":"disinfo_items";
-      var need=which==="pulse"?["tweet_url","handle","body"]:["body","verdict","rebuttal"];
-      var miss=need.filter(function(k){ return !row[k]; });
-      if(miss.length){ if(msg){ msg.style.color="#E5625A"; msg.textContent="Missing: "+miss.join(", "); } return; }
-      btn.disabled=true; if(msg){ msg.style.color=""; msg.textContent="Publishing…"; }
-      ASB.from(table).insert(row).then(function(r){
-        btn.disabled=false;
-        if(r.error){ if(msg){ msg.style.color="#E5625A"; msg.textContent="Failed: "+r.error.message+(/(permission|row-level|policy|denied)/i.test(r.error.message||"")?" — is your email in the admins allow-list?":""); } return; }
-        if(msg){ msg.style.color="#3FB984"; msg.textContent="Published ✓ — live on the next hub load."; }
-        form.querySelectorAll("[data-f]").forEach(function(el){ if(el.tagName!=="SELECT") el.value=""; });
-      });
-    });
+  var who=document.getElementById("uplWho");
+  if(who) who.addEventListener("click",function(e){ e.preventDefault(); var m=document.getElementById("uplWhoMsg"); if(m){ m.style.color=""; m.textContent="checking…"; }
+    ASB.rpc("whoami").then(function(r){ if(!m)return; if(r.error){ m.style.color="#E5625A"; m.textContent="whoami missing — run fix-admin-rls.sql ("+r.error.message+")"; return; } var d=r.data||{}; m.style.color=d.is_admin?"#3FB984":"#E5625A"; m.textContent=" DB sees "+(d.jwt_email||d.meta_email||"(no email in token)")+" · admin="+d.is_admin; }); });
+  // draft persistence
+  document.querySelectorAll(".upl-form[data-draft]").forEach(function(form){
+    uplRestoreDraft(form);
+    form.querySelectorAll("[data-f]").forEach(function(el){ if(el.type==="file")return; el.addEventListener("input",function(){ uplSaveDraft(form); }); el.addEventListener("change",function(){ uplSaveDraft(form); }); });
   });
+  document.querySelectorAll("[data-clear]").forEach(function(b){ b.addEventListener("click",function(){ var form=b.closest(".upl-form"); uplClearForm(form); var m=form.querySelector(".upl-msg"); if(m){ m.style.color=""; m.textContent="Cleared."; } }); });
+  document.querySelectorAll("[data-pub-form]").forEach(function(btn){ btn.addEventListener("click",function(){ publishUpload(btn); }); });
+}
+
+function publishUpload(btn){
+  var which=btn.getAttribute("data-pub-form"), form=btn.closest(".upl-form"), msg=form.querySelector(".upl-msg"), row={};
+  form.querySelectorAll("[data-f]").forEach(function(el){ if(el.type==="file")return; var v=(el.value||"").trim(); if(v) row[el.getAttribute("data-f")]=v; });
+  if(row.date){ row.posted_at=uplFmtDate(row.date); } delete row.date;
+  var parts=[]; if(row.reposts) parts.push("↻ "+uplFmtN(row.reposts)); if(row.likes) parts.push("♥ "+uplFmtN(row.likes)); if(row.reach) parts.push("👁 "+uplFmtN(row.reach));
+  if(parts.length) row.eng=parts.join(" · "); delete row.reposts; delete row.likes; delete row.reach;
+  if(which==="pulse"){ var sel=form.querySelector('[data-f="tag_sector"]'); var label=sel?sel.options[sel.selectedIndex].text:""; row.tag=row.tag_detail?(label+" · "+row.tag_detail):label; row.tag_class=sel?sel.value:""; delete row.tag_detail; delete row.tag_sector; }
+  if(row.tweet_url) row.tweet_url=row.tweet_url.replace("://x.com/","://twitter.com/").split("?")[0];
+  var table=which==="pulse"?"pulse_items":"disinfo_items";
+  var need=which==="pulse"?["tweet_url","handle","body"]:["body","verdict","rebuttal"];
+  var miss=need.filter(function(k){ return !row[k]; });
+  if(miss.length){ if(msg){ msg.style.color="#E5625A"; msg.textContent="Missing: "+miss.join(", "); } return; }
+  btn.disabled=true; if(msg){ msg.style.color=""; msg.textContent="Publishing…"; }
+  var fileEl=form.querySelector('[data-f="media"]'), hasFile=fileEl&&fileEl.files&&fileEl.files[0];
+  function doInsert(){
+    ASB.from(table).insert(row).then(function(r){
+      btn.disabled=false;
+      if(r.error){ if(msg){ msg.style.color="#E5625A"; msg.textContent="Failed: "+r.error.message+(/(permission|row-level|policy|denied)/i.test(r.error.message||"")?" — click 'check my access' above":""); } return; }
+      if(msg){ msg.style.color="#3FB984"; msg.textContent="Published ✓ — live on the next hub load."; }
+      uplClearForm(form); if(fileEl) fileEl.value="";
+    });
+  }
+  if(hasFile){
+    var f=fileEl.files[0], path=which+"/"+Date.now()+"_"+f.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+    if(msg) msg.textContent="Uploading image…";
+    ASB.storage.from("media").upload(path,f,{cacheControl:"3600",upsert:false}).then(function(up){
+      if(up.error){ btn.disabled=false; if(msg){ msg.style.color="#E5625A"; msg.textContent="Image upload failed: "+up.error.message+" — is the 'media' storage bucket set up?"; } return; }
+      try{ row.media_url=ASB.storage.from("media").getPublicUrl(path).data.publicUrl; }catch(e){}
+      if(msg) msg.textContent="Publishing…"; doInsert();
+    });
+  } else { doInsert(); }
 }
 function subById(id){ for(var i=0;i<SUBMISSIONS.length;i++) if(SUBMISSIONS[i].id===id) return SUBMISSIONS[i]; }
 function modAct(a){

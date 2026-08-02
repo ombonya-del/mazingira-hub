@@ -37,10 +37,25 @@ create table if not exists public.disinfo_items (
 );
 
 -- 3) Admin check (security definer → avoids RLS recursion on admins) ---------
+--    case-insensitive + trimmed, with a user_metadata fallback for the email claim.
 create or replace function public.is_admin() returns boolean
 language sql stable security definer set search_path = public as $$
-  select exists (select 1 from public.admins a where a.email = (auth.jwt() ->> 'email'));
+  select exists (
+    select 1 from public.admins a
+    where lower(trim(a.email)) = lower(trim(coalesce(
+      auth.jwt() ->> 'email',
+      auth.jwt() -> 'user_metadata' ->> 'email'
+    )))
+  );
 $$;
+-- diagnostic used by the admin "Check my access" button
+create or replace function public.whoami() returns json
+language sql stable security definer set search_path = public as $$
+  select json_build_object('jwt_email', auth.jwt()->>'email',
+    'meta_email', auth.jwt()->'user_metadata'->>'email', 'is_admin', public.is_admin());
+$$;
+grant execute on function public.is_admin() to anon, authenticated;
+grant execute on function public.whoami()   to anon, authenticated;
 
 -- 4) Row-level security -----------------------------------------------------
 alter table public.pulse_items   enable row level security;
