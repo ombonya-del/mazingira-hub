@@ -320,6 +320,7 @@ main{padding-top:22px}
 </style>
 </head>
 <body>
+<script>try{window.name="mzk_raia";}catch(e){}</script>
 
 <header class="topbar">
   <div class="row">
@@ -823,7 +824,26 @@ function render(){
   else if(v==="truth") app.innerHTML=viewStream("gap","truth");
   else if(v==="learn") app.innerHTML=viewLearn();
   else if(v==="voices") app.innerHTML=viewVoices();
+  else if(v==="flag") app.innerHTML=viewFlag();
   updateChrome(); window.scrollTo(0,0); bind();
+  if(v==="flag") loadTweetWidget();
+}
+function viewFlag(){
+  var id=state.flagPost||"", vd=state.flagVerdict||"";
+  return '<section class="wrap" style="max-width:600px;margin:0 auto;padding:18px 16px 40px">'+
+    '<a class="lie-backhub" href="https://hub.mazingirakenya.org/#narrative" target="mzk_hub">&larr; '+esc(L({en:"Back to the hub",sw:"Rudi kwa hub",sh:"Rudi hub"}))+'</a>'+
+    '<h1 style="font-size:1.35rem;line-height:1.2;margin:8px 0 6px">&#9888; '+esc(L({en:"Flagged as disinformation",sw:"Imetambuliwa kama upotoshaji",sh:"Imeflag kama disinfo"}))+'</h1>'+
+    (vd?'<p style="font-weight:900;color:var(--red);margin:0 0 12px;text-transform:uppercase;font-size:.8rem;letter-spacing:.04em">'+esc(vd)+'</p>':'')+
+    '<p class="muted" style="margin:0 0 14px">'+esc(L({en:"The coalition has flagged this post. The full fact-check and rebuttal are on the hub.",sw:"Muungano umetambua chapisho hili. Uhakiki kamili uko kwa hub.",sh:"Coalition imeflag hii post. Fact-check kamili iko kwa hub."}))+'</p>'+
+    (id?'<div id="flagEmbed"><blockquote class="twitter-tweet" data-dnt="true"><a href="https://twitter.com/i/status/'+esc(id)+'"></a></blockquote></div>':'')+
+    '<p style="margin:18px 0 0"><a href="https://hub.mazingirakenya.org/#narrative" target="mzk_hub" style="color:var(--green-ink);font-weight:800">'+esc(L({en:"See the full debunk on the hub →",sw:"Ona uhakiki kamili kwa hub →",sh:"Ona debunk kamili kwa hub →"}))+'</a></p>'+
+  '</section>';
+}
+function loadTweetWidget(){
+  function go(){ if(window.twttr&&window.twttr.widgets){ var h=document.getElementById("flagEmbed"); if(h) window.twttr.widgets.load(h); } }
+  if(window.twttr&&window.twttr.widgets){ go(); return; }
+  if(document.getElementById("twitter-wjs")){ var t=setInterval(function(){ if(window.twttr&&window.twttr.widgets){ clearInterval(t); go(); } },150); return; }
+  var s=document.createElement("script"); s.id="twitter-wjs"; s.async=true; s.charset="utf-8"; s.src="https://platform.twitter.com/widgets.js"; s.onload=go; document.head.appendChild(s);
 }
 
 function viewNiNini(){
@@ -911,7 +931,7 @@ function viewLearn(){
         '<div class="panel">'+paras(b.a)+caseHtml(CASES[b.id])+'</div></div>';});
   } else if(tab==="d"){
     var _list = state.focusLie ? DISINFO.filter(function(z){return z.id===state.focusLie;}) : DISINFO;
-    if(state.focusLie && _list.length){ body+='<a class="lie-backhub" href="https://hub.mazingirakenya.org/#narrative">← '+esc(L({en:"Back to Narrative Disinfo (hub)",sw:"Rudi Narrative Disinfo (hub)",sh:"Rudi Narrative Disinfo (hub)"}))+'</a>'+
+    if(state.focusLie && _list.length){ body+='<a class="lie-backhub" href="https://hub.mazingirakenya.org/#narrative" target="mzk_hub">← '+esc(L({en:"Back to Narrative Disinfo (hub)",sw:"Rudi Narrative Disinfo (hub)",sh:"Rudi Narrative Disinfo (hub)"}))+'</a>'+
       '<p class="lie-intro">'+esc(L({en:"The actual post, and why it doesn't hold up",sw:"Chapisho lenyewe, na kwa nini haisimami",sh:"Post yenyewe, na kwa nini haishiki"}))+' · <a data-lieall="1" href="javascript:void 0">'+esc(L({en:"see all fact-checks",sw:"ona uhakiki wote",sh:"ona fact-checks zote"}))+' →</a></p>'; }
     _list.forEach(function(x){ var v=VERDICT[x.verdict]; var src=DISINFO_SRC[x.id]; var p=LIE_POST[x.id]||{}; var av=p.plat||"x";
       var media="";
@@ -1078,6 +1098,12 @@ function applyHash(scroll){
     state.view="learn"; state.learnTab="d"; state.focusLie=id||null; render();
     if(id){ var el=document.getElementById("lie-"+id); if(el){ el.scrollIntoView({behavior:scroll?"smooth":"auto",block:"start"}); el.classList.add("flash"); } }
     return true;
+  }
+  if(h.indexOf("flag/")===0){
+    var parts=h.slice(5).split("/");
+    state.flagPost=(parts[0]||"").replace(/[^0-9]/g,"");
+    state.flagVerdict=parts[1]?decodeURIComponent((parts[1]||"").replace(/\+/g," ")):"";
+    state.view="flag"; render(); return true;
   }
   return false;
 }
