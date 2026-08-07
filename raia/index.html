@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#15161A">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,600&family=Nunito+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -825,8 +826,37 @@ function render(){
   else if(v==="learn") app.innerHTML=viewLearn();
   else if(v==="voices") app.innerHTML=viewVoices();
   else if(v==="flag") app.innerHTML=viewFlag();
+  else if(v==="disinfo") app.innerHTML=viewDisinfo();
   updateChrome(); window.scrollTo(0,0); bind();
   if(v==="flag") loadTweetWidget();
+  if(v==="disinfo") fetchDisinfo();
+}
+var RSB = (window.supabase && window.supabase.createClient)
+  ? window.supabase.createClient("https://uueemckdoozsuowcqkhl.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA")
+  : null;
+function viewDisinfo(){
+  return '<section class="wrap" style="max-width:620px;margin:0 auto;padding:18px 16px 44px">'+
+    '<a class="lie-backhub" href="https://hub.mazingirakenya.org/#narrative" target="mzk_hub">&larr; '+esc(L({en:"Back to the hub",sw:"Rudi kwa hub",sh:"Rudi hub"}))+'</a>'+
+    '<div id="disinfoBody"><p class="muted" style="margin-top:14px">'+esc(L({en:"Loading the fact-check…",sw:"Inapakia uhakiki…",sh:"Inaload fact-check…"}))+'</p></div></section>';
+}
+function fetchDisinfo(){
+  var host=document.getElementById("disinfoBody"), id=state.disinfoId;
+  if(!host) return;
+  var missing='<p class="muted">'+esc(L({en:"This item isn't available on raia.",sw:"Kipengele hiki hakipatikani kwenye raia.",sh:"Hii item haiko kwa raia."}))+' <a href="https://hub.mazingirakenya.org/#narrative" target="mzk_hub" style="color:var(--green-ink);font-weight:800">'+esc(L({en:"Open the hub →",sw:"Fungua hub →",sh:"Fungua hub →"}))+'</a></p>';
+  if(!RSB || !id){ host.innerHTML=missing; return; }
+  RSB.from("disinfo_items").select("*").eq("id",id).single().then(function(r){
+    if(r.error || !r.data){ host.innerHTML=missing; return; }
+    var i=r.data, vmap={vf:"#C0202A",vm:"#DC9A18",vc:"#2C4B59",vp:"#B4531A"}, color=vmap[i.verdict_class]||"#C0202A";
+    host.innerHTML=
+      '<span style="display:inline-block;background:'+color+';color:#fff;font-weight:900;font-size:.7rem;letter-spacing:.05em;text-transform:uppercase;padding:5px 12px;border-radius:999px;margin:8px 0 10px">&#9888; '+esc(i.verdict||"Flagged")+'</span>'+
+      '<h1 style="font-size:1.3rem;line-height:1.22;margin:2px 0 10px">'+esc(L({en:"Flagged as disinformation",sw:"Imetambuliwa kama upotoshaji",sh:"Imeflag kama disinfo"}))+'</h1>'+
+      ((i.name||i.handle)?'<p class="muted" style="margin:0 0 10px;font-weight:700">'+esc(i.name||"")+' '+esc(i.handle||"")+(i.posted_at?" · "+esc(i.posted_at):"")+'</p>':'')+
+      '<p style="font-size:1.02rem;line-height:1.5;margin:0 0 14px">&#8220;'+esc(i.body||"")+'&#8221;</p>'+
+      (i.tweet_url?'<div id="flagEmbed"><blockquote class="twitter-tweet" data-dnt="true"><a href="'+esc(i.tweet_url)+'"></a></blockquote></div>':'')+
+      '<div style="background:var(--paper);border-left:4px solid var(--green);border-radius:10px;padding:14px 16px;margin:14px 0"><div style="font-weight:900;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--green-ink);margin-bottom:6px">&#8627; '+esc(L({en:"Coalition rebuttal",sw:"Jibu la muungano",sh:"Rebuttal ya coalition"}))+'</div><p style="margin:0;line-height:1.55">'+esc(i.rebuttal||"")+'</p></div>'+
+      '<p style="margin:16px 0 0"><a href="https://hub.mazingirakenya.org/#narrative" target="mzk_hub" style="color:var(--green-ink);font-weight:800">'+esc(L({en:"See the full desk on the hub →",sw:"Ona dawati kamili kwa hub →",sh:"Ona desk kamili kwa hub →"}))+'</a></p>';
+    if(i.tweet_url) loadTweetWidget();
+  }, function(){ host.innerHTML=missing; });
 }
 function viewFlag(){
   var id=state.flagPost||"", vd=state.flagVerdict||"";
@@ -1098,6 +1128,9 @@ function applyHash(scroll){
     state.view="learn"; state.learnTab="d"; state.focusLie=id||null; render();
     if(id){ var el=document.getElementById("lie-"+id); if(el){ el.scrollIntoView({behavior:scroll?"smooth":"auto",block:"start"}); el.classList.add("flash"); } }
     return true;
+  }
+  if(h.indexOf("disinfo/")===0){
+    state.disinfoId=h.slice(8).replace(/[^0-9]/g,""); state.view="disinfo"; render(); return true;
   }
   if(h.indexOf("flag/")===0){
     var parts=h.slice(5).split("/");

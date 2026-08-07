@@ -3770,7 +3770,7 @@ var SB = (window.supabase && window.supabase.createClient)
           +'<p class="nd-etext">"'+escE(i.body||"")+'"</p>'
           +(i.media_url?'<a class="pc-shot" href="'+escE(i.tweet_url||i.media_url)+'" target="_blank" rel="noopener noreferrer"><img src="'+escE(i.media_url)+'" alt="" loading="lazy"></a>':'')
           +'<div class="nd-efoot"><span class="nd-eng">'+escE(i.eng||"")+'</span>'
-          +(i.tweet_url?'<span class="nd-acts"><button class="xorig-toggle" type="button" data-tweet="'+escE(i.tweet_url)+'">View original →</button><a class="nd-viewpost" href="https://raia.mazingirakenya.org/#flag/'+escE((String(i.tweet_url).match(/status\/(\d+)/)||[])[1]||"")+'/'+encodeURIComponent(i.verdict||"")+'" target="mzk_raia" rel="noopener noreferrer">on raia ↗</a></span>':'')+'</div>'
+          +'<span class="nd-acts">'+(i.tweet_url?'<button class="xorig-toggle" type="button" data-tweet="'+escE(i.tweet_url)+'">View original →</button>':'')+'<a class="nd-viewpost" href="https://raia.mazingirakenya.org/#disinfo/'+encodeURIComponent(i.id)+'" target="mzk_raia" rel="noopener noreferrer">on raia ↗</a></span></div>'
           +(i.tweet_url?'<div class="xorig-embed" hidden></div>':'')
           +'</div>'
           +'<div class="nd-flagline"><span class="nd-flag '+cls+'">'+escE(i.verdict||"")+'</span></div>'
