@@ -685,6 +685,19 @@ footer a{ color:var(--muted); } footer a:hover{ color:var(--green); }
 .matrixwrap{ margin-top:4px; }
 .matrixscroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--line); }
 table.matrix{ border-collapse:collapse; width:100%; min-width:560px; }
+table.matrix .rabbr{ display:none; }
+/* phone: drop the min-width, swap to short labels and compact cells so the grid
+   fits the screen instead of sliding sideways */
+@media (max-width:560px){
+  table.matrix{ min-width:0; table-layout:fixed; }
+  table.matrix .rfull{ display:none; }
+  table.matrix .rabbr{ display:inline; }
+  table.matrix thead th{ font-size:.5rem; letter-spacing:.02em; padding:6px 1px; }
+  table.matrix tbody th{ font-size:.56rem; letter-spacing:.01em; padding:6px 4px; white-space:normal; width:34px; }
+  .cell{ height:38px; font-size:.62rem; }
+  .cell.gap .g{ font-size:.46rem; }
+  .matrixscroll{ overflow-x:hidden; }
+}
 table.matrix th, table.matrix td{ border:1px solid var(--line); padding:0; text-align:center; }
 table.matrix thead th{
   background:var(--panel); position:sticky; top:0; z-index:1;
@@ -911,10 +924,23 @@ table.matrix tbody th{
   color:var(--green); font-variant-numeric:tabular-nums; }
 .idesk-stats .val.e{ color:var(--ember); }
 .idesk-stats .lab{ display:block; margin-top:8px; font-size:.66rem; font-weight:800; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--muted-dim); line-height:1.4; }
+  text-transform:uppercase; color:var(--muted-dim); line-height:1.4; overflow-wrap:break-word; word-break:break-word; hyphens:auto; }
+@media (max-width:560px){
+  .idesk-stats .kpi{ padding:12px 9px; }
+  .idesk-stats .lab{ font-size:.58rem; letter-spacing:.04em; }
+  .idesk-stats .val{ font-size:clamp(1.4rem,7vw,1.9rem); }
+}
 
 .lanes{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:26px; }
-.lane{ background:var(--panel); padding:18px 16px; border-top:3px solid var(--line-2); }
+.lane{ display:block; background:var(--panel); padding:18px 16px; border-top:3px solid var(--line-2);
+  color:inherit; text-decoration:none; cursor:pointer; transition:background .15s ease, transform .15s ease; }
+a.lane:hover{ background:var(--panel-2); }
+a.lane:focus-visible{ outline:2px solid var(--green); outline-offset:2px; }
+.lane .lane-go{ display:inline-block; margin-top:12px; font-size:.72rem; font-weight:800;
+  letter-spacing:.04em; text-transform:uppercase; color:var(--green); }
+.lane.challenge .lane-go{ color:var(--ember-hot); }
+.lane.document .lane-go{ color:#7FB0FF; }
+.lane-block{ scroll-margin-top:120px; }
 .lane.document{ border-top-color:#7FB0FF; } .lane.challenge{ border-top-color:var(--ember-hot); }
 .lane.build{ border-top-color:var(--green); }
 .lane .ln{ display:flex; align-items:baseline; gap:9px; }
@@ -1181,13 +1207,11 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
   <div class="wrap tabs-inner">
     <a href="#live"      data-view="live" class="on">Live</a>
     <a href="#map"       data-view="explore" data-sub="map">National map</a>
-    <a href="#sectors"   data-view="explore" data-sub="sectors">Sector gaps</a>
-    <a href="#network"   data-view="explore" data-sub="network">Network</a>
+    <a href="#directory" data-view="explore" data-sub="directory">Directory</a>
     <a href="#legal"     data-view="explore" data-sub="legal">Legal</a>
     <a href="#sentiment" data-view="explore" data-sub="sentiment">Sentiment</a>
+    <a href="#exchange"  data-view="explore" data-sub="exchange">Exchange</a>
     <a href="#cop"       data-view="cop">COP31</a>
-    <a href="#desk"      data-view="desk">Desk</a>
-    <a href="#events"    data-view="events">Events</a>
     <a href="#voices"    data-view="voices">Voices</a>
     <a href="#ajesasa"   data-view="act">Je, Hatua?</a>
   </div>
@@ -1199,8 +1223,6 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <a href="#live" data-view="live" class="on"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.2"/><path d="M8.3 8.3a5 5 0 0 0 0 7.4M15.7 8.3a5 5 0 0 1 0 7.4M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span>Live</span></a>
     <a href="#explore" data-view="explore"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15 9-2.2 4.2L8.5 15l2.3-4.3z"/></svg><span>Explore</span></a>
     <a href="#cop" data-view="cop"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3.2 12h17.6M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>COP31</span></a>
-    <a href="#desk" data-view="desk"><svg class="ico" viewBox="0 0 24 24"><path d="M5 4h13v14H6a1 1 0 0 0-1 1z"/><path d="M5 19a1 1 0 0 0 1 1h12"/><path d="M9 8h6"/></svg><span>Desk</span></a>
-    <a href="#events" data-view="events"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9.5h16M8.5 3v4M15.5 3v4"/></svg><span>Events</span></a>
     <a href="#voices" data-view="voices"><svg class="ico" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg><span>Voices</span></a>
     <a href="#ajesasa" data-view="act"><svg class="ico" viewBox="0 0 24 24"><path d="M13 2 5 13.5h6L10 22l9-12h-6z"/></svg><span>Hatua</span></a>
   </div>
@@ -1224,10 +1246,10 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 <nav class="subtabs" id="exploreSub" aria-label="Explore sections" hidden>
   <div class="wrap subtabs-inner">
     <a href="#map"     data-sub="map" class="on">Map</a>
-    <a href="#sectors" data-sub="sectors">Gaps</a>
-    <a href="#network" data-sub="network">Network</a>
+    <a href="#directory" data-sub="directory">Directory</a>
     <a href="#legal"   data-sub="legal">Legal</a>
     <a href="#sentiment" data-sub="sentiment">Sentiment</a>
+    <a href="#exchange" data-sub="exchange">Exchange</a>
   </div>
 </nav>
 
@@ -1282,6 +1304,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
           </svg>
           <span class="gauge-txt"><span class="n mono" id="gapIdx">0</span><span class="s" id="gapLabel">calculating</span></span>
         </div>
+        <span class="sub">Convened by deCOALonize — a coalition opposing coal development and advancing a just energy transition across Kenya and the region.</span>
       </div>
     </div>
     <p class="datastatus"><b>Data status:</b> legal matters, the organisation network, mapped projects and
@@ -1427,7 +1450,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 </section>
 
 <!-- ============================ SECTOR GAPS ============================ -->
-<section class="band" id="sectors" data-view="explore" data-sub="sectors">
+<section class="band" id="sectors" data-view="explore" data-sub="directory">
   <div class="wrap">
     <div class="sec-head">
       <div class="grow">
@@ -1536,7 +1559,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 </section>
 
 <!-- ============================ NETWORK ============================ -->
-<section class="band" id="network" data-view="explore" data-sub="network">
+<section class="band" id="network" data-view="explore" data-sub="directory">
   <div class="wrap">
     <div class="sec-head">
       <div class="grow">
@@ -1809,7 +1832,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
   </div>
 </section>
 
-<section class="band" id="desk" data-view="desk">
+<section class="band" id="desk" data-view="explore" data-sub="exchange">
   <div class="wrap">
     <div class="sec-head">
       <div class="grow">
@@ -1823,7 +1846,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 </section>
 
 <!-- ============================ EVENTS ============================ -->
-<section class="band" id="events" data-view="events">
+<section class="band" id="events" data-view="explore" data-sub="exchange">
   <div class="wrap">
     <div class="sec-head">
       <div class="grow"><p class="kicker">Convenings &amp; barazas</p><h2>What's coming up</h2></div>
@@ -2154,22 +2177,6 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 <footer>
   <div class="wrap">
     <div class="foot-grid">
-      <div>
-        <h4>MazingiraKenya Communications Hub</h4>
-        <p style="max-width:46ch; margin:0 0 12px">
-          Convened by deCOALonize — a transnational civil society coalition opposing coal development
-          and advancing a just energy transition across Kenya and the wider African region.
-        </p>
-        <span class="demo-badge">Prototype · live where sourced, sample where marked</span>
-      </div>
-      <div>
-        <h4>Dashboards</h4>
-        <ul class="foot-list">
-          <li><a href="#live">hub — sector coordination</a></li>
-          <li><a href="https://raia.mazingirakenya.org">raia — public platform</a></li>
-          <li><a href="https://admin.mazingirakenya.org">admin — moderation portal</a></li>
-        </ul>
-      </div>
       <div>
         <h4>Data &amp; privacy</h4>
         <ul class="foot-list">
@@ -3401,15 +3408,15 @@ var PROJECTS = [
    gap:"Elgeyo-Marakwet minerals: newly reactivated, currently unmonitored.",
    county:"Elgeyo-Marakwet", sector:"Minerals", budget:"KES 2.4M / 9 mo", funder:"Pooled sub-grant" },
  { lane:"challenge", title:"Dangote Refinery ESIA Intervention", status:"dev",
-   pitch:"Fund legal and community review of the proposed 700,000 bpd Lamu refinery's environmental and social impact assessment before it is licensed — the window is open now.",
+   pitch:"Fund legal and community review of the proposed 700,000 bpd Lamu refinery's environmental and social impact assessment before it is licensed — the window is open now. Legal partner: Katiba Institute.",
    gap:"Lamu oil: a nationally significant proposed project with no organised scrutiny yet.",
    county:"Lamu", sector:"Oil & gas", budget:"KES 6.0M / 18 mo", funder:"AJWS" },
  { lane:"challenge", title:"Siaya Nuclear FPIC Campaign", status:"idea",
-   pitch:"Support Luanda Kotieno lake communities to secure free, prior and informed consent on the proposed nuclear plant. They are already protesting — without legal backing.",
+   pitch:"Support Luanda Kotieno lake communities to secure free, prior and informed consent on the proposed nuclear plant. They are already protesting — without legal backing. Legal partner: Katiba Institute.",
    gap:"Siaya nuclear: proposed on Lake Victoria, community opposition with no legal support.",
    county:"Siaya", sector:"Nuclear", budget:"KES 4.5M / 12 mo", funder:"AJWS · Africa Climate Fund" },
  { lane:"challenge", title:"Mui Basin Community Evidence", status:"dev",
-   pitch:"Compile community documentation into an evidentiary record for the pending judicial review of the coal concessions — turning field reports into court-usable primary sources.",
+   pitch:"Compile community documentation into an evidentiary record for the pending judicial review of the coal concessions — turning field reports into court-usable primary sources. Legal partner: Katiba Institute.",
    gap:"Kitui coal: live litigation, national reach only, no embedded local documentation.",
    county:"Kitui", sector:"Coal", budget:"KES 3.5M / 12 mo", funder:"Strategic litigation fund" },
  { lane:"build", title:"Coastal Citizen Journalism Expansion", status:"dev",
@@ -3473,8 +3480,9 @@ var PROJECTS = [
 
   document.getElementById("laneRow").innerHTML = Object.keys(LANES).map(function(k){
     var n = PROJECTS.filter(function(p){ return p.lane===k; }).length;
-    return '<div class="lane '+k+'"><div class="ln"><h4>'+LANES[k].n+'</h4><span class="cnt">'+n+'</span></div>'+
-      '<p><b style="color:var(--text)">'+LANES[k].q+'</b><br>'+LANES[k].d+'</p></div>';
+    return '<a class="lane '+k+'" href="#porti-'+k+'"><div class="ln"><h4>'+LANES[k].n+'</h4><span class="cnt">'+n+'</span></div>'+
+      '<p><b style="color:var(--text)">'+LANES[k].q+'</b><br>'+LANES[k].d+'</p>'+
+      '<span class="lane-go">See '+n+' project'+(n===1?'':'s')+' →</span></a>';
   }).join("");
 })();
 
@@ -3483,7 +3491,7 @@ var PROJECTS = [
   var host = document.getElementById("projectLanes");
   Object.keys(LANES).forEach(function(k){
     var items = PROJECTS.filter(function(p){ return p.lane===k; });
-    var block = el("div","lane-block");
+    var block = el("div","lane-block"); block.id = "porti-"+k;
     block.innerHTML = '<div class="lb-head"><h3>'+LANES[k].n+'</h3>'+
       '<span class="tag '+k+'">'+items.length+' project'+(items.length>1?"s":"")+'</span></div>'+
       '<div class="projects">'+ items.map(function(p){
@@ -4132,6 +4140,10 @@ var REGIONS = {
 };
 var REG_NAMES = Object.keys(REGIONS);
 var SEC_ORDER = ["o","c","m","w","l","e","p"];
+/* short labels so the coverage grid fits a phone screen without sideways scroll */
+var REG_ABBR = { "Coast":"Cst", "North Eastern":"N.E", "Eastern":"Est", "Central":"Ctl",
+                 "Rift Valley":"Rift", "Western":"Wst", "Nyanza":"Nyz", "Nairobi":"Nbi" };
+var SEC_ABBR = { o:"Oil", c:"Coal", m:"Min", w:"Water", l:"Land", e:"Enrg", p:"Plas" };
 
 /* org → which sectors it works, which regions it is rooted in, and whether it
    counts as ground response. "national" reach = available but not embedded. */
@@ -4222,10 +4234,10 @@ var matrixBuilt = false, matrixSel = null;
 function renderMatrix(){
   var tbl = document.getElementById("matrix");
   if(!tbl) return;
-  var head = '<thead><tr><th>Sector \\ Region</th>' +
-    REG_NAMES.map(function(r){ return '<th>' + r + '</th>'; }).join("") + '</tr></thead>';
+  var head = '<thead><tr><th class="corner"><span class="rfull">Sector \\ Region</span><span class="rabbr">Sector</span></th>' +
+    REG_NAMES.map(function(r){ return '<th><span class="rfull">' + r + '</span><span class="rabbr">' + (REG_ABBR[r]||r) + '</span></th>'; }).join("") + '</tr></thead>';
   var body = '<tbody>' + SEC_ORDER.map(function(sec){
-    return '<tr><th>' + SECNAME[sec] + '</th>' + REG_NAMES.map(function(reg){
+    return '<tr><th><span class="rfull">' + SECNAME[sec] + '</span><span class="rabbr">' + (SEC_ABBR[sec]||SECNAME[sec]) + '</span></th>' + REG_NAMES.map(function(reg){
       var st = cellState(reg, sec);
       var label = st.cls === "none" ? ""
         : st.cls === "gap" ? '<span class="g">GAP</span>'
@@ -4905,15 +4917,20 @@ form.addEventListener("submit", function(e){
 /* =================================================================
    TABBED VIEWS — each tab is its own screen, no endless scroll
    ================================================================= */
-var VIEWS = ["live","explore","cop","desk","events","voices","act"];
-/* Map / Sector gaps / Network / Legal now live inside the grouped "Explore" view.
-   A hash may point at one of those section ids — route it to Explore and pick the sub. */
+var VIEWS = ["live","explore","cop","voices","act"];
+/* Map / Directory (Gaps+Network) / Legal / Sentiment / Exchange (Desk+Events) now live
+   inside the grouped "Explore" view. A hash may point at one of those section ids —
+   route it to Explore and pick the sub. */
 var HASH2VIEW = { live:"live", explore:"explore",
-  map:"explore", sectors:"explore", network:"explore", legal:"explore", disinfo:"explore", sentiment:"explore", narrative:"explore",
-  cop:"cop", desk:"desk", events:"events", voices:"voices",
+  map:"explore", directory:"explore", sectors:"explore", network:"explore",
+  legal:"explore", disinfo:"explore", sentiment:"explore", narrative:"explore",
+  exchange:"explore", desk:"explore", events:"explore",
+  cop:"cop", voices:"voices",
   ajesasa:"act", contribute:"act" };
-var HASH2SUB = { map:"map", sectors:"sectors", network:"network", legal:"legal", disinfo:"sentiment", sentiment:"sentiment", narrative:"sentiment" };
-var EXPLORE_SUBS = ["map","sectors","network","legal","sentiment"];
+var HASH2SUB = { map:"map", directory:"directory", sectors:"directory", network:"directory",
+  legal:"legal", disinfo:"sentiment", sentiment:"sentiment", narrative:"sentiment",
+  exchange:"exchange", desk:"exchange", events:"exchange" };
+var EXPLORE_SUBS = ["map","directory","legal","sentiment","exchange"];
 var exploreSub = "map";
 var tabLinks = document.querySelectorAll("nav.tabs a");
 
@@ -4926,8 +4943,7 @@ function applyExploreSub(){
   document.querySelectorAll("#exploreSub a").forEach(function(a){
     a.classList.toggle("on", a.getAttribute("data-sub") === exploreSub);
   });
-  if(exploreSub === "sectors"){ renderMatrix(); renderSectorMap(); }
-  if(exploreSub === "network") renderNetMap();
+  if(exploreSub === "directory"){ renderMatrix(); renderSectorMap(); renderNetMap(); }
   if(exploreSub === "legal" && typeof renderLegalMap === "function") renderLegalMap();
 }
 
