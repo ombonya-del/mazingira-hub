@@ -569,6 +569,13 @@ section.band{ padding:36px 0; border-bottom:1px solid var(--line); scroll-margin
 .card .meta{ font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted-dim); font-weight:800; }
 .card p{ margin:10px 0 0; font-size:.82rem; color:var(--muted); }
 .member{ display:flex; gap:11px; align-items:flex-start; }
+/* directory cards are buttons: reset button chrome, add a clickable affordance */
+button.orgcard{ display:block; width:100%; text-align:left; font:inherit; color:inherit;
+  border:0; cursor:pointer; transition:background .15s ease; }
+button.orgcard:hover{ background:var(--panel-2); }
+button.orgcard:focus-visible{ outline:2px solid var(--green); outline-offset:-2px; }
+.orgcard-go{ display:inline-block; margin-top:11px; font-size:.66rem; font-weight:800;
+  letter-spacing:.05em; text-transform:uppercase; color:var(--green); }
 .avatar{ flex:none; width:38px; height:38px; background:var(--panel-3); color:var(--green); display:grid; place-items:center; font-family:Lora,serif; font-weight:700; font-size:.82rem; }
 .avatar.e{ color:var(--ember); }
 
@@ -720,6 +727,25 @@ table.matrix tbody th{
 .cell.cov{ background:#3E9E76; color:#041610; }
 .cell.none{ background:var(--panel-2); color:var(--muted-dim); }
 .cell.gap .g{ font-size:.58rem; display:block; font-weight:800; letter-spacing:.06em; }
+/* coverage-at-a-glance strip (folded-in sector grid) */
+.covstrip{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line); }
+.cov-row{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; font:inherit;
+  color:inherit; background:var(--panel); border:0; cursor:pointer; padding:9px 12px;
+  transition:background .15s ease; }
+.cov-row:hover{ background:var(--panel-2); }
+.cov-row.on{ background:var(--panel-2); box-shadow:inset 3px 0 0 var(--green); }
+.cov-row:focus-visible{ outline:2px solid var(--green); outline-offset:-2px; }
+.cov-name{ flex:0 0 40%; min-width:0; font-size:.8rem; font-weight:700; color:var(--text);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cov-dots{ display:flex; gap:4px; flex:1; }
+.cov-dot{ flex:1; height:16px; border-radius:2px; min-width:0; }
+.cov-dot.cov{ background:#3E9E76; } .cov-dot.thin{ background:#DE742B; }
+.cov-dot.gap{ background:#B02310; } .cov-dot.none{ background:var(--panel-2); border:1px solid var(--line-2); }
+@media (max-width:560px){
+  .cov-row{ gap:8px; padding:8px 9px; }
+  .cov-name{ flex-basis:34%; font-size:.72rem; }
+  .cov-dot{ height:14px; }
+}
 .matrix-key{ display:flex; flex-wrap:wrap; gap:12px 16px; padding:12px 2px 0; }
 .matrix-key span{ display:flex; align-items:center; gap:6px; font-size:.64rem; font-weight:700;
   letter-spacing:.04em; color:var(--muted-dim); }
@@ -1492,23 +1518,17 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
       </div>
     </div>
 
-    <div class="sec-head" style="margin-top:34px">
-      <div class="grow"><p class="kicker">Grid summary</p><h3 class="trackh">Every sector × region at a glance</h3></div>
+    <div class="sec-head" style="margin-top:30px">
+      <div class="grow"><p class="kicker">Coverage at a glance</p><h3 class="trackh">Every sector's response, by region</h3>
+        <p class="lede">Tap a sector to load it on the map above. Each square is a region, coloured by whether a locally-rooted organisation covers it.</p></div>
     </div>
-
-    <div class="matrixwrap">
-      <div class="matrixscroll">
-        <table class="matrix" id="matrix" aria-label="Sector by region coverage matrix"></table>
-      </div>
-      <div class="matrix-key">
-        <span><i class="mk cov"></i>Local organisation embedded</span>
-        <span><i class="mk thin"></i>National reach only — no local base</span>
-        <span><i class="mk gap"></i>No response at all</span>
-        <span><i class="mk none"></i>Low pressure</span>
-      </div>
+    <div class="covstrip" id="coverStrip" role="group" aria-label="Coverage at a glance — tap a sector to load it on the map"></div>
+    <div class="matrix-key">
+      <span><i class="mk cov"></i>Local organisation embedded</span>
+      <span><i class="mk thin"></i>National reach only</span>
+      <span><i class="mk gap"></i>No response</span>
+      <span><i class="mk none"></i>Low pressure</span>
     </div>
-
-    <div class="secdetail" id="secDetail" aria-live="polite"></div>
 
     <div class="sec-head" style="margin-top:30px">
       <div class="grow"><p class="kicker">Priority</p><h3 class="trackh">Widest sector-geography gaps</h3></div>
@@ -1978,7 +1998,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         Written for policymakers, funders and researchers. <span id="briefStamp" class="mono"></span></p>
       <div class="brief-body" id="briefBody"></div>
       <div class="brief-actions">
-        <button class="btn btn--green" id="briefDownload" type="button">Download brief (.md)</button>
+        <button class="btn btn--green" id="briefDownload" type="button">Download brief (PDF)</button>
         <button class="btn btn--ghost" id="briefToggle" type="button">Show full brief</button>
         <span class="brief-note">Illustrative data · confirm before circulating externally</span>
       </div>
@@ -3602,24 +3622,134 @@ function downloadText(name, text){
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
   } catch(e){ alert("Download not supported in this view."); }
 }
-document.getElementById("briefDownload").addEventListener("click", function(){
+/* ---------- PDF export: lazy-loaded jsPDF + canvas donut charts ---------- */
+function loadJsPDF(){
+  return new Promise(function(res,rej){
+    if(window.jspdf && window.jspdf.jsPDF) return res(window.jspdf.jsPDF);
+    var s=document.createElement("script");
+    s.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+    s.onload=function(){ (window.jspdf&&window.jspdf.jsPDF)?res(window.jspdf.jsPDF):rej(0); };
+    s.onerror=function(){ rej(0); };
+    document.head.appendChild(s);
+  });
+}
+function pdfDec(s){ return String(s).replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&#39;/g,"'"); }
+function pdfRgb(h){ h=h.replace("#",""); if(h.length===3) h=h.split("").map(function(c){return c+c;}).join(""); var n=parseInt(h,16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+var PDF_PAL=["#2F7D5B","#DE742B","#6E86F0","#B02310","#9B6BC4","#C9A227","#4FA3A0","#C4617E"];
+var PDF_COV={cov:"#3E9E76",thin:"#DE742B",gap:"#B02310",none:"#C9D2CE"};
+function donutPNG(segs, center){
+  var S=340, cv=document.createElement("canvas"); cv.width=S; cv.height=S;
+  var x=cv.getContext("2d"); if(!x) return null;
+  var t=segs.reduce(function(s,v){return s+v.value;},0)||1, cx=S/2, cy=S/2, rO=S*0.44, rI=S*0.26, a=-Math.PI/2;
+  segs.forEach(function(g){ var an=g.value/t*Math.PI*2; if(an<=0) return;
+    x.beginPath(); x.moveTo(cx,cy); x.arc(cx,cy,rO,a,a+an); x.closePath(); x.fillStyle=g.color; x.fill(); a+=an; });
+  x.globalCompositeOperation="destination-out"; x.beginPath(); x.arc(cx,cy,rI,0,7); x.fill();
+  x.globalCompositeOperation="source-over";
+  x.fillStyle="#12261D"; x.textAlign="center"; x.textBaseline="middle";
+  x.font="bold 66px Helvetica,Arial,sans-serif"; x.fillText(String(center),cx,cy);
+  return cv.toDataURL("image/png");
+}
+function pdfHeader(doc,M,sub){
+  var W=doc.internal.pageSize.getWidth();
+  doc.setFillColor(18,38,29); doc.rect(0,0,W,70,"F");
+  doc.setTextColor(255,255,255); doc.setFont("helvetica","bold"); doc.setFontSize(15);
+  doc.text("MazingiraKenya", M, 32);
+  doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(198,214,205);
+  doc.text(sub, M, 50); doc.setTextColor(18,38,29);
+}
+function briefToPDF(){
   var b = window.__brief || buildBrief(briefCadence);
-  downloadText("MazingiraKenya-Intelligence-Brief-"+briefCadence+".md", b.md);
+  return loadJsPDF().then(function(JsPDF){
+    var doc=new JsPDF({unit:"pt",format:"a4"});
+    var W=doc.internal.pageSize.getWidth(), Hh=doc.internal.pageSize.getHeight(), M=48, y=94;
+    pdfHeader(doc,M,"Intelligence Brief · "+b.label);
+    function ensure(h){ if(y+h>Hh-M){ doc.addPage(); y=M+8; } }
+    doc.setFont("helvetica","bold"); doc.setFontSize(18); doc.text("Intelligence Brief", M, y); y+=17;
+    doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(92,107,100);
+    doc.text(b.label+" · "+b.date, M, y); y+=18; doc.setTextColor(18,38,29);
+    b.md.split("\n").forEach(function(ln){
+      ln=pdfDec(ln.replace(/\*\*/g,"").trim());
+      if(!ln){ y+=4; return; }
+      if(/^#\s/.test(ln)) return;
+      if(/^##\s/.test(ln)){ y+=8; ensure(24); doc.setFont("helvetica","bold"); doc.setFontSize(12.5);
+        doc.setTextColor(47,125,91); var h=doc.splitTextToSize(ln.replace(/^##\s/,""),W-2*M);
+        doc.text(h,M,y); y+=h.length*15+3; doc.setTextColor(18,38,29); return; }
+      var bullet=/^[-*]\s/.test(ln), txt=ln.replace(/^[-*]\s/,"");
+      doc.setFont("helvetica","normal"); doc.setFontSize(10);
+      var w=doc.splitTextToSize((bullet?"•  ":"")+txt, W-2*M-(bullet?10:0));
+      ensure(w.length*13+2); doc.text(w, M+(bullet?10:0), y); y+=w.length*13+3;
+    });
+    doc.save("MazingiraKenya-Intelligence-Brief-"+briefCadence+".pdf");
+  });
+}
+function portfolioToPDF(){
+  return loadJsPDF().then(function(JsPDF){
+    var doc=new JsPDF({unit:"pt",format:"a4"});
+    var W=doc.internal.pageSize.getWidth(), Hh=doc.internal.pageSize.getHeight(), M=48, y=94;
+    pdfHeader(doc,M,"Fundable Project Portfolio");
+    function ensure(h){ if(y+h>Hh-M){ doc.addPage(); y=M+8; } }
+    doc.setFont("helvetica","bold"); doc.setFontSize(18); doc.text("Fundable Project Portfolio", M, y); y+=16;
+    doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(92,107,100);
+    doc.text("Each project closes a gap visible on the platform. Budgets are indicative. · "+new Date().toLocaleDateString(), M, y);
+    y+=20; doc.setTextColor(18,38,29);
+
+    // snapshots
+    var cov={cov:0,thin:0,gap:0,none:0};
+    SEC_ORDER.forEach(function(s){ REG_NAMES.forEach(function(r){ cov[cellState(r,s).cls]++; }); });
+    var byCat={}; MEMBERS.forEach(function(m){ byCat[m.c]=(byCat[m.c]||0)+1; });
+    var byStat={won:0,active:0,watch:0}; LEGAL.forEach(function(c){ byStat[c.s]=(byStat[c.s]||0)+1; });
+    var donuts=[
+      { title:"Sector-geography coverage", center:(cov.gap+cov.thin), sub:"of "+(cov.cov+cov.thin+cov.gap+cov.none)+" cells have weak or no local response",
+        segs:[{label:"Local response",value:cov.cov,color:PDF_COV.cov},{label:"National only",value:cov.thin,color:PDF_COV.thin},{label:"No response",value:cov.gap,color:PDF_COV.gap},{label:"Low pressure",value:cov.none,color:PDF_COV.none}] },
+      { title:"Response network by type", center:MEMBERS.length, sub:"organisations mapped in the directory",
+        segs:Object.keys(byCat).map(function(k,i){ return {label:k,value:byCat[k],color:PDF_PAL[i%PDF_PAL.length]}; }) },
+      { title:"Legal matters by status", center:LEGAL.length, sub:"cases & submissions tracked",
+        segs:[{label:"Won / precedent",value:byStat.won,color:"#3E9E76"},{label:"Active litigation",value:byStat.active,color:"#DE742B"},{label:"Ongoing / policy",value:byStat.watch,color:"#6E86F0"}] }
+    ];
+    donuts.forEach(function(d){
+      ensure(128);
+      var img=donutPNG(d.segs, d.center);
+      if(img) doc.addImage(img,"PNG",M,y,104,104);
+      var tx=M+120, ty=y+16;
+      doc.setFont("helvetica","bold"); doc.setFontSize(12.5); doc.setTextColor(18,38,29);
+      doc.text(d.title, tx, ty); ty+=13;
+      doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(92,107,100);
+      doc.text(doc.splitTextToSize(d.sub, W-tx-M), tx, ty); ty+=15; doc.setTextColor(18,38,29);
+      d.segs.forEach(function(s){ if(s.value<=0) return; var c=pdfRgb(s.color);
+        doc.setFillColor(c[0],c[1],c[2]); doc.rect(tx, ty-7, 8, 8, "F");
+        doc.setFontSize(9); doc.text(pdfDec(s.label)+"  —  "+s.value, tx+13, ty); ty+=13; });
+      y += Math.max(114, ty-y) + 14;
+    });
+
+    // projects by lane
+    ["document","challenge","build"].forEach(function(k){
+      ensure(34); y+=6;
+      doc.setFont("helvetica","bold"); doc.setFontSize(13.5); doc.setTextColor(47,125,91);
+      var lh=doc.splitTextToSize(pdfDec(LANES[k].n+" — "+LANES[k].q), W-2*M);
+      doc.text(lh, M, y); y+=lh.length*15+6; doc.setTextColor(18,38,29);
+      PROJECTS.filter(function(p){ return p.lane===k; }).forEach(function(p){
+        doc.setFont("helvetica","bold"); doc.setFontSize(11);
+        var tt=doc.splitTextToSize(pdfDec(p.title)+"   ["+(p.status==="dev"?"In development":"Idea")+"]", W-2*M);
+        ensure(tt.length*13+46); doc.text(tt, M, y); y+=tt.length*13+2;
+        doc.setFont("helvetica","normal"); doc.setFontSize(9.5); doc.setTextColor(58,68,62);
+        var pt=doc.splitTextToSize(pdfDec(p.pitch), W-2*M); doc.text(pt, M, y); y+=pt.length*12+3;
+        doc.setTextColor(92,107,100); doc.setFontSize(8.5);
+        var mt=doc.splitTextToSize("Closes: "+pdfDec(p.gap)+"   ·   "+pdfDec(p.county)+"   ·   "+pdfDec(p.sector)+"   ·   "+p.budget+"   ·   "+pdfDec(p.funder), W-2*M);
+        doc.text(mt, M, y); y+=mt.length*11+12; doc.setTextColor(18,38,29);
+      });
+    });
+    doc.save("MazingiraKenya-Project-Portfolio.pdf");
+  });
+}
+document.getElementById("briefDownload").addEventListener("click", function(){
+  var btn=this, t=btn.textContent; btn.disabled=true; btn.textContent="Building PDF…";
+  briefToPDF().catch(function(){ alert("Couldn't load the PDF tool. Check your connection and try again."); })
+    .then(function(){ btn.disabled=false; btn.textContent=t; });
 });
 document.getElementById("ctaDownload").addEventListener("click", function(){
-  var lines = ["# MazingiraKenya — Fundable Project Portfolio","",
-    "Each project closes a gap visible on the platform. Budgets are indicative.",""];
-  ["document","challenge","build"].forEach(function(k){
-    lines.push("## "+LANES[k].n+" — "+LANES[k].q,"");
-    PROJECTS.filter(function(p){ return p.lane===k; }).forEach(function(p){
-      lines.push("### "+p.title+"  ["+(p.status==="dev"?"In development":"Idea")+"]");
-      lines.push(p.pitch);
-      lines.push("- Closes: "+p.gap);
-      lines.push("- Where: "+p.county+"  ·  Sector: "+p.sector);
-      lines.push("- Budget: "+p.budget+"  ·  Funder fit: "+p.funder,"");
-    });
-  });
-  downloadText("MazingiraKenya-Project-Portfolio.md", lines.join("\n"));
+  var btn=this, t=btn.textContent; btn.disabled=true; btn.textContent="Building PDF…";
+  portfolioToPDF().catch(function(){ alert("Couldn't load the PDF tool. Check your connection and try again."); })
+    .then(function(){ btn.disabled=false; btn.textContent=t; });
 });
 renderBrief();
 
@@ -3637,10 +3767,16 @@ CATS.forEach(function(c){
 function renderMembers(cat){
   mList.innerHTML="";
   MEMBERS.filter(function(m){ return cat==="All"||m.c===cat; }).forEach(function(m){
-    var c = el("div","card");
+    var c = el("button","card orgcard"); c.type="button";
+    c.setAttribute("aria-label","View "+m.n+" — footprint and funding chain");
     c.innerHTML = '<div class="member"><div class="avatar'+(m.e?" e":"")+'" aria-hidden="true">'+initials(m.n)+'</div>'+
       '<div style="flex:1; min-width:0"><h3>'+m.n+'</h3><span class="meta">'+m.c+' · '+m.loc+'</span></div></div>'+
-      '<p>'+m.d+'</p>';
+      '<p>'+m.d+'</p><span class="orgcard-go">View footprint &amp; funding →</span>';
+    c.addEventListener("click", function(){
+      showNetOrg(m.n);
+      var mp = document.getElementById("netMap");
+      if(mp) setTimeout(function(){ try{ mp.scrollIntoView({ behavior: reduce?"auto":"smooth", block:"start" }); }catch(_){} }, 30);
+    });
     mList.appendChild(c);
   });
 }
@@ -4472,14 +4608,41 @@ var SECMAP_CH = [["all","All pressure"]].concat(SEC_ORDER.map(function(s){ retur
 var secChipWrap = document.getElementById("secMapChips");
 if(secChipWrap){
   SECMAP_CH.forEach(function(pair){
-    var b = el("button","chip",pair[1]); b.type="button";
+    var b = el("button","chip",pair[1]); b.type="button"; b.dataset.sec = pair[0];
     b.setAttribute("aria-pressed", pair[0]===secMapSec);
     b.addEventListener("click", function(){
       secChipWrap.querySelectorAll(".chip").forEach(function(x){ x.setAttribute("aria-pressed","false"); });
       b.setAttribute("aria-pressed","true"); secMapSec = pair[0]; renderSectorMap();
+      if(typeof renderCoverStrip==="function") renderCoverStrip();
     });
     secChipWrap.appendChild(b);
   });
+}
+/* Coverage-at-a-glance strip: folds the old sector×region grid into the map.
+   One tappable row per sector; each square is a region coloured by coverage. */
+var COV_WORD = { cov:"local response", thin:"national only", gap:"no response", none:"low pressure" };
+function renderCoverStrip(){
+  var host = document.getElementById("coverStrip"); if(!host) return;
+  host.innerHTML = SEC_ORDER.map(function(sec){
+    var dots = REG_NAMES.map(function(reg){
+      var cls = cellState(reg, sec).cls;
+      return '<i class="cov-dot '+cls+'" title="'+(REG_ABBR[reg]||reg)+' — '+COV_WORD[cls]+'"></i>';
+    }).join("");
+    return '<button type="button" class="cov-row'+(sec===secMapSec?' on':'')+'" data-s="'+sec+'" '+
+      'aria-pressed="'+(sec===secMapSec)+'"><span class="cov-name">'+SECNAME[sec]+'</span>'+
+      '<span class="cov-dots">'+dots+'</span></button>';
+  }).join("");
+  host.querySelectorAll(".cov-row").forEach(function(b){
+    b.addEventListener("click", function(){
+      secMapSec = b.dataset.s;
+      var cw = document.getElementById("secMapChips");
+      if(cw) cw.querySelectorAll(".chip").forEach(function(x){ x.setAttribute("aria-pressed", x.dataset.sec===secMapSec); });
+      renderSectorMap(); renderCoverStrip();
+      var mp = document.getElementById("sectorMap");
+      if(mp) setTimeout(function(){ try{ mp.scrollIntoView({ behavior: reduce?"auto":"smooth", block:"start" }); }catch(_){} }, 20);
+    });
+  });
+  renderSecGaps();
 }
 function secPressure(nm){
   var c = countyByName[nm]; if(!c) return 0;
@@ -4790,9 +4953,9 @@ function renderNetMap(){
 
 var netSel = null;
 function showNetOrg(nm){
-  netMode = nm; netSel = null;
-  renderNetMap();                       // draw map in footprint mode; does NOT call back here
   var l = ORG_LOC[nm];
+  netMode = l ? nm : "density"; netSel = null;   // orgs without a mapped footprint keep the density map
+  renderNetMap();                       // draw map in footprint mode; does NOT call back here
   var m = MEMBERS.filter(function(x){ return x.n===nm || x.n.indexOf(nm)>=0 || nm.indexOf(x.n)>=0; })[0];
   var secs = (ORG_SEC[nm]||[]).map(function(s){ return SECNAME[s]; }).join(" · ") || "—";
   var progs = PROGRAMS[nm] || [];
@@ -4818,10 +4981,13 @@ function showNetOrg(nm){
   var contestedBanner = contested
     ? '<div class="contested-banner">⚠ Contested actor — mapped as a source of land-related pressure, '+
       'not as a coalition responder. It is <b>not</b> counted in response coverage.</div>' : '';
+  var whereLine = l
+    ? '<p class="where">'+(contested?"Contested actor":l[1])+' · '+(l[2]?"operates across the north":"based in "+l[0])+
+        ' · '+(contested?"present in ":"active in ")+orgCounties(nm).length+(orgCounties(nm).length>1?" counties":" county")+'</p>'
+    : '<p class="where">'+(m?m.c+' · '+m.loc:'Organisation')+'</p>';
   document.getElementById("netDetail").innerHTML =
     '<button class="backbtn" id="netBack" type="button">‹ All organisations</button>'+
-    '<p class="where">'+(contested?"Contested actor":l[1])+' · '+(l[2]?"operates across the north":"based in "+l[0])+
-      ' · '+(contested?"present in ":"active in ")+orgCounties(nm).length+(orgCounties(nm).length>1?" counties":" county")+'</p>'+
+    whereLine+
     '<h3>'+nm+'</h3>'+
     contestedBanner+
     (m?'<p class="cnote">'+m.d+'</p>':'')+
@@ -4943,7 +5109,7 @@ function applyExploreSub(){
   document.querySelectorAll("#exploreSub a").forEach(function(a){
     a.classList.toggle("on", a.getAttribute("data-sub") === exploreSub);
   });
-  if(exploreSub === "directory"){ renderMatrix(); renderSectorMap(); renderNetMap(); }
+  if(exploreSub === "directory"){ renderSectorMap(); renderCoverStrip(); renderNetMap(); }
   if(exploreSub === "legal" && typeof renderLegalMap === "function") renderLegalMap();
 }
 
