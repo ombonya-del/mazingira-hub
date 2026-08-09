@@ -958,21 +958,24 @@ table.matrix tbody th{
 }
 
 .lanes{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:26px; }
-.lane{ display:block; background:var(--panel); padding:18px 16px; border-top:3px solid var(--line-2);
-  color:inherit; text-decoration:none; cursor:pointer; transition:background .15s ease, transform .15s ease; }
+/* lane cards mirror the idesk-stats boxes above: number-forward, flat, seamless grid */
+.lane{ display:block; background:var(--panel); padding:16px 14px; color:inherit; text-decoration:none;
+  cursor:pointer; transition:background .15s ease; }
 a.lane:hover{ background:var(--panel-2); }
-a.lane:focus-visible{ outline:2px solid var(--green); outline-offset:2px; }
-.lane .lane-go{ display:inline-block; margin-top:12px; font-size:.72rem; font-weight:800;
-  letter-spacing:.04em; text-transform:uppercase; color:var(--green); }
-.lane.challenge .lane-go{ color:var(--ember-hot); }
+a.lane:focus-visible{ outline:2px solid var(--green); outline-offset:-2px; }
+.lane-num{ display:block; font-family:Lora,serif; font-size:clamp(1.6rem,5vw,2.2rem); font-weight:700;
+  line-height:1; color:var(--green); font-variant-numeric:tabular-nums; }
+.lane.document .lane-num{ color:#7FB0FF; }
+.lane.challenge .lane-num{ color:var(--ember); }
+.lane-name{ display:block; margin-top:8px; font-size:.66rem; font-weight:800; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted-dim); }
+.lane-q{ margin:12px 0 0; font-size:.92rem; font-weight:700; color:var(--text); line-height:1.4; }
+.lane-d{ margin:6px 0 0; font-size:.8rem; color:var(--muted); line-height:1.5; }
+.lane-go{ display:inline-block; margin-top:12px; font-size:.7rem; font-weight:800;
+  letter-spacing:.05em; text-transform:uppercase; color:var(--green); }
 .lane.document .lane-go{ color:#7FB0FF; }
+.lane.challenge .lane-go{ color:var(--ember); }
 .lane-block{ scroll-margin-top:120px; }
-.lane.document{ border-top-color:#7FB0FF; } .lane.challenge{ border-top-color:var(--ember-hot); }
-.lane.build{ border-top-color:var(--green); }
-.lane .ln{ display:flex; align-items:baseline; gap:9px; }
-.lane h4{ font-family:Lora,serif; font-size:1.05rem; font-weight:600; }
-.lane .cnt{ font-family:var(--mono); font-size:.9rem; font-weight:700; color:var(--text); }
-.lane p{ margin:8px 0 0; font-size:.82rem; color:var(--muted); line-height:1.5; }
 
 .briefcard{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--green);
   padding:20px; margin-bottom:24px; }
@@ -3500,8 +3503,11 @@ var PROJECTS = [
 
   document.getElementById("laneRow").innerHTML = Object.keys(LANES).map(function(k){
     var n = PROJECTS.filter(function(p){ return p.lane===k; }).length;
-    return '<a class="lane '+k+'" href="#porti-'+k+'"><div class="ln"><h4>'+LANES[k].n+'</h4><span class="cnt">'+n+'</span></div>'+
-      '<p><b style="color:var(--text)">'+LANES[k].q+'</b><br>'+LANES[k].d+'</p>'+
+    return '<a class="lane '+k+'" href="#porti-'+k+'">'+
+      '<span class="lane-num">'+n+'</span>'+
+      '<span class="lane-name">'+LANES[k].n+'</span>'+
+      '<p class="lane-q">'+LANES[k].q+'</p>'+
+      '<p class="lane-d">'+LANES[k].d+'</p>'+
       '<span class="lane-go">See '+n+' project'+(n===1?'':'s')+' →</span></a>';
   }).join("");
 })();
@@ -3706,36 +3712,41 @@ function portfolioToPDF(){
       { title:"Legal matters by status", center:LEGAL.length, sub:"cases & submissions tracked",
         segs:[{label:"Won / precedent",value:byStat.won,color:"#3E9E76"},{label:"Active litigation",value:byStat.active,color:"#DE742B"},{label:"Ongoing / policy",value:byStat.watch,color:"#6E86F0"}] }
     ];
-    donuts.forEach(function(d){
-      ensure(128);
-      var img=donutPNG(d.segs, d.center);
-      if(img) doc.addImage(img,"PNG",M,y,104,104);
-      var tx=M+120, ty=y+16;
-      doc.setFont("helvetica","bold"); doc.setFontSize(12.5); doc.setTextColor(18,38,29);
-      doc.text(d.title, tx, ty); ty+=13;
-      doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(92,107,100);
-      doc.text(doc.splitTextToSize(d.sub, W-tx-M), tx, ty); ty+=15; doc.setTextColor(18,38,29);
+    // three donuts side by side, legends beneath — keeps the report to two pages
+    var colW=(W-2*M)/3, dS=82, rowY=y;
+    donuts.forEach(function(d,i){
+      var cx=M+i*colW, img=donutPNG(d.segs, d.center);
+      if(img) doc.addImage(img,"PNG", cx+(colW-dS)/2, rowY, dS, dS);
+      var ty=rowY+dS+13;
+      doc.setFont("helvetica","bold"); doc.setFontSize(9.5); doc.setTextColor(18,38,29);
+      var tl=doc.splitTextToSize(d.title, colW-6); doc.text(tl, cx, ty); ty+=tl.length*11+3;
+      doc.setFont("helvetica","normal"); doc.setFontSize(7.5);
       d.segs.forEach(function(s){ if(s.value<=0) return; var c=pdfRgb(s.color);
-        doc.setFillColor(c[0],c[1],c[2]); doc.rect(tx, ty-7, 8, 8, "F");
-        doc.setFontSize(9); doc.text(pdfDec(s.label)+"  —  "+s.value, tx+13, ty); ty+=13; });
-      y += Math.max(114, ty-y) + 14;
+        doc.setFillColor(c[0],c[1],c[2]); doc.rect(cx, ty-6, 6, 6, "F");
+        doc.setTextColor(70,80,74); doc.text(pdfDec(s.label)+" — "+s.value, cx+10, ty); ty+=9.5; });
     });
+    doc.setTextColor(18,38,29);
+    y = rowY + dS + 13 + 14 + 8*9.5 + 14;   // reserve a fixed, uniform row height
 
     // projects by lane
     ["document","challenge","build"].forEach(function(k){
-      ensure(34); y+=6;
-      doc.setFont("helvetica","bold"); doc.setFontSize(13.5); doc.setTextColor(47,125,91);
+      ensure(26); y+=4;
+      doc.setFont("helvetica","bold"); doc.setFontSize(11.5); doc.setTextColor(47,125,91);
       var lh=doc.splitTextToSize(pdfDec(LANES[k].n+" — "+LANES[k].q), W-2*M);
-      doc.text(lh, M, y); y+=lh.length*15+6; doc.setTextColor(18,38,29);
+      doc.text(lh, M, y); y+=lh.length*13+5; doc.setTextColor(18,38,29);
       PROJECTS.filter(function(p){ return p.lane===k; }).forEach(function(p){
-        doc.setFont("helvetica","bold"); doc.setFontSize(11);
+        doc.setFont("helvetica","bold"); doc.setFontSize(10);
         var tt=doc.splitTextToSize(pdfDec(p.title)+"   ["+(p.status==="dev"?"In development":"Idea")+"]", W-2*M);
-        ensure(tt.length*13+46); doc.text(tt, M, y); y+=tt.length*13+2;
-        doc.setFont("helvetica","normal"); doc.setFontSize(9.5); doc.setTextColor(58,68,62);
-        var pt=doc.splitTextToSize(pdfDec(p.pitch), W-2*M); doc.text(pt, M, y); y+=pt.length*12+3;
-        doc.setTextColor(92,107,100); doc.setFontSize(8.5);
+        var pit=pdfDec(p.pitch); if(pit.length>150) pit=pit.slice(0,148)+"…";
+        doc.setFont("helvetica","normal"); doc.setFontSize(8.5);
+        var pt=doc.splitTextToSize(pit, W-2*M);
         var mt=doc.splitTextToSize("Closes: "+pdfDec(p.gap)+"   ·   "+pdfDec(p.county)+"   ·   "+pdfDec(p.sector)+"   ·   "+p.budget+"   ·   "+pdfDec(p.funder), W-2*M);
-        doc.text(mt, M, y); y+=mt.length*11+12; doc.setTextColor(18,38,29);
+        ensure(tt.length*12 + pt.length*10.5 + mt.length*10 + 14);
+        doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.text(tt, M, y); y+=tt.length*12+1;
+        doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(58,68,62);
+        doc.text(pt, M, y); y+=pt.length*10.5+1;
+        doc.setTextColor(120,132,124); doc.setFontSize(7.5);
+        doc.text(mt, M, y); y+=mt.length*10+8; doc.setTextColor(18,38,29);
       });
     });
     doc.save("MazingiraKenya-Project-Portfolio.pdf");
