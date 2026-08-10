@@ -260,6 +260,7 @@ var NAV = [
   {id:"upload", label:"Manual upload", grp:"Publishing", icon:'<path d="M12 19V5M5 12l7-7 7 7"/>'},
   {id:"publishing", label:"Publish to raia", grp:"Publishing", icon:'<path d="M12 19V5M5 12l7-7 7 7"/>', badgeFrom:"ready"},
   {id:"content", label:"Content", grp:"Manage", icon:'<path d="M4 5h16M4 12h16M4 19h10"/>'},
+  {id:"resources", label:"Resources", grp:"Manage", icon:'<path d="M4 5h10l2 2h4v11H4z"/><path d="M8 13h6"/>'},
   {id:"members", label:"Members", grp:"Manage", icon:'<circle cx="9" cy="8" r="3"/><path d="M4 20a5 5 0 0 1 10 0"/><path d="M16 6a3 3 0 0 1 0 6M14 20a5 5 0 0 1 6-3"/>'}
 ];
 
@@ -378,6 +379,7 @@ function render(){
   else if(v==="upload") app.innerHTML=viewUpload();
   else if(v==="publishing") app.innerHTML=viewPublishing();
   else if(v==="content") app.innerHTML=viewContent();
+  else if(v==="resources") app.innerHTML=viewResources();
   else if(v==="members") app.innerHTML=viewMembers();
   bindView();
   window.scrollTo(0,0);
@@ -532,6 +534,57 @@ function bindView(){
   app.querySelectorAll("[data-active]").forEach(function(el){ el.addEventListener("click",function(){ var i=+el.getAttribute("data-active"); MEMBERS[i].active=!MEMBERS[i].active; el.setAttribute("aria-pressed",MEMBERS[i].active); toast(MEMBERS[i].active?"Member activated":"Member suspended"); }); });
   var add=document.getElementById("addMember"); if(add) add.addEventListener("click",openAddMember);
   bindUpload();
+  if(state.view==="resources") loadResources();
+}
+
+/* ==================== EXCHANGE RESOURCES — member uploads (edit / delete) ==================== */
+function viewResources(){
+  return '<div class="view"><div class="vhead"><h2>Exchange resources</h2>'+
+    '<p class="vsub">Members publish these straight to the hub Exchange (no approval). Edit or delete here.</p></div>'+
+    '<div id="resAdminList" class="ndr-list">Loading…</div></div>';
+}
+function loadResources(){
+  var host=document.getElementById("resAdminList"); if(!host) return;
+  if(!ASB){ host.textContent="Supabase unavailable — check the connection."; return; }
+  host.textContent="Loading…";
+  ASB.from("resources").select("*").order("created_at",{ascending:false}).then(function(res){
+    if(res.error){ host.textContent="Load failed: "+res.error.message; return; }
+    var data=res.data||[];
+    if(!data.length){ host.innerHTML='<p class="vsub">No member uploads yet.</p>'; return; }
+    host.innerHTML="";
+    data.forEach(function(row){
+      var wrap=document.createElement("div"); wrap.className="ndr-draft";
+      function mkbtn(t){ var b=document.createElement("button"); b.type="button"; b.className="btn btn--ghost"; b.textContent=t; return b; }
+      function fld(label,node){ var l=document.createElement("label"); l.style.cssText="display:block;font-size:.7rem;color:var(--muted,#8aa);margin:4px 0 0"; l.textContent=label; node.style.cssText="width:100%;margin-top:2px"; l.appendChild(node); return l; }
+      function viewMode(){
+        wrap.innerHTML='<div class="grow"><b>'+esc(row.title)+'</b> <span class="pill">'+esc(row.category)+'</span>'+
+          '<div style="font-size:.78rem;opacity:.75;margin-top:3px">'+esc(row.meta||"")+
+          (row.url?' · <a href="'+esc(row.url)+'" target="_blank" rel="noopener">link ↗</a>':"")+
+          (row.by?' · by '+esc(row.by):"")+'</div></div><div class="ndr-acts"></div>';
+        var acts=wrap.querySelector(".ndr-acts");
+        var eb=mkbtn("Edit"); eb.onclick=editMode; acts.appendChild(eb);
+        var db=mkbtn("Delete"); db.onclick=function(){ if(!confirm("Delete \""+row.title+"\"?"))return; db.disabled=true;
+          ASB.from("resources").delete().eq("id",row.id).then(function(r){ if(r.error){db.disabled=false;toast("Delete failed: "+r.error.message);return;} toast("Resource deleted"); wrap.remove(); }); };
+        acts.appendChild(db);
+      }
+      function editMode(){
+        wrap.innerHTML="";
+        var box=document.createElement("div"); box.className="grow";
+        var ti=document.createElement("input"); ti.value=row.title;
+        var me=document.createElement("input"); me.value=row.meta||"";
+        var ur=document.createElement("input"); ur.value=row.url||"";
+        var sel=document.createElement("select"); ["Resources","Media briefs","Opportunities"].forEach(function(c){ var o=document.createElement("option"); o.textContent=c; if(c===row.category)o.selected=true; sel.appendChild(o); });
+        box.appendChild(fld("Title",ti)); box.appendChild(fld("Category",sel)); box.appendChild(fld("Description",me)); box.appendChild(fld("Link",ur));
+        wrap.appendChild(box);
+        var acts=document.createElement("div"); acts.className="ndr-acts";
+        var sv=mkbtn("Save"); sv.onclick=function(){ sv.disabled=true;
+          ASB.from("resources").update({title:ti.value,meta:me.value,url:ur.value,category:sel.value}).eq("id",row.id).then(function(r){ if(r.error){sv.disabled=false;toast("Save failed: "+r.error.message);return;} row.title=ti.value;row.meta=me.value;row.url=ur.value;row.category=sel.value; toast("Saved"); viewMode(); }); };
+        var cn=mkbtn("Cancel"); cn.onclick=viewMode;
+        acts.appendChild(sv); acts.appendChild(cn); wrap.appendChild(acts);
+      }
+      viewMode(); host.appendChild(wrap);
+    });
+  });
 }
 
 /* ==================== MANUAL UPLOAD — Supabase magic-link sign-in + publish ==================== */
