@@ -93,15 +93,22 @@ header.top{
 }
 .top-inner{ height:var(--nav-h); display:flex; align-items:center; gap:14px; }
 .brand{ display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:1px; min-width:0; }
-/* convening line lives in the header on desktop; on mobile it sits in the KPI box on Live */
+/* convening line: in the header on desktop; in the Live hero on mobile */
 .convene{ display:none; }
-.convene-mob{ font-size:.72rem; color:var(--muted); line-height:1.45; }
+.convene-hero{ display:none; }
+.hero-actions{ display:none; }
 @media (min-width:860px){
   .convene{ display:block; flex:1 1 auto; min-width:0; margin:0 4px; text-align:right;
     font-size:.62rem; line-height:1.32; color:var(--muted); max-width:58ch; margin-left:auto; }
-  .convene-cell{ display:none; }
 }
-@media (max-width:859px){ .brand{ margin-right:auto; } }
+@media (max-width:859px){
+  .brand{ margin-right:auto; }
+  .top-inner .tm-only{ display:none !important; }   /* raia + Submit move into the hero on mobile */
+  .convene-hero{ display:block; margin:12px 0 0; font-size:.82rem; line-height:1.5;
+    color:var(--muted); max-width:60ch; }
+  .hero-actions{ display:flex; gap:9px; margin-top:14px; }
+  .hero-actions .btn{ padding:9px 16px; font-size:.72rem; }
+}
 .brand-mark{
   font-family:Lora, serif; font-size:1.14rem; font-weight:700; color:var(--text);
   letter-spacing:-.02em; white-space:nowrap;
@@ -1379,6 +1386,11 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <div class="deck-top">
       <div class="grow" style="flex:1; min-width:260px">
         <h1>Extractive pressure and civil society response, county by county.</h1>
+        <p class="convene-hero">Convened by deCOALonize — a coalition opposing coal development and advancing a just energy transition across Kenya and the region.</p>
+        <div class="hero-actions">
+          <a class="btn btn--public" href="https://raia.mazingirakenya.org" target="mzk_raia" rel="noopener" title="Open raia — the public platform">raia ↗</a>
+          <a class="btn btn--ember" href="#contribute">Submit</a>
+        </div>
       </div>
       <p class="deck-vision">“A one stop shop that can let you know in a heartbeat what the climate justice ecosystem looks like — and is essentially a call to action.”</p>
     </div>
@@ -1415,9 +1427,6 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
           </svg>
           <span class="gauge-txt"><span class="n mono" id="gapIdx">0</span><span class="s" id="gapLabel">calculating</span></span>
         </div>
-      </div>
-      <div class="kpi convene-cell">
-        <span class="convene-mob">Convened by deCOALonize — a coalition opposing coal development and advancing a just energy transition across Kenya and the region.</span>
       </div>
     </div>
     <p class="datastatus"><b>Data status:</b> legal matters, the organisation network, mapped projects and
