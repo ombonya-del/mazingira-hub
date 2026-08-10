@@ -2011,7 +2011,8 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
           <label>Type<select name="kind"><option>PDF</option><option>DOC</option><option>ZIP</option><option>WEB</option><option>CALL</option><option>LINK</option></select></label>
         </div>
         <label>Short description<input name="meta" placeholder="e.g. Policy analysis · 22 pp · 2026"></label>
-        <label>Link (where it lives)<input type="url" name="url" placeholder="https://…"></label>
+        <label>Link to it<input type="url" name="url" placeholder="https://…"></label>
+        <label>…or upload a document<input type="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.txt,.zip,.png,.jpg,.jpeg"></label>
         <label>Your name / organisation (optional)<input name="by" placeholder="e.g. LAWA"></label>
         <div class="ev-actions">
           <button type="button" class="btn btn--ghost" id="resmCancel">Cancel</button>
@@ -4034,22 +4035,35 @@ window.renderDeskActive = function(){
     e.preventDefault();
     if(form.checkValidity && !form.checkValidity()){ if(form.reportValidity) form.reportValidity(); return; }
     var f=form.elements;
+    var fileEl=f.file, file=fileEl && fileEl.files && fileEl.files[0];
+    if(!f.url.value.trim() && !file){ hubToast("Add a link or upload a document"); return; }
     var rec={ category:(DESK[f.category.value]?f.category.value:"Resources"), title:f.title.value.trim(),
       meta:(f.meta.value.trim()||(f.by.value.trim()?"Shared by "+f.by.value.trim():"Community upload")),
       url:f.url.value.trim(), kind:f.kind.value, by:f.by.value.trim(), published:true };
+    var submitBtn=form.querySelector('button[type="submit"]');
     function showLocal(){
       DESK[rec.category].unshift({ t:rec.title, m:rec.meta, dl:"—", k:rec.kind, url:rec.url, _new:true });
-      // jump the Exchange to that category and re-render
       var tab=[].slice.call(document.querySelectorAll("#deskTabs .tab")).filter(function(t){return t.textContent===rec.category;})[0];
       if(tab) tab.click(); else if(window.renderDeskActive) window.renderDeskActive();
-      closeM(); form.reset(); hubToast("Resource published to the Exchange");
+      closeM(); form.reset(); if(submitBtn) submitBtn.disabled=false; hubToast("Resource published to the Exchange");
     }
-    if(SB){
-      SB.from("resources").insert(rec).then(function(r){
-        if(r.error){ hubToast("Saved locally — sync failed"); }
-        showLocal();
-      }, function(){ showLocal(); });
-    } else { showLocal(); }
+    function insertRec(){
+      if(SB){ SB.from("resources").insert(rec).then(function(r){ if(r.error){ hubToast("Saved locally — sync failed"); } showLocal(); }, function(){ showLocal(); }); }
+      else showLocal();
+    }
+    if(file){
+      if(!SB || !SB.storage){ hubToast("File upload needs a connection — using the link instead"); insertRec(); return; }
+      if(file.size > 25*1024*1024){ hubToast("File is over 25 MB — please link to it instead"); return; }
+      if(submitBtn) submitBtn.disabled=true; hubToast("Uploading document…");
+      var ext=(file.name.split(".").pop()||"").toUpperCase();
+      var path="resources/"+Date.now()+"_"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+      SB.storage.from("media").upload(path,file,{cacheControl:"3600",upsert:false}).then(function(up){
+        if(up.error){ if(submitBtn) submitBtn.disabled=false; hubToast("Upload failed: "+up.error.message); return; }
+        try{ rec.url=SB.storage.from("media").getPublicUrl(path).data.publicUrl; }catch(e){}
+        if(!rec.kind || rec.kind==="LINK"){ rec.kind = /pdf/i.test(ext)?"PDF":/docx?/i.test(ext)?"DOC":/pptx?/i.test(ext)?"PPT":/xlsx?|csv/i.test(ext)?"XLS":/zip/i.test(ext)?"ZIP":/png|jpe?g|gif|webp/i.test(ext)?"IMG":(ext||"FILE"); }
+        insertRec();
+      }, function(){ if(submitBtn) submitBtn.disabled=false; hubToast("Upload failed — check your connection"); });
+    } else { insertRec(); }
   });
 })();
 

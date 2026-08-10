@@ -45,27 +45,34 @@ often landing in spam. To send from **admin@mazingirakenya.org** and stay out of
 Supabase to a custom SMTP sender and add the domain's email-auth DNS records. (I can't do
 this for you — it needs SMTP credentials and DNS access — but here's the whole path.)
 
-### 5a. Pick a sender
-Use a transactional email provider that lets you verify a domain (best deliverability):
-**Resend**, **SendGrid**, **Postmark**, or **Mailgun** — or, if `admin@mazingirakenya.org`
-is a Google Workspace mailbox, Google's SMTP relay. A dedicated transactional provider is
-the most reliable for auth email.
+You're on **Resend**, so here are the exact values.
 
-### 5b. Verify the domain + add DNS (this is what keeps it out of spam)
-In the provider, add and verify `mazingirakenya.org`, then add the DNS records it gives you
-at your domain registrar:
-- **SPF** — a TXT record authorising the provider to send for your domain.
-- **DKIM** — the CNAME/TXT keys the provider supplies (cryptographic signing).
-- **DMARC** — a TXT record at `_dmarc.mazingirakenya.org`, start with `v=DMARC1; p=none;
-  rua=mailto:admin@mazingirakenya.org` and tighten to `p=quarantine` later.
-Without SPF + DKIM aligned to your domain, invite mail will keep hitting spam.
+### 5a. Verify the domain in Resend + add its DNS (this is what stops spam)
+Resend dashboard → **Domains → Add domain** → `mazingirakenya.org`. Resend shows a set of
+records — add them **exactly as shown** at your DNS registrar (they're unique to your
+account). They are, in shape:
+- **SPF** — a TXT record on the `send` subdomain: `v=spf1 include:amazonses.com ~all`
+- **DKIM** — the TXT/CNAME record(s) Resend lists under `resend._domainkey…`
+- **MX** — on `send.mazingirakenya.org` → `feedback-smtp.<region>.amazonses.com` (return path)
+- **DMARC** — add a TXT at `_dmarc.mazingirakenya.org`:
+  `v=DMARC1; p=none; rua=mailto:admin@mazingirakenya.org`
+Wait for Resend to show the domain **Verified** (green) before sending.
 
-### 5c. Point Supabase at it
+### 5b. Create a Resend API key
+Resend → **API Keys → Create** → copy the `re_…` key (this is the SMTP password).
+
+### 5c. Point Supabase at Resend
 Supabase dashboard → **Authentication → Emails → SMTP Settings** → enable **Custom SMTP**:
-- **Sender email:** `admin@mazingirakenya.org`
+- **Host:** `smtp.resend.com`
+- **Port:** `587`
+- **Username:** `resend`
+- **Password:** your `re_…` API key
+- **Sender email:** `admin@mazingirakenya.org`  (must be on the verified domain)
 - **Sender name:** `MazingiraKenya`
-- **Host / Port / Username / Password:** from your provider (port usually 587)
-Save, then send yourself a test invite and confirm it arrives from admin@ and not in spam.
+
+Then in **Authentication → Rate limits**, if you'll invite several members at once, raise
+the email cap and drop the "minimum interval between emails". Send yourself a test invite
+and confirm it arrives from admin@ and not in spam.
 
 ### 5d. Make the emails read as official
 Authentication → **Email Templates** → edit **Invite user** and **Magic Link**. Suggested:
