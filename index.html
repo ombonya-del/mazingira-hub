@@ -264,6 +264,10 @@ a.sf-item:hover{ border-color:var(--muted); text-decoration:none; }
 .pc-head{ display:flex; align-items:center; gap:10px; margin:0 0 9px; }
 .pc-av{ width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-weight:900; font-size:1rem; flex:0 0 auto; }
 .pc-av.x{ background:#0b0b0b; border:1px solid #333; color:#fff; }
+.pc-av.news{ background:rgba(98,199,155,.14); border:1px solid rgba(98,199,155,.35); color:var(--green); font-size:.95rem; }
+.pulse-card.news{ border-left:3px solid var(--green); }
+.pc-src{ font-size:.72rem; font-weight:800; letter-spacing:.03em; color:var(--green); text-decoration:none; }
+.pc-src:hover{ text-decoration:underline; }
 .pc-who{ display:flex; flex-direction:column; line-height:1.25; min-width:0; flex:1; }
 .pc-who b{ color:var(--text); font-size:.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .pc-who span{ color:var(--muted); font-size:.72rem; font-weight:700; }
@@ -1208,7 +1212,9 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 .gate input{ width:100%; padding:12px 14px; font-family:inherit; font-size:1rem; text-align:center; letter-spacing:.06em; background:var(--panel-2); border:1px solid var(--line-2); border-radius:var(--radius); color:var(--text); }
 .gate input:focus{ border-color:var(--green); outline:none; }
 .gate button{ margin-top:12px; width:100%; }
-.gate .err{ color:var(--ember); font-size:.8rem; margin-top:10px; min-height:1.1em; }
+.gate .err{ font-size:.8rem; margin-top:10px; min-height:1.1em; }
+.gate .gate-note{ font-size:.72rem; color:var(--muted-dim); margin-top:12px; line-height:1.5; }
+.gate .btn--ghost{ margin-top:8px; background:transparent; }
 .gate.shake .gate-card{ animation:shk .4s; }
 @keyframes shk{ 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
 </style>
@@ -1217,36 +1223,71 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 <body>
 <script>try{window.name="mzk_hub";}catch(e){}</script>
 
-<div class="gate" id="gate" role="dialog" aria-modal="true" aria-label="Preview access">
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-label="Members sign-in">
   <div class="gate-card">
     <div class="gate-mark">Mazingira<span class="k">Kenya</span></div>
-    <h1>Preview access</h1>
-    <p>This dashboard is in stakeholder review. Enter the access code to continue.</p>
+    <h1>Members' hub</h1>
+    <p>This coordination hub is for coalition members. Sign in to continue.</p>
     <form id="gateForm" novalidate>
-      <input id="gateCode" type="password" placeholder="Access code" autocomplete="off" aria-label="Access code">
-      <button class="btn btn--ember" type="submit">Enter</button>
+      <input id="gateEmail" type="email" placeholder="you@organisation.org" autocomplete="email" aria-label="Email">
+      <input id="gatePass" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
+      <button class="btn btn--ember" type="submit" id="gatePassBtn">Sign in</button>
+      <button class="btn btn--ghost" type="button" id="gateLinkBtn">Email me a sign-in link instead</button>
       <p class="err" id="gateErr" role="status"></p>
+      <p class="gate-note">Access is by invitation. New here? Use the sign-in link, or ask the coordinator to add you.</p>
     </form>
   </div>
 </div>
 <script>
 (function(){
-  var CODE="MAZINGIRA-REVIEW";
-  var g=document.getElementById("gate");
-  /* One codebase, two domains: only the review subdomain is gated. The public
-     hub (and any other host) shows the dashboard immediately. Add ?review=1 to
-     any URL to preview the gate. */
-  var gated = /(^|\.)review\./i.test(location.hostname) || /[?&]review\b/.test(location.search);
-  if(!gated){ g.classList.add("hidden"); return; }
-  try{ if(sessionStorage.getItem("mzg-preview")==="1"){ g.classList.add("hidden"); return; } }catch(e){}
-  var f=document.getElementById("gateForm");
-  f.addEventListener("submit", function(ev){
+  var g=document.getElementById("gate"); if(!g) return;
+  /* Members-only hub: every real host is gated behind Supabase auth (magic-link or
+     password, invite-only). Local files / localhost stay open for development;
+     add ?gate=1 to any URL to preview the gate. */
+  var gated = location.protocol!=="file:" && !/^(localhost|127\.|0\.0\.0\.0)$/.test(location.hostname);
+  if(/[?&]gate=1\b/.test(location.search)) gated=true;   // force-preview the gate on any host
+  if(!gated){ g.classList.add("hidden"); return; }        // local dev stays open; no production bypass
+
+  var HAUTH = (window.supabase && window.supabase.createClient)
+    ? window.supabase.createClient(
+        "https://uueemckdoozsuowcqkhl.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA")
+    : null;
+  window.HAUTH = HAUTH;   // the data layer reuses this one client
+
+  var errEl=document.getElementById("gateErr");
+  function err(t){ errEl.textContent=t; errEl.style.color="var(--ember)"; g.classList.add("shake"); setTimeout(function(){ g.classList.remove("shake"); },450); }
+  function ok(t){ errEl.textContent=t; errEl.style.color="var(--green)"; }
+  function enter(){ g.classList.add("hidden"); document.body.style.overflow=""; }
+
+  document.body.style.overflow="hidden";
+  if(!HAUTH){ err("Sign-in service is unavailable — check your connection and reload."); return; }
+
+  HAUTH.auth.getSession().then(function(r){ if(r && r.data && r.data.session) enter(); });
+  HAUTH.auth.onAuthStateChange(function(_e, session){ if(session) enter(); });
+
+  document.getElementById("gateForm").addEventListener("submit", function(ev){
     ev.preventDefault();
-    var v=(document.getElementById("gateCode").value||"").trim().toUpperCase();
-    if(v===CODE){ try{ sessionStorage.setItem("mzg-preview","1"); }catch(e){} g.classList.add("hidden"); }
-    else { document.getElementById("gateErr").textContent="Incorrect code — try again."; g.classList.add("shake"); setTimeout(function(){ g.classList.remove("shake"); },450); }
+    var em=(document.getElementById("gateEmail").value||"").trim();
+    var pw=document.getElementById("gatePass").value;
+    if(!em){ err("Enter your email."); return; }
+    if(!pw){ err("Enter your password, or use the sign-in link below."); return; }
+    ok("Signing in…");
+    HAUTH.auth.signInWithPassword({ email:em, password:pw }).then(function(r){
+      if(r.error){ err(/invalid/i.test(r.error.message||"")?"Wrong email or password.":(r.error.message||"Sign-in failed.")); return; }
+      enter();
+    });
   });
-  try{ document.getElementById("gateCode").focus(); }catch(e){}
+  document.getElementById("gateLinkBtn").addEventListener("click", function(){
+    var em=(document.getElementById("gateEmail").value||"").trim();
+    if(!em){ err("Enter your email first, then request the link."); return; }
+    ok("Sending your sign-in link…");
+    HAUTH.auth.signInWithOtp({ email:em, options:{ shouldCreateUser:false, emailRedirectTo:location.origin+location.pathname } }).then(function(r){
+      if(r.error){ var m=r.error.message||""; err(/not|exist|allow|signup|found/i.test(m)?"That email isn't on the members list — ask the coordinator to add you.":m); return; }
+      ok("Check your email for the sign-in link.");
+    });
+  });
+  try{ document.getElementById("gateEmail").focus(); }catch(e){}
 })();
 </script>
 
@@ -2277,7 +2318,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <div class="foot-bar">
       <span>Developed under AJWS Grant ID 17252 to consolidate knowledge sharing, sector coordination
         and public awareness across the climate and environmental justice ecosystem in Kenya.</span>
-      <span class="spacer">© <span id="yr"></span> MazingiraKenya</span>
+      <span class="spacer">© <span id="yr"></span> MazingiraKenya · <a href="#" id="hubSignOut">Sign out</a></span>
     </div>
   </div>
 </footer>
@@ -3962,15 +4003,20 @@ window.renderDeskActive = function(){
         pulled from Supabase and merged in front of the built-in items ---- */
 (function(){
   if(!SB) return;
-  SB.from("resources").select("*").eq("published",true).order("created_at",{ascending:false}).limit(80)
-    .then(function(r){
-      if(r.error || !r.data || !r.data.length) return;
-      r.data.forEach(function(row){
-        var cat = DESK[row.category] ? row.category : "Resources";
-        DESK[cat].unshift({ t:row.title, m:row.meta||"", dl:"—", k:row.kind||"LINK", url:row.url||"", _new:true, _id:row.id });
-      });
-      if(window.renderDeskActive) window.renderDeskActive();
-    }, function(){});
+  function fetchResources(){
+    SB.from("resources").select("*").eq("published",true).order("created_at",{ascending:false}).limit(80)
+      .then(function(r){
+        if(r.error || !r.data || !r.data.length) return;
+        r.data.forEach(function(row){
+          var cat = DESK[row.category] ? row.category : "Resources";
+          DESK[cat].unshift({ t:row.title, m:row.meta||"", dl:"—", k:row.kind||"LINK", url:row.url||"", _new:true, _id:row.id });
+        });
+        if(window.renderDeskActive) window.renderDeskActive();
+      }, function(){});
+  }
+  // wait until the member's session is attached (RLS is authenticated-only), then fetch
+  if(SB.auth && SB.auth.getSession){ SB.auth.getSession().then(fetchResources, fetchResources); }
+  else fetchResources();
 })();
 
 /* ---- upload-resource modal ---- */
@@ -4065,11 +4111,20 @@ function hubToast(m){ var t=document.getElementById("hubToast"); if(!t) return; 
 })();
 
 /* ---- Live data from Supabase (anon key is public — protected by row-level security) ---- */
-var SB = (window.supabase && window.supabase.createClient)
+var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
   ? window.supabase.createClient(
       "https://uueemckdoozsuowcqkhl.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA")
-  : null;
+  : null);
+/* Sign out — clears the Supabase session; the gate re-appears on reload */
+(function(){
+  var so=document.getElementById("hubSignOut"); if(!so) return;
+  so.addEventListener("click", function(e){
+    e.preventDefault();
+    if(SB && SB.auth){ SB.auth.signOut().then(function(){ location.reload(); }, function(){ location.reload(); }); }
+    else location.reload();
+  });
+})();
 (async function(){
   if(!SB) return;                                  // CDN blocked / offline → keep in-file content
   try{
