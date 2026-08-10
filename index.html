@@ -2022,6 +2022,24 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     </div>
   </div>
 </div>
+<!-- Optional: a signed-in member can set a password (so they can sign in without a link) -->
+<div class="modal-overlay" id="pwModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pwmTitle">
+    <div class="modal-head">
+      <div class="grow"><h3 id="pwmTitle">Set a password</h3><p>Optional — so you can sign in with a password instead of an email link.</p></div>
+      <button class="modal-x" id="pwmClose" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="pwForm" class="ev-form">
+        <label>New password<input type="password" name="pw" minlength="8" required placeholder="At least 8 characters" autocomplete="new-password"></label>
+        <div class="ev-actions">
+          <button type="button" class="btn btn--ghost" id="pwmCancel">Cancel</button>
+          <button type="submit" class="btn btn--green">Save password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 <div id="hubToast" class="hub-toast" role="status" aria-live="polite"></div>
 
 <!-- ============================ VOICES ============================ -->
@@ -2319,7 +2337,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <div class="foot-bar">
       <span>Developed under AJWS Grant ID 17252 to consolidate knowledge sharing, sector coordination
         and public awareness across the climate and environmental justice ecosystem in Kenya.</span>
-      <span class="spacer">© <span id="yr"></span> MazingiraKenya · <a href="#" id="hubSignOut">Sign out</a></span>
+      <span class="spacer">© <span id="yr"></span> MazingiraKenya · <a href="#" id="hubSetPass">Set password</a> · <a href="#" id="hubSignOut">Sign out</a></span>
     </div>
   </div>
 </footer>
@@ -4137,6 +4155,35 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
     e.preventDefault();
     if(SB && SB.auth){ SB.auth.signOut().then(function(){ location.reload(); }, function(){ location.reload(); }); }
     else location.reload();
+  });
+})();
+/* Set / change password — optional, for members who prefer a password to email links */
+(function(){
+  var overlay=document.getElementById("pwModal"); if(!overlay) return;
+  var form=document.getElementById("pwForm");
+  function openM(){ overlay.classList.add("on"); overlay.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden"; setTimeout(function(){ if(form.elements.pw) form.elements.pw.focus(); },30); }
+  function closeM(){ overlay.classList.remove("on"); overlay.setAttribute("aria-hidden","true"); document.body.style.overflow=""; }
+  var open=document.getElementById("hubSetPass");
+  if(open) open.addEventListener("click", function(e){
+    e.preventDefault();
+    if(!SB || !SB.auth){ hubToast("Sign in first"); return; }
+    SB.auth.getSession().then(function(r){
+      if(r && r.data && r.data.session) openM();
+      else hubToast("Sign in first, then set a password");
+    });
+  });
+  var x=document.getElementById("pwmClose"), cx=document.getElementById("pwmCancel");
+  if(x) x.addEventListener("click",closeM); if(cx) cx.addEventListener("click",closeM);
+  overlay.addEventListener("click",function(e){ if(e.target===overlay) closeM(); });
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var pw=form.elements.pw.value;
+    if((pw||"").length<8){ hubToast("Password must be at least 8 characters"); return; }
+    if(!SB || !SB.auth){ hubToast("Not signed in"); return; }
+    SB.auth.updateUser({ password:pw }).then(function(r){
+      if(r.error){ hubToast("Couldn't set password: "+r.error.message); return; }
+      closeM(); form.reset(); hubToast("Password set — you can now sign in with it");
+    }, function(){ hubToast("Couldn't set password — try again"); });
   });
 })();
 (async function(){

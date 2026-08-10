@@ -20,14 +20,33 @@ admin keeps its own gate. This file is the one-time Supabase configuration.
 Supabase dashboard → **Authentication → Sign In / Providers** (or **Settings**) →
 disable **"Allow new users to sign up"**. Now only users you create can get in.
 
-## 2. Invite each member
-Supabase dashboard → **Authentication → Users → Invite user** → enter their email.
-They receive an email to set a password and are added as a user. Do this for:
-- `ombonya@gmail.com` (you)
-- each coalition member's email
+## 2. Add each member (invite-only — only admins do this)
 
-A member can then either use their password, or click **"Email me a sign-in link"** on
-the hub (magic link) — both work once they exist as a user.
+Two things are different and easy to confuse:
+- **Adding a member** = creating their account (an admin action). Below.
+- **Signing in** = how a member gets in once they exist → **magic link OR password** (§ "How the gate behaves").
+
+Magic link is fully available — as the **sign-in** method (the hub's "Email me a sign-in
+link"). It is *not* a way to self-invite: `shouldCreateUser:false` means an email that
+isn't already a member is turned away. So an admin adds people first, one of two ways:
+
+**Path A — Invite user (Authentication → Users → Invite user) — use this for passwordless.**
+Enter their email → they get an invite email → they click **Accept** → they land on the hub
+**already signed in**. There is *no* "set a password" step, and that's expected — the hub
+doesn't force one. From then on they sign in with **"Email me a sign-in link"** (magic link).
+This is the right route for people like `ombonya@gmail.com` who don't want a password.
+
+**Path B — Add user (Authentication → Users → Add user) — only if you want to assign a password.**
+The dashboard **requires** a password here (you can't leave it blank), so use Path B only
+when you deliberately want to give someone a starting password. Set one, share it, and they
+can change it later.
+
+**Either way, a member can set/choose a password themselves** once signed in: on the hub,
+footer → **"Set password"** (calls a secure Supabase update). So magic-link-only members can
+add a password later if they want one, and invited members never have to.
+
+Do Path A for `ombonya@gmail.com` and most members; it stays invite-only because public
+sign-ups are off (step 1) and only admins can add users.
 
 ## 3. (Optional) confirm the email templates
 Authentication → **Email Templates** → make sure "Invite user" and "Magic Link"
@@ -74,14 +93,36 @@ Then in **Authentication → Rate limits**, if you'll invite several members at 
 the email cap and drop the "minimum interval between emails". Send yourself a test invite
 and confirm it arrives from admin@ and not in spam.
 
-### 5d. Make the emails read as official
-Authentication → **Email Templates** → edit **Invite user** and **Magic Link**. Suggested:
-- **Invite subject:** `You're invited to the MazingiraKenya coalition hub`
-- **Invite body:** "Hello, you've been invited to the MazingiraKenya coordination hub — the
-  coalition's shared dashboard for extractive-pressure and civil-society response across
-  Kenya. Click below to accept and sign in. If you weren't expecting this, you can ignore
-  it. — deCOALonize / MazingiraKenya"
-- **Button link — use the variable exactly:** `<p><a href="{{ .ConfirmationURL }}">Accept invitation</a></p>`
+### 5d. Email templates (ready to paste)
+Authentication → **Email Templates**. Edit each template's Subject and Body (Source view).
+
+**Invite user**
+- Subject:
+  `You're invited to the MazingiraKenya coalition hub`
+- Body:
+  ```html
+  <p>Hello,</p>
+  <p>You've been invited to the <strong>MazingiraKenya</strong> coordination hub — the coalition's shared dashboard for extractive-pressure and civil-society response across Kenya.</p>
+  <p><a href="{{ .ConfirmationURL }}">Accept invitation</a></p>
+  <p>If you weren't expecting this, you can ignore this email.</p>
+  <p>— deCOALonize / MazingiraKenya</p>
+  ```
+
+**Magic Link**
+- Subject:
+  `Your MazingiraKenya hub sign-in link`
+- Body:
+  ```html
+  <p>Hello,</p>
+  <p>Here's your one-time sign-in link for the <strong>MazingiraKenya</strong> coalition hub. It signs you straight in, no password needed.</p>
+  <p><a href="{{ .ConfirmationURL }}">Sign in to the hub</a></p>
+  <p>This link works once and expires shortly. If you didn't request it, you can safely ignore this email.</p>
+  <p>— deCOALonize / MazingiraKenya</p>
+  ```
+
+> Use `{{ .ConfirmationURL }}` exactly — Supabase substitutes the real working link. Never
+> hardcode a URL there (that causes "refused to connect"). `{{ .Token }}` is only the raw
+> OTP code, for hand-built links — not needed here.
 
 > ⚠️ **The link MUST be `{{ .ConfirmationURL }}`** — Supabase substitutes the real working
 > link. Do NOT hardcode `{{ hub.mazingirakenya.org }}` or any URL there; that produces a
