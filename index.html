@@ -594,10 +594,10 @@ section.band{ padding:36px 0; border-bottom:1px solid var(--line); scroll-margin
 .card p{ margin:10px 0 0; font-size:.82rem; color:var(--muted); }
 .member{ display:flex; gap:11px; align-items:flex-start; }
 /* directory cards are buttons: reset button chrome, add a clickable affordance */
-button.orgcard{ display:block; width:100%; text-align:left; font:inherit; color:inherit;
-  border:0; cursor:pointer; transition:background .15s ease; }
-button.orgcard:hover{ background:var(--panel-2); }
-button.orgcard:focus-visible{ outline:2px solid var(--green); outline-offset:-2px; }
+.orgcard{ display:block; width:100%; text-align:left; font:inherit; color:inherit;
+  border:0; cursor:pointer; text-decoration:none; transition:background .15s ease; }
+.orgcard:hover{ background:var(--panel-2); text-decoration:none; }
+.orgcard:focus-visible{ outline:2px solid var(--green); outline-offset:-2px; }
 .orgcard-go{ display:inline-block; margin-top:11px; font-size:.66rem; font-weight:800;
   letter-spacing:.05em; text-transform:uppercase; color:var(--green); }
 .avatar{ flex:none; width:38px; height:38px; background:var(--panel-3); color:var(--green); display:grid; place-items:center; font-family:Lora,serif; font-weight:700; font-size:.82rem; }
@@ -1010,6 +1010,9 @@ a.lane:focus-visible{ outline:2px solid var(--green); outline-offset:-2px; }
 .brief-head{ display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap; }
 .brief-sub{ font-size:.82rem; color:var(--muted); margin:12px 0 0; line-height:1.55; }
 .brief-sub b{ color:var(--text); }
+.brief-cad-tag{ display:inline-flex; align-items:center; font-size:.6rem; font-weight:800; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--green); background:rgba(98,199,155,.12); border:1px solid rgba(98,199,155,.3);
+  padding:6px 11px; border-radius:100px; white-space:nowrap; }
 #briefStamp{ color:var(--muted-dim); font-size:.72rem; }
 .brief-body{ margin:16px 0 0; border-top:1px solid var(--line); padding-top:16px; }
 .brief-body h5{ font-family:"Nunito Sans",sans-serif; font-size:.64rem; font-weight:800; letter-spacing:.14em;
@@ -1714,19 +1717,19 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 
     <div class="sec-head" style="margin:6px 0 12px"><div class="grow"><p class="kicker">Latest scanned items</p></div></div>
     <div class="sent-feed">
+      <a class="sf-item" href="https://www.the-star.co.ke/counties/nyanza/2026-08-07-dont-impose-nuclear-plant-on-siaya-people-lobby-tells-state" target="_blank" rel="noopener noreferrer"><span class="sf-src">The Star</span><span class="sf-h">Don't impose nuclear plant on Siaya people, lobby tells state</span><span class="sf-tag pos">Supportive</span></a>
       <a class="sf-item" href="https://news.mongabay.com/short-article/2026/08/kenyans-protesting-nuclear-facility-face-terrorism-investigation/" target="_blank" rel="noopener noreferrer"><span class="sf-src">Mongabay</span><span class="sf-h">Kenyans protesting the Siaya nuclear facility face a terrorism investigation</span><span class="sf-tag pos">Supportive</span></a>
-      <a class="sf-item" href="https://www.washingtonpost.com/world/2026/08/04/carbon-credits-caps-kenya-paris-agreement/052c9c60-902b-11f1-9fdc-0a725c989a7b_story.html" target="_blank" rel="noopener noreferrer"><span class="sf-src">Washington Post</span><span class="sf-h">Kenya unveils carbon-market rule book and caps overseas sale of credits</span><span class="sf-tag pos">Supportive</span></a>
-      <a class="sf-item" href="https://news.mongabay.com/2026/08/environmental-activists-in-kenya-concerned-over-billionaires-planned-oil-refinery/" target="_blank" rel="noopener noreferrer"><span class="sf-src">Mongabay</span><span class="sf-h">Activists sound alarm over Dangote's planned Lamu oil refinery</span><span class="sf-tag pos">Supportive</span></a>
-      <a class="sf-item" href="https://africasustainabilitymatters.com/greenpeace-calls-for-suspension-of-dangotes-planned-lamu-refinery-as-environmental-review-debate-intensifies-in-kenya/" target="_blank" rel="noopener noreferrer"><span class="sf-src">Africa Sustainability</span><span class="sf-h">Greenpeace calls for suspension of Dangote's planned Lamu refinery</span><span class="sf-tag pos">Supportive</span></a>
-      <a class="sf-item" href="https://citizen.digital/article/public-participation-exercise-begins-for-ksh500b-siaya-nuclear-power-plant-n386871" target="_blank" rel="noopener noreferrer"><span class="sf-src">Citizen Digital</span><span class="sf-h">Public participation exercise begins for Ksh.500B Siaya nuclear plant</span><span class="sf-tag neu">Neutral</span></a>
+      <a class="sf-item" href="https://www.ans.org/news/article-8077/kenyan-nuclear-authority-addresses-power-plant-protests/" target="_blank" rel="noopener noreferrer"><span class="sf-src">Nuclear Newswire</span><span class="sf-h">Kenyan nuclear authority addresses Siaya power-plant protests</span><span class="sf-tag neg">Critical</span></a>
+      <a class="sf-item" href="https://kahawatungu.com/17-suspects-arrested-for-disrupting-public-participation-on-siaya-nuclear-plant-freed-on-bond/" target="_blank" rel="noopener noreferrer"><span class="sf-src">Kahawatungu</span><span class="sf-h">17 suspects arrested over Siaya nuclear public participation freed on bond</span><span class="sf-tag neu">Neutral</span></a>
       <a class="sf-item" href="https://www.kenyans.co.ke/news/125946-senate-issues-seven-day-ultimatum-over-illegal-gold-mining-river-yala" target="_blank" rel="noopener noreferrer"><span class="sf-src">Kenyans.co.ke</span><span class="sf-h">Senate issues 7-day ultimatum over illegal gold dredging in River Yala</span><span class="sf-tag pos">Supportive</span></a>
+      <a class="sf-item" href="https://www.washingtonpost.com/world/2026/08/04/carbon-credits-caps-kenya-paris-agreement/052c9c60-902b-11f1-9fdc-0a725c989a7b_story.html" target="_blank" rel="noopener noreferrer"><span class="sf-src">Washington Post</span><span class="sf-h">Kenya unveils carbon-market rule book and caps overseas sale of credits</span><span class="sf-tag pos">Supportive</span></a>
+      <a class="sf-item" href="https://www.semafor.com/article/07/31/2026/greenpeace-threatens-legal-action-over-dangote-lamu-project-plan" target="_blank" rel="noopener noreferrer"><span class="sf-src">Semafor</span><span class="sf-h">Greenpeace threatens legal action over Dangote's Lamu refinery</span><span class="sf-tag pos">Supportive</span></a>
+      <a class="sf-item" href="https://news.mongabay.com/2026/08/environmental-activists-in-kenya-concerned-over-billionaires-planned-oil-refinery/" target="_blank" rel="noopener noreferrer"><span class="sf-src">Mongabay</span><span class="sf-h">Activists sound alarm over Dangote's planned Lamu oil refinery</span><span class="sf-tag pos">Supportive</span></a>
       <a class="sf-item" href="https://ntvkenya.co.ke/newsfeatures/modern-day-robbery-ntv-exposes-illegal-gold-mining-in-river-yala-by-chinese-nationals/" target="_blank" rel="noopener noreferrer"><span class="sf-src">NTV Kenya</span><span class="sf-h">Modern-day robbery: NTV exposes illegal River Yala gold mining</span><span class="sf-tag pos">Supportive</span></a>
-      <a class="sf-item" href="https://www.ghanamma.com/2026/07/09/kenya-advances-first-nuclear-plant-as-siaya-leaders-back-bondo-project-dawan-africa/" target="_blank" rel="noopener noreferrer"><span class="sf-src">Dawan Africa</span><span class="sf-h">Kenya advances first nuclear plant as Siaya leaders back Bondo project</span><span class="sf-tag neg">Critical</span></a>
-      <a class="sf-item" href="https://www.ans.org/news/article-7918/kenya-rwanda-eye-nuclear-reactors/" target="_blank" rel="noopener noreferrer"><span class="sf-src">Nuclear Newswire</span><span class="sf-h">Kenya and Rwanda eye new nuclear reactors</span><span class="sf-tag neg">Critical</span></a>
       <a class="sf-item" href="https://www.ipsnews.net/2026/04/artisanal-miners-in-western-kenya-move-away-from-mercury/" target="_blank" rel="noopener noreferrer"><span class="sf-src">IPS News</span><span class="sf-h">Western Kenya's artisanal gold miners move away from toxic mercury</span><span class="sf-tag neu">Research</span></a>
     </div>
 
-    <p class="sc-meta" style="margin-top:12px">The items above are real, drawn from public Kenyan and international coverage (August 2026) — click any to read the source. At scale this runs automatically via RSS &amp; APIs from a curated source list, de-duplicated and stance-scored (supportive · neutral · critical) with human review; the aggregate index and counts are indicative until the automated scanner is connected.</p>
+    <p class="sc-meta" style="margin-top:12px">The items above are real, drawn from public Kenyan and international coverage (10 August 2026) — click any to read the source. At scale this runs automatically via RSS &amp; APIs from a curated source list, de-duplicated and stance-scored (supportive · neutral · critical) with human review; the aggregate index and counts are indicative until the automated scanner is connected.</p>
 
     <div class="sec-head" style="margin:18px 0 12px"><div class="grow"><p class="kicker">Community pulse · live from X</p></div></div>
     <div class="pulse-feed" id="communityPulse">
@@ -2026,11 +2029,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
           <p class="kicker g">Standing intelligence brief</p>
           <h3 class="trackh">MazingiraKenya Intelligence Brief</h3>
         </div>
-        <div class="seg" id="briefCadence" role="group" aria-label="Brief cadence">
-          <button type="button" data-cad="weekly" aria-pressed="false">Weekly</button>
-          <button type="button" data-cad="fortnightly" aria-pressed="true">Bi-monthly</button>
-          <button type="button" data-cad="monthly" aria-pressed="false">Monthly</button>
-        </div>
+        <span class="brief-cad-tag" id="briefCadence">Refreshed every 2 weeks</span>
       </div>
       <p class="brief-sub">Composed live from the streams on <b>Live</b>, the county gaps on the
         <b>National Map</b>, the coverage grid on <b>Sector Gaps</b>, and the public mood on <b>Sentiment</b>.
@@ -3529,7 +3528,16 @@ var PROJECTS = [
  { lane:"build", title:"Lake Victoria Basin Response Hub", status:"idea",
    pitch:"A shared hub for the lake basin covering industrial effluent, gold-mining runoff, the nuclear proposal and plastic pollution — one node for four overlapping pressures across Nyanza.",
    gap:"Nyanza water & plastics & nuclear: stacked pressure, coverage split across single-issue groups.",
-   county:"Kisumu · Siaya · Homa Bay · Migori", sector:"Water · Plastics", budget:"KES 6.5M / 24 mo", funder:"Pooled donor facility" }
+   county:"Kisumu · Siaya · Homa Bay · Migori", sector:"Water · Plastics", budget:"KES 6.5M / 24 mo", funder:"Pooled donor facility" },
+
+ { lane:"challenge", title:"River Yala Gold-Cyanide Enforcement Petition", status:"idea",
+   pitch:"Back a public-interest petition to compel enforcement against the cyanide and mercury discharge from illegal gold processing poisoning the River Yala and its wetland — built on NEMA's own effluent rules and the clean-environment right in Articles 42 and 69. Legal partner: Katiba Institute.",
+   gap:"Nyanza/Rift gold: rivers being poisoned with no enforcement case yet filed.",
+   county:"Siaya · Vihiga · Nandi", sector:"Minerals · Water", budget:"KES 3.8M / 12 mo", funder:"Strategic litigation fund" },
+ { lane:"build", title:"Western Gold-Belt Mercury Watch", status:"idea",
+   pitch:"Stand up a shared community-monitoring node across the Western gold belt — Kakamega, Migori and Vihiga — testing water and soil for mercury and cyanide, training citizen samplers, and feeding verified readings into the platform's water and minerals layers so the harm is documented as it happens.",
+   gap:"Western gold belt: severe mercury and water pressure, monitoring scattered and un-pooled.",
+   county:"Kakamega · Migori · Vihiga", sector:"Minerals · Water", budget:"KES 7.5M / 24 mo", funder:"Pooled donor facility" }
 ];
 
 /* ---- stats + lanes ---- */
@@ -3581,7 +3589,7 @@ var PROJECTS = [
 var briefCadence = "fortnightly";
 var CAD_META = {
   weekly:      { label:"Weekly", window:"week", every:"every Monday" },
-  fortnightly: { label:"Bi-monthly", window:"fortnight", every:"every second Monday" },
+  fortnightly: { label:"Every 2 weeks", window:"fortnight", every:"every second Monday" },
   monthly:     { label:"Monthly", window:"month", every:"on the 1st" }
 };
 function money(){ return ""; }
@@ -3611,6 +3619,17 @@ function buildBrief(cad){
     "With "+copDays+" days to COP31, "+noResp+" counties are under active extractive pressure with no organised response. "+
     "Widest single gap: "+(countyGaps[0]?countyGaps[0].n:"—")+". "+mega.length+" proposed/stalled mega-projects on the watch list."]);
 
+  var topGap = countyGaps[0], topMega = mega[0];
+  S.push(["Priority this fortnight",
+    "<p>The single highest-leverage move right now: <b>place or fund one documentation partner in "+
+      (topGap?topGap.n:"the widest gap county")+"</b> (community pressure "+(topGap?Math.round(topGap.comm.p*100):"—")+
+      "%, response "+(topGap?topGap.r:"—")+"/5), and get a Kenya-specific evidence brief onto <b>"+
+      (topMega?topMega[0].replace(/&amp;/g,"&"):"the lead watch-list project")+"</b> before its next licensing or public-participation step. "+
+      "Both are ready to fund now and each closes a gap the map can point a donor straight to.</p>",
+    "Priority: fund one documentation partner in "+(topGap?topGap.n:"the widest gap county")+
+      "; get an evidence brief onto "+(topMega?topMega[0].replace(/&amp;/g,"&"):"the lead watch-list project")+
+      " before its next licensing step."]);
+
   S.push(["Where the response gaps are",
     "<ul>"+countyGaps.map(function(c){ return "<li><b>"+c.n+"</b> — community pressure "+Math.round(c.comm.p*100)+
       "%, response "+c.r+"/5. "+(c.note||"")+"</li>"; }).join("")+"</ul>",
@@ -3632,11 +3651,18 @@ function buildBrief(cad){
       "% vs radar "+Math.round(c.rad.p*100)+"%</li>"; }).join("")+"</ul>",
     diverge.map(function(c){ return "- "+c.n+": community "+Math.round(c.comm.p*100)+"% vs radar "+Math.round(c.rad.p*100)+"%"; }).join("\n")]);
 
-  S.push(["Recommended actions",
+  var opps = (DESK && DESK["Opportunities"]) || [];
+  if(opps.length) S.push(["Funding windows closing soon",
+    "<ul>"+opps.map(function(o){ return "<li><b>"+o.t+"</b> — "+o.m+"</li>"; }).join("")+"</ul>",
+    opps.map(function(o){ return "- "+o.t+": "+o.m; }).join("\n")]);
+
+  S.push(["Recommended actions this fortnight",
     "<ul>"+["document","challenge","build"].map(function(k){ var p=PROJECTS.filter(function(x){return x.lane===k;})[0];
-      return "<li><b>"+LANES[k].n+":</b> "+p.title+" — "+p.county+", "+p.budget+" ("+p.funder+")</li>"; }).join("")+"</ul>",
+      var first=p.pitch.split(". ")[0];
+      return "<li><b>"+LANES[k].n+" — "+p.title+".</b> "+first+". <i>Ask:</i> "+p.budget+" from "+p.funder+
+        " for "+p.county+". <i>Closes:</i> "+p.gap+"</li>"; }).join("")+"</ul>",
     ["document","challenge","build"].map(function(k){ var p=PROJECTS.filter(function(x){return x.lane===k;})[0];
-      return "- "+LANES[k].n+": "+p.title+" ("+p.county+", "+p.budget+")"; }).join("\n")]);
+      return "- "+LANES[k].n+" — "+p.title+": "+p.budget+" from "+p.funder+" for "+p.county+" (closes: "+p.gap+")"; }).join("\n")]);
 
   var dateStr = now.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
   var html = S.map(function(s){ return "<h5>"+s[0]+"</h5>"+s[1]; }).join("");
@@ -3645,7 +3671,7 @@ function buildBrief(cad){
     "\n\n---\nComposed from live MazingiraKenya platform data. Figures are illustrative pending coalition confirmation.\n";
   return { html:html, md:md, date:dateStr, label:meta.label };
 }
-var briefClipped = true;
+var briefClipped = false;
 function renderBrief(){
   var b = buildBrief(briefCadence);
   var body = document.getElementById("briefBody");
@@ -3820,19 +3846,55 @@ CATS.forEach(function(c){
   });
   fWrap.appendChild(b);
 });
+/* official websites for the established organisations — clicking the card opens the
+   site in a new tab; local groups without a public site keep the footprint view */
+var ORG_WEB = {
+  "deCOALonize":"https://decoalonize.net",
+  "Save Lamu":"https://www.savelamu.org",
+  "Katiba Institute":"https://katibainstitute.org",
+  "Friends of Lake Turkana":"https://friendsoflaketurkana.org",
+  "Green Belt Movement":"https://www.greenbeltmovement.org",
+  "Greenpeace Africa":"https://www.greenpeace.org/africa/",
+  "Fossil Fuel Non-Proliferation Treaty Initiative":"https://fossilfueltreaty.org",
+  "350 Africa":"https://350africa.org",
+  "Natural Justice":"https://naturaljustice.org",
+  "AJWS — American Jewish World Service":"https://ajws.org",
+  "NAMATI":"https://namati.org",
+  "GROOTS Kenya":"https://grootskenya.org",
+  "Defenders Coalition":"https://defenderscoalition.org",
+  "HIVOS":"https://hivos.org",
+  "FEMNET — African Women's Dev. & Communication Network":"https://femnet.org",
+  "UAF-Africa — Urgent Action Fund–Africa":"https://www.uaf-africa.org",
+  "PACJA — Pan African Climate Justice Alliance":"https://pacja.org",
+  "KHRC — Kenya Human Rights Commission":"https://www.khrc.or.ke",
+  "Heinrich Böll Stiftung":"https://ke.boell.org",
+  "Northern Rangelands Trust (NRT)":"https://www.nrt-kenya.org",
+  "StopEACOP (Kenya hub)":"https://stopeacop.net",
+  "EACOP — East African Crude Oil Pipeline":"https://eacop.com"
+};
 function renderMembers(cat){
   mList.innerHTML="";
   MEMBERS.filter(function(m){ return cat==="All"||m.c===cat; }).forEach(function(m){
-    var c = el("button","card orgcard"); c.type="button";
-    c.setAttribute("aria-label","View "+m.n+" — footprint and funding chain");
-    c.innerHTML = '<div class="member"><div class="avatar'+(m.e?" e":"")+'" aria-hidden="true">'+initials(m.n)+'</div>'+
+    var web = ORG_WEB[m.n], c, go;
+    var body = '<div class="member"><div class="avatar'+(m.e?" e":"")+'" aria-hidden="true">'+initials(m.n)+'</div>'+
       '<div style="flex:1; min-width:0"><h3>'+m.n+'</h3><span class="meta">'+m.c+' · '+m.loc+'</span></div></div>'+
-      '<p>'+m.d+'</p><span class="orgcard-go">View footprint &amp; funding →</span>';
-    c.addEventListener("click", function(){
-      showNetOrg(m.n);
-      var mp = document.getElementById("netMap");
-      if(mp) setTimeout(function(){ try{ mp.scrollIntoView({ behavior: reduce?"auto":"smooth", block:"start" }); }catch(_){} }, 30);
-    });
+      '<p>'+m.d+'</p>';
+    if(web){
+      c = el("a","card orgcard"); c.href = web; c.target = "_blank"; c.rel = "noopener noreferrer";
+      c.setAttribute("aria-label","Open the "+m.n+" website (new tab)");
+      go = '<span class="orgcard-go">Visit website ↗</span>';
+      c.innerHTML = body + go;
+    } else {
+      c = el("button","card orgcard"); c.type="button";
+      c.setAttribute("aria-label","View "+m.n+" — footprint and funding chain");
+      go = '<span class="orgcard-go">View footprint &amp; funding →</span>';
+      c.innerHTML = body + go;
+      c.addEventListener("click", function(){
+        showNetOrg(m.n);
+        var mp = document.getElementById("netMap");
+        if(mp) setTimeout(function(){ try{ mp.scrollIntoView({ behavior: reduce?"auto":"smooth", block:"start" }); }catch(_){} }, 30);
+      });
+    }
     mList.appendChild(c);
   });
 }
