@@ -79,10 +79,27 @@ Authentication → **Email Templates** → edit **Invite user** and **Magic Link
 - **Invite subject:** `You're invited to the MazingiraKenya coalition hub`
 - **Invite body:** "Hello, you've been invited to the MazingiraKenya coordination hub — the
   coalition's shared dashboard for extractive-pressure and civil-society response across
-  Kenya. Click below to set your password and sign in. If you weren't expecting this, you
-  can ignore it. — deCOALonize / MazingiraKenya" + the `{{ .ConfirmationURL }}` button.
-- **Magic-link subject:** `Your MazingiraKenya hub sign-in link`
-- Keep `{{ .ConfirmationURL }}` / `{{ .Token }}` variables intact.
+  Kenya. Click below to accept and sign in. If you weren't expecting this, you can ignore
+  it. — deCOALonize / MazingiraKenya"
+- **Button link — use the variable exactly:** `<p><a href="{{ .ConfirmationURL }}">Accept invitation</a></p>`
+
+> ⚠️ **The link MUST be `{{ .ConfirmationURL }}`** — Supabase substitutes the real working
+> link. Do NOT hardcode `{{ hub.mazingirakenya.org }}` or any URL there; that produces a
+> dead link ("refused to connect"). `{{ .ConfirmationURL }}` = the full invite/confirm link
+> (Supabase builds it and redirects to your Site URL). `{{ .Token }}` = the raw 6-digit OTP
+> code, only for hand-built links — you don't need it here.
+
+### 5e. Point the redirect at the hub (required, or the link fails)
+Authentication → **URL Configuration**:
+- **Site URL:** `https://hub.mazingirakenya.org`
+- **Redirect URLs (allow-list):** add `https://hub.mazingirakenya.org/**`
+Without this, `{{ .ConfirmationURL }}` redirects to `localhost:3000` and looks broken.
+
+### 5f. Admins with no password — cross over from the console
+An admin who signed into **admin.mazingirakenya.org** by magic link can click
+**"Members' hub ↗"** in the admin top bar — it opens the hub carrying that session, so you
+land straight in without a password. (Admins can also just use "Email me a sign-in link" on
+the hub.)
 
 ## Security note (honest)
 This is a solid **application-level** gate: the page won't function and the sign-in is

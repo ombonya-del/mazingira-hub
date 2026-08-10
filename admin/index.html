@@ -235,6 +235,7 @@ button{font-family:inherit;cursor:pointer}
     <div class="who">
       <div style="text-align:right"><div class="nm">A. Mwangi</div><div class="rl">Coalition admin</div></div>
       <div class="avatar">AM</div>
+      <button class="signout" id="toHub" title="Open the members' hub carrying your sign-in">Members' hub ↗</button>
       <button class="signout" id="signout">Sign out</button>
     </div>
   </header>
@@ -825,6 +826,26 @@ document.getElementById("signout").addEventListener("click",function(){
   document.getElementById("shell").classList.remove("on");
   document.getElementById("gate").classList.remove("hidden");
   document.getElementById("gcode").value="";
+});
+/* Cross over to the members' hub carrying the admin's Supabase session, so an admin
+   (e.g. one who signed in by magic link and never set a password) lands straight in. */
+document.getElementById("toHub").addEventListener("click",function(){
+  var base="https://hub.mazingirakenya.org/", btn=this;
+  if(!ASB || !ASB.auth){ window.open(base,"_blank","noopener"); return; }
+  btn.disabled=true;
+  ASB.auth.getSession().then(function(r){
+    btn.disabled=false;
+    var s=r && r.data && r.data.session;
+    if(s && s.access_token && s.refresh_token){
+      var u=base+"#access_token="+encodeURIComponent(s.access_token)+
+        "&refresh_token="+encodeURIComponent(s.refresh_token)+
+        "&expires_in="+(s.expires_in||3600)+"&token_type=bearer&type=magiclink";
+      window.open(u,"_blank","noopener");
+    } else {
+      toast("Sign in first (Manual upload → email a magic link), then cross over.");
+      window.open(base,"_blank","noopener");
+    }
+  }, function(){ btn.disabled=false; window.open(base,"_blank","noopener"); });
 });
 try{ if(sessionStorage.getItem("mzk_auth")==="1") showConsole(); }catch(e){}
 
