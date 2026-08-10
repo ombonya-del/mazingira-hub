@@ -92,7 +92,16 @@ header.top{
   border-bottom:1px solid var(--green); padding-top:env(safe-area-inset-top);
 }
 .top-inner{ height:var(--nav-h); display:flex; align-items:center; gap:14px; }
-.brand{ display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:1px; margin-right:auto; min-width:0; }
+.brand{ display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:1px; min-width:0; }
+/* convening line lives in the header on desktop; on mobile it sits in the KPI box on Live */
+.convene{ display:none; }
+.convene-mob{ font-size:.72rem; color:var(--muted); line-height:1.45; }
+@media (min-width:860px){
+  .convene{ display:block; flex:1 1 auto; min-width:0; margin:0 4px; text-align:right;
+    font-size:.62rem; line-height:1.32; color:var(--muted); max-width:58ch; margin-left:auto; }
+  .convene-cell{ display:none; }
+}
+@media (max-width:859px){ .brand{ margin-right:auto; } }
 .brand-mark{
   font-family:Lora, serif; font-size:1.14rem; font-weight:700; color:var(--text);
   letter-spacing:-.02em; white-space:nowrap;
@@ -184,7 +193,7 @@ nav.subtabs[hidden]{ display:none; }
 .subtabs-inner{ display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
 .subtabs-inner::-webkit-scrollbar{ display:none; }
 nav.subtabs a{
-  flex:none; color:var(--muted); font-size:.68rem; font-weight:800; letter-spacing:.06em;
+  flex:1 1 0; text-align:center; color:var(--muted); font-size:.68rem; font-weight:800; letter-spacing:.06em;
   text-transform:uppercase; padding:10px 12px 8px; border-bottom:2px solid transparent; white-space:nowrap;
 }
 nav.subtabs a:hover{ color:var(--text); text-decoration:none; }
@@ -397,6 +406,13 @@ main > [data-view].view-on.sub-off{ display:none; }
 /* compact, less-prominent header actions */
 .top-inner .btn{ padding:7px 11px; font-size:.64rem; }
 @media (max-width:560px){ .top-inner .btn{ padding:6px 9px; font-size:.6rem; letter-spacing:.06em; } }
+/* raia + Submit: in the header on mobile, in the nav bar on desktop */
+.nav-actions{ display:none; }
+@media (min-width:860px){
+  .tm-only{ display:none; }
+  .nav-actions{ display:flex; align-items:center; gap:8px; margin-left:auto; padding-left:12px; }
+  .nav-actions .btn{ padding:7px 12px; font-size:.64rem; }
+}
 .btn--ghost{ background:transparent; color:var(--text); border-color:var(--line-2); }
 .btn--ghost:hover{ border-color:var(--muted); text-decoration:none; }
 .btn--green{ background:var(--green); color:#062018; }
@@ -472,15 +488,23 @@ section.band{ padding:36px 0; border-bottom:1px solid var(--line); scroll-margin
 
 /* ============================ LIVE STREAMS ============================ */
 .streams{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line); }
-.stream{ background:var(--panel); padding:15px 15px 12px; display:flex; flex-direction:column; min-height:196px; }
-.stream-head{ display:flex; align-items:center; gap:8px; margin-bottom:12px; }
-.stream-head .nm{ font-size:.63rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); flex:1; min-width:0; }
-.stream-num{ display:flex; align-items:baseline; gap:8px; margin-bottom:4px; }
-.stream-num .n{ font-family:Lora,serif; font-size:1.75rem; font-weight:700; line-height:1; font-variant-numeric:tabular-nums; }
-.stream-num .n.e{ color:var(--ember); } .stream-num .n.g{ color:var(--green); }
-.stream-num.flash .n{ animation:flash .9s ease-out; }
-@keyframes flash{ 0%{ color:#fff; text-shadow:0 0 16px rgba(242,118,47,.8); } 100%{ } }
-.spark{ width:100%; height:26px; margin:8px 0 10px; display:block; }
+/* Live streams — an intelligence feed, not a trading board: soft issue icon,
+   one calm figure, a plain-language source line, and the incoming items as the focus */
+.stream{ background:var(--panel); padding:16px 15px 12px; display:flex; flex-direction:column; min-height:196px; }
+.stream-head{ display:flex; align-items:center; gap:9px; margin-bottom:12px; }
+.s-ico{ flex:none; width:30px; height:30px; border-radius:9px; display:grid; place-items:center; background:rgba(98,199,155,.12); }
+.s-ico.e{ background:rgba(238,148,85,.14); }
+.s-ico svg{ width:17px; height:17px; fill:none; stroke:var(--green); stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.s-ico.e svg{ stroke:var(--ember); }
+.stream-head .nm{ font-size:.82rem; font-weight:700; letter-spacing:.01em; color:var(--text); flex:1; min-width:0; line-height:1.25; }
+.stream-metric{ display:flex; align-items:baseline; gap:7px; margin-bottom:6px; flex-wrap:wrap; }
+.stream-metric .n{ font-family:Lora,serif; font-size:1.7rem; font-weight:700; line-height:1; color:var(--green); }
+.stream-metric .n.e{ color:var(--ember); }
+.s-unit{ font-size:.66rem; color:var(--muted-dim); font-weight:600; letter-spacing:.02em; }
+.s-src{ display:flex; align-items:center; gap:6px; font-size:.62rem; font-weight:700; letter-spacing:.03em; color:var(--muted-dim); margin-bottom:8px; }
+.s-src .s-dot{ width:6px; height:6px; border-radius:50%; background:var(--green); flex:none; }
+.s-src.radar .s-dot{ background:var(--ember); }
+.s-src.desk .s-dot{ background:var(--muted); }
 .feed{ list-style:none; margin:0; padding:10px 0 0; border-top:1px solid var(--line); flex:1; }
 .feed li{ font-size:.76rem; color:var(--muted); padding:5px 0; display:flex; gap:8px; align-items:flex-start; line-height:1.4; }
 .feed li.new{ animation:slidein .5s ease-out; }
@@ -586,6 +610,10 @@ button.orgcard:focus-visible{ outline:2px solid var(--green); outline-offset:-2p
 .tab{ font-family:inherit; font-size:.68rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; padding:11px 13px; background:none; border:0; border-bottom:2px solid transparent; color:var(--muted-dim); cursor:pointer; white-space:nowrap; }
 .tab:hover{ color:var(--text); }
 .tab[aria-selected="true"]{ color:var(--text); border-bottom-color:var(--ember-hot); }
+/* Exchange category tabs: 3 evenly-spaced, full-width tabs (fit the phone without scroll) */
+.deskTabs{ overflow-x:visible; }
+.deskTabs .tab{ flex:1 1 0; text-align:center; }
+@media (max-width:560px){ .deskTabs .tab{ padding:11px 4px; font-size:.6rem; letter-spacing:.03em; } }
 .res-row{ display:flex; align-items:flex-start; gap:12px; padding:13px 2px; border-bottom:1px solid var(--line); }
 .res-icon{ flex:none; width:30px; height:30px; background:var(--ember-wash); color:var(--ember); display:grid; place-items:center; font-size:.55rem; font-weight:800; }
 .res-icon.g{ background:var(--green-wash); color:var(--green); }
@@ -1224,9 +1252,10 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
       <span class="brand-mark">Mazingira<span class="k">Kenya</span></span>
       <span class="brand-sub">Comms Hub</span>
     </div>
+    <p class="convene">Convened by deCOALonize — a coalition opposing coal development and advancing a just energy transition across Kenya and the region.</p>
     <span class="sysstat"><span class="dot" aria-hidden="true"></span><span id="sync">Synced</span></span>
-    <a class="btn btn--public" href="https://raia.mazingirakenya.org" target="mzk_raia" rel="noopener" title="Open raia — the public platform">raia ↗</a>
-    <a class="btn btn--ember" href="#contribute">Submit</a>
+    <a class="btn btn--public tm-only" href="https://raia.mazingirakenya.org" target="mzk_raia" rel="noopener" title="Open raia — the public platform">raia ↗</a>
+    <a class="btn btn--ember tm-only" href="#contribute">Submit</a>
   </div>
 </header>
 
@@ -1243,6 +1272,10 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <a href="#cop"       data-view="cop">COP31</a>
     <a href="#voices"    data-view="voices">Voices</a>
     <a href="#ajesasa"   data-view="act">Je, Hatua?</a>
+    <span class="nav-actions">
+      <a class="btn btn--public" href="https://raia.mazingirakenya.org" target="mzk_raia" rel="noopener" title="Open raia — the public platform">raia ↗</a>
+      <a class="btn btn--ember" href="#contribute">Submit</a>
+    </span>
   </div>
 </nav>
 
@@ -1333,7 +1366,9 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
           </svg>
           <span class="gauge-txt"><span class="n mono" id="gapIdx">0</span><span class="s" id="gapLabel">calculating</span></span>
         </div>
-        <span class="sub">Convened by deCOALonize — a coalition opposing coal development and advancing a just energy transition across Kenya and the region.</span>
+      </div>
+      <div class="kpi convene-cell">
+        <span class="convene-mob">Convened by deCOALonize — a coalition opposing coal development and advancing a just energy transition across Kenya and the region.</span>
       </div>
     </div>
     <p class="datastatus"><b>Data status:</b> legal matters, the organisation network, mapped projects and
@@ -1862,8 +1897,9 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         <p class="kicker">Knowledge, tools, and openings</p>
         <h2>Resource &amp; opportunity desk</h2>
       </div>
+      <a class="btn btn--green" href="https://admin.mazingirakenya.org" target="mzk_admin" rel="noopener" title="Upload a resource for coalition review">+ Upload a resource</a>
     </div>
-    <div class="tabs" role="tablist" aria-label="Resource categories" id="deskTabs"></div>
+    <div class="tabs deskTabs" role="tablist" aria-label="Resource categories" id="deskTabs"></div>
     <div id="deskPanel" role="tabpanel"></div>
   </div>
 </section>
@@ -2478,7 +2514,7 @@ var LEGAL = [
  {t:"Lake Turkana Wind Power — community land", county:"Marsabit", meta:"Environment &amp; Land Court, Meru · 2021, review declined 2023", s:"won", sl:"Won", issue:"Renewables / land",
   body:"The court nullified title deeds over ~150,000 acres of community land irregularly allocated to the wind project, and declined the operator's review — the land reverts to the community.",
   why:"Why it matters: the leading Kenyan authority that a 'green' megaproject cannot override indigenous community-land rights."},
- {t:"Mui Basin coal concessions — judicial review", county:"Kitui", meta:"High Court · Filed, hearing pending", s:"active", sl:"Active", issue:"Coal",
+ {t:"Mui Basin coal concessions — judicial review", county:"Kitui", meta:"High Court · Petition 305 of 2012, judgment 18 Sep 2015; concessions still contested", s:"active", sl:"Active", issue:"Coal",
   body:"Judicial review challenging the process by which coal mining concessions in the Mui Basin were granted, with particular reference to community consultation and compensation for affected land holders.",
   why:"Why it matters: the largest remaining coal proposal in Kenya. Community documentation submitted through this Hub forms part of the evidentiary record."},
  {t:"Western Kenya gold evictions — Shanta Gold", county:"Kakamega", meta:"High Court &amp; ELC · KHRC suit, 2026", s:"active", sl:"Active", issue:"Minerals",
@@ -2487,19 +2523,19 @@ var LEGAL = [
  {t:"Community land rights, Kilifi", county:"Kilifi", meta:"Environment &amp; Land Court · Ongoing", s:"watch", sl:"Ongoing", issue:"Land",
   body:"Support to coastal communities contesting land allocations affecting customary use, with documentation and expert evidence contributed by coalition members.",
   why:"Why it matters: land tenure security is the precondition for communities being able to resist extractive projects at all."},
- {t:"Nairobi River effluent — prosecution", county:"Nairobi", meta:"Environment &amp; Land Court · Prosecution opened", s:"active", sl:"Active", issue:"Water",
+ {t:"Nairobi River effluent — prosecution", county:"Nairobi", meta:"NEMA / ELC · prosecutions from 2024", s:"active", sl:"Active", issue:"Water",
   body:"Prosecution over effluent discharge into the Nairobi River, backed by Katiba Institute, testing enforcement of clean-water and public-health obligations in the capital.",
   why:"Why it matters: whether existing pollution law is actually enforced against urban industrial discharge."},
- {t:"Energy (Amendment) Bill 2026 — just transition", county:"Nairobi", meta:"National Assembly · Committee stage", s:"watch", sl:"Bill", issue:"Policy",
+ {t:"Energy (Amendment) Bill 2026 — just transition", county:"Nairobi", meta:"National Assembly · tabled 2026, committee stage", s:"watch", sl:"Bill", issue:"Policy",
   body:"The coalition is advocating for explicit just transition provisions — worker retraining obligations, community benefit-sharing, and a moratorium on new coal generation licensing.",
   why:"Why it matters: signature legislation. Moving the just transition from litigation defence to statutory footing is the central legislative goal."},
- {t:"Climate Change (Carbon Markets) Regulations", county:"Nairobi", meta:"Public participation · Submission filed", s:"watch", sl:"Policy", issue:"Policy",
+ {t:"Climate Change (Carbon Markets) Regulations", county:"Nairobi", meta:"Public participation 2024; gazetted 17 May 2024 (LN 84)", s:"watch", sl:"Policy", issue:"Policy",
   body:"Coalition submission focused on free prior and informed consent for community land, benefit-sharing floors, and safeguards against offset projects displacing pastoralist land use.",
   why:"Why it matters: carbon market rules will govern land access across northern Kenya for a generation."},
- {t:"Marsabit residents v. BP &amp; the State — toxic drilling waste", county:"Marsabit", meta:"Environment &amp; Land Court · Filed", s:"active", sl:"Active", issue:"Minerals / water",
+ {t:"Marsabit residents v. BP &amp; the State — toxic drilling waste", county:"Marsabit", meta:"ELC Isiolo · filed Feb 2026; certified urgent, 16 Apr 2026", s:"active", sl:"Active", issue:"Minerals / water",
   body:"~300 Marsabit residents sued British multinational BP and the Kenyan government, alleging toxic waste from decades of exploratory drilling (Sirius-1, Chalbi-3) contaminated drinking water; they seek independent toxicological assessments.",
   why:"Why it matters: a historic environmental-justice case putting a foreign oil major on the hook for legacy contamination on pastoralist land."},
- {t:"Merti community conservancies shut down — Isiolo", county:"Isiolo", meta:"High Court · Ruling", s:"won", sl:"Won", issue:"Land / minerals",
+ {t:"Merti community conservancies shut down — Isiolo", county:"Isiolo", meta:"ELC Isiolo · Petition E006 of 2021; judgment 24 Jan 2025", s:"won", sl:"Won", issue:"Land / minerals",
   body:"The High Court shut down regional community wildlife conservancies in Merti because officials breached constitutional mandates by failing to register community land before permitting operations on it.",
   why:"Why it matters: a precedent now used to freeze large-scale mining concessions on unregistered community land."},
  {t:"Community land &amp; mining permits — Garissa (ELC No. 1 of 2018)", county:"Garissa", meta:"Environment &amp; Land Court, Garissa · 2018", s:"won", sl:"Won", issue:"Minerals / land",
@@ -2511,25 +2547,25 @@ var LEGAL = [
  {t:"Gypsum-site violence appeal — Daniel Mwangi Chege v Republic", county:"Garissa", meta:"Court of Appeal, Nairobi · October 2025", s:"won", sl:"Overturned", issue:"Minerals",
   body:"The Court of Appeal overturned the death sentence of a Bora Mineral Products operator convicted over a 2014 killing at a Garissa gypsum site, citing weak evidence and how security breakdowns at mining sites compromise investigations.",
   why:"Why it matters: shows how resource conflict at unregulated sites corrupts even criminal-justice outcomes."},
- {t:"Kishushe iron-ore consent &amp; royalties — Taita Taveta", county:"Taita Taveta", meta:"Consent withdrawn; Ministry ultimatums · Ongoing", s:"active", sl:"Active", issue:"Minerals",
+ {t:"Kishushe iron-ore consent &amp; royalties — Taita Taveta", county:"Taita Taveta", meta:"Consent withdrawn 2020; Ministry ultimatums, ongoing", s:"active", sl:"Active", issue:"Minerals",
   body:"Kishushe Ranching Cooperative withdrew its consent from Samruddha Resources over an alleged Sh150m royalty default and FPIC breaches on the 60,000-acre community ranch; rival firms' turf wars have repeatedly halted work.",
   why:"Why it matters: a live test of FPIC, royalty enforcement and community control over a community ranch."},
- {t:"Mkuki Ranch Tsavorite access — Mwatate", county:"Taita Taveta", meta:"Environment &amp; Land Court · Ongoing", s:"active", sl:"Active", issue:"Minerals",
+ {t:"Mkuki Ranch Tsavorite access — Mwatate", county:"Taita Taveta", meta:"ELC Mwatate · court site visit 2024, ongoing", s:"active", sl:"Active", issue:"Minerals",
   body:"A 6,000-acre Chawia Ward Tsavorite site is contested between artisanal community miners and a local firm; judges have visited the ground as vested political interests stalled the gemstone's marketing.",
   why:"Why it matters: whether artisanal community miners can hold access against politically-backed firms."},
- {t:"Alia community v Kenya Wildlife Service — Mwatate", county:"Taita Taveta", meta:"Lawsuit filed · Ongoing", s:"active", sl:"Active", issue:"Land / minerals",
+ {t:"Alia community v Kenya Wildlife Service — Mwatate", county:"Taita Taveta", meta:"ELC Mwatate · Case 106 of 2019, ongoing", s:"active", sl:"Active", issue:"Land / minerals",
   body:"Locals sued to stop a Sh40m KWS electric-fence project over 2,000 acres of mineral-rich land, alleging the fence was a bid to grab community mining fields under the guise of conservation.",
   why:"Why it matters: 'conservation' used as cover for enclosing mineral-rich community land."},
- {t:"Endorois Welfare Council — Arabal land gazettement", county:"Nakuru", meta:"Environment &amp; Land Court, Nakuru · Ruling", s:"won", sl:"Won", issue:"Land / minerals",
+ {t:"Endorois Welfare Council — Arabal land gazettement", county:"Nakuru", meta:"ELC Nakuru · gazettement quashed, 4 Feb 2026", s:"won", sl:"Won", issue:"Land / minerals",
   body:"The Nakuru ELC ruled for the Endorois Welfare Council, quashing a government attempt to gazette ancestral communal land (Arabal) without robust public participation — communities must be consulted and statutory land rights cannot be bypassed.",
   why:"Why it matters: a regional precedent that consent is mandatory before extractive or conservation projects on community land."},
- {t:"Kaptagat Forest access — Keiyo community", county:"Elgeyo-Marakwet", meta:"Iten High Court · Injunction, case active", s:"active", sl:"Active", issue:"Land / forest",
+ {t:"Kaptagat Forest access — Keiyo community", county:"Elgeyo-Marakwet", meta:"ELC Iten · conservatory orders lifted 23 Jul 2026; mention 1 Oct 2026", s:"active", sl:"Active", issue:"Land / forest",
   body:"Keiyo community members obtained a temporary injunction against the Ministry of Environment and KFS over fencing the Kaptagat Forest, which restricted traditional access to livelihoods and cultural shrines; the main case remains active.",
   why:"Why it matters: the region's readiness to litigate land access — the backdrop to the Kimwarer fluorspar standoff."},
- {t:"Family gold-land injunctions &amp; contempt — West Pokot", county:"West Pokot", meta:"High Court · Injunctions, contempt applications", s:"active", sl:"Active", issue:"Minerals / land",
+ {t:"Family gold-land injunctions &amp; contempt — West Pokot", county:"West Pokot", meta:"ELC Eldoret · Case 59 of 2017; injunctions &amp; contempt, ongoing", s:"active", sl:"Active", issue:"Minerals / land",
   body:"Landowners over struck gold reserves won injunctions halting mining, but developers ignored the orders under armed protection, forcing repeated contempt applications; safety laws triggered blanket closures after fatal collapses.",
   why:"Why it matters: exposes weak enforcement — court wins on paper while mining continues on the ground."},
- {t:"Macalder mines shutdown — Migori", county:"Migori", meta:"Environment &amp; Land Court, Migori · Orders", s:"active", sl:"Active", issue:"Minerals",
+ {t:"Macalder mines shutdown — Migori", county:"Migori", meta:"High Court Migori · shutdown ordered 2019", s:"active", sl:"Active", issue:"Minerals",
   body:"The Migori ELC ordered shutdowns of major sites including Macalder after miners died in collapsed shafts and severe environmental degradation, compelling operators to halt and restore land; residents also clash with H-Nuo over secret tunnelling.",
   why:"Why it matters: safety and environmental law used to halt operations and force land restoration."},
  {t:"Community land acquisition halts &amp; FPIC — Samburu", county:"Samburu", meta:"Courts · Ongoing (Kituo cha Sheria)", s:"active", sl:"Active", issue:"Minerals / land",
@@ -2550,10 +2586,10 @@ var LEGAL = [
  {t:"Peter K Waweru v Republic — clean-environment right", county:"Kajiado", meta:"High Court · [2006] eKLR", s:"won", sl:"Won", issue:"Water",
   body:"A landmark ruling on sewage discharge at Kiserian that recognised the right to a clean and healthy environment and applied the polluter-pays principle before it was expressly in the Constitution.",
   why:"Why it matters: an early cornerstone for environmental-rights and pollution enforcement across Kenya."},
- {t:"Sengwer community &amp; Embobut Forest evictions", county:"Elgeyo-Marakwet", meta:"Courts &amp; petitions · Ongoing", s:"active", sl:"Active", issue:"Land / forest",
+ {t:"Sengwer community &amp; Embobut Forest evictions", county:"Elgeyo-Marakwet", meta:"Courts &amp; petitions · since 2014, ongoing", s:"active", sl:"Active", issue:"Land / forest",
   body:"The Sengwer indigenous community has faced repeated forced evictions from the Embobut Forest by the Kenya Forest Service; injunctions and petitions contest the evictions and the loss of ancestral livelihoods.",
   why:"Why it matters: a live test of indigenous forest rights against 'conservation' evictions, in the same region as the fluorspar revival."},
- {t:"Turkana oil benefit-sharing &amp; land — Lokichar", county:"Turkana", meta:"Community advocacy &amp; disputes · Ongoing", s:"watch", sl:"Ongoing", issue:"Oil",
+ {t:"Turkana oil benefit-sharing &amp; land — Lokichar", county:"Turkana", meta:"Community advocacy &amp; disputes · since 2019, ongoing", s:"watch", sl:"Ongoing", issue:"Oil",
   body:"Turkana communities and Friends of Lake Turkana continue to press for benefit-sharing, land and environmental safeguards around the South Lokichar oil basin, where a stalled crude-export plan and land questions persist.",
   why:"Why it matters: keeps the oil frontier's consent and revenue-sharing questions live even while export plans are stalled."}
 ];
@@ -2611,19 +2647,17 @@ var MEMBERS = [
 ];
 
 var DESK = {
- "Briefs &amp; research":[
+ "Resources":[
   {t:"The Lamu ruling: what the Court of Appeal actually decided",m:"Legal brief · 18 pp · March 2026",dl:"412",g:true,k:"PDF"},
   {t:"Kenya's coal pipeline after Lamu",m:"Research paper · 34 pp · February 2026",dl:"287",k:"PDF"},
   {t:"Just transition financing in East Africa",m:"Policy analysis · 22 pp · January 2026",dl:"196",k:"PDF"},
-  {t:"County response gap analysis, mid-2026",m:"Data brief · 12 pp · July 2026",dl:"84",g:true,k:"PDF"}
- ],
- "Advocacy toolkits":[
+  {t:"County response gap analysis, mid-2026",m:"Data brief · 12 pp · July 2026",dl:"84",g:true,k:"PDF"},
   {t:"Campaign graphics pack — just transition",m:"12 assets · social and print · May 2026",dl:"338",k:"ZIP"},
   {t:"Talking points: answering the 'coal means jobs' argument",m:"Briefing note · 4 pp",dl:"241",g:true,k:"DOC"},
   {t:"Community baraza facilitation guide (Kiswahili)",m:"Facilitator manual · 16 pp",dl:"163",g:true,k:"PDF"},
   {t:"Media pitch templates for coalition members",m:"Template pack",dl:"97",k:"DOC"}
  ],
- "Press repository":[
+ "Media briefs":[
   {t:"Court of Appeal revokes Lamu coal plant licence",m:"Press release · October 2025",dl:"1,204",g:true,k:"WEB"},
   {t:"Coalition statement on Mui Basin concessions",m:"Statement · April 2026",dl:"366",k:"WEB"},
   {t:"Submission on the Energy (Amendment) Bill 2026",m:"Public statement · June 2026",dl:"152",k:"WEB"},
@@ -2758,6 +2792,19 @@ document.getElementById("tickTrack").innerHTML = tickItems.join("") + tickItems.
 var streamWrap = document.getElementById("streams");
 var state = {};
 
+/* icons, plain-language source labels and a per-stream unit word so the Live board
+   reads as a civil-society intelligence feed rather than a trading screen */
+var STREAM_ICON = {
+  extract:'<path d="M3 20h18"/><path d="M6 20l4.5-8 3.5 5 2-3 2 6"/>',
+  legal:'<path d="M12 3v17"/><path d="M6 20h12"/><path d="M4 7h16"/><path d="M7 7l-3 5h6z"/><path d="M17 7l-3 5h6z"/>',
+  policy:'<path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/><path d="M10 12h6M10 16h4"/>',
+  community:'<circle cx="9" cy="8" r="3"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 6a4 4 0 0 1 0 8"/>',
+  funding:'<path d="M12 21V10"/><path d="M12 13c-3 0-5-2-5-5 3 0 5 2 5 5z"/><path d="M12 11c0-3 2-5 5-5 0 3-2 5-5 5z"/>',
+  media:'<circle cx="12" cy="12" r="2"/><path d="M8 8a5 5 0 0 0 0 8M16 8a5 5 0 0 1 0 8M5 5a9 9 0 0 0 0 14M19 5a9 9 0 0 1 0 14"/>'
+};
+var STREAM_UNIT = { extract:"signals", legal:"matters", policy:"updates", community:"reports", funding:"openings", media:"mentions" };
+var STREAM_SRC  = { radar:"Media & registry scan", partner:"Community-reported", desk:"Coalition desk" };
+
 STREAMS.forEach(function(s){
   state[s.id] = { count:s.base, items:[] };
   var seedTimes = [1000*60*4, 1000*60*23, 1000*60*71];
@@ -2766,12 +2813,11 @@ STREAMS.forEach(function(s){
   }
   var box = el("div","stream");
   box.innerHTML =
-    '<div class="stream-head"><span class="dot'+(s.accent==="e"?" ember":"")+'" aria-hidden="true"></span>'+
-      '<span class="nm">'+s.nm+'</span>'+
-      '<span class="prov '+s.prov+'">'+s.prov+'</span></div>'+
-    '<div class="stream-num" id="num-'+s.id+'"><span class="n '+s.accent+' mono">0</span>'+
-      '<span style="font-size:.64rem; color:var(--muted-dim); letter-spacing:.1em; text-transform:uppercase; font-weight:800">30d</span></div>'+
-    sparkline(s.spark, s.accent==="g" ? "#62C79B" : "#EE9455")+
+    '<div class="stream-head"><span class="s-ico '+s.accent+'" aria-hidden="true"><svg viewBox="0 0 24 24">'+STREAM_ICON[s.id]+'</svg></span>'+
+      '<span class="nm">'+s.nm+'</span></div>'+
+    '<div class="stream-metric" id="num-'+s.id+'"><span class="n '+s.accent+'">0</span>'+
+      '<span class="s-unit">'+STREAM_UNIT[s.id]+' · past 30 days</span></div>'+
+    '<div class="s-src '+s.prov+'"><span class="s-dot" aria-hidden="true"></span>'+STREAM_SRC[s.prov]+'</div>'+
     '<ul class="feed" id="feed-'+s.id+'"></ul>';
   streamWrap.appendChild(box);
   countUp(box.querySelector(".n"), s.base, 1100);
@@ -2796,7 +2842,6 @@ function pushItem(){
   state[s.id].count += 1;
   var numBox = document.getElementById("num-"+s.id);
   numBox.querySelector(".n").textContent = state[s.id].count.toLocaleString();
-  numBox.classList.remove("flash"); void numBox.offsetWidth; numBox.classList.add("flash");
   renderFeed(s.id);
   bumpSync();
 }
