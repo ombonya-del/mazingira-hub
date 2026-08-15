@@ -597,6 +597,10 @@ section.band{ padding:36px 0; border-bottom:1px solid var(--line); scroll-margin
 .acc.open .acc-body{ display:block; }
 .acc-body p{ margin:14px 0 0; color:var(--muted); font-size:.86rem; }
 .acc-body .why{ margin-top:13px; padding:11px 13px; background:var(--green-wash); border-left:2px solid var(--green); font-size:.82rem; color:var(--text); }
+.case-src{ display:inline-block; margin-top:12px; font-size:.76rem; font-weight:800; letter-spacing:.02em; color:var(--green); text-decoration:none; }
+.case-src:hover{ text-decoration:underline; }
+.lc-src{ display:inline-block; margin-top:8px; font-size:.72rem; font-weight:800; color:var(--green); text-decoration:none; }
+.lc-src:hover{ text-decoration:underline; }
 
 .cards{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line); }
 .card{ background:var(--panel); padding:16px; }
@@ -3462,12 +3466,28 @@ function accordion(host, items, render){
   });
 }
 
+/* Verified direct Kenya Law / court links for the landmark cases; everything else
+   falls back to a Kenya Law search on the case name so every matter is viewable. */
+var LEGAL_SRC = {
+  "Merti community conservancies":"https://new.kenyalaw.org/akn/ke/judgment/keelc/2025/99/eng@2025-01-24",
+  "Endorois Welfare Council — Arabal":"https://new.kenyalaw.org/akn/ke/judgment/keelc/2026/432/eng@2026-02-04",
+  "Mui Basin coal concessions":"https://new.kenyalaw.org/akn/ke/judgment/kehc/2015/473/eng@2015-09-18",
+  "Climate Change (Carbon Markets)":"https://new.kenyalaw.org/akn/ke/act/ln/2024/84/eng@2024-06-07"
+};
+function caseLink(m){
+  var t=(m.t||"").replace(/&amp;/g,"&").replace(/&#39;/g,"'");
+  for(var k in LEGAL_SRC){ if(t.indexOf(k)>=0) return { url:LEGAL_SRC[k], label:"View the judgment on Kenya Law ↗" }; }
+  var q=t.split("—")[0].replace(/\(.*?\)/g,"").trim();
+  return { url:"https://www.google.com/search?q="+encodeURIComponent(q+" Kenya Law case"), label:"Look up this case ↗" };
+}
 accordion(document.getElementById("legalList"), LEGAL, function(m,i){
+  var lk=caseLink(m);
   return '<button class="acc-btn" aria-expanded="'+(i===0)+'">'+
     '<span class="grow"><h3>'+m.t+'</h3><span class="meta">'+m.county+' · '+m.meta+'</span></span>'+
     tagFor(m.s,m.sl)+
     '<svg class="acc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'+
-    '</button><div class="acc-body"><p>'+m.body+'</p><div class="why">'+m.why+'</div></div>';
+    '</button><div class="acc-body"><p>'+m.body+'</p><div class="why">'+m.why+'</div>'+
+    '<a class="case-src" href="'+lk.url+'" target="_blank" rel="noopener noreferrer">'+lk.label+'</a></div>';
 });
 
 /* =================================================================
@@ -3512,10 +3532,12 @@ function showLegalCounty(nm){
     '<p class="where">'+nm+' · '+cs.length+' case'+(cs.length>1?"s":"")+'</p>'+
     '<h3>'+nm+'</h3>'+
     cs.map(function(c){
+      var lk=caseLink(c);
       return '<div class="legalcase"><div class="lc-top">'+tagFor(c.s,c.sl)+
         '<span class="lc-issue">'+c.issue+'</span></div>'+
         '<h4>'+c.t+'</h4><p class="lc-meta">'+c.meta+'</p>'+
-        '<p class="lc-body">'+c.body+'</p><p class="lc-why">'+c.why+'</p></div>';
+        '<p class="lc-body">'+c.body+'</p><p class="lc-why">'+c.why+'</p>'+
+        '<a class="lc-src" href="'+lk.url+'" target="_blank" rel="noopener noreferrer">'+lk.label+'</a></div>';
     }).join("");
 }
 
