@@ -183,8 +183,8 @@ nav.tabs.tabs-desk{ display:none; }
      height so the sub-tabs offset is exact and no content bleeds through a gap */
   a.copbar{ position:sticky; top:calc(var(--nav-h) + env(safe-area-inset-top)); z-index:88; height:36px; }
   nav.subtabs#exploreSub{ position:sticky; top:calc(var(--nav-h) + 36px + env(safe-area-inset-top)); z-index:88; }
-  nav.subtabs#exploreSub .subtabs-inner{ overflow-x:visible; }
-  nav.subtabs#exploreSub a{ flex:1 1 0; min-width:0; text-align:center; white-space:nowrap; font-size:.6rem; letter-spacing:.01em; padding:9px 2px 7px; }
+  nav.subtabs#exploreSub .subtabs-inner{ overflow-x:hidden; gap:0; }
+  nav.subtabs#exploreSub a{ flex:1 1 0; min-width:0; width:0; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:clip; font-size:.56rem; letter-spacing:0; padding:9px 3px 7px; }
   /* Sentiment segmented control: one line, buttons hug their text so padding stays even.
      ID selector so it beats the later base `.sent-seg{flex-wrap:wrap}` rule. */
   #sentSeg{ display:flex !important; flex-wrap:nowrap !important; gap:3px; max-width:100%; }
@@ -1179,10 +1179,20 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 @media (max-width:720px){ .copbar .cb-where{ display:none; } }
 
 /* ---------- corporate accountability index ---------- */
-.acc-legend{ display:flex; gap:16px; flex-wrap:wrap; margin:2px 0 18px; }
-.acc-key{ display:inline-flex; align-items:center; gap:7px; font-size:.78rem; color:var(--muted); }
-.acc-dot{ width:10px; height:10px; border-radius:50%; flex:none; }
-.acc-dot.kept{ background:var(--green); } .acc-dot.partial{ background:var(--ember); } .acc-dot.lip{ background:#E86A5E; }
+.acc-summary{ display:flex; align-items:center; gap:24px; flex-wrap:wrap; background:var(--panel); border:1px solid var(--line); padding:16px 22px; margin:2px 0 18px; }
+.acc-donut{ width:118px; height:118px; flex:none; position:relative; }
+.acc-donut svg{ width:118px; height:118px; transform:rotate(-90deg); }
+.acc-donut .track{ fill:none; stroke:var(--panel-3); stroke-width:13; }
+.acc-donut .seg{ fill:none; stroke-width:13; transition:stroke-dasharray .9s cubic-bezier(.22,1,.36,1); }
+.acc-dtot{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.acc-dtot b{ font-family:Lora,serif; font-size:28px; font-weight:700; color:var(--text); line-height:1; }
+.acc-dtot span{ font-size:.52rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:var(--muted-dim); margin-top:2px; }
+.acc-sumtext{ flex:1; min-width:230px; }
+.acc-sumtext h3{ margin:0 0 10px; font-size:.98rem; color:var(--text); }
+.acc-sumleg{ display:flex; flex-direction:column; gap:7px; }
+.acc-sumrow{ display:flex; align-items:baseline; gap:9px; font-size:.83rem; color:var(--muted); }
+.acc-sumrow i{ width:11px; height:11px; border-radius:3px; flex:none; position:relative; top:1px; }
+.acc-sumrow b{ color:var(--text); min-width:14px; }
 .acc-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:14px; }
 .acc-card{ background:var(--panel); border:1px solid var(--line); border-left-width:3px; padding:16px; display:flex; flex-direction:column; gap:10px; }
 .acc-card.kept{ border-left-color:var(--green); } .acc-card.partial{ border-left-color:var(--ember); } .acc-card.lip{ border-left-color:#E86A5E; }
@@ -1219,6 +1229,26 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 .vs-call-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
 .vs-call-actions .btn{ padding:8px 12px; font-size:.72rem; }
 .vs-empty{ border:1px dashed var(--line-2); padding:22px; text-align:center; color:var(--muted); font-size:.9rem; }
+.vs-notegrid{ display:grid; grid-template-columns:1.7fr 1fr; gap:16px; align-items:start; }
+@media (max-width:760px){ .vs-notegrid{ grid-template-columns:1fr; } }
+.vs-notes label{ display:block; font-size:.68rem; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+.vs-notes input, .vs-notes textarea{ display:block; width:100%; margin-top:5px; padding:10px 12px; background:var(--panel); border:1px solid var(--line); border-radius:8px; color:var(--text); font-family:inherit; font-size:.9rem; text-transform:none; letter-spacing:normal; font-weight:400; }
+.vs-notes textarea{ resize:vertical; }
+.vs-notes .ev-row{ display:flex; gap:12px; } .vs-notes .ev-row label{ flex:1; }
+.mn-tarow{ position:relative; }
+.mn-tarow #mnDictate{ position:absolute; right:8px; bottom:8px; padding:6px 10px; font-size:.66rem; }
+.mn-tarow #mnDictate.on{ background:var(--ember-hot); color:#160B03; }
+.mn-aihead{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.mn-aihead b{ font-size:.8rem; color:var(--text); }
+.mn-addact{ padding:6px 10px; font-size:.66rem; }
+.mn-actions{ display:flex; flex-direction:column; gap:8px; }
+.mn-act{ display:flex; gap:6px; }
+.mn-act input{ margin-top:0; padding:8px 10px; font-size:.85rem; }
+.mn-act .mn-task{ flex:2; } .mn-act .mn-owner{ flex:1; min-width:0; }
+.mn-act .mn-del{ flex:none; width:32px; border:1px solid var(--line); background:transparent; color:var(--muted); border-radius:7px; cursor:pointer; font-size:1rem; }
+.mn-act .mn-del:hover{ color:var(--ember); border-color:var(--ember); }
+.vs-notefoot{ display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap; }
+.vs-notefoot .vs-note{ color:var(--muted); font-size:.78rem; }
 
 /* ---------- petitions & memoranda (Voices) ---------- */
 .pet-head{ display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
@@ -1391,7 +1421,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <a href="#map"       data-view="explore" data-sub="map">National map</a>
     <a href="#directory" data-view="explore" data-sub="directory">Directory</a>
     <a href="#legal"     data-view="explore" data-sub="legal">Legal</a>
-    <a href="#sentiment" data-view="explore" data-sub="sentiment">Sentiment</a>
+    <a href="#sentiment" data-view="explore" data-sub="sentiment">Media</a>
     <a href="#exchange"  data-view="explore" data-sub="exchange">Exchange</a>
     <a href="#accountability" data-view="explore" data-sub="accountability">Pledges</a>
     <a href="#cop"       data-view="cop">COP31</a>
@@ -1435,7 +1465,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <a href="#map"     data-sub="map" class="on">Map</a>
     <a href="#directory" data-sub="directory">Directory</a>
     <a href="#legal"   data-sub="legal">Legal</a>
-    <a href="#sentiment" data-sub="sentiment">Sentiment</a>
+    <a href="#sentiment" data-sub="sentiment">Media</a>
     <a href="#exchange" data-sub="exchange">Exchange</a>
     <a href="#accountability" data-sub="accountability">Pledges</a>
   </div>
@@ -1973,11 +2003,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         held against their own public climate promises. Each call is the coalition's read of the public record; follow the
         sources and judge for yourself.</p>
     </div></div>
-    <div class="acc-legend">
-      <span class="acc-key"><span class="acc-dot kept"></span> Kept — promise matched by action</span>
-      <span class="acc-key"><span class="acc-dot partial"></span> Partial — real movement, real gaps</span>
-      <span class="acc-key"><span class="acc-dot lip"></span> Lip-service — claim, not conduct</span>
-    </div>
+    <div class="acc-summary" id="accSummary"></div>
     <div class="acc-grid" id="accGrid"></div>
     <p class="acc-note">Ratings reflect the cited public record and change as commitments and conduct change.
       Spot something out of date, or an entity we should add? Share it via the Exchange.</p>
@@ -2034,6 +2060,34 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         <button class="btn btn--ghost" id="vsBarCopy" type="button">Copy link</button>
         <button class="btn btn--ghost" id="vsBarNew" type="button">Open in new tab</button>
         <button class="btn btn--ember" id="vsLeave" type="button">Leave</button>
+      </div>
+    </div>
+
+    <div class="vs-notes">
+      <div class="sec-head" style="margin-top:26px"><div class="grow"><p class="kicker">Instant minutes</p><h3 class="trackh">Meeting notes → shareable PDF</h3>
+        <p class="lede">Capture decisions and action items live. Generate a formatted PDF the moment the call ends and share it with everyone — no three-week wait for minutes.</p></div></div>
+      <div class="vs-notegrid">
+        <div class="vs-notemain">
+          <div class="ev-row">
+            <label>Meeting title<input id="mnTitle" type="text" placeholder="e.g. Legal working group — Siaya nuclear"></label>
+            <label>Date<input id="mnDate" type="date"></label>
+          </div>
+          <label>Attendees<input id="mnAttendees" type="text" placeholder="Names / organisations, comma-separated"></label>
+          <label>Discussion &amp; decisions
+            <div class="mn-tarow">
+              <textarea id="mnNotes" rows="7" placeholder="Key points, decisions, agreements…"></textarea>
+              <button type="button" class="btn btn--ghost" id="mnDictate" title="Dictate with your microphone">🎤 Dictate</button>
+            </div>
+          </label>
+        </div>
+        <div class="vs-noteside">
+          <div class="mn-aihead"><b>Action items</b><button type="button" class="btn btn--ghost mn-addact" id="mnAddAct">+ Add</button></div>
+          <div id="mnActions" class="mn-actions"></div>
+        </div>
+      </div>
+      <div class="vs-notefoot">
+        <button type="button" class="btn btn--green" id="mnGenerate">Generate &amp; share PDF minutes →</button>
+        <span class="vs-note">The video room's own controls can also record the call where your Jitsi server allows it.</span>
       </div>
     </div>
 
@@ -4352,7 +4406,27 @@ var ACCOUNT = [
  { n:"Standard Bank (Stanbic)", t:"Bank", r:"lip",
    c:"Africa’s largest bank by assets, with climate and human-rights commitments and an internal review of its EACOP exposure.",
    real:"After that review it went ahead — confirming funding for EACOP in 2024 as a lead arranger, drawing condemnation from the #StopEACOP campaign and affected communities across Uganda and Tanzania.",
-   src:[{label:"Business & Human Rights",url:"https://www.business-humanrights.org/en/latest-news/standard-bank-set-to-proceed-with-funding-for-eacop-after-internal-review/"},{label:"AllAfrica",url:"https://allafrica.com/stories/202406200186.html"}] }
+   src:[{label:"Business & Human Rights",url:"https://www.business-humanrights.org/en/latest-news/standard-bank-set-to-proceed-with-funding-for-eacop-after-internal-review/"},{label:"AllAfrica",url:"https://allafrica.com/stories/202406200186.html"}] },
+
+ { n:"Shell", t:"Oil major", r:"partial",
+   c:"Net zero by 2050, with interim targets to cut the carbon intensity of the energy it sells.",
+   real:"In 2024 it scrapped its 2035 target and weakened the 2030 goal to 15–20% (from 20%) — but, after years of shareholder pressure, set its first target to cut emissions from customers burning its oil (Scope 3) 15–20% by 2030. Backsliding on the path, some movement on the biggest number.",
+   src:[{label:"Carbon Brief",url:"https://www.carbonbrief.org/shell-abandons-2035-emissions-target-and-weakens-2030-goal/"},{label:"ESG Today",url:"https://www.esgtoday.com/shell-sets-2030-goal-to-reduce-emissions-from-customers-use-of-gasoline-and-diesel/"}] },
+
+ { n:"BP", t:"Oil major", r:"lip",
+   c:"A 2020 net-zero-by-2050 pledge headlined by a promise to cut oil & gas output 40% by 2030.",
+   real:"That 2030 cut was trimmed to 25% in 2023 and scrapped entirely in February 2025. New leadership called the green pivot “too far, too fast,” raised oil & gas spending to ~$10bn a year and cut transition spending — while keeping “net zero by 2050” on paper.",
+   src:[{label:"ESG News",url:"https://esgnews.com/bp-revises-strategy-abandons-2030-production-cut-target-to-focus-on-oil-and-gas/"},{label:"Global Witness",url:"https://globalwitness.org/en/press-releases/bps-climate-u-turn-set-to-cause-72000-extra-heat-deaths/"}] },
+
+ { n:"World Bank", t:"Public finance", r:"partial",
+   c:"To stop financing upstream oil & gas after 2019, and — from 2023 — to steer 45% of its lending to climate by 2025.",
+   real:"It did largely exit upstream oil & gas financing, a real line held. But under political pressure it dropped the 45% climate-finance target in 2025–26, keeping the broader action plan while abandoning its sharpest metric.",
+   src:[{label:"Carbon Brief",url:"https://www.carbonbrief.org/qa-how-will-the-world-banks-abandoned-finance-goal-affect-climate-action/"},{label:"Argus",url:"https://www.argusmedia.com/en/news-and-insights/latest-market-news/2845985-world-bank-to-drop-climate-finance-targets"}] },
+
+ { n:"Global insurers & banks (EACOP)", t:"Insurers & banks", r:"kept",
+   c:"Case by case, to weigh the East African Crude Oil Pipeline against their own climate and human-rights policies.",
+   real:"The finance wall keeps rising: by 2025, 30+ major insurers (Chubb the 30th) and 40+ banks have publicly ruled out EACOP — a collective refusal that has stalled the pipeline's funding and turned policy into decisions.",
+   src:[{label:"Rainforest Action Network",url:"https://www.ran.org/press-releases/chubb-becomes-the-30th-major-insurer-to-reject-the-east-african-crude-oil-pipeline-eacop/"},{label:"#StopEACOP",url:"https://www.stopeacop.net/banks-checklist"}] }
 ];
 (function(){
   var grid=document.getElementById("accGrid"); if(!grid) return;
@@ -4369,6 +4443,22 @@ var ACCOUNT = [
       '<div class="acc-src">'+srcs+'</div>';
     grid.appendChild(card);
   });
+  /* donut summary — distribution of ratings across all tracked entities */
+  var sum=document.getElementById("accSummary");
+  if(sum){
+    var order=[{k:"kept",label:"Kept — promise matched by action",color:"62C79B"},
+      {k:"partial",label:"Partial — real movement, real gaps",color:"EE9455"},
+      {k:"lip",label:"Lip-service — a claim, not conduct",color:"E86A5E"}];
+    var total=ACCOUNT.length; order.forEach(function(o){ o.n=ACCOUNT.filter(function(a){return a.r===o.k;}).length; });
+    var cum=0, segs="";
+    order.forEach(function(o){ if(!o.n) return; var pct=total?(o.n/total*100):0;
+      segs+='<circle class="seg" cx="59" cy="59" r="52" stroke="#'+o.color+'" pathLength="100" stroke-dasharray="'+pct.toFixed(2)+' '+(100-pct).toFixed(2)+'" stroke-dashoffset="'+(-cum).toFixed(2)+'"></circle>';
+      cum+=pct; });
+    var donut='<div class="acc-donut"><svg viewBox="0 0 118 118"><circle class="track" cx="59" cy="59" r="52"></circle>'+segs+
+      '</svg><div class="acc-dtot"><b>'+total+'</b><span>tracked</span></div></div>';
+    var legend=order.map(function(o){ return '<div class="acc-sumrow"><i style="background:#'+o.color+'"></i><b>'+o.n+'</b> '+o.label+'</div>'; }).join("");
+    sum.innerHTML=donut+'<div class="acc-sumtext"><h3>'+total+' financiers &amp; pledges tracked, across banks, oil majors and public finance</h3><div class="acc-sumleg">'+legend+'</div></div>';
+  }
 })();
 
 function hubToast(m){ var t=document.getElementById("hubToast"); if(!t) return; t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove("show"); },2200); }
@@ -4703,6 +4793,72 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
       } else finish(rec);
     });
   })();
+})();
+
+/* ---- Coalition Room: live meeting notes → instant shareable PDF ---- */
+(function(){
+  var gen=document.getElementById("mnGenerate"); if(!gen) return;
+  var dateEl=document.getElementById("mnDate"); if(dateEl && !dateEl.value){ try{ dateEl.value=new Date().toISOString().slice(0,10); }catch(e){} }
+  var actWrap=document.getElementById("mnActions"), notesEl=document.getElementById("mnNotes");
+  function addAct(task,owner){
+    var row=document.createElement("div"); row.className="mn-act";
+    row.innerHTML='<input class="mn-task" placeholder="Action / decision" value="'+String(task||"").replace(/"/g,"&quot;")+'"><input class="mn-owner" placeholder="Owner" value="'+String(owner||"").replace(/"/g,"&quot;")+'"><button type="button" class="mn-del" title="Remove">×</button>';
+    row.querySelector(".mn-del").addEventListener("click",function(){ row.remove(); });
+    actWrap.appendChild(row);
+  }
+  if(actWrap && !actWrap.children.length){ addAct(); }
+  var addBtn=document.getElementById("mnAddAct"); if(addBtn) addBtn.addEventListener("click",function(){ addAct(); });
+
+  /* dictation — Web Speech API (best-effort; captures your microphone) */
+  var rec=null, base="";
+  var dictateBtn=document.getElementById("mnDictate");
+  if(dictateBtn) dictateBtn.addEventListener("click",function(){
+    var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){ hubToast("Dictation isn't supported in this browser — type your notes"); return; }
+    if(rec){ rec.stop(); return; }
+    rec=new SR(); rec.continuous=true; rec.interimResults=true; try{ rec.lang="en-KE"; }catch(e){}
+    base=notesEl.value;
+    rec.onresult=function(e){ var interim="";
+      for(var i=e.resultIndex;i<e.results.length;i++){ var r=e.results[i];
+        if(r.isFinal){ base+=(base && !/\s$/.test(base)?" ":"")+r[0].transcript.trim(); } else interim+=r[0].transcript; }
+      notesEl.value=base+(interim?(base?" ":"")+interim:""); };
+    rec.onend=function(){ dictateBtn.classList.remove("on"); dictateBtn.textContent="🎤 Dictate"; base=notesEl.value; rec=null; };
+    rec.onerror=function(){};
+    try{ rec.start(); dictateBtn.classList.add("on"); dictateBtn.textContent="⏹ Stop"; }catch(e){ rec=null; }
+  });
+
+  gen.addEventListener("click",function(){
+    var title=(document.getElementById("mnTitle").value||"Coalition meeting").trim();
+    var date=(document.getElementById("mnDate").value||"");
+    var attendees=(document.getElementById("mnAttendees").value||"").trim();
+    var notes=(notesEl.value||"").trim();
+    var acts=[].slice.call(actWrap.querySelectorAll(".mn-act")).map(function(r){
+      return { task:(r.querySelector(".mn-task").value||"").trim(), owner:(r.querySelector(".mn-owner").value||"").trim() }; }).filter(function(a){ return a.task; });
+    if(!notes && !acts.length){ hubToast("Add some notes or action items first"); return; }
+    gen.disabled=true; var lbl=gen.textContent; gen.textContent="Building PDF…";
+    loadJsPDF().then(function(JsPDF){
+      var doc=new JsPDF({unit:"pt",format:"a4"}); var W=doc.internal.pageSize.getWidth(), M=48, y=56;
+      function line(txt,size,color,bold,gap){ doc.setFont("helvetica",bold?"bold":"normal"); doc.setFontSize(size); doc.setTextColor(color[0],color[1],color[2]);
+        var lines=doc.splitTextToSize(txt,W-M*2); lines.forEach(function(l){ if(y>790){ doc.addPage(); y=56; } doc.text(l,M,y); y+=size*1.35; }); if(gap) y+=gap; }
+      doc.setFillColor(27,107,74); doc.rect(0,0,W,8,"F");
+      line("MAZINGIRAKENYA — MEETING MINUTES",9,[122,141,131],true,3);
+      line(title,20,[27,38,33],true,5);
+      var meta=[]; if(date) meta.push(date); if(attendees) meta.push("Attendees: "+attendees);
+      if(meta.length) line(meta.join("    ·    "),10,[90,107,99],false,10);
+      doc.setDrawColor(217,226,220); doc.line(M,y,W-M,y); y+=20;
+      if(notes){ line("Discussion & decisions",12,[27,107,74],true,7); line(notes,11,[40,48,43],false,16); }
+      if(acts.length){ line("Action items",12,[27,107,74],true,7);
+        acts.forEach(function(a){ line("•  "+a.task+(a.owner?"   —   "+a.owner:""),11,[40,48,43],false,4); }); y+=12; }
+      line("Generated "+new Date().toLocaleString()+"  ·  MazingiraKenya Coalition Room",8,[122,141,131],false,0);
+      var fname=(title.replace(/[^a-z0-9]+/gi,"-").toLowerCase().replace(/^-|-$/g,"")||"minutes")+"-minutes.pdf";
+      var blob=doc.output("blob"), file=null;
+      try{ file=new File([blob],fname,{type:"application/pdf"}); }catch(e){}
+      gen.disabled=false; gen.textContent=lbl;
+      if(file && navigator.canShare && navigator.canShare({files:[file]})){
+        navigator.share({files:[file], title:title}).then(function(){ hubToast("Minutes shared"); }, function(){ doc.save(fname); });
+      } else { doc.save(fname); hubToast("Minutes PDF ready — share it with the group"); }
+    }).catch(function(){ gen.disabled=false; gen.textContent=lbl; hubToast("Couldn't load the PDF tool — check your connection"); });
+  });
 })();
 
 /* Sign out — clears the Supabase session; the gate re-appears on reload */
