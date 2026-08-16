@@ -1,7 +1,7 @@
 /* MazingiraKenya Admin — service worker.
    Network-first for navigations (an internal tool should always load the latest deploy),
    cache-first for static assets, offline fallback to the app shell. Bump CACHE to force update. */
-const CACHE = "admin-v10";
+const CACHE = "admin-v11";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 self.addEventListener("install", function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(SHELL); }).catch(function(){}).then(function(){ return self.skipWaiting(); }));
