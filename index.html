@@ -4746,10 +4746,13 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
 (async function(){
   if(!SB) return;                                  // CDN blocked / offline → keep in-file content
   try{
-    var r = await SB.from("sentiment_items").select("source,title,url,stance").order("published_at",{ascending:false}).limit(8);
+    var r = await SB.from("sentiment_items").select("source,title,url,stance,published_at").order("published_at",{ascending:false}).limit(8);
     if(r.error || !r.data || !r.data.length) return;   // empty table → keep in-file fallback
+    var scut = Date.now() - 30*864e5;                  // ignore rows older than 30 days
+    var rows = r.data.filter(function(i){ var t=Date.parse(i.published_at||""); return isNaN(t)?true:t>=scut; });
+    if(!rows.length) return;                            // nothing fresh → keep curated in-file items
     var map={supportive:"pos",neutral:"neu",critical:"neg"};
-    var html = r.data.map(function(i){
+    var html = rows.map(function(i){
       return '<a class="sf-item" href="'+escE(i.url)+'" target="_blank" rel="noopener noreferrer">'+
         '<span class="sf-src">'+escE(i.source)+'</span><span class="sf-h">'+escE(i.title)+'</span>'+
         '<span class="sf-tag '+(map[i.stance]||"neu")+'">'+escE(i.stance||"neutral")+'</span></a>';
@@ -4770,6 +4773,9 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
   sb.from("pulse_items").select("*").eq("published",true).order("created_at",{ascending:false}).limit(6)
     .then(function(res){
       var d=res&&res.data; if(!d||!d.length) return;
+      var pcut = Date.now() - 30*864e5;                 // ignore pulse rows older than 30 days
+      d = d.filter(function(i){ var t=Date.parse(i.created_at||i.posted_at||""); return isNaN(t)?true:t>=pcut; });
+      if(!d.length) return;                             // nothing fresh → keep curated in-file cards
       var feed=document.getElementById("communityPulse"); if(!feed) return;
       feed.insertAdjacentHTML("afterbegin", d.map(function(i){
         return '<div class="pulse-card">'
