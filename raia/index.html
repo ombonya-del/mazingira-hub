@@ -810,7 +810,7 @@ var TYPES = {
 };
 
 /* ============================ ROUTER + RENDER ============================ */
-var state = { view:"ninini", id:null, lens:"happening", learnTab:"q", openAcc:null, shareType:"text" };
+var state = { view:"ninini", id:null, lens:"happening", learnTab:"q", openAcc:null, shareType:"text", petitionId:null };
 var app = document.getElementById("app");
 function issueById(id){ for(var i=0;i<ISSUES.length;i++) if(ISSUES[i].id===id) return ISSUES[i]; return null; }
 function statusChip(s){ var st=STATUS[s]; return '<span class="chip '+st.cls+'">'+esc(L(st.t))+'</span>'; }
@@ -827,9 +827,11 @@ function render(){
   else if(v==="voices") app.innerHTML=viewVoices();
   else if(v==="flag") app.innerHTML=viewFlag();
   else if(v==="disinfo") app.innerHTML=viewDisinfo();
+  else if(v==="petitions") app.innerHTML=viewPetitions();
   updateChrome(); window.scrollTo(0,0); bind();
   if(v==="flag") loadTweetWidget();
   if(v==="disinfo") fetchDisinfo();
+  if(v==="petitions") fetchPetitions();
 }
 var RSB = (window.supabase && window.supabase.createClient)
   ? window.supabase.createClient("https://uueemckdoozsuowcqkhl.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA")
@@ -1062,6 +1064,72 @@ function voiceCard(v){
       '<button data-react="angry">😠 <span class="c">'+v.react.angry+'</span></button></div></div>';
 }
 
+/* ---------- petitions & memoranda (public support) ---------- */
+function petBtn(){ return "display:inline-block;background:var(--green);color:#fff;border:0;border-radius:10px;padding:11px 16px;font-weight:800;font-size:.9rem;cursor:pointer"; }
+function viewPetitions(){
+  return '<section class="view reading">'+
+    '<div class="shead"><h2>'+esc(L({en:"Petitions & memoranda",sw:"Malalamiko na memoranda",sh:"Petitions na memoranda"}))+'</h2><span class="rule"></span></div>'+
+    '<p class="sum" style="margin:0 0 18px">'+esc(L({en:"Coalition demands to those in power. Add your name — every signature counts.",sw:"Madai ya muungano kwa walio madarakani. Ongeza jina lako — kila sahihi inahesabika.",sh:"Madai ya coalition kwa walio na power. Ongeza jina lako — kila signature inacount."}))+'</p>'+
+    '<div id="petpub" style="display:grid;gap:14px"></div>'+footer()+'</section>';
+}
+function petCardHtml(p){
+  var count=p.sign_count||0, goal=p.goal||0;
+  var pct=goal>0?Math.min(100,Math.round(count/goal*100)):(count>0?100:0);
+  var goalTxt=goal>0?(' '+L({en:"of",sw:"kati ya",sh:"kati ya"})+' '+goal.toLocaleString()):'';
+  var doc=p.doc_url?'<a href="'+esc(p.doc_url)+'" target="_blank" rel="noopener noreferrer" style="font-weight:700">'+esc(L({en:"Read memorandum ↗",sw:"Soma memoranda ↗",sh:"Soma memo ↗"}))+'</a>':'';
+  return '<div class="card" data-pid="'+esc(p.id)+'" style="padding:16px">'+
+    '<div style="font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a6a06;margin-bottom:6px">'+esc(L({en:"To",sw:"Kwa",sh:"Kwa"}))+': '+esc(p.target)+'</div>'+
+    '<h3 style="margin:0 0 8px;font-size:1.08rem;line-height:1.3">'+esc(p.title)+'</h3>'+
+    '<p class="sum" style="margin:0 0 12px">'+esc(p.summary)+'</p>'+
+    '<div style="height:7px;border-radius:6px;background:var(--line);overflow:hidden;margin-bottom:6px"><i style="display:block;height:100%;width:'+pct+'%;background:var(--green);border-radius:6px"></i></div>'+
+    '<p style="font-size:.82rem;color:var(--ink-soft);margin:0 0 12px"><b style="color:var(--ink)">'+count.toLocaleString()+'</b> '+esc(L({en:"signatures",sw:"sahihi",sh:"signatures"}))+goalTxt+'</p>'+
+    '<div class="petsignwrap"></div>'+
+    '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><button class="petsign" type="button" style="'+petBtn()+'">'+esc(L({en:"Add your name",sw:"Ongeza jina lako",sh:"Ongeza jina lako"}))+'</button>'+doc+'</div>'+
+  '</div>';
+}
+function petSignForm(){
+  return '<div style="background:var(--paper2);border-radius:12px;padding:14px;margin:6px 0 14px;display:grid;gap:9px">'+
+    '<input class="ps-name" placeholder="'+esc(L({en:"Your name",sw:"Jina lako",sh:"Jina lako"}))+'" style="padding:11px;border:1px solid var(--line);border-radius:9px;font:inherit;background:var(--card)">'+
+    '<input class="ps-org" placeholder="'+esc(L({en:"Organisation (optional)",sw:"Shirika (hiari)",sh:"Org (optional)"}))+'" style="padding:11px;border:1px solid var(--line);border-radius:9px;font:inherit;background:var(--card)">'+
+    '<label style="display:flex;gap:8px;align-items:flex-start;font-size:.86rem"><input type="checkbox" class="ps-consent"><span>'+esc(L({en:"I add my name and consent to it being counted publicly.",sw:"Ninaongeza jina langu na kukubali lihesabiwe hadharani.",sh:"Naongeza jina langu na kukubali licountiwe publicly."}))+'</span></label>'+
+    '<button class="ps-submit" type="button" style="'+petBtn()+'">'+esc(L({en:"Sign",sw:"Tia sahihi",sh:"Sign"}))+'</button></div>';
+}
+function fetchPetitions(){
+  var box=document.getElementById("petpub"); if(!box) return;
+  box.innerHTML='<p class="muted">'+esc(L({en:"Loading…",sw:"Inapakia…",sh:"Ina-load…"}))+'</p>';
+  if(!RSB){ box.innerHTML='<div class="card" style="padding:20px;text-align:center"><span class="muted">'+esc(L({en:"Petitions are unavailable right now.",sw:"Malalamiko hayapatikani sasa.",sh:"Petitions hazipatikani sasa."}))+'</span></div>'; return; }
+  RSB.from("petitions").select("*").eq("published",true).order("created_at",{ascending:false}).limit(50).then(function(r){
+    var rows=r&&r.data;
+    if(r.error || !rows || !rows.length){ box.innerHTML='<div class="card" style="padding:20px;text-align:center"><span class="muted">'+esc(L({en:"No active petitions yet — check back soon.",sw:"Hakuna malalamiko hai bado — angalia tena hivi karibuni.",sh:"Hakuna petitions bado — rudi soon."}))+'</span></div>'; return; }
+    if(state.petitionId){ rows.sort(function(a,b){ return (b.id===state.petitionId?1:0)-(a.id===state.petitionId?1:0); }); }
+    box.innerHTML=rows.map(petCardHtml).join("");
+    bindPetitions();
+    if(state.petitionId){ var c=box.querySelector('[data-pid="'+state.petitionId+'"]'); if(c){ c.scrollIntoView({block:"center"}); } }
+  }, function(){ box.innerHTML='<div class="card" style="padding:20px;text-align:center"><span class="muted">'+esc(L({en:"Couldn’t load petitions.",sw:"Imeshindwa kupakia.",sh:"Haiwezi load."}))+'</span></div>'; });
+}
+function bindPetitions(){
+  var box=document.getElementById("petpub"); if(!box) return;
+  box.querySelectorAll(".card[data-pid]").forEach(function(card){
+    var pid=card.getAttribute("data-pid");
+    var openBtn=card.querySelector(".petsign"), wrap=card.querySelector(".petsignwrap");
+    openBtn.addEventListener("click",function(){
+      if(wrap.innerHTML){ wrap.innerHTML=""; return; }
+      wrap.innerHTML=petSignForm();
+      var sub=wrap.querySelector(".ps-submit");
+      sub.addEventListener("click",function(){
+        var name=(wrap.querySelector(".ps-name").value||"").trim();
+        var org=(wrap.querySelector(".ps-org").value||"").trim();
+        var consent=wrap.querySelector(".ps-consent").checked;
+        if(!name||!consent){ sub.textContent=L({en:"Name + consent needed",sw:"Jina + ridhaa",sh:"Jina + consent"}); setTimeout(function(){ sub.textContent=L({en:"Sign",sw:"Tia sahihi",sh:"Sign"}); },1600); return; }
+        sub.disabled=true;
+        function done(){ wrap.innerHTML='<p style="color:var(--green-ink);font-weight:800;margin:4px 0 12px">✓ '+esc(L({en:"Thank you — your name is added.",sw:"Asante — jina lako limeongezwa.",sh:"Asante — jina lako limeaddiwa."}))+'</p>'; }
+        if(RSB){ RSB.from("petition_signatures").insert({petition_id:pid,name:name,org:org}).then(function(rr){ if(rr.error){ sub.disabled=false; sub.textContent=L({en:"Try again",sw:"Jaribu tena",sh:"Try again"}); } else done(); }, function(){ done(); }); }
+        else done();
+      });
+    });
+  });
+}
+
 function footer(){
   return '<div class="footer overflow-anywhere"><p>'+esc(L({
     en:"MazingiraKenya · Raia — the people’s platform for climate & environmental justice in Kenya.",
@@ -1133,6 +1201,8 @@ function applyHash(scroll){
   if(h.indexOf("disinfo/")===0){
     state.disinfoId=h.slice(8).replace(/[^0-9]/g,""); state.view="disinfo"; render(); return true;
   }
+  if(h==="petitions"){ state.view="petitions"; state.petitionId=null; render(); return true; }
+  if(h.indexOf("petition=")===0){ state.petitionId=decodeURIComponent(h.slice(9)); state.view="petitions"; render(); return true; }
   if(h.indexOf("flag/")===0){
     var parts=h.slice(5).split("/");
     state.flagPost=(parts[0]||"").replace(/[^0-9]/g,"");

@@ -1178,6 +1178,50 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 .copbar .cb-go{ font-size:.6rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ember); flex:none; }
 @media (max-width:720px){ .copbar .cb-where{ display:none; } }
 
+/* ---------- virtual space (Jitsi) ---------- */
+.vs-room{ border:1px solid var(--line); background:var(--panel); }
+.vs-cta{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:18px; }
+.vs-ctatext{ flex:1; min-width:200px; }
+.vs-ctatext h3{ margin:0 0 4px; }
+.vs-ctatext p{ margin:0; color:var(--muted); font-size:.85rem; }
+.vs-ctabtns{ display:flex; gap:8px; flex-wrap:wrap; }
+.vs-stage{ width:100%; height:560px; background:#000; }
+.vs-stage iframe{ width:100%; height:100%; border:0; display:block; }
+@media (max-width:640px){ .vs-stage{ height:66vh; } }
+.vs-bar{ display:flex; gap:8px; align-items:center; padding:10px 14px; border-top:1px solid var(--line); flex-wrap:wrap; }
+.vs-bar .vs-note{ color:var(--muted); font-size:.78rem; margin-right:auto; }
+.vs-bar .btn{ padding:8px 12px; font-size:.72rem; }
+.vs-calls{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px; }
+.vs-call{ border:1px solid var(--line); background:var(--panel); padding:14px; display:flex; flex-direction:column; gap:7px; }
+.vs-call h4{ margin:0; font-size:1rem; color:var(--text); }
+.vs-when{ font-size:.78rem; color:var(--green); font-weight:800; letter-spacing:.02em; }
+.vs-call .meta{ color:var(--muted); font-size:.82rem; margin:0; }
+.vs-call-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+.vs-call-actions .btn{ padding:8px 12px; font-size:.72rem; }
+.vs-empty{ border:1px dashed var(--line-2); padding:22px; text-align:center; color:var(--muted); font-size:.9rem; }
+
+/* ---------- petitions & memoranda (Voices) ---------- */
+.pet-head{ display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
+.pet-wrap{ display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:14px; }
+.pet-card{ background:var(--panel); border:1px solid var(--line); padding:16px 16px 14px; display:flex; flex-direction:column; }
+.pet-card h3{ margin:0 0 5px; font-size:1.02rem; line-height:1.25; color:var(--text); }
+.pet-target{ font-size:.66rem; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--ember); margin:0 0 9px; }
+.pet-sum{ margin:0 0 13px; color:var(--muted); font-size:.88rem; line-height:1.5; flex:1; }
+.pet-meter{ height:7px; border-radius:6px; background:var(--line); overflow:hidden; margin:0 0 6px; }
+.pet-meter > i{ display:block; height:100%; background:var(--green); border-radius:6px; transition:width .5s; min-width:2px; }
+.pet-count{ font-size:.78rem; color:var(--muted); margin:0 0 13px; }
+.pet-count b{ color:var(--text); font-weight:800; }
+.pet-actions{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.pet-actions .btn{ padding:9px 14px; font-size:.72rem; }
+.pet-doc{ font-size:.74rem; color:var(--green); font-weight:700; align-self:center; }
+.pet-share{ display:inline-flex; gap:6px; margin-left:auto; }
+.pet-share button, .pet-share a{ width:33px; height:33px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--line-2); background:transparent; border-radius:7px; cursor:pointer; color:var(--muted); padding:0; }
+.pet-share button:hover, .pet-share a:hover{ color:var(--text); border-color:var(--muted); }
+.pet-share svg{ width:15px; height:15px; fill:currentColor; }
+.pet-empty{ border:1px dashed var(--line-2); padding:26px 20px; text-align:center; color:var(--muted); font-size:.9rem; line-height:1.55; }
+.pet-empty b{ color:var(--text); }
+.pet-signed{ font-size:.72rem; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--green); align-self:center; }
+
 /* ---------- social embeds in Voices ---------- */
 .voice-embed{ width:100%; margin-top:10px; }
 .voice-embed:empty{ display:none; }
@@ -1922,6 +1966,67 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
   </div>
 </section>
 
+<!-- ============================ VIRTUAL SPACE ============================ -->
+<section class="band" id="virtual" data-view="explore" data-sub="exchange">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="grow"><p class="kicker">Meet · convene · coordinate</p><h2>Virtual space</h2>
+        <p class="lede">A coalition video room — start one now, or schedule a call and share the invite with members.
+          Runs on Jitsi Meet in your browser; no account or install needed.</p></div>
+      <button class="btn btn--green" id="scheduleCall" type="button">+ Schedule a call</button>
+    </div>
+
+    <div class="vs-room" id="vsRoom">
+      <div class="vs-cta" id="vsCta">
+        <div class="vs-ctatext"><h3>Coalition room</h3>
+          <p>A private, unguessable room shared by the coalition. For sensitive calls, turn on the lobby once inside.</p></div>
+        <div class="vs-ctabtns">
+          <button class="btn btn--ember" id="vsStart" type="button">Start / join now →</button>
+          <button class="btn btn--ghost" id="vsCopy" type="button">Copy room link</button>
+        </div>
+      </div>
+      <div class="vs-stage" id="vsStage" hidden></div>
+      <div class="vs-bar" id="vsBar" hidden>
+        <span class="vs-note">Others join with the same link. Camera &amp; mic stay off until you allow them.</span>
+        <button class="btn btn--ghost" id="vsBarCopy" type="button">Copy link</button>
+        <button class="btn btn--ghost" id="vsBarNew" type="button">Open in new tab</button>
+        <button class="btn btn--ember" id="vsLeave" type="button">Leave</button>
+      </div>
+    </div>
+
+    <div class="sec-head" style="margin-top:26px"><div class="grow"><p class="kicker">Scheduled</p><h3 class="trackh">Upcoming calls</h3></div></div>
+    <div class="vs-calls" id="vsCalls"></div>
+  </div>
+</section>
+
+<!-- Schedule-a-call modal -->
+<div class="modal-overlay" id="callModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cmTitle">
+    <div class="modal-head">
+      <div class="grow"><h3 id="cmTitle">Schedule a call</h3><p>Creates a video room and a calendar invite (.ics) you can share with members.</p></div>
+      <button class="modal-x" id="cmClose" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="callForm" class="ev-form">
+        <label>Title<input name="title" required placeholder="e.g. Legal working group — Siaya nuclear"></label>
+        <div class="ev-row">
+          <label>Date<input name="date" type="date" required></label>
+          <label>Time<input name="time" type="time" required></label>
+        </div>
+        <div class="ev-row">
+          <label>Duration<select name="dur"><option value="30">30 minutes</option><option value="60" selected>1 hour</option><option value="90">1.5 hours</option><option value="120">2 hours</option></select></label>
+          <label>Host / convener<input name="host" placeholder="e.g. deCOALonize secretariat"></label>
+        </div>
+        <label>Note <span class="opt">(optional)</span><textarea name="note" rows="2" placeholder="Agenda, who should join…"></textarea></label>
+        <div class="ev-actions">
+          <button type="button" class="btn btn--ghost" id="cmCancel">Cancel</button>
+          <button type="submit" class="btn btn--green">Schedule &amp; get invite</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Create-event modal -->
 <div class="modal-overlay" id="eventModal" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="evmTitle">
@@ -1975,6 +2080,52 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
         <div class="ev-actions">
           <button type="button" class="btn btn--ghost" id="resmCancel">Cancel</button>
           <button type="submit" class="btn btn--green">Publish resource</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Start-a-petition modal (members only; publishes to the coalition + raia) -->
+<div class="modal-overlay" id="petModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="petmTitle">
+    <div class="modal-head">
+      <div class="grow"><h3 id="petmTitle">Start a petition</h3><p>A collective demand to a duty-bearer. It publishes to the coalition and can be shared publicly on raia.</p></div>
+      <button class="modal-x" id="petmClose" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="petForm" class="ev-form">
+        <label>Title<input name="title" required placeholder="e.g. Halt the Siaya nuclear siting until public participation is complete"></label>
+        <label>Addressed to<input name="target" required placeholder="e.g. Nuclear Power &amp; Energy Agency; Siaya County Assembly"></label>
+        <label>The ask (short summary)<textarea name="summary" required rows="3" placeholder="One or two sentences on what you're demanding and why."></textarea></label>
+        <label>Full memorandum text <span class="opt">(optional)</span><textarea name="body" rows="4" placeholder="The full text of the memorandum, if you have it."></textarea></label>
+        <div class="ev-row">
+          <label>Signature goal<input type="number" name="goal" min="1" value="500"></label>
+          <label>Link to memorandum <span class="opt">(optional)</span><input type="url" name="doc" placeholder="https://…"></label>
+        </div>
+        <div class="ev-actions">
+          <button type="button" class="btn btn--ghost" id="petmCancel">Cancel</button>
+          <button type="submit" class="btn btn--green">Publish petition</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Sign-a-petition modal -->
+<div class="modal-overlay" id="signModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="signmTitle">
+    <div class="modal-head">
+      <div class="grow"><h3 id="signmTitle">Add your name</h3><p id="signmFor">Sign this petition.</p></div>
+      <button class="modal-x" id="signmClose" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="signForm" class="ev-form">
+        <label>Your name<input name="name" required placeholder="Full name"></label>
+        <label>Organisation <span class="opt">(optional)</span><input name="org" placeholder="e.g. Save Lamu"></label>
+        <label>Email <span class="opt">(optional, not shown publicly)</span><input type="email" name="email" placeholder="you@organisation.org"></label>
+        <label class="consent"><input type="checkbox" name="consent" required> <span>I add my name to this demand and consent to it being counted publicly.</span></label>
+        <div class="ev-actions">
+          <button type="button" class="btn btn--ghost" id="signmCancel">Cancel</button>
+          <button type="submit" class="btn btn--ember">Sign</button>
         </div>
       </form>
     </div>
@@ -2048,6 +2199,23 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 
     <div class="sec-head" style="margin-top:6px"><div class="grow"><p class="kicker">Recent</p><h3 class="trackh">From the community</h3></div></div>
     <div class="cards" id="voiceList"></div>
+  </div>
+</section>
+
+<!-- ============================ PETITIONS ============================ -->
+<section class="band" id="petitions" data-view="voices">
+  <div class="wrap">
+    <div class="pet-head">
+      <div class="grow">
+        <p class="kicker">Collective demands</p>
+        <h2>Petitions &amp; memoranda</h2>
+        <p class="lede">Coalition demands to duty-bearers — courts, county assemblies, ministries, financiers. Members
+          start one here; anyone can add their name. Share it to gather public support on
+          <a href="https://raia.mazingirakenya.org/#petitions" target="_blank" rel="noopener noreferrer">raia</a>.</p>
+      </div>
+      <button class="btn btn--green" id="startPetition" type="button">+ Start a petition</button>
+    </div>
+    <div class="pet-wrap" id="petList"></div>
   </div>
 </section>
 
@@ -4151,6 +4319,296 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
       "https://uueemckdoozsuowcqkhl.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA")
   : null);
+/* =================================================================
+   PETITIONS & MEMORANDA (Voices) — Supabase-backed, graceful fallback
+   ================================================================= */
+(function(){
+  var listEl = document.getElementById("petList");
+  if(!listEl) return;
+  var signed = {}; // ids signed this session (soft guard)
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function shareUrl(p){ return "https://raia.mazingirakenya.org/#petition="+encodeURIComponent(p.id); }
+  function shareText(p){ return "Add your name: “"+p.title+"” — a coalition demand to "+p.target+". #MazingiraKenya"; }
+  var ICON = {
+    x:'<svg viewBox="0 0 24 24"><path d="M18.9 2h3.3l-7.2 8.3L23.5 22h-6.6l-5.2-6.8L5.7 22H2.4l7.7-8.8L1.8 2h6.8l4.7 6.2L18.9 2zm-1.2 18h1.8L7.2 3.9H5.3L17.7 20z"/></svg>',
+    fb:'<svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 10-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0022 12z"/></svg>',
+    wa:'<svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.2-.7.2s-.8 1-.9 1.1c-.2.2-.3.2-.6.1a8 8 0 01-2.4-1.5 9 9 0 01-1.7-2c-.2-.4 0-.5.1-.7l.5-.6c.2-.2.2-.3.3-.5s0-.4 0-.6L8.9 6.6c-.2-.5-.4-.4-.6-.5H7.8c-.2 0-.6.1-.9.4-.3.4-1.2 1.2-1.2 2.8s1.2 3.2 1.4 3.5c.2.2 2.4 3.7 5.9 5.1 3.5 1.4 3.5.9 4.1.9.6-.1 1.9-.8 2.2-1.6.3-.8.3-1.4.2-1.6-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 00-8.5 15.2L2 22l4.9-1.3A10 10 0 1012 2z"/></svg>',
+    link:'<svg viewBox="0 0 24 24"><path d="M3.9 12a3.1 3.1 0 013.1-3.1h4V7h-4a5 5 0 000 10h4v-1.9h-4A3.1 3.1 0 013.9 12zM8 13h8v-2H8v2zm9-6h-4v1.9h4a3.1 3.1 0 010 6.2h-4V17h4a5 5 0 000-10z"/></svg>'
+  };
+  var PETS = [];
+  function card(p){
+    var count=p._count||0, goal=p.goal||0;
+    var pct = goal>0 ? Math.min(100, Math.round(count/goal*100)) : (count>0?100:0);
+    var su=shareUrl(p), st=shareText(p);
+    var doc = p.doc ? '<a class="pet-doc" href="'+esc(p.doc)+'" target="_blank" rel="noopener noreferrer">Memorandum ↗</a>' : '';
+    var goalTxt = goal>0 ? (' of '+goal.toLocaleString()+' goal') : '';
+    var signBtn = signed[p.id] ? '<span class="pet-signed">✓ Signed</span>' : '<button class="btn btn--ember pet-sign" type="button">Add your name</button>';
+    var n=document.createElement("div"); n.className="pet-card";
+    n.innerHTML =
+      '<h3>'+esc(p.title)+'</h3>'+
+      '<p class="pet-target">To: '+esc(p.target)+'</p>'+
+      '<p class="pet-sum">'+esc(p.summary)+'</p>'+
+      '<div class="pet-meter"><i style="width:'+pct+'%"></i></div>'+
+      '<p class="pet-count"><b>'+count.toLocaleString()+'</b> signature'+(count===1?'':'s')+goalTxt+'</p>'+
+      '<div class="pet-actions">'+signBtn+doc+
+        '<span class="pet-share">'+
+          '<a title="Share on X" href="https://twitter.com/intent/tweet?text='+encodeURIComponent(st)+'&url='+encodeURIComponent(su)+'" target="_blank" rel="noopener noreferrer">'+ICON.x+'</a>'+
+          '<a title="Share on Facebook" href="https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(su)+'" target="_blank" rel="noopener noreferrer">'+ICON.fb+'</a>'+
+          '<a title="Share on WhatsApp" href="https://wa.me/?text='+encodeURIComponent(st+" "+su)+'" target="_blank" rel="noopener noreferrer">'+ICON.wa+'</a>'+
+          '<button title="Share / copy link" class="pet-copy" type="button">'+ICON.link+'</button>'+
+        '</span>'+
+      '</div>';
+    var copyBtn=n.querySelector(".pet-copy");
+    copyBtn.addEventListener("click", function(){
+      if(navigator.share){ navigator.share({title:p.title, text:st, url:su}).catch(function(){}); return; }
+      if(navigator.clipboard){ navigator.clipboard.writeText(su).then(function(){ hubToast("Link copied"); }, function(){ hubToast(su); }); }
+      else hubToast(su);
+    });
+    var sb2=n.querySelector(".pet-sign");
+    if(sb2) sb2.addEventListener("click", function(){ openSign(p); });
+    return n;
+  }
+  function render(){
+    listEl.innerHTML="";
+    if(!PETS.length){
+      var e=document.createElement("div"); e.className="pet-empty";
+      e.innerHTML="<b>No active petitions yet.</b><br>When the coalition has a live demand — a court matter, a county budget line, a financier — it starts here and gathers names. Members: <b>Start a petition</b> above.";
+      listEl.appendChild(e); return;
+    }
+    PETS.forEach(function(p){ listEl.appendChild(card(p)); });
+  }
+  render();
+  function loadCounts(){
+    if(!SB) return;
+    PETS.forEach(function(p){
+      if((""+p.id).indexOf("local-")===0) return;
+      SB.from("petition_signatures").select("id",{count:"exact",head:true}).eq("petition_id",p.id)
+        .then(function(r){ if(typeof r.count==="number"){ p._count=r.count; render(); } }, function(){});
+    });
+  }
+  function load(){
+    if(!SB) return;
+    SB.from("petitions").select("*").eq("published",true).order("created_at",{ascending:false}).limit(50)
+      .then(function(r){
+        if(r.error || !r.data) return;
+        PETS = r.data.map(function(row){
+          return { id:row.id, title:row.title, target:row.target, summary:row.summary, body:row.body,
+                   goal:row.goal||0, doc:row.doc_url||"", _count:row.sign_count||0 };
+        });
+        render(); loadCounts();
+      }, function(){});
+  }
+  if(SB && SB.auth && SB.auth.getSession){ SB.auth.getSession().then(load, load); } else load();
+
+  /* create-petition modal */
+  (function(){
+    var overlay=document.getElementById("petModal"), form=document.getElementById("petForm");
+    var openBtn=document.getElementById("startPetition");
+    if(!overlay||!form) return;
+    function openM(){ overlay.classList.add("on"); overlay.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden"; setTimeout(function(){ if(form.elements.title) form.elements.title.focus(); },30); }
+    function closeM(){ overlay.classList.remove("on"); overlay.setAttribute("aria-hidden","true"); document.body.style.overflow=""; }
+    if(openBtn) openBtn.addEventListener("click", function(){ if(!SB){ hubToast("Sign in to start a petition"); return; } openM(); });
+    var x=document.getElementById("petmClose"), cx=document.getElementById("petmCancel");
+    if(x) x.addEventListener("click",closeM); if(cx) cx.addEventListener("click",closeM);
+    overlay.addEventListener("click",function(e){ if(e.target===overlay) closeM(); });
+    document.addEventListener("keydown",function(e){ if(e.key==="Escape" && overlay.classList.contains("on")) closeM(); });
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      if(form.checkValidity && !form.checkValidity()){ if(form.reportValidity) form.reportValidity(); return; }
+      var f=form.elements;
+      var rec={ title:f.title.value.trim(), target:f.target.value.trim(), summary:f.summary.value.trim(),
+        body:f.body.value.trim(), goal:parseInt(f.goal.value,10)||0, doc_url:f.doc.value.trim(), published:true };
+      var btn=form.querySelector('button[type="submit"]'); if(btn) btn.disabled=true;
+      function localDone(){ PETS.unshift({ id:"local-"+Date.now(), title:rec.title, target:rec.target, summary:rec.summary, body:rec.body, goal:rec.goal, doc:rec.doc_url, _count:0 }); render(); closeM(); form.reset(); if(btn) btn.disabled=false; }
+      if(SB){
+        SB.from("petitions").insert(rec).then(function(r){
+          if(r.error){ hubToast("Saved locally — sync failed"); localDone(); }
+          else { closeM(); form.reset(); if(btn) btn.disabled=false; hubToast("Petition published"); load(); }
+        }, function(){ hubToast("Saved locally — sync failed"); localDone(); });
+      } else localDone();
+    });
+  })();
+
+  /* sign-petition modal */
+  var signOverlay=document.getElementById("signModal"), signFormEl=document.getElementById("signForm"), signFor=document.getElementById("signmFor");
+  var _cur=null;
+  function openSign(p){
+    if(!signOverlay) return; _cur=p;
+    if(signFor) signFor.textContent="“"+p.title+"” — to "+p.target;
+    signOverlay.classList.add("on"); signOverlay.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden";
+    setTimeout(function(){ if(signFormEl.elements.name) signFormEl.elements.name.focus(); },30);
+  }
+  function closeSign(){ if(!signOverlay) return; signOverlay.classList.remove("on"); signOverlay.setAttribute("aria-hidden","true"); document.body.style.overflow=""; }
+  (function(){
+    if(!signOverlay||!signFormEl) return;
+    var x=document.getElementById("signmClose"), cx=document.getElementById("signmCancel");
+    if(x) x.addEventListener("click",closeSign); if(cx) cx.addEventListener("click",closeSign);
+    signOverlay.addEventListener("click",function(e){ if(e.target===signOverlay) closeSign(); });
+    document.addEventListener("keydown",function(e){ if(e.key==="Escape" && signOverlay.classList.contains("on")) closeSign(); });
+    signFormEl.addEventListener("submit", function(e){
+      e.preventDefault();
+      if(signFormEl.checkValidity && !signFormEl.checkValidity()){ if(signFormEl.reportValidity) signFormEl.reportValidity(); return; }
+      if(!_cur) return;
+      var f=signFormEl.elements;
+      var sig={ petition_id:_cur.id, name:f.name.value.trim(), org:f.org.value.trim(), email:f.email.value.trim() };
+      var btn=signFormEl.querySelector('button[type="submit"]'); if(btn) btn.disabled=true;
+      function done(){ signed[_cur.id]=true; _cur._count=(_cur._count||0)+1; render(); closeSign(); signFormEl.reset(); if(btn) btn.disabled=false; hubToast("Thank you — your name is added"); }
+      if(SB && (""+_cur.id).indexOf("local-")!==0){
+        SB.from("petition_signatures").insert(sig).then(function(r){ if(r.error){ hubToast("Couldn't record — try again"); if(btn) btn.disabled=false; } else done(); }, function(){ done(); });
+      } else done();
+    });
+  })();
+})();
+
+/* =================================================================
+   VIRTUAL SPACE (Jitsi Meet) — meet now + scheduled calls
+   ================================================================= */
+(function(){
+  var section=document.getElementById("virtual"); if(!section) return;
+  var JITSI="meet.jit.si";
+  var COALITION_ROOM="MazingiraKenya-Coalition-a7f3c9e2b18d4f6a";
+  function roomUrl(slug){ return "https://"+JITSI+"/"+encodeURIComponent(slug); }
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function rhex(n){ var s=""; for(var i=0;i<n;i++) s+=Math.floor(Math.random()*16).toString(16); return s; }
+  function copy(text){ if(navigator.clipboard){ navigator.clipboard.writeText(text).then(function(){ hubToast("Link copied"); }, function(){ hubToast(text); }); } else hubToast(text); }
+
+  /* ---- embed / leave ---- */
+  var stage=document.getElementById("vsStage"), cta=document.getElementById("vsCta"), bar=document.getElementById("vsBar");
+  var curRoom=COALITION_ROOM, api=null;
+  function loadApi(cb){
+    if(window.JitsiMeetExternalAPI) return cb();
+    var s=document.createElement("script"); s.src="https://"+JITSI+"/external_api.js";
+    s.onload=function(){ cb(); }; s.onerror=function(){ cb(new Error("noapi")); };
+    document.head.appendChild(s);
+  }
+  function startRoom(slug){
+    curRoom=slug||COALITION_ROOM;
+    if(cta) cta.hidden=true; if(stage) stage.hidden=false; if(bar) bar.hidden=false;
+    stage.innerHTML="";
+    loadApi(function(err){
+      if(err || !window.JitsiMeetExternalAPI){
+        stage.innerHTML='<iframe allow="camera; microphone; fullscreen; display-capture; autoplay" src="'+roomUrl(curRoom)+'#config.prejoinPageEnabled=true"></iframe>';
+        return;
+      }
+      try{
+        api=new window.JitsiMeetExternalAPI(JITSI,{
+          roomName:curRoom, parentNode:stage, width:"100%", height:"100%",
+          configOverwrite:{ prejoinPageEnabled:true, startWithAudioMuted:true, disableDeepLinking:true },
+          interfaceConfigOverwrite:{ MOBILE_APP_PROMO:false, SHOW_JITSI_WATERMARK:false }
+        });
+        api.addEventListener("readyToClose", leaveRoom);
+      }catch(e){
+        stage.innerHTML='<iframe allow="camera; microphone; fullscreen; display-capture; autoplay" src="'+roomUrl(curRoom)+'#config.prejoinPageEnabled=true"></iframe>';
+      }
+    });
+    section.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  function leaveRoom(){
+    if(api){ try{ api.dispose(); }catch(e){} api=null; }
+    if(stage){ stage.innerHTML=""; stage.hidden=true; } if(bar) bar.hidden=true; if(cta) cta.hidden=false;
+  }
+  var b;
+  if((b=document.getElementById("vsStart"))) b.addEventListener("click", function(){ startRoom(COALITION_ROOM); });
+  if((b=document.getElementById("vsCopy"))) b.addEventListener("click", function(){ copy(roomUrl(COALITION_ROOM)); });
+  if((b=document.getElementById("vsBarCopy"))) b.addEventListener("click", function(){ copy(roomUrl(curRoom)); });
+  if((b=document.getElementById("vsBarNew"))) b.addEventListener("click", function(){ window.open(roomUrl(curRoom), "_blank", "noopener"); });
+  if((b=document.getElementById("vsLeave"))) b.addEventListener("click", leaveRoom);
+
+  /* ---- .ics calendar invite ---- */
+  function pad(n){ return (n<10?"0":"")+n; }
+  function icsStamp(d){ return d.getUTCFullYear()+pad(d.getUTCMonth()+1)+pad(d.getUTCDate())+"T"+pad(d.getUTCHours())+pad(d.getUTCMinutes())+"00Z"; }
+  function downloadIcs(call){
+    var start=new Date(call.start_at), end=new Date(start.getTime()+(call.duration_min||60)*60000);
+    var link=roomUrl(call.room);
+    var desc=(call.note?call.note+"\\n\\n":"")+"Join the video call: "+link+(call.host?"\\nHost: "+call.host:"");
+    var ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//MazingiraKenya//Virtual Space//EN","CALSCALE:GREGORIAN","METHOD:PUBLISH",
+      "BEGIN:VEVENT","UID:"+(call.id||rhex(16))+"@mazingirakenya.org","DTSTAMP:"+icsStamp(new Date()),
+      "DTSTART:"+icsStamp(start),"DTEND:"+icsStamp(end),
+      "SUMMARY:"+String(call.title||"Coalition call").replace(/[\r\n]+/g," "),
+      "DESCRIPTION:"+desc,"LOCATION:"+link,"URL:"+link,"END:VEVENT","END:VCALENDAR"].join("\r\n");
+    var blob=new Blob([ics],{type:"text/calendar;charset=utf-8"});
+    var a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download=(String(call.title||"call").replace(/[^a-z0-9]+/gi,"-").toLowerCase())+".ics";
+    document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },500);
+  }
+  function inviteText(call){
+    return "You're invited: "+call.title+"\n"+new Date(call.start_at).toLocaleString()+
+      (call.host?"\nHost: "+call.host:"")+"\nJoin: "+roomUrl(call.room);
+  }
+
+  /* ---- upcoming calls list ---- */
+  var callsEl=document.getElementById("vsCalls"), CALLS=[];
+  function fmtWhen(iso){
+    try{ return new Date(iso).toLocaleString([], {weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit"}); }
+    catch(e){ return iso; }
+  }
+  function renderCalls(){
+    if(!callsEl) return; callsEl.innerHTML="";
+    if(!CALLS.length){
+      var e=document.createElement("div"); e.className="vs-empty";
+      e.innerHTML="No calls scheduled yet. <b>Schedule a call</b> to create a room and share the invite.";
+      callsEl.appendChild(e); return;
+    }
+    CALLS.forEach(function(c){
+      var n=document.createElement("div"); n.className="vs-call";
+      n.innerHTML='<span class="vs-when">'+esc(fmtWhen(c.start_at))+'</span>'+
+        '<h4>'+esc(c.title)+'</h4>'+
+        (c.host?'<p class="meta">Host: '+esc(c.host)+'</p>':'')+
+        (c.note?'<p class="meta">'+esc(c.note)+'</p>':'')+
+        '<div class="vs-call-actions">'+
+          '<button class="btn btn--ember vsc-join" type="button">Join</button>'+
+          '<button class="btn btn--ghost vsc-ics" type="button">Add to calendar</button>'+
+          '<button class="btn btn--ghost vsc-copy" type="button">Copy invite</button>'+
+        '</div>';
+      n.querySelector(".vsc-join").addEventListener("click", function(){ startRoom(c.room); });
+      n.querySelector(".vsc-ics").addEventListener("click", function(){ downloadIcs(c); });
+      n.querySelector(".vsc-copy").addEventListener("click", function(){ copy(inviteText(c)); });
+      callsEl.appendChild(n);
+    });
+  }
+  renderCalls();
+  function loadCalls(){
+    if(!SB) return;
+    var cutoff=new Date(Date.now()-2*3600*1000).toISOString();
+    SB.from("calls").select("*").gte("start_at",cutoff).order("start_at",{ascending:true}).limit(50)
+      .then(function(r){ if(r.error||!r.data) return; CALLS=r.data; renderCalls(); }, function(){});
+  }
+  if(SB && SB.auth && SB.auth.getSession){ SB.auth.getSession().then(loadCalls, loadCalls); } else loadCalls();
+
+  /* ---- schedule modal ---- */
+  (function(){
+    var overlay=document.getElementById("callModal"), form=document.getElementById("callForm");
+    var openBtn=document.getElementById("scheduleCall"); if(!overlay||!form) return;
+    function openM(){ overlay.classList.add("on"); overlay.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden"; setTimeout(function(){ if(form.elements.title) form.elements.title.focus(); },30); }
+    function closeM(){ overlay.classList.remove("on"); overlay.setAttribute("aria-hidden","true"); document.body.style.overflow=""; }
+    if(openBtn) openBtn.addEventListener("click", function(){ if(!SB){ hubToast("Sign in to schedule a call"); return; } openM(); });
+    var x=document.getElementById("cmClose"), cx=document.getElementById("cmCancel");
+    if(x) x.addEventListener("click",closeM); if(cx) cx.addEventListener("click",closeM);
+    overlay.addEventListener("click",function(e){ if(e.target===overlay) closeM(); });
+    document.addEventListener("keydown",function(e){ if(e.key==="Escape" && overlay.classList.contains("on")) closeM(); });
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      if(form.checkValidity && !form.checkValidity()){ if(form.reportValidity) form.reportValidity(); return; }
+      var f=form.elements;
+      var start=new Date(f.date.value+"T"+f.time.value);
+      if(isNaN(start.getTime())){ hubToast("Check the date and time"); return; }
+      var rec={ title:f.title.value.trim(), start_at:start.toISOString(), duration_min:parseInt(f.dur.value,10)||60,
+        host:f.host.value.trim(), note:f.note.value.trim(), room:"MazingiraKenya-"+rhex(12) };
+      var btn=form.querySelector('button[type="submit"]'); if(btn) btn.disabled=true;
+      function finish(saved){
+        var call=saved||rec; downloadIcs(call);
+        closeM(); form.reset(); if(btn) btn.disabled=false;
+        hubToast("Scheduled — invite downloaded to share");
+        loadCalls();
+        if(!SB){ CALLS.push(rec); CALLS.sort(function(a,b){ return new Date(a.start_at)-new Date(b.start_at); }); renderCalls(); }
+      }
+      if(SB){
+        SB.from("calls").insert(rec).then(function(r){ if(r.error){ hubToast("Saved locally — sync failed"); } finish(rec); }, function(){ finish(rec); });
+      } else finish(rec);
+    });
+  })();
+})();
+
 /* Sign out — clears the Supabase session; the gate re-appears on reload */
 (function(){
   var so=document.getElementById("hubSignOut"); if(!so) return;
