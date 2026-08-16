@@ -2890,43 +2890,29 @@ var MEMBERS = [
 ];
 
 var DESK = {
+ /* Real, verified public resources. Members add more via "+ Upload a resource".
+    Opportunities starts empty — grant calls are time-sensitive, so members post
+    live ones rather than us shipping ones that may have closed. */
  "Resources":[
-  {t:"The Lamu ruling: what the Court of Appeal actually decided",m:"Legal brief · 18 pp · March 2026",dl:"412",g:true,k:"PDF"},
-  {t:"Kenya's coal pipeline after Lamu",m:"Research paper · 34 pp · February 2026",dl:"287",k:"PDF"},
-  {t:"Just transition financing in East Africa",m:"Policy analysis · 22 pp · January 2026",dl:"196",k:"PDF"},
-  {t:"County response gap analysis, mid-2026",m:"Data brief · 12 pp · July 2026",dl:"84",g:true,k:"PDF"},
-  {t:"Campaign graphics pack — just transition",m:"12 assets · social and print · May 2026",dl:"338",k:"ZIP"},
-  {t:"Talking points: answering the 'coal means jobs' argument",m:"Briefing note · 4 pp",dl:"241",g:true,k:"DOC"},
-  {t:"Community baraza facilitation guide (Kiswahili)",m:"Facilitator manual · 16 pp",dl:"163",g:true,k:"PDF"},
-  {t:"Media pitch templates for coalition members",m:"Template pack",dl:"97",k:"DOC"}
+  {t:"The Kenya Coal Report — coal power & mining in Kenya",m:"Research report · Heinrich Böll Stiftung & deCOALonize · 2021",g:true,k:"PDF",url:"https://ke.boell.org/sites/default/files/2021-09/The%20Kenya%20Coal%20Report%20Final.pdf"},
+  {t:"Save Lamu v NEMA — the coal ruling explained",m:"Legal summary of NET Appeal 196 of 2016 · Natural Justice",g:true,k:"PDF",url:"https://naturaljustice.org/wp-content/uploads/2020/03/NET-Judgment-summary-2.pdf"},
+  {t:"Save Lamu & others v NEMA and Amu Power — case record",m:"Full litigation record · Climate Case Chart",k:"WEB",url:"https://www.climatecasechart.com/document/save-lamu-et-al-v-national-environmental-management-authority-and-amu-power-co-ltd_6dbd"},
+  {t:"Lamu coal power project — the finance behind it",m:"Project & financier profile · BankTrack",k:"WEB",url:"https://www.banktrack.org/project/lamu_coal_power_project"}
  ],
  "Media briefs":[
-  {t:"Court of Appeal revokes Lamu coal plant licence",m:"Press release · October 2025",dl:"1,204",g:true,k:"WEB"},
-  {t:"Coalition statement on Mui Basin concessions",m:"Statement · April 2026",dl:"366",k:"WEB"},
-  {t:"Submission on the Energy (Amendment) Bill 2026",m:"Public statement · June 2026",dl:"152",k:"WEB"},
-  {t:"Media contact sheet — coalition spokespeople",m:"Contact list · July 2026",dl:"71",k:"DOC"}
+  {t:"deCOALonize — press releases",m:"Official coalition statements · decoalonize.org",k:"WEB",url:"https://www.decoalonize.org/category/resources/pressreleases/"},
+  {t:"Historic victory for the Lamu community",m:"Statement · Natural Justice · 2019",k:"WEB",url:"https://naturaljustice.org/historic-victory-for-lamu-community-and-environmental-justice/"},
+  {t:"Kenya court upholds cancellation of the 1,050 MW coal plant licence",m:"News · Mongabay · Nov 2025",k:"WEB",url:"https://news.mongabay.com/short-article/2025/11/kenya-court-upholds-cancellation-of-1050-mw-coal-plant-license/"},
+  {t:"Lamu residents welcome Environment Court ruling on the coal project",m:"News · The Star · Oct 2025",k:"WEB",url:"https://www.the-star.co.ke/counties/coast/2025-10-21-lamu-residents-welcome-environment-court-ruling-on-sh200-billion-coal-project"}
  ],
- "Opportunities":[
-  {t:"AJWS narrative reporting window opens",m:"Reporting deadline · 30 September 2026",dl:"—",g:true,k:"CALL"},
-  {t:"FIMI Ayni Fund — indigenous-led content production",m:"Applications open · rolling",dl:"—",k:"CALL"},
-  {t:"Sub-grant call: county-level environmental documentation",m:"Closes 15 August 2026",dl:"—",g:true,k:"CALL"},
-  {t:"Pre-COP31 delegate accreditation support",m:"Expressions of interest · August 2026",dl:"—",k:"CALL"}
- ]
+ "Opportunities":[]
 };
 
-var EVENTS = [
- {m:"Aug",d:"07",t:"Mkomani Ward community baraza",w:"Lamu · in person",p:"Community discussion on what follows the licence revocation, convened with LAWA."},
- {m:"Aug",d:"21",t:"Youth citizen journalism training",w:"Lamu · LAWA",p:"Second cohort of the citizen journalism programme — filming, consent, and verification."},
- {m:"Sep",d:"11",t:"Just transition convening",w:"Nairobi · hybrid",p:"Coalition-wide convening on the Energy (Amendment) Bill and coordinated advocacy at committee stage."},
- {m:"Oct",d:"03",t:"Pre-COP31 coalition briefing",w:"Virtual",p:"Positioning, delegation coordination, and shared messaging ahead of COP31."}
-];
+/* Convenings & Community voices start empty — real items are added by members
+   (Create event / Share with the Hub) or synced from raia. No placeholder data. */
+var EVENTS = [];
 
-var VOICES = [
- {t:"Mkomani speaks: what the ruling changed",m:"Video · 2:14 · LAWA · July 2026",i:"video",p:"Young citizen journalists ask residents what has and has not changed since the coal plant licence was revoked."},
- {t:"Aweer elders on land and water",m:"Audio · 6:40 · LAWA · June 2026",i:"audio",p:"Indigenous Aweer/Boni community members on customary land use, water access, and being consulted after the fact."},
- {t:"Laikipia field situation report, June 2026",m:"Report · MKNF · June 2026",i:"doc",p:"Farmer-documented account of the dry season, grazing pressure, and the local advocacy response."},
- {t:"A pastoralist's account of the 2026 dry season",m:"Testimony · MKNF · May 2026",i:"doc",p:"First-person testimony recorded with consent during an MKNF community documentation session."}
-];
+var VOICES = [];
 
 var AJE = [
  {q:"The map shows counties nobody is covering. Aje sasa?", body:"A response gap is a fundable, closable thing — not a permanent condition.",
@@ -4174,12 +4160,24 @@ Object.keys(DESK).forEach(function(k,i){
 });
 function renderDesk(k){
   panel.innerHTML="";
-  (DESK[k]||[]).forEach(function(r){
+  var items = DESK[k]||[];
+  if(!items.length){
+    var empties = {
+      "Resources":"No resources here yet. Members add reports, briefs and guides with <b>+ Upload a resource</b>.",
+      "Media briefs":"No media briefs yet. Members share coalition statements, press releases and coverage here.",
+      "Opportunities":"No open calls right now. Members post live funding calls, fellowships and accreditation windows here as they open."
+    };
+    panel.innerHTML = '<div class="pet-empty" style="margin-top:6px">'+(empties[k]||"Nothing here yet.")+'</div>';
+    return;
+  }
+  items.forEach(function(r){
     var row = el(r.url?"a":"div","res-row"+(r.url?" res-link":""));
     if(r.url){ row.href=r.url; row.target="_blank"; row.rel="noopener noreferrer"; }
+    var isDl = /^(PDF|DOC|DOCX|ZIP|XLS|XLSX|PPT|PPTX|IMG)$/i.test(r.k||"");
+    var label = r.url ? (isDl?"Download ↓":"Open →") : "";
     row.innerHTML = '<div class="res-icon'+(r.g?" g":"")+'" aria-hidden="true">'+r.k+'</div>'+
       '<div class="grow"><h3>'+r.t+(r._new?' <span class="res-new">New</span>':'')+'</h3><span class="meta">'+r.m+'</span></div>'+
-      '<span class="res-dl">'+(r.dl==="—"?"Open →":r.dl+" ↓")+'</span>';
+      '<span class="res-dl">'+label+'</span>';
     panel.appendChild(row);
   });
 }
@@ -4230,15 +4228,17 @@ window.renderDeskActive = function(){
       meta:(f.meta.value.trim()||(f.by.value.trim()?"Shared by "+f.by.value.trim():"Community upload")),
       url:f.url.value.trim(), kind:f.kind.value, by:f.by.value.trim(), published:true };
     var submitBtn=form.querySelector('button[type="submit"]');
-    function showLocal(){
+    function showLocal(localOnly, msg){
       DESK[rec.category].unshift({ t:rec.title, m:rec.meta, dl:"—", k:rec.kind, url:rec.url, _new:true });
       var tab=[].slice.call(document.querySelectorAll("#deskTabs .tab")).filter(function(t){return t.textContent===rec.category;})[0];
       if(tab) tab.click(); else if(window.renderDeskActive) window.renderDeskActive();
-      closeM(); form.reset(); if(submitBtn) submitBtn.disabled=false; hubToast("Resource published to the Exchange");
+      closeM(); form.reset(); if(submitBtn) submitBtn.disabled=false;
+      if(localOnly) hubToast("⚠ Saved on this device only — not synced"+(msg?" ("+msg+")":""));
+      else hubToast("Resource published to the Exchange");
     }
     function insertRec(){
-      if(SB){ SB.from("resources").insert(rec).then(function(r){ if(r.error){ hubToast("Saved locally — sync failed"); } showLocal(); }, function(){ showLocal(); }); }
-      else showLocal();
+      if(SB){ SB.from("resources").insert(rec).then(function(r){ if(r.error){ showLocal(true, r.error.message||r.error.code||"sync failed"); } else showLocal(false); }, function(err){ showLocal(true, (err&&err.message)||"network error"); }); }
+      else showLocal(true, "offline");
     }
     if(file){
       if(!SB || !SB.storage){ hubToast("File upload needs a connection — using the link instead"); insertRec(); return; }
@@ -4262,6 +4262,7 @@ function escE(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g
 function evKey(e){ var mi=MONTHS.indexOf(e.m); return (mi<0?99:mi)*100 + (parseInt(e.d,10)||0); }
 function renderEvents(){
   evWrap.innerHTML = "";
+  if(!EVENTS.length){ evWrap.innerHTML = '<div class="pet-empty">No convenings scheduled yet. Use <b>+ Create event</b> to add a baraza, training or convening to the coalition calendar.</div>'; return; }
   EVENTS.slice().sort(function(a,b){ return evKey(a)-evKey(b); }).forEach(function(e){
     var c = el("div","card");
     var org = e.org ? '<b>'+escE(e.org)+'.</b> ' : '';
@@ -4783,6 +4784,7 @@ var ICON_EMBED = { youtube:"video", x:"video", tiktok:"video", instagram:"photo"
 var vWrap = document.getElementById("voiceList");
 function renderVoices(){
   vWrap.innerHTML = "";
+  if(!VOICES.length){ vWrap.innerHTML = '<div class="pet-empty">No community voices yet. Members share photos, video, audio or reports using the form above — they appear here after moderation.</div>'; return; }
   VOICES.forEach(function(v){
     var c = el("div","card");
     var icon = ICONS[v.i] || ICONS.doc;
