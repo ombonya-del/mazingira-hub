@@ -1178,6 +1178,26 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 .copbar .cb-go{ font-size:.6rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ember); flex:none; }
 @media (max-width:720px){ .copbar .cb-where{ display:none; } }
 
+/* ---------- corporate accountability index ---------- */
+.acc-legend{ display:flex; gap:16px; flex-wrap:wrap; margin:2px 0 18px; }
+.acc-key{ display:inline-flex; align-items:center; gap:7px; font-size:.78rem; color:var(--muted); }
+.acc-dot{ width:10px; height:10px; border-radius:50%; flex:none; }
+.acc-dot.kept{ background:var(--green); } .acc-dot.partial{ background:var(--ember); } .acc-dot.lip{ background:#E86A5E; }
+.acc-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:14px; }
+.acc-card{ background:var(--panel); border:1px solid var(--line); border-left-width:3px; padding:16px; display:flex; flex-direction:column; gap:10px; }
+.acc-card.kept{ border-left-color:var(--green); } .acc-card.partial{ border-left-color:var(--ember); } .acc-card.lip{ border-left-color:#E86A5E; }
+.acc-top{ display:flex; align-items:flex-start; gap:10px; }
+.acc-top h3{ margin:0; font-size:1.05rem; flex:1; color:var(--text); line-height:1.25; }
+.acc-type{ font-size:.6rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line-2); padding:3px 8px; border-radius:20px; white-space:nowrap; }
+.acc-pill{ align-self:flex-start; font-size:.64rem; font-weight:800; letter-spacing:.05em; text-transform:uppercase; padding:4px 11px; border-radius:20px; }
+.acc-pill.kept{ background:var(--green-wash); color:var(--green); } .acc-pill.partial{ background:var(--ember-wash); color:var(--ember); } .acc-pill.lip{ background:rgba(232,106,94,.15); color:#E86A5E; }
+.acc-row{ font-size:.86rem; line-height:1.5; }
+.acc-row b{ display:block; font-size:.62rem; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--muted-dim); margin-bottom:3px; }
+.acc-row.commit{ color:var(--text); } .acc-row.real{ color:var(--muted); }
+.acc-src{ display:flex; gap:14px; flex-wrap:wrap; margin-top:2px; }
+.acc-src a{ font-size:.74rem; color:var(--green); font-weight:700; }
+.acc-note{ font-size:.78rem; color:var(--muted-dim); font-style:italic; margin:16px 0 0; }
+
 /* ---------- virtual space (Jitsi) ---------- */
 .vs-room{ border:1px solid var(--line); background:var(--panel); }
 .vs-cta{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:18px; }
@@ -1373,6 +1393,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <a href="#legal"     data-view="explore" data-sub="legal">Legal</a>
     <a href="#sentiment" data-view="explore" data-sub="sentiment">Sentiment</a>
     <a href="#exchange"  data-view="explore" data-sub="exchange">Exchange</a>
+    <a href="#accountability" data-view="explore" data-sub="accountability">Accountability</a>
     <a href="#cop"       data-view="cop">COP31</a>
     <a href="#voices"    data-view="voices">Voices</a>
     <a href="#ajesasa"   data-view="act">Je, Hatua?</a>
@@ -1416,6 +1437,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     <a href="#legal"   data-sub="legal">Legal</a>
     <a href="#sentiment" data-sub="sentiment">Sentiment</a>
     <a href="#exchange" data-sub="exchange">Exchange</a>
+    <a href="#accountability" data-sub="accountability">Accountability</a>
   </div>
 </nav>
 
@@ -1938,6 +1960,27 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     </div>
 
     </div><!-- /sp-narrative -->
+  </div>
+</section>
+
+<!-- ============================ ACCOUNTABILITY ============================ -->
+<section class="band" id="accountability" data-view="explore" data-sub="accountability">
+  <div class="wrap">
+    <div class="sec-head"><div class="grow">
+      <p class="kicker">Explore · Accountability</p>
+      <h2>Corporate accountability index</h2>
+      <p class="lede">The banks, oil majors and state financiers whose choices shape Kenya's — and Africa's — energy future,
+        held against their own public climate promises. Each call is the coalition's read of the public record; follow the
+        sources and judge for yourself.</p>
+    </div></div>
+    <div class="acc-legend">
+      <span class="acc-key"><span class="acc-dot kept"></span> Kept — promise matched by action</span>
+      <span class="acc-key"><span class="acc-dot partial"></span> Partial — real movement, real gaps</span>
+      <span class="acc-key"><span class="acc-dot lip"></span> Lip-service — claim, not conduct</span>
+    </div>
+    <div class="acc-grid" id="accGrid"></div>
+    <p class="acc-note">Ratings reflect the cited public record and change as commitments and conduct change.
+      Spot something out of date, or an entity we should add? Share it via the Exchange.</p>
   </div>
 </section>
 
@@ -4276,6 +4319,58 @@ function renderEvents(){
 }
 renderEvents();
 
+/* =================================================================
+   CORPORATE ACCOUNTABILITY INDEX (Explore → Accountability)
+   Each entry cites the public record; ratings are the coalition's read.
+   ================================================================= */
+var ACCOUNT = [
+ { n:"China — “no new coal abroad” pledge", t:"State pledge", r:"partial",
+   c:"At the UN General Assembly on 21 Sept 2021, Xi Jinping pledged that China would build no new coal-fired power plants abroad and would scale up green-energy support for developing countries.",
+   real:"New overseas coal financing has largely stopped — Chinese lenders and investors have honoured the halt. But projects greenlit before the pledge keep advancing: ~8 GW came online in 2022–23 and ~9 GW more is planned or under construction. The freeze bit closest to home here, helping collapse financing for Kenya’s Lamu coal plant (PowerChina / ICBC).",
+   src:[{label:"CSIS",url:"https://www.csis.org/analysis/chinas-commitment-stop-overseas-financing-new-coal-plants-perspective"},{label:"BU Global Dev Policy",url:"https://www.bu.edu/gdp/2025/04/28/no-new-coal-a-shift-in-the-composition-of-chinas-overseas-power-plant-portfolio/"}] },
+
+ { n:"African Development Bank", t:"Development bank", r:"partial",
+   c:"Its New Deal on Energy for Africa (2015) promised universal electricity access by 2030, led by renewables, with no financing for new coal.",
+   real:"Between 2015 and 2023, roughly 77% of its energy financing went to renewables and it funded no new coal — a genuine shift. But about 7.5% still flowed to fossil fuels, mainly gas the Bank frames as a “transition” fuel.",
+   src:[{label:"Christian Aid",url:"https://www.christianaid.org.uk/news/policy/role-african-development-bank-delivering-renewable-energy"},{label:"AfDB",url:"https://www.afdb.org/en/topics-and-sectors/initiatives-partnerships/sustainable-energy-fund-for-africa"}] },
+
+ { n:"TotalEnergies", t:"Oil major", r:"partial",
+   c:"Carbon neutrality (net zero) by 2050, a 60% cut in methane by 2025, and a falling carbon-intensity of the energy it sells.",
+   real:"It has cut operational (Scope 1&2) emissions ~28% and lifecycle intensity ~19% since 2015 — real progress — but now says a 1.5°C-aligned net-zero target is “out of reach” and won’t commit to one under EU rules, even as it expands oil & gas, including backing the East African Crude Oil Pipeline (EACOP) through Uganda and Tanzania.",
+   src:[{label:"ESG Today",url:"https://www.esgtoday.com/totalenergies-says-it-cant-formulate-net-zero-targets-as-1-5c-is-out-of-reach/"},{label:"TotalEnergies",url:"https://corporate.totalenergies.us/news/totalenergies-publishes-its-sustainability-climate-2025-progress-report-and-further"}] },
+
+ { n:"ExxonMobil", t:"Oil major", r:"lip",
+   c:"An “ambition” for net-zero greenhouse-gas emissions from its operated assets by 2050 (announced January 2022).",
+   real:"The target covers only Scope 1&2 — the ~15% of emissions from running its own facilities — and ignores Scope 3, the ~85% from customers burning its oil and gas. Its CEO says the company can keep expanding oil & gas and still “meet” the goal; it bought Pioneer for $60bn, lifting production ~20%.",
+   src:[{label:"ExxonMobil",url:"https://corporate.exxonmobil.com/news/news-releases/2022/0118_exxonmobil-announces-ambition-for-net-zero-greenhouse-gas-emissions-by-2050"},{label:"The Nation",url:"https://www.thenation.com/article/environment/exxon-orwellian-emissions-oil-production/"}] },
+
+ { n:"Standard Chartered", t:"Bank", r:"kept",
+   c:"Under pressure over fossil-fuel finance, it opened due-diligence on whether to fund the East African Crude Oil Pipeline (EACOP).",
+   real:"It confirmed it will not finance EACOP, citing human-rights and environmental concerns — joining 40+ banks and insurers that have ruled the pipeline out. A concrete decline, not just a policy line.",
+   src:[{label:"Business & Human Rights",url:"https://www.business-humanrights.org/en/latest-news/east-african-oil-pipeline-faces-another-blow-as-standard-chartered-refuses-financing/"},{label:"GTR",url:"https://www.gtreview.com/news/africa/east-african-oil-pipeline-faces-another-blow-as-standard-chartered-refuses-financing/"}] },
+
+ { n:"Standard Bank (Stanbic)", t:"Bank", r:"lip",
+   c:"Africa’s largest bank by assets, with climate and human-rights commitments and an internal review of its EACOP exposure.",
+   real:"After that review it went ahead — confirming funding for EACOP in 2024 as a lead arranger, drawing condemnation from the #StopEACOP campaign and affected communities across Uganda and Tanzania.",
+   src:[{label:"Business & Human Rights",url:"https://www.business-humanrights.org/en/latest-news/standard-bank-set-to-proceed-with-funding-for-eacop-after-internal-review/"},{label:"AllAfrica",url:"https://allafrica.com/stories/202406200186.html"}] }
+];
+(function(){
+  var grid=document.getElementById("accGrid"); if(!grid) return;
+  var RATE={kept:"Kept",partial:"Partial",lip:"Lip-service"};
+  function e2(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  ACCOUNT.forEach(function(a){
+    var srcs=(a.src||[]).map(function(s){ return '<a href="'+e2(s.url)+'" target="_blank" rel="noopener noreferrer">'+e2(s.label)+' ↗</a>'; }).join("");
+    var card=el("div","acc-card "+a.r);
+    card.innerHTML =
+      '<div class="acc-top"><h3>'+e2(a.n)+'</h3><span class="acc-type">'+e2(a.t)+'</span></div>'+
+      '<span class="acc-pill '+a.r+'">'+RATE[a.r]+'</span>'+
+      '<div class="acc-row commit"><b>Promised</b>'+e2(a.c)+'</div>'+
+      '<div class="acc-row real"><b>Reality</b>'+e2(a.real)+'</div>'+
+      '<div class="acc-src">'+srcs+'</div>';
+    grid.appendChild(card);
+  });
+})();
+
 function hubToast(m){ var t=document.getElementById("hubToast"); if(!t) return; t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove("show"); },2200); }
 
 /* Sentiment ⇄ disinfo internal tabs (Media pulse / Classic / Narrative) */
@@ -5883,13 +5978,13 @@ var VIEWS = ["live","explore","cop","voices","act"];
 var HASH2VIEW = { live:"live", explore:"explore",
   map:"explore", directory:"explore", sectors:"explore", network:"explore",
   legal:"explore", disinfo:"explore", sentiment:"explore", narrative:"explore",
-  exchange:"explore", desk:"explore", events:"explore",
+  exchange:"explore", desk:"explore", events:"explore", accountability:"explore",
   cop:"cop", voices:"voices",
   ajesasa:"act", contribute:"act" };
 var HASH2SUB = { map:"map", directory:"directory", sectors:"directory", network:"directory",
   legal:"legal", disinfo:"sentiment", sentiment:"sentiment", narrative:"sentiment",
-  exchange:"exchange", desk:"exchange", events:"exchange" };
-var EXPLORE_SUBS = ["map","directory","legal","sentiment","exchange"];
+  exchange:"exchange", desk:"exchange", events:"exchange", accountability:"accountability" };
+var EXPLORE_SUBS = ["map","directory","legal","sentiment","exchange","accountability"];
 var exploreSub = "map";
 var tabLinks = document.querySelectorAll("nav.tabs a");
 
