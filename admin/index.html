@@ -263,6 +263,7 @@ var NAV = [
   {id:"content", label:"Content", grp:"Manage", icon:'<path d="M4 5h16M4 12h16M4 19h10"/>'},
   {id:"resources", label:"Resources", grp:"Manage", icon:'<path d="M4 5h10l2 2h4v11H4z"/><path d="M8 13h6"/>'},
   {id:"meetings", label:"Meetings", grp:"Manage", icon:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/>'},
+  {id:"events", label:"Events", grp:"Manage", icon:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/>'},
   {id:"members", label:"Members", grp:"Manage", icon:'<circle cx="9" cy="8" r="3"/><path d="M4 20a5 5 0 0 1 10 0"/><path d="M16 6a3 3 0 0 1 0 6M14 20a5 5 0 0 1 6-3"/>'}
 ];
 
@@ -383,6 +384,7 @@ function render(){
   else if(v==="content") app.innerHTML=viewContent();
   else if(v==="resources") app.innerHTML=viewResources();
   else if(v==="meetings") app.innerHTML=viewMeetings();
+  else if(v==="events") app.innerHTML=viewEvents();
   else if(v==="members") app.innerHTML=viewMembers();
   bindView();
   window.scrollTo(0,0);
@@ -539,6 +541,7 @@ function bindView(){
   bindUpload();
   if(state.view==="resources") loadResources();
   if(state.view==="meetings") loadMeetings();
+  if(state.view==="events") loadEvents();
 }
 
 /* ==================== EXCHANGE RESOURCES — member uploads (edit / delete) ==================== */
@@ -639,6 +642,64 @@ function loadMeetings(){
           var start=new Date(dt.value+"T"+(tm.value||"09:00")); if(isNaN(start.getTime())){ toast("Check the date and time"); return; }
           sv.disabled=true;
           ASB.from("calls").update({title:ti.value,start_at:start.toISOString(),host:ho.value,note:no.value}).eq("id",row.id).then(function(r){ if(r.error){sv.disabled=false;toast("Save failed: "+r.error.message);return;} row.title=ti.value;row.start_at=start.toISOString();row.host=ho.value;row.note=no.value; toast("Saved"); viewMode(); }); };
+        var cn=mkbtn("Cancel"); cn.onclick=viewMode;
+        acts.appendChild(sv); acts.appendChild(cn); wrap.appendChild(acts);
+      }
+      viewMode(); host.appendChild(wrap);
+    });
+  });
+}
+
+/* ==================== COALITION CALENDAR — events oversight (edit / remove) ==================== */
+function viewEvents(){
+  return '<div class="view"><div class="vhead"><h2>Coalition calendar — events</h2>'+
+    '<p class="vsub">Convenings, barazas, trainings and webinars members add to the calendar. Edit or remove them here.</p></div>'+
+    '<div id="evAdminList" class="ndr-list">Loading…</div></div>';
+}
+function loadEvents(){
+  var host=document.getElementById("evAdminList"); if(!host) return;
+  if(!ASB){ host.textContent="Supabase unavailable — check the connection."; return; }
+  host.textContent="Loading…";
+  ASB.from("calendar_events").select("*").order("start_date",{ascending:true}).then(function(res){
+    if(res.error){ host.textContent="Load failed: "+res.error.message; return; }
+    var data=res.data||[];
+    if(!data.length){ host.innerHTML='<p class="vsub">No events on the calendar yet.</p>'; return; }
+    host.innerHTML="";
+    function fmt(d){ try{ return new Date(String(d).slice(0,10)+"T00:00:00").toLocaleDateString([], {weekday:"short",year:"numeric",month:"short",day:"numeric"}); }catch(e){ return d; } }
+    data.forEach(function(row){
+      var wrap=document.createElement("div"); wrap.className="ndr-draft";
+      function mkbtn(t){ var b=document.createElement("button"); b.type="button"; b.className="btn btn--ghost"; b.textContent=t; return b; }
+      function fld(label,node){ var l=document.createElement("label"); l.style.cssText="display:block;font-size:.7rem;color:var(--muted,#8aa);margin:4px 0 0"; l.textContent=label; node.style.cssText="width:100%;margin-top:2px"; l.appendChild(node); return l; }
+      function viewMode(){
+        var past = row.start_date && new Date(String(row.start_date).slice(0,10)+"T23:59:59") < new Date();
+        wrap.innerHTML='<div class="grow"><b>'+esc(row.title)+'</b> <span class="pill">'+(past?"past":"upcoming")+'</span>'+
+          '<div style="font-size:.78rem;opacity:.75;margin-top:3px">'+esc(fmt(row.start_date))+(row.time?' · '+esc(row.time):'')+
+          (row.location?' · '+esc(row.location):'')+(row.mode?' · '+esc(String(row.mode).toLowerCase()):'')+
+          (row.org?' · '+esc(row.org):'')+
+          (row.link?' · <a href="'+esc(row.link)+'" target="_blank" rel="noopener">info ↗</a>':'')+'</div>'+
+          (row.description?'<div style="font-size:.78rem;opacity:.6;margin-top:2px">'+esc(row.description)+'</div>':"")+'</div><div class="ndr-acts"></div>';
+        var acts=wrap.querySelector(".ndr-acts");
+        var eb=mkbtn("Edit"); eb.onclick=editMode; acts.appendChild(eb);
+        var db=mkbtn("Delete"); db.onclick=function(){ if(!confirm("Remove \""+row.title+"\" from the calendar?"))return; db.disabled=true;
+          ASB.from("calendar_events").delete().eq("id",row.id).then(function(r){ if(r.error){db.disabled=false;toast("Delete failed: "+r.error.message);return;} toast("Event removed"); wrap.remove(); }); };
+        acts.appendChild(db);
+      }
+      function editMode(){
+        wrap.innerHTML="";
+        var box=document.createElement("div"); box.className="grow";
+        var ti=document.createElement("input"); ti.value=row.title;
+        var dt=document.createElement("input"); dt.type="date"; if(row.start_date) dt.value=String(row.start_date).slice(0,10);
+        var tm=document.createElement("input"); tm.value=row.time||""; tm.placeholder="e.g. 10:00";
+        var lo=document.createElement("input"); lo.value=row.location||"";
+        var mo=document.createElement("select"); ["In person","Virtual","Hybrid"].forEach(function(c){ var o=document.createElement("option"); o.textContent=c; if(c===row.mode)o.selected=true; mo.appendChild(o); });
+        var og=document.createElement("input"); og.value=row.org||"";
+        var de=document.createElement("input"); de.value=row.description||"";
+        var li=document.createElement("input"); li.value=row.link||"";
+        box.appendChild(fld("Title",ti)); box.appendChild(fld("Date",dt)); box.appendChild(fld("Time",tm)); box.appendChild(fld("Location",lo)); box.appendChild(fld("Mode",mo)); box.appendChild(fld("Organiser",og)); box.appendChild(fld("Description",de)); box.appendChild(fld("Link",li));
+        wrap.appendChild(box);
+        var acts=document.createElement("div"); acts.className="ndr-acts";
+        var sv=mkbtn("Save"); sv.onclick=function(){ sv.disabled=true;
+          ASB.from("calendar_events").update({title:ti.value,start_date:dt.value||null,time:tm.value,location:lo.value,mode:mo.value,org:og.value,description:de.value,link:li.value}).eq("id",row.id).then(function(r){ if(r.error){sv.disabled=false;toast("Save failed: "+r.error.message);return;} row.title=ti.value;row.start_date=dt.value;row.time=tm.value;row.location=lo.value;row.mode=mo.value;row.org=og.value;row.description=de.value;row.link=li.value; toast("Saved"); viewMode(); }); };
         var cn=mkbtn("Cancel"); cn.onclick=viewMode;
         acts.appendChild(sv); acts.appendChild(cn); wrap.appendChild(acts);
       }

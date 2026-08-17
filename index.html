@@ -4996,14 +4996,34 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
   form.addEventListener("submit",function(e){
     e.preventDefault();
     if(form.checkValidity && !form.checkValidity()){ if(form.reportValidity) form.reportValidity(); return; }
-    var f=form.elements, m="", day="";
-    if(f.date.value){ var dt=new Date(f.date.value+"T00:00:00"); if(!isNaN(dt.getTime())){ m=MONTHS[dt.getMonth()]; day=String(dt.getDate()); if(day.length<2) day="0"+day; } }
-    var where=(f.location.value||"TBC")+" · "+(f.mode.value||"").toLowerCase();
-    if(f.time.value) where+=" · "+f.time.value;
-    EVENTS.push({ m:m||"—", d:day||"–", t:f.title.value, w:where, p:(f.desc.value||f.type.value), org:f.org.value, link:f.link.value });
-    renderEvents(); closeM(); form.reset(); hubToast("Event added to the calendar");
+    var f=form.elements;
+    var rec={ title:f.title.value.trim(), start_date:f.date.value||null, time:f.time.value||"",
+      location:f.location.value.trim(), mode:f.mode.value||"", description:(f.desc.value.trim()||f.type.value||""),
+      org:f.org.value.trim(), link:f.link.value.trim(), published:true };
+    var btn=form.querySelector('button[type="submit"]'); if(btn) btn.disabled=true;
+    function localAdd(msg){ EVENTS.push(eventFromRow(rec)); renderEvents(); closeM(); form.reset(); if(btn) btn.disabled=false; hubToast(msg||"Event added to the calendar"); }
+    if(SB){
+      SB.from("calendar_events").insert(rec).then(function(r){
+        if(r.error){ localAdd("⚠ Saved on this device only — "+(r.error.message||r.error.code||"not synced")); }
+        else { closeM(); form.reset(); if(btn) btn.disabled=false; hubToast("Event added to the calendar"); mzFetchEvents(); }
+      }, function(){ localAdd("Saved locally — sync failed"); });
+    } else localAdd();
   });
 })();
+
+/* ---- events: live from Supabase (members create; admins manage in the console) ---- */
+function eventFromRow(row){
+  var m="—", d="–";
+  if(row.start_date){ var dt=new Date(String(row.start_date).slice(0,10)+"T00:00:00"); if(!isNaN(dt.getTime())){ m=MONTHS[dt.getMonth()]; d=String(dt.getDate()); if(d.length<2) d="0"+d; } }
+  var w=(row.location||"TBC")+(row.mode?" · "+String(row.mode).toLowerCase():"")+(row.time?" · "+row.time:"");
+  return { m:m, d:d, t:row.title, w:w, p:(row.description||""), org:row.org||"", link:row.link||"", _id:row.id };
+}
+function mzFetchEvents(){
+  if(!SB) return;
+  SB.from("calendar_events").select("*").eq("published",true).order("start_date",{ascending:true}).limit(100)
+    .then(function(r){ if(r.error||!r.data) return; EVENTS = r.data.map(eventFromRow); renderEvents(); }, function(){});
+}
+(function(){ if(!SB) return; if(SB.auth&&SB.auth.getSession){ SB.auth.getSession().then(mzFetchEvents,mzFetchEvents); } else mzFetchEvents(); })();
 
 var ICONS = {
  video:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m10 8 6 4-6 4V8z"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>',

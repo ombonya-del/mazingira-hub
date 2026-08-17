@@ -69,14 +69,27 @@ Rationale: strong, verifiable clean-energy and climate-adaptation financing reco
   - https://nation.africa/kenya/brand-book/equity-climate-change-mitigation-through-green-financing-3371868
   - https://equitygroupholdings.com/ke/newsroom/press-releases/equity-bank-kenya-recognized-for-climate-financing-reporting-excellence-by-international-finance-corporation/
 
-### Candidates not completed this cycle (search quota exhausted)
-The weekly web-search limit was reached mid-scan (resets 21 Aug). Two further African financiers surfaced as promising leads but could NOT be verified to the two-source standard and are therefore deliberately left out: **Africa Finance Corporation (AFC)** and **Trade & Development Bank (TDB)**, both reported as EACOP-adjacent regional lenders with stated sustainability positioning. Recommend verifying these first on the next run. The newly launched **Africa Energy Bank** was considered and set aside: it is expressly an oil-and-gas financing vehicle without a public climate/sustainability commitment, so it fails the index's entry criterion (a).
+### Candidate 3 — Nordea
+**Type: Bank / asset manager · Finland (Nordic).** Proposed rating (coalition's read): **Partial.**
+Rationale: took a real, named step against EACOP-linked fossil expansion, but stopped short of full divestment — an accountability half-measure.
+
+- **Promised:** Responsible-investment and net-zero commitments across its banking and asset-management arms.
+- **Reality:** Declined to provide project finance to EACOP, and in April 2025 its asset-management arm confirmed it will buy no new TotalEnergies shares or bonds because of EACOP — while keeping existing holdings, citing a wish to retain influence; campaigners are pressing it to divest fully.
+- **Sources:**
+  - https://www.banktrack.org/article/nordea_stops_new_investment_in_totalenergies_over_eacop
+  - https://politiken.dk/debat/debatindlaeg/art10339324/Nordea-er-ogs%C3%A5-modstander-af-r%C3%B8rledning-i-Afrika (Politiken — comment by Nordea Asset Management's Head of Responsible Investments)
+
+### Also verified, lower priority — SMBC
+**Sumitomo Mitsui Banking Corporation (Japan), oil-and-gas net-zero commitments.** Withdrew as an EACOP financial advisor and joint lead arranger in May 2023 after campaign pressure. A verifiable action against the project, but older than this cycle's window; flagged for the coalition to decide whether to add. Sources: https://www.banktrack.org/success/eacop_financial_advisor_smbc_is_no_longer_involved_with_the_project and https://www.energyvoice.com/oilandgas/africa/pipelines-africa/502822/smbc-follows-stanchart-disavows-eacop-role/
+
+### Leads dropped after verification
+Earlier speculative leads **Africa Finance Corporation (AFC)** and **Trade & Development Bank (TDB)** were checked against BankTrack's EACOP financier record and do NOT appear among the confirmed lenders/advisers (Afreximbank, Standard Bank, Stanbic Uganda, KCB Bank Uganda, ICD), so they are dropped rather than added on an unverified basis. The newly launched **Africa Energy Bank** was also set aside: it is expressly an oil-and-gas financing vehicle without a public climate/sustainability commitment, so it fails entry criterion (a).
 
 ---
 
 ## Notes on method and limits
 - Ratings are drafts and the coalition's interpretation, not fact.
 - No URLs, quotes, dates, or figures were invented; every figure above traces to a listed source.
-- Search coverage was partial this cycle because the web-search quota was exhausted; TotalEnergies' 2026 disclosure and several EACOP figures were confirmed before the limit, but AFC/TDB verification and a wider new-candidate sweep are outstanding for next run.
+- The WebSearch quota was exhausted mid-run (resets 21 Aug), so the candidate sweep was completed using direct fetches of the reputable EACOP financier trackers (BankTrack, StopEACOP) rather than open search. This is enough to verify named financiers, but a fuller open-web sweep for non-EACOP candidates (coal, nuclear, carbon markets) remains lighter than ideal and should be redone next run.
 
-**2 existing-entry changes (1 text refresh, 1 watch note) plus 1 shared EACOP reality refresh, 2 new candidates — awaiting approval.**
+**3 existing-entry changes (1 text refresh, 1 watch note, 1 shared EACOP reality refresh), 3 new candidates (Nordea added; SMBC flagged) — awaiting approval.**
