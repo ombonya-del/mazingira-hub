@@ -744,7 +744,7 @@ function oppReviewCard(row,host){
       (row.url?' · <a href="'+esc(row.url)+'" target="_blank" rel="noopener">official link ↗</a>':"")+
       (row.by?' · '+esc(row.by):"")+'</div><div class="ndr-preview" hidden></div></div><div class="ndr-acts"></div>';
     var prev=wrap.querySelector(".ndr-preview");
-    prev.innerHTML='<div style="margin-top:8px;padding:10px 12px;background:rgba(98,199,155,.07);border-radius:8px;font-size:.82rem;line-height:1.55"><div><b>'+esc(row.title)+'</b></div>'+(row.meta?'<div style="margin-top:4px">'+esc(row.meta)+'</div>':'')+(row.by?'<div style="margin-top:2px;opacity:.8">Funder / host: '+esc(row.by)+'</div>':'')+(row.url?'<div style="margin-top:8px"><a class="btn pub" href="'+esc(row.url)+'" target="_blank" rel="noopener">Open the official call ↗</a></div>':'<div style="margin-top:6px;opacity:.7">No official link — verify before accepting.</div>')+'</div>';
+    prev.innerHTML='<div style="margin-top:8px;padding:10px 12px;background:rgba(98,199,155,.07);border-radius:8px;font-size:.82rem;line-height:1.6"><div><b>'+esc(row.title)+'</b></div>'+(row.opp_type?'<div style="margin-top:4px"><b>Type:</b> '+esc(row.opp_type)+'</div>':'')+(row.deadline?'<div style="margin-top:2px"><b>Deadline:</b> '+esc(row.deadline)+'</div>':'')+(row.amount?'<div style="margin-top:2px"><b>Amount:</b> '+esc(row.amount)+'</div>':'')+(row.by?'<div style="margin-top:2px"><b>Funder / host:</b> '+esc(row.by)+'</div>':'')+(row.eligibility?'<div style="margin-top:2px"><b>Eligibility:</b> '+esc(row.eligibility)+'</div>':'')+((row.meta&&!row.opp_type&&!row.deadline)?'<div style="margin-top:4px;opacity:.85">'+esc(row.meta)+'</div>':'')+(row.url?'<div style="margin-top:8px"><a class="btn pub" href="'+esc(row.url)+'" target="_blank" rel="noopener">Open the official call ↗</a></div>':'<div style="margin-top:6px;opacity:.7">No official link — verify before accepting.</div>')+'</div>';
     var acts=wrap.querySelector(".ndr-acts");
     var pv=mkbtn("Preview","ghost"); pv.onclick=function(){ prev.hidden=!prev.hidden; pv.textContent=prev.hidden?"Preview":"Hide preview"; }; acts.appendChild(pv);
     var ac=mkbtn("Accept","approve"); ac.onclick=function(){ ac.disabled=true;
@@ -758,14 +758,18 @@ function oppReviewCard(row,host){
     wrap.innerHTML="";
     var box=document.createElement("div"); box.className="grow";
     var ti=document.createElement("input"); ti.value=row.title||"";
-    var me=document.createElement("input"); me.value=row.meta||""; me.placeholder='Grant · Host · closes 31 Aug 2026';
+    var ty=document.createElement("input"); ty.value=row.opp_type||""; ty.placeholder="Grant / Fellowship / Accreditation";
+    var dl=document.createElement("input"); dl.value=row.deadline||""; dl.placeholder="31 Aug 2026 or Rolling";
+    var am=document.createElement("input"); am.value=row.amount||""; am.placeholder="e.g. Up to USD 20,000";
+    var el2=document.createElement("input"); el2.value=row.eligibility||""; el2.placeholder="Who can apply (Kenya / Africa)";
+    var me=document.createElement("input"); me.value=row.meta||""; me.placeholder='One-line: Grant · Host · closes 31 Aug 2026';
     var ur=document.createElement("input"); ur.value=row.url||"";
     var by=document.createElement("input"); by.value=row.by||""; by.placeholder="Funder / host";
-    box.appendChild(fld("Title",ti)); box.appendChild(fld("Meta",me)); box.appendChild(fld("Official link",ur)); box.appendChild(fld("Funder / host",by));
+    box.appendChild(fld("Title",ti)); box.appendChild(fld("Type",ty)); box.appendChild(fld("Deadline",dl)); box.appendChild(fld("Amount",am)); box.appendChild(fld("Eligibility",el2)); box.appendChild(fld("One-line meta",me)); box.appendChild(fld("Official link",ur)); box.appendChild(fld("Funder / host",by));
     wrap.appendChild(box);
     var acts=document.createElement("div"); acts.className="ndr-acts";
     var sv=mkbtn("Save draft","ghost"); sv.onclick=function(){ sv.disabled=true;
-      ASB.from("resources").update({title:ti.value,meta:me.value,url:ur.value,by:by.value}).eq("id",row.id).then(function(r){ if(r.error){sv.disabled=false;toast("Save failed: "+r.error.message);return;} row.title=ti.value;row.meta=me.value;row.url=ur.value;row.by=by.value; toast("Draft updated"); viewMode(); }); };
+      ASB.from("resources").update({title:ti.value,opp_type:ty.value,deadline:dl.value,amount:am.value,eligibility:el2.value,meta:me.value,url:ur.value,by:by.value}).eq("id",row.id).then(function(r){ if(r.error){sv.disabled=false;toast("Save failed: "+r.error.message);return;} row.title=ti.value;row.opp_type=ty.value;row.deadline=dl.value;row.amount=am.value;row.eligibility=el2.value;row.meta=me.value;row.url=ur.value;row.by=by.value; toast("Draft updated"); viewMode(); }); };
     var cn=mkbtn("Cancel","ghost"); cn.onclick=viewMode;
     acts.appendChild(sv); acts.appendChild(cn); wrap.appendChild(acts);
   }
