@@ -1,3 +1,12 @@
 
 # FUSE mount temp files
 .fuse_hidden*
+
+# Local secrets — NEVER commit (service_role key used by the scheduled watchers)
+scripts/.secrets
+.secrets
+
+# Weekly-watcher review drafts (local working files)
+OPPORTUNITIES-REVIEW.md
+EVENTS-REVIEW.md
+PLEDGES-REVIEW.md

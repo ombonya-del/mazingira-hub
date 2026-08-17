@@ -1356,7 +1356,8 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
   var HAUTH = (window.supabase && window.supabase.createClient)
     ? window.supabase.createClient(
         "https://uueemckdoozsuowcqkhl.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA")
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA",
+        { auth:{ flowType:"implicit", detectSessionInUrl:true, persistSession:true, autoRefreshToken:true } })
     : null;
   window.HAUTH = HAUTH;   // the data layer reuses this one client
 

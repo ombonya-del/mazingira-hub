@@ -742,8 +742,11 @@ function oppReviewCard(row,host){
     wrap.innerHTML='<div class="grow"><span class="status-tag st-pending">Pending review</span> <b>'+esc(row.title)+'</b> <span class="pill">Opportunity</span>'+
       '<div style="font-size:.78rem;opacity:.75;margin-top:3px;overflow-wrap:anywhere">'+esc(row.meta||"")+
       (row.url?' · <a href="'+esc(row.url)+'" target="_blank" rel="noopener">official link ↗</a>':"")+
-      (row.by?' · '+esc(row.by):"")+'</div></div><div class="ndr-acts"></div>';
+      (row.by?' · '+esc(row.by):"")+'</div><div class="ndr-preview" hidden></div></div><div class="ndr-acts"></div>';
+    var prev=wrap.querySelector(".ndr-preview");
+    prev.innerHTML='<div style="margin-top:8px;padding:10px 12px;background:rgba(98,199,155,.07);border-radius:8px;font-size:.82rem;line-height:1.55"><div><b>'+esc(row.title)+'</b></div>'+(row.meta?'<div style="margin-top:4px">'+esc(row.meta)+'</div>':'')+(row.by?'<div style="margin-top:2px;opacity:.8">Funder / host: '+esc(row.by)+'</div>':'')+(row.url?'<div style="margin-top:8px"><a class="btn pub" href="'+esc(row.url)+'" target="_blank" rel="noopener">Open the official call ↗</a></div>':'<div style="margin-top:6px;opacity:.7">No official link — verify before accepting.</div>')+'</div>';
     var acts=wrap.querySelector(".ndr-acts");
+    var pv=mkbtn("Preview","ghost"); pv.onclick=function(){ prev.hidden=!prev.hidden; pv.textContent=prev.hidden?"Preview":"Hide preview"; }; acts.appendChild(pv);
     var ac=mkbtn("Accept","approve"); ac.onclick=function(){ ac.disabled=true;
       ASB.from("resources").update({published:true}).eq("id",row.id).then(function(r){ if(r.error){ac.disabled=false;toast("Accept failed: "+r.error.message);return;} toast("Accepted → live on the hub"); wrap.remove(); state.oppPending=Math.max(0,(state.oppPending||1)-1); renderNav(); if(host&&!host.children.length) host.innerHTML='<p class="vsub">Nothing awaiting review.</p>'; }); };
     var eb=mkbtn("Edit","ghost"); eb.onclick=editMode;
@@ -799,8 +802,11 @@ function evReviewCard(row,host){
       '<div style="font-size:.78rem;opacity:.75;margin-top:3px;overflow-wrap:anywhere">'+esc(row.start_date?fmt(row.start_date):"date TBC")+(row.time?' · '+esc(row.time):'')+
       (row.location?' · '+esc(row.location):'')+(row.mode?' · '+esc(String(row.mode).toLowerCase()):'')+(row.org?' · '+esc(row.org):'')+
       (row.link?' · <a href="'+esc(row.link)+'" target="_blank" rel="noopener">info ↗</a>':'')+'</div>'+
-      (row.description?'<div style="font-size:.78rem;opacity:.6;margin-top:2px">'+esc(row.description)+'</div>':"")+'</div><div class="ndr-acts"></div>';
+      (row.description?'<div style="font-size:.78rem;opacity:.6;margin-top:2px">'+esc(row.description)+'</div>':"")+'<div class="ndr-preview" hidden></div></div><div class="ndr-acts"></div>';
+    var prev=wrap.querySelector(".ndr-preview");
+    prev.innerHTML='<div style="margin-top:8px;padding:10px 12px;background:rgba(98,199,155,.07);border-radius:8px;font-size:.82rem;line-height:1.55"><div><b>'+esc(row.title)+'</b></div><div style="margin-top:4px">'+esc(row.start_date?fmt(row.start_date):"date TBC")+(row.time?' · '+esc(row.time):'')+'</div>'+((row.location||row.mode)?'<div style="margin-top:2px;opacity:.85">'+esc(row.location||'')+(row.mode?' · '+esc(row.mode):'')+'</div>':'')+(row.org?'<div style="margin-top:2px;opacity:.8">'+esc(row.org)+'</div>':'')+(row.description?'<div style="margin-top:6px">'+esc(row.description)+'</div>':'')+(row.link?'<div style="margin-top:8px"><a class="btn pub" href="'+esc(row.link)+'" target="_blank" rel="noopener">Open the event page ↗</a></div>':'<div style="margin-top:6px;opacity:.7">No link — verify before accepting.</div>')+'</div>';
     var acts=wrap.querySelector(".ndr-acts");
+    var pv=mkbtn("Preview","ghost"); pv.onclick=function(){ prev.hidden=!prev.hidden; pv.textContent=prev.hidden?"Preview":"Hide preview"; }; acts.appendChild(pv);
     var ac=mkbtn("Accept","approve"); ac.onclick=function(){ ac.disabled=true;
       ASB.from("calendar_events").update({published:true}).eq("id",row.id).then(function(r){ if(r.error){ac.disabled=false;toast("Accept failed: "+r.error.message);return;} toast("Accepted → on the calendar"); wrap.remove(); state.evPending=Math.max(0,(state.evPending||1)-1); renderNav(); if(host&&!host.children.length) host.innerHTML='<p class="vsub">Nothing awaiting review.</p>'; }); };
     var eb=mkbtn("Edit","ghost"); eb.onclick=editMode;
@@ -840,7 +846,8 @@ function fetchWatchCounts(){
 /* ==================== MANUAL UPLOAD — Supabase magic-link sign-in + publish ==================== */
 var ASB = (window.supabase && window.supabase.createClient)
   ? window.supabase.createClient("https://uueemckdoozsuowcqkhl.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA")
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA",
+      { auth:{ flowType:"implicit", detectSessionInUrl:true, persistSession:true, autoRefreshToken:true } })
   : null;
 var authUser=null;
 if(ASB){
