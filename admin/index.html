@@ -576,8 +576,9 @@ function loadResources(){
         wrap.innerHTML='<div class="grow"><b>'+esc(row.title)+'</b> <span class="pill">'+esc(row.category)+'</span>'+
           '<div style="font-size:.78rem;opacity:.75;margin-top:3px">'+esc(row.meta||"")+
           (row.url?' · <a href="'+esc(row.url)+'" target="_blank" rel="noopener">link ↗</a>':"")+
-          (row.by?' · by '+esc(row.by):"")+'</div></div><div class="ndr-acts"></div>';
+          (row.by?' · by '+esc(row.by):"")+'</div><div class="ndr-match" hidden></div></div><div class="ndr-acts"></div>';
         var acts=wrap.querySelector(".ndr-acts");
+        if(row.category==="Opportunities"){ var mn=mkbtn("Match & notify"); mn.onclick=function(){ oppMatch(row,wrap,mn); }; acts.appendChild(mn); }
         var eb=mkbtn("Edit"); eb.onclick=editMode; acts.appendChild(eb);
         var db=mkbtn("Delete"); db.onclick=function(){ if(!confirm("Delete \""+row.title+"\"?"))return; db.disabled=true;
           ASB.from("resources").delete().eq("id",row.id).then(function(r){ if(r.error){db.disabled=false;toast("Delete failed: "+r.error.message);return;} toast("Resource deleted"); wrap.remove(); }); };
@@ -752,7 +753,7 @@ function oppReviewCard(row,host){
     var pv=mkbtn("Preview","ghost"); pv.onclick=function(){ prev.hidden=!prev.hidden; pv.textContent=prev.hidden?"Preview":"Hide preview"; }; acts.appendChild(pv);
     var mn=mkbtn("Match & notify","ghost"); mn.onclick=function(){ oppMatch(row,wrap,mn); }; acts.appendChild(mn);
     var ac=mkbtn("Accept","approve"); ac.onclick=function(){ ac.disabled=true;
-      ASB.from("resources").update({published:true}).eq("id",row.id).then(function(r){ if(r.error){ac.disabled=false;toast("Accept failed: "+r.error.message);return;} toast("Accepted → live on the hub"); wrap.remove(); state.oppPending=Math.max(0,(state.oppPending||1)-1); renderNav(); if(host&&!host.children.length) host.innerHTML='<p class="vsub">Nothing awaiting review.</p>'; }); };
+      ASB.from("resources").update({published:true}).eq("id",row.id).then(function(r){ if(r.error){ac.disabled=false;toast("Accept failed: "+r.error.message);return;} oppAutoNotify(row); wrap.remove(); state.oppPending=Math.max(0,(state.oppPending||1)-1); renderNav(); if(host&&!host.children.length) host.innerHTML='<p class="vsub">Nothing awaiting review.</p>'; }); };
     var eb=mkbtn("Edit","ghost"); eb.onclick=editMode;
     var rj=mkbtn("Reject","reject"); rj.onclick=function(){ if(!confirm("Reject and discard \""+row.title+"\"?"))return; rj.disabled=true;
       ASB.from("resources").delete().eq("id",row.id).then(function(r){ if(r.error){rj.disabled=false;toast("Reject failed: "+r.error.message);return;} toast("Rejected — not published"); wrap.remove(); state.oppPending=Math.max(0,(state.oppPending||1)-1); renderNav(); if(host&&!host.children.length) host.innerHTML='<p class="vsub">Nothing awaiting review.</p>'; }); };
@@ -920,6 +921,23 @@ function oppMatch(row, wrap, btn){
         if(r.error){ stat.textContent="Failed: "+(r.error.message||r.error); return; }
         var d=r.data||{}; if(d.error){ stat.textContent="Failed: "+(typeof d.error==="string"?d.error:JSON.stringify(d.error)); return; }
         stat.textContent="Sent to "+(d.sent||emails.length)+" partner(s)."; toast("Interest email sent to "+(d.sent||emails.length)+" partner(s)"); }, function(e){ sbn.disabled=false; stat.textContent="Failed: "+e; }); };
+  });
+}
+
+/* Auto-match + email focus-matched partners (used when an opportunity is Accepted from review). */
+function oppAutoNotify(row){
+  if(!ASB) return;
+  ASB.from("partners").select("*").eq("active",true).then(function(res){
+    if(res.error || !res.data) return;
+    var partners=res.data.filter(function(p){ return p.email; });
+    if(!partners.length){ toast("Accepted → live (no partners with emails to notify)"); return; }
+    var hay=((row.title||"")+" "+(row.opp_type||"")+" "+(row.eligibility||"")+" "+(row.meta||"")).toLowerCase();
+    var matched=partners.filter(function(p){ var tags=(p.focus||"").toLowerCase().split(/[,;\s]+/).filter(function(t){return t.length>2;}); return tags.some(function(t){return hay.indexOf(t)>=0;}); });
+    if(!matched.length){ toast("Accepted → live (no partner focus-match to notify)"); return; }
+    var emails=matched.map(function(p){ return p.email; });
+    ASB.functions.invoke("notify-partners",{ body:{ opportunity:{title:row.title,opp_type:row.opp_type,deadline:row.deadline,amount:row.amount,by:row.by,eligibility:row.eligibility,url:row.url}, recipients:emails } }).then(function(r){
+      if(r.error || (r.data&&r.data.error)){ toast("Accepted → live — partner email failed (send manually)"); return; }
+      toast("Accepted → live · notified "+((r.data&&r.data.sent)||emails.length)+" matched partner(s)"); }, function(){ toast("Accepted → live — partner email failed"); });
   });
 }
 
