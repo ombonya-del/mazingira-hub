@@ -1,14 +1,14 @@
 // Supabase Edge Function: notify-partners
-// Emails matched partners about an opportunity, via Resend. BCC so partners
-// don't see each other. Admin-only (verifies is_admin() with the caller's JWT).
+// Emails matched partners about an opportunity, via Resend — ONE personalised email per
+// partner (to their primary + alternate addresses), each carrying a "Register interest"
+// button that links to the public register-interest function. Admin-only.
 //
 // Deploy:
 //   supabase functions deploy notify-partners
 //   supabase secrets set RESEND_API_KEY=re_xxx
-// (The SUPABASE_URL and SUPABASE_ANON_KEY secrets are injected automatically.)
 //
 // Called from the admin console:
-//   ASB.functions.invoke("notify-partners", { body: { opportunity, recipients } })
+//   ASB.functions.invoke("notify-partners", { body: { opportunity, partners:[{name,emails:[...]}] } })
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -38,9 +38,9 @@ Deno.serve(async (req) => {
     const { data: isAdmin, error: adminErr } = await supa.rpc("is_admin");
     if (adminErr || !isAdmin) return json({ error: "admin only" }, 403);
 
-    const { opportunity: o, recipients } = await req.json();
-    const to = (recipients ?? []).filter((e: string) => e && /@/.test(e));
-    if (!o || !o.title || !to.length) return json({ error: "opportunity.title + recipients required" }, 400);
+    const { opportunity: o, partners } = await req.json();
+    const list = (partners ?? []).filter((p: any) => p && Array.isArray(p.emails) && p.emails.filter((e: string) => e && /@/.test(e)).length);
+    if (!o || !o.title || !list.length) return json({ error: "opportunity.title + partners[] required" }, 400);
 
     const rows = [
       o.opp_type ? `<li><b>Type:</b> ${esc(o.opp_type)}</li>` : "",
@@ -49,23 +49,30 @@ Deno.serve(async (req) => {
       o.by ? `<li><b>Funder / host:</b> ${esc(o.by)}</li>` : "",
       o.eligibility ? `<li><b>Eligibility:</b> ${esc(o.eligibility)}</li>` : "",
     ].join("");
-    const html =
-      `<p>Hello,</p>` +
-      `<p>Through the <strong>MazingiraKenya</strong> coalition hub we've flagged an opportunity that may fit your work:</p>` +
-      `<p style="font-size:1.05rem"><strong>${esc(o.title)}</strong></p>` +
-      (rows ? `<ul>${rows}</ul>` : "") +
-      (o.url ? `<p><a href="${esc(o.url)}">View the opportunity and apply &rarr;</a></p>` : "") +
-      `<p>If it's relevant, reply to this email to register interest and we'll support your application.</p>` +
-      `<p>&mdash; deCOALonize / MazingiraKenya</p>`;
+    const fnBase = `${SUPABASE_URL}/functions/v1/register-interest`;
 
-    const r = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: FROM, to: FROM, bcc: to, subject: `Opportunity: ${o.title}`, html }),
-    });
-    const data = await r.json();
-    if (!r.ok) return json({ error: data }, 502);
-    return json({ sent: to.length, id: data.id });
+    let sent = 0;
+    const errors: unknown[] = [];
+    for (const p of list) {
+      const to = p.emails.filter((e: string) => e && /@/.test(e));
+      const link = `${fnBase}?t=${encodeURIComponent(o.title)}&u=${encodeURIComponent(o.url || "")}&n=${encodeURIComponent(p.name || "")}&e=${encodeURIComponent(to[0] || "")}`;
+      const html =
+        `<p>Hello${p.name ? " " + esc(p.name) : ""},</p>` +
+        `<p>Through the <strong>MazingiraKenya</strong> coalition hub we've flagged an opportunity that may fit your work:</p>` +
+        `<p style="font-size:1.05rem"><strong>${esc(o.title)}</strong></p>` +
+        (rows ? `<ul>${rows}</ul>` : "") +
+        (o.url ? `<p><a href="${esc(o.url)}">View the opportunity and apply &rarr;</a></p>` : "") +
+        `<p style="margin:18px 0"><a href="${esc(link)}" style="display:inline-block;background:#1B6B4A;color:#ffffff;padding:11px 20px;border-radius:8px;text-decoration:none;font-weight:700">Register your interest &#10003;</a></p>` +
+        `<p style="color:#666;font-size:.9em">One click lets the coalition know you're interested and we'll follow up to support your application.</p>` +
+        `<p>&mdash; deCOALonize / MazingiraKenya</p>`;
+      const r = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ from: FROM, to, subject: `Opportunity: ${o.title}`, html }),
+      });
+      if (r.ok) sent++; else errors.push(await r.json().catch(() => r.status));
+    }
+    return json({ sent, partners: list.length, errors: errors.length ? errors : undefined });
   } catch (e) {
     return json({ error: String(e) }, 500);
   }

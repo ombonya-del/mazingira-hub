@@ -267,6 +267,7 @@ var NAV = [
   {id:"meetings", label:"Meetings", grp:"Manage", icon:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/>'},
   {id:"events", label:"Events", grp:"Manage", icon:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/>'},
   {id:"partners", label:"Partners", grp:"Manage", icon:'<rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="2.5"/><path d="M8 17a4 4 0 0 1 8 0"/>'},
+  {id:"interest", label:"Interest", grp:"Manage", icon:'<path d="M4 5h16v11H4z"/><path d="m4 7 8 5 8-5"/><path d="m15 18 2 2 4-4"/>'},
   {id:"members", label:"Members", grp:"Manage", icon:'<circle cx="9" cy="8" r="3"/><path d="M4 20a5 5 0 0 1 10 0"/><path d="M16 6a3 3 0 0 1 0 6M14 20a5 5 0 0 1 6-3"/>'}
 ];
 
@@ -391,6 +392,7 @@ function render(){
   else if(v==="meetings") app.innerHTML=viewMeetings();
   else if(v==="events") app.innerHTML=viewEvents();
   else if(v==="partners") app.innerHTML=viewPartners();
+  else if(v==="interest") app.innerHTML=viewInterest();
   else if(v==="members") app.innerHTML=viewMembers();
   bindView();
   window.scrollTo(0,0);
@@ -549,6 +551,7 @@ function bindView(){
   if(state.view==="meetings") loadMeetings();
   if(state.view==="events") loadEvents();
   if(state.view==="partners") loadPartners();
+  if(state.view==="interest") loadInterest();
   if(state.view==="oppsreview") loadOppsReview();
   if(state.view==="eventsreview") loadEventsReview();
 }
@@ -865,11 +868,11 @@ function loadPartners(){
   if(!ASB){ host.textContent="Supabase unavailable — check the connection."; return; }
   host.innerHTML="";
   var af=document.createElement("div"); af.className="ndr-draft";
-  var nm=pInput("Organisation name"), em=pInput("info@org.org"), fo=pInput("coal, land, gold, nuclear, water, legal, gender, youth, media"), rg=pInput("Nyanza / Lamu / National");
-  af.appendChild(pLab("Name",nm)); af.appendChild(pLab("Contact email",em)); af.appendChild(pLab("Focus tags (comma-separated)",fo)); af.appendChild(pLab("Region",rg));
+  var nm=pInput("Organisation name"), em=pInput("info@org.org"), ea=pInput("alt1@org.org, alt2@org.org"), fo=pInput("coal, land, gold, nuclear, water, legal, gender, youth, media"), rg=pInput("Nyanza / Lamu / National");
+  af.appendChild(pLab("Name",nm)); af.appendChild(pLab("Contact email (primary)",em)); af.appendChild(pLab("Alternate emails (up to 2, comma-separated)",ea)); af.appendChild(pLab("Focus tags (comma-separated)",fo)); af.appendChild(pLab("Region",rg));
   var addb=document.createElement("button"); addb.className="btn pub"; addb.textContent="Add partner"; addb.style.marginTop="10px";
   addb.onclick=function(){ if(!nm.value.trim()){ toast("Name is required"); return; } addb.disabled=true;
-    ASB.from("partners").insert({name:nm.value.trim(),email:em.value.trim()||null,focus:fo.value.trim()||null,region:rg.value.trim()||null,active:true}).then(function(r){ addb.disabled=false; if(r.error){ toast("Add failed: "+r.error.message); return; } toast("Partner added"); loadPartners(); }); };
+    ASB.from("partners").insert({name:nm.value.trim(),email:em.value.trim()||null,email_alt:ea.value.trim()||null,focus:fo.value.trim()||null,region:rg.value.trim()||null,active:true}).then(function(r){ addb.disabled=false; if(r.error){ toast("Add failed: "+r.error.message); return; } toast("Partner added"); loadPartners(); }); };
   af.appendChild(addb); host.appendChild(af);
   var listWrap=document.createElement("div"); host.appendChild(listWrap);
   ASB.from("partners").select("*").order("name",{ascending:true}).then(function(res){
@@ -887,16 +890,19 @@ function loadPartners(){
         acts.appendChild(eb); acts.appendChild(db);
       }
       function edit(){ w.innerHTML=""; var box=document.createElement("div"); box.className="grow";
-        var n2=pInput(""); n2.value=row.name||""; var e2=pInput("info@org.org"); e2.value=row.email||""; var f2=pInput("focus tags"); f2.value=row.focus||""; var r2=pInput("region"); r2.value=row.region||"";
-        box.appendChild(pLab("Name",n2)); box.appendChild(pLab("Contact email",e2)); box.appendChild(pLab("Focus tags",f2)); box.appendChild(pLab("Region",r2)); w.appendChild(box);
+        var n2=pInput(""); n2.value=row.name||""; var e2=pInput("info@org.org"); e2.value=row.email||""; var a2=pInput("alt1@org.org, alt2@org.org"); a2.value=row.email_alt||""; var f2=pInput("focus tags"); f2.value=row.focus||""; var r2=pInput("region"); r2.value=row.region||"";
+        box.appendChild(pLab("Name",n2)); box.appendChild(pLab("Contact email (primary)",e2)); box.appendChild(pLab("Alternate emails",a2)); box.appendChild(pLab("Focus tags",f2)); box.appendChild(pLab("Region",r2)); w.appendChild(box);
         var a2=document.createElement("div"); a2.className="ndr-acts";
-        var sv=document.createElement("button"); sv.className="btn pub"; sv.textContent="Save"; sv.onclick=function(){ sv.disabled=true; ASB.from("partners").update({name:n2.value.trim(),email:e2.value.trim()||null,focus:f2.value.trim()||null,region:r2.value.trim()||null}).eq("id",row.id).then(function(r){ if(r.error){sv.disabled=false;toast("Save failed: "+r.error.message);return;} row.name=n2.value;row.email=e2.value;row.focus=f2.value;row.region=r2.value; toast("Saved"); view(); }); };
+        var sv=document.createElement("button"); sv.className="btn pub"; sv.textContent="Save"; sv.onclick=function(){ sv.disabled=true; ASB.from("partners").update({name:n2.value.trim(),email:e2.value.trim()||null,email_alt:a2.value.trim()||null,focus:f2.value.trim()||null,region:r2.value.trim()||null}).eq("id",row.id).then(function(r){ if(r.error){sv.disabled=false;toast("Save failed: "+r.error.message);return;} row.name=n2.value;row.email=e2.value;row.email_alt=a2.value;row.focus=f2.value;row.region=r2.value; toast("Saved"); view(); }); };
         var cn=document.createElement("button"); cn.className="btn ghost"; cn.textContent="Cancel"; cn.onclick=view; a2.appendChild(sv); a2.appendChild(cn); w.appendChild(a2);
       }
       view(); listWrap.appendChild(w);
     });
   });
 }
+
+/* All of a partner's emails: primary + up to two alternates (email_alt, comma-separated). */
+function partnerEmails(p){ var a=[p.email]; if(p.email_alt) a=a.concat(String(p.email_alt).split(/[,;\s]+/)); return a.filter(function(e){ return e && /@/.test(e); }); }
 
 /* Match an opportunity to partners by focus-tag overlap, then email them via the notify-partners function. */
 function oppMatch(row, wrap, btn){
@@ -907,20 +913,47 @@ function oppMatch(row, wrap, btn){
   box.innerHTML='<div style="'+bg+'"><span class="muted">Matching partners…</span></div>';
   ASB.from("partners").select("*").eq("active",true).then(function(res){
     if(res.error){ box.innerHTML='<div style="'+bg+'">Load failed: '+esc(res.error.message)+'</div>'; return; }
-    var partners=(res.data||[]).filter(function(p){ return p.email; });
+    var partners=(res.data||[]).filter(function(p){ return partnerEmails(p).length; });
     if(!partners.length){ box.innerHTML='<div style="'+bg+'">No partners with an email yet — add them under <b>Partners</b> first.</div>'; return; }
     var hay=((row.title||"")+" "+(row.opp_type||"")+" "+(row.eligibility||"")+" "+(row.meta||"")).toLowerCase();
     var scored=partners.map(function(p){ var tags=(p.focus||"").toLowerCase().split(/[,;\s]+/).filter(function(t){return t.length>2;}); var hits=tags.filter(function(t){return hay.indexOf(t)>=0;}); return {p:p,hits:hits}; }).sort(function(a,b){ return b.hits.length-a.hits.length; });
     var html='<div style="'+bg+'"><div style="margin-bottom:6px"><b>Matched partners</b> — tick who to email about "'+esc(row.title)+'":</div>';
-    scored.forEach(function(s){ html+='<label style="display:block;margin:3px 0"><input type="checkbox" class="mnp" data-email="'+esc(s.p.email)+'" '+(s.hits.length?'checked':'')+'> '+esc(s.p.name)+(s.hits.length?' <span style="color:#3FB984">· '+esc(s.hits.join(", "))+'</span>':' <span class="muted">· no tag match</span>')+'</label>'; });
+    scored.forEach(function(s){ var em=partnerEmails(s.p); html+='<label style="display:block;margin:3px 0"><input type="checkbox" class="mnp" data-email="'+esc(em.join(","))+'" data-name="'+esc(s.p.name||"")+'" '+(s.hits.length?'checked':'')+'> '+esc(s.p.name)+(em.length>1?' <span class="muted">('+em.length+' contacts)</span>':'')+(s.hits.length?' <span style="color:#3FB984">· '+esc(s.hits.join(", "))+'</span>':' <span class="muted">· no tag match</span>')+'</label>'; });
     html+='<button class="btn pub mnsend" type="button" style="margin-top:8px">Send interest email</button> <span class="mnstat muted" style="margin-left:8px"></span></div>';
     box.innerHTML=html;
     var stat=box.querySelector(".mnstat");
-    box.querySelector(".mnsend").onclick=function(){ var sbn=box.querySelector(".mnsend"); var emails=[].slice.call(box.querySelectorAll(".mnp:checked")).map(function(c){return c.getAttribute("data-email");}); if(!emails.length){ toast("Pick at least one partner"); return; } sbn.disabled=true; stat.textContent="Sending…";
-      ASB.functions.invoke("notify-partners",{ body:{ opportunity:{ title:row.title, opp_type:row.opp_type, deadline:row.deadline, amount:row.amount, by:row.by, eligibility:row.eligibility, url:row.url }, recipients:emails } }).then(function(r){ sbn.disabled=false;
+    box.querySelector(".mnsend").onclick=function(){ var sbn=box.querySelector(".mnsend"); var mnParts=[].slice.call(box.querySelectorAll(".mnp:checked")).map(function(c){ return {name:c.getAttribute("data-name")||"", emails:(c.getAttribute("data-email")||"").split(",").map(function(e){return e.trim();}).filter(Boolean)}; }).filter(function(p){return p.emails.length;}); if(!mnParts.length){ toast("Pick at least one partner"); return; } sbn.disabled=true; stat.textContent="Sending…";
+      ASB.functions.invoke("notify-partners",{ body:{ opportunity:{ title:row.title, opp_type:row.opp_type, deadline:row.deadline, amount:row.amount, by:row.by, eligibility:row.eligibility, url:row.url }, partners:mnParts } }).then(function(r){ sbn.disabled=false;
         if(r.error){ stat.textContent="Failed: "+(r.error.message||r.error); return; }
         var d=r.data||{}; if(d.error){ stat.textContent="Failed: "+(typeof d.error==="string"?d.error:JSON.stringify(d.error)); return; }
-        stat.textContent="Sent to "+(d.sent||emails.length)+" partner(s)."; toast("Interest email sent to "+(d.sent||emails.length)+" partner(s)"); }, function(e){ sbn.disabled=false; stat.textContent="Failed: "+e; }); };
+        stat.textContent="Sent to "+(d.sent||mnParts.length)+" partner(s)."; toast("Interest email sent to "+(d.sent||mnParts.length)+" partner(s)"); }, function(e){ sbn.disabled=false; stat.textContent="Failed: "+e; }); };
+  });
+}
+
+/* ==================== INTEREST — partners who clicked "Register interest" ==================== */
+function viewInterest(){
+  return '<div class="view"><div class="vhead"><h2>Partner interest</h2>'+
+    '<p class="vsub">Partners who clicked “Register interest” in an opportunity email — the return loop. Follow up with these organisations.</p></div>'+
+    '<div id="interestList" class="ndr-list">Loading…</div></div>';
+}
+function loadInterest(){
+  var host=document.getElementById("interestList"); if(!host) return;
+  if(!ASB){ host.textContent="Supabase unavailable — check the connection."; return; }
+  host.textContent="Loading…";
+  ASB.from("opportunity_interest").select("*").order("created_at",{ascending:false}).limit(300).then(function(res){
+    if(res.error){ host.textContent="Load failed: "+res.error.message; return; }
+    var data=res.data||[];
+    if(!data.length){ host.innerHTML='<p class="vsub">No interest registered yet. When a partner clicks “Register interest” in an opportunity email, they appear here, grouped by opportunity.</p>'; return; }
+    var groups={}, order=[];
+    data.forEach(function(r){ var k=r.opportunity_title||"(untitled)"; if(!groups[k]){ groups[k]=[]; order.push(k); } groups[k].push(r); });
+    host.innerHTML="";
+    order.forEach(function(k){
+      var g=groups[k], w=document.createElement("div"); w.className="ndr-draft";
+      var rows=g.map(function(r){ var when=""; try{ when=new Date(r.created_at).toLocaleString(); }catch(e){ when=r.created_at||""; }
+        return '<div style="font-size:.82rem;margin-top:3px">• <b>'+esc(r.partner_name||r.partner_email||"—")+'</b>'+(r.partner_email?' <span class="muted">'+esc(r.partner_email)+'</span>':'')+' <span class="muted">· '+esc(when)+'</span></div>'; }).join("");
+      w.innerHTML='<div class="grow"><b>'+esc(k)+'</b> <span class="pill">'+g.length+' interested</span>'+(g[0].opportunity_url?' · <a href="'+esc(g[0].opportunity_url)+'" target="_blank" rel="noopener">link ↗</a>':'')+rows+'</div>';
+      host.appendChild(w);
+    });
   });
 }
 
@@ -929,15 +962,15 @@ function oppAutoNotify(row){
   if(!ASB) return;
   ASB.from("partners").select("*").eq("active",true).then(function(res){
     if(res.error || !res.data) return;
-    var partners=res.data.filter(function(p){ return p.email; });
+    var partners=res.data.filter(function(p){ return partnerEmails(p).length; });
     if(!partners.length){ toast("Accepted → live (no partners with emails to notify)"); return; }
     var hay=((row.title||"")+" "+(row.opp_type||"")+" "+(row.eligibility||"")+" "+(row.meta||"")).toLowerCase();
     var matched=partners.filter(function(p){ var tags=(p.focus||"").toLowerCase().split(/[,;\s]+/).filter(function(t){return t.length>2;}); return tags.some(function(t){return hay.indexOf(t)>=0;}); });
     if(!matched.length){ toast("Accepted → live (no partner focus-match to notify)"); return; }
-    var emails=matched.map(function(p){ return p.email; });
-    ASB.functions.invoke("notify-partners",{ body:{ opportunity:{title:row.title,opp_type:row.opp_type,deadline:row.deadline,amount:row.amount,by:row.by,eligibility:row.eligibility,url:row.url}, recipients:emails } }).then(function(r){
+    var mparts=matched.map(function(p){ return {name:p.name, emails:partnerEmails(p)}; });
+    ASB.functions.invoke("notify-partners",{ body:{ opportunity:{title:row.title,opp_type:row.opp_type,deadline:row.deadline,amount:row.amount,by:row.by,eligibility:row.eligibility,url:row.url}, partners:mparts } }).then(function(r){
       if(r.error || (r.data&&r.data.error)){ toast("Accepted → live — partner email failed (send manually)"); return; }
-      toast("Accepted → live · notified "+((r.data&&r.data.sent)||emails.length)+" matched partner(s)"); }, function(){ toast("Accepted → live — partner email failed"); });
+      toast("Accepted → live · notified "+((r.data&&r.data.sent)||mparts.length)+" matched partner(s)"); }, function(){ toast("Accepted → live — partner email failed"); });
   });
 }
 
