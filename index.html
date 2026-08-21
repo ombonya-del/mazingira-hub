@@ -183,12 +183,22 @@ nav.tabs.tabs-desk{ display:none; }
      height so the sub-tabs offset is exact and no content bleeds through a gap */
   a.copbar{ position:sticky; top:calc(var(--nav-h) + env(safe-area-inset-top)); z-index:88; height:36px; }
   nav.subtabs#exploreSub{ position:sticky; top:calc(var(--nav-h) + 36px + env(safe-area-inset-top)); z-index:88; }
-  nav.subtabs#exploreSub .subtabs-inner{ overflow-x:hidden; gap:0; }
-  nav.subtabs#exploreSub a{ flex:1 1 0; min-width:0; width:0; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:clip; font-size:.56rem; letter-spacing:0; padding:9px 3px 7px; }
+  nav.subtabs#exploreSub .subtabs-inner{ display:flex; overflow-x:hidden; gap:0; padding-left:0; padding-right:0; max-width:100%; width:100%; }
+  nav.subtabs#exploreSub a{ flex:1 1 0; min-width:0; width:0; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:clip; font-size:.53rem; letter-spacing:0; padding:9px 2px 7px; }
   /* Sentiment segmented control: one line, buttons hug their text so padding stays even.
      ID selector so it beats the later base `.sent-seg{flex-wrap:wrap}` rule. */
   #sentSeg{ display:flex !important; flex-wrap:nowrap !important; gap:3px; max-width:100%; }
   #sentSeg button{ flex:0 1 auto; padding:9px 9px; font-size:.7rem; white-space:nowrap; }
+  /* Map: keep the control bar, resource-site key and SVG inside the viewport on phones */
+  #map .mappanel{ max-width:100%; overflow:hidden; }
+  #map .mapbar{ gap:6px; padding:10px; }
+  #map .mapbar .seg{ flex-wrap:wrap; }
+  #map .mapbar .seg button{ font-size:.6rem; padding:6px 7px; }
+  #map #resToggle{ margin-left:0 !important; font-size:.6rem; padding:6px 8px; }
+  #map .reslegend{ gap:6px 12px; padding:0 10px 12px; }
+  #map .reslegend span{ font-size:.55rem; }
+  #map .reslegend svg{ width:11px; height:11px; }
+  #map #kenyamap{ width:100%; height:auto; display:block; }
 }
 
 /* Explore sub-tabs — sit just beneath the primary bar */
