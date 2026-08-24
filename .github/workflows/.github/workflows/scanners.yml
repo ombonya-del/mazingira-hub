@@ -1,0 +1,55 @@
+name: MazingiraKenya Scanners
+
+# Fires the four MazingiraKenya Supabase edge functions on a weekly cron so drafts
+# insert themselves into the admin review queue (Accept/Reject) — no Claude task,
+# no Terminal, no device needed. Mirrors the ImaarishaSRHR scanner workflows.
+#
+# Functions (deployed to project uueemckdoozsuowcqkhl):
+#   opportunity-scanner · resource-scanner · event-scanner · disinfo-scanner
+#
+# Required repo secret:  MAZINGIRA_CRON_SECRET  (must match the CRON_SECRET set on
+#   the Supabase functions:  supabase secrets set CRON_SECRET=... )
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'    # Mondays 06:00 UTC (09:00 EAT)
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Which scanner to run'
+        required: false
+        default: 'all'
+        type: choice
+        options: [all, opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner]
+
+env:
+  SUPABASE_URL: https://uueemckdoozsuowcqkhl.supabase.co
+  # public anon key (already shipped in the frontend) — used as the function gateway bearer
+  ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        fn: [opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner]
+    steps:
+      - name: Run ${{ matrix.fn }}
+        if: github.event_name == 'schedule' || inputs.target == 'all' || inputs.target == matrix.fn
+        env:
+          CRON_SECRET: ${{ secrets.MAZINGIRA_CRON_SECRET }}
+        run: |
+          set -e
+          RESP=$(curl -sS -w '\n%{http_code}' -X POST \
+            "$SUPABASE_URL/functions/v1/${{ matrix.fn }}" \
+            -H "Authorization: Bearer $ANON_KEY" \
+            -H "apikey: $ANON_KEY" \
+            -H "x-cron-secret: $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            -d '{}' --max-time 300)
+          BODY=$(echo "$RESP" | head -n -1)
+          CODE=$(echo "$RESP" | tail -n 1)
+          echo "${{ matrix.fn }} -> HTTP $CODE"
+          echo "$BODY"
+          [ "$CODE" = "200" ] || exit 1
