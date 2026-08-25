@@ -1,14 +1,14 @@
 name: MazingiraKenya Scanners
 
-# Fires the four MazingiraKenya Supabase edge functions on a weekly cron so drafts
-# insert themselves into the admin review queue (Accept/Reject) — no Claude task,
-# no Terminal, no device needed. Mirrors the ImaarishaSRHR scanner workflows.
+# Fires the MazingiraKenya Supabase edge functions so drafts insert themselves into the
+# admin review queue (Accept/Reject) — no Claude task, no Terminal, no device needed.
+# Mirrors the ImaarishaSRHR scanner workflows.
 #
-# Functions (deployed to project uueemckdoozsuowcqkhl):
-#   opportunity-scanner · resource-scanner · event-scanner · disinfo-scanner
+# Weekly scanners (schedule):  opportunity-scanner · resource-scanner · event-scanner · disinfo-scanner
+# One-off maintenance (manual, target=cleanup):  opportunity-cleanup  — reviews the existing
+#   pending Opportunity drafts, deletes stale/off-topic ones, enriches the survivors.
 #
-# Required repo secret:  MAZINGIRA_CRON_SECRET  (must match the CRON_SECRET set on
-#   the Supabase functions:  supabase secrets set CRON_SECRET=... )
+# Required repo secret:  MAZINGIRA_CRON_SECRET  (must match CRON_SECRET set on the Supabase functions)
 
 on:
   schedule:
@@ -16,15 +16,14 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: 'Which scanner to run'
+        description: 'Which scanner to run (or "cleanup" for the one-off opportunity review)'
         required: false
         default: 'all'
         type: choice
-        options: [all, opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner]
+        options: [all, opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner, cleanup]
 
 env:
   SUPABASE_URL: https://uueemckdoozsuowcqkhl.supabase.co
-  # public anon key (already shipped in the frontend) — used as the function gateway bearer
   ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA
 
 jobs:
@@ -43,13 +42,33 @@ jobs:
           set -e
           RESP=$(curl -sS -w '\n%{http_code}' -X POST \
             "$SUPABASE_URL/functions/v1/${{ matrix.fn }}" \
-            -H "Authorization: Bearer $ANON_KEY" \
-            -H "apikey: $ANON_KEY" \
-            -H "x-cron-secret: $CRON_SECRET" \
-            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $ANON_KEY" -H "apikey: $ANON_KEY" \
+            -H "x-cron-secret: $CRON_SECRET" -H "Content-Type: application/json" \
             -d '{}' --max-time 300)
-          BODY=$(echo "$RESP" | head -n -1)
-          CODE=$(echo "$RESP" | tail -n 1)
-          echo "${{ matrix.fn }} -> HTTP $CODE"
-          echo "$BODY"
+          BODY=$(echo "$RESP" | head -n -1); CODE=$(echo "$RESP" | tail -n 1)
+          echo "${{ matrix.fn }} -> HTTP $CODE"; echo "$BODY"
           [ "$CODE" = "200" ] || exit 1
+
+  cleanup:
+    # One-off: review + enrich the existing pending Opportunity drafts. Loops the
+    # opportunity-cleanup function (12 drafts per call) until nothing is left un-reviewed.
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'cleanup'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Review & enrich pending opportunities
+        env:
+          CRON_SECRET: ${{ secrets.MAZINGIRA_CRON_SECRET }}
+        run: |
+          set -e
+          for i in $(seq 1 20); do
+            RESP=$(curl -sS -X POST \
+              "$SUPABASE_URL/functions/v1/opportunity-cleanup" \
+              -H "Authorization: Bearer $ANON_KEY" -H "apikey: $ANON_KEY" \
+              -H "x-cron-secret: $CRON_SECRET" -H "Content-Type: application/json" \
+              -d '{}' --max-time 300)
+            echo "batch $i: $RESP"
+            REM=$(echo "$RESP" | grep -o '"remaining":[0-9]*' | grep -o '[0-9]*' | head -n1)
+            echo "$RESP" | grep -q '"error"' && { echo "function error, stopping"; exit 1; }
+            [ "${REM:-0}" -eq 0 ] && { echo "Cleanup complete — nothing left to review."; break; }
+            sleep 2
+          done
