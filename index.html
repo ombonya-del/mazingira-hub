@@ -210,8 +210,9 @@ nav.subtabs[hidden]{ display:none; }
 .subtabs-inner{ display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
 .subtabs-inner::-webkit-scrollbar{ display:none; }
 nav.subtabs a{
-  flex:1 1 0; text-align:center; color:var(--muted); font-size:.68rem; font-weight:800; letter-spacing:.06em;
+  flex:1 1 0; min-width:0; text-align:center; color:var(--muted); font-size:.68rem; font-weight:800; letter-spacing:.06em;
   text-transform:uppercase; padding:10px 12px 8px; border-bottom:2px solid transparent; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis;
 }
 nav.subtabs a:hover{ color:var(--text); text-decoration:none; }
 nav.subtabs a.on{ color:var(--text); border-bottom-color:var(--green); }

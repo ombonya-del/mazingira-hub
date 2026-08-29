@@ -76,7 +76,19 @@ button{font-family:inherit;cursor:pointer}
 .mtabs button[aria-current="true"]{color:var(--text);border-bottom-color:var(--ember)}
 .mtabs .badge{background:var(--ember);color:#1a0d03;font-size:.6rem;font-weight:900;border-radius:999px;padding:0 5px;margin-left:5px}
 
-.main{flex:1;min-width:0;padding:20px 18px 60px;max-width:1080px;margin:0 auto;width:100%}
+/* bottom section nav + sub-tabs (5 grouped consoles) */
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:80;display:flex;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.bottomnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;color:var(--muted);font-weight:800;font-size:.66rem;letter-spacing:.02em;padding:9px 4px 8px;position:relative}
+.bottomnav button[aria-current="true"]{color:var(--text)}
+.bottomnav button[aria-current="true"] .ico{color:var(--green)}
+.bottomnav .ico{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bottomnav .badge{position:absolute;top:4px;left:calc(50% + 7px);background:var(--ember);color:#1a0d03;font-size:.56rem;font-weight:900;border-radius:999px;padding:0 5px;min-width:15px;text-align:center}
+.subtabs{display:flex;gap:6px;overflow-x:auto;padding:12px 16px 2px;scrollbar-width:none;position:sticky;top:56px;background:var(--bg);z-index:40}
+.subtabs::-webkit-scrollbar{display:none}
+.subtabs button{flex:none;background:var(--panel);border:1px solid var(--line-2);color:var(--muted);border-radius:999px;padding:7px 14px;font-weight:800;font-size:.78rem;white-space:nowrap}
+.subtabs button[aria-current="true"]{background:var(--panel-2);color:var(--text);border-color:var(--green-deep)}
+.subtabs .badge{background:var(--ember);color:#1a0d03;font-size:.6rem;font-weight:900;border-radius:999px;padding:0 5px;margin-left:5px}
+.main{min-width:0;padding:16px 18px calc(88px + env(safe-area-inset-bottom));max-width:1080px;margin:0 auto;width:100%}
 .view{animation:fade .22s ease both}
 @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.view{animation:none}}
@@ -211,7 +223,7 @@ button{font-family:inherit;cursor:pointer}
 .ndshare-btn{font-size:.72rem;font-weight:800;border:1px solid var(--line-2);border-radius:8px;padding:6px 11px;color:var(--text);background:var(--panel)}
 .ndshare-btn.x{background:#0b0b0b;color:#fff;border-color:#333} .ndshare-btn.wa{background:#128C7E;color:#fff;border-color:#128C7E}
 
-@media(min-width:900px){ .sidenav{display:block} .mtabs{display:none} .main{padding:26px 28px 60px} }
+@media(min-width:900px){ .main{padding:22px 28px calc(88px + env(safe-area-inset-bottom))} .subtabs{padding:14px 28px 2px} }
 </style>
 </head>
 <body>
@@ -240,12 +252,9 @@ button{font-family:inherit;cursor:pointer}
     </div>
   </header>
 
-  <div class="mtabs" id="mtabs"></div>
-
-  <div class="layout">
-    <nav class="sidenav" id="sidenav" aria-label="Sections"></nav>
-    <main class="main" id="app"></main>
-  </div>
+  <div class="subtabs" id="subtabs"></div>
+  <main class="main" id="app"></main>
+  <nav class="bottomnav" id="bottomnav" aria-label="Sections"></nav>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -349,35 +358,56 @@ function count(status){ return SUBMISSIONS.filter(function(s){return s.status===
 function pubCount(status){ return PUBLISH.filter(function(p){return p.status===status;}).length; }
 function toast(msg){ var t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove("show");},2000); }
 
-/* ============================ NAV ============================ */
+/* ============================ NAV (5 grouped sections, bottom bar) ============================ */
+var SECTIONS = [
+  {id:"overview", label:"Overview", icon:'<path d="M4 13h6V4H4zM14 20h6v-9h-6zM14 4v4h6V4zM4 20h6v-4H4z"/>', views:["overview"]},
+  {id:"voices",   label:"Voices",   icon:'<path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/>', views:["moderation","upload","narrative","publishing"]},
+  {id:"exchange", label:"Exchange", icon:'<path d="M4 7h16M4 12h16M4 17h10"/>', views:["resources","meetings","events"]},
+  {id:"network",  label:"Network",  icon:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6a3 3 0 0 1 0 6M15 20a6 6 0 0 1 6-4"/>', views:["partners","interest","members"]},
+  {id:"review",   label:"Review",   icon:'<path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/>', views:["content","oppsreview","eventsreview"]}
+];
+var secMem = {};
+function navLabel(id){ for(var i=0;i<NAV.length;i++) if(NAV[i].id===id) return NAV[i].label; return id; }
+function sectionOf(view){ for(var i=0;i<SECTIONS.length;i++) if(SECTIONS[i].views.indexOf(view)>=0) return SECTIONS[i]; return SECTIONS[0]; }
+function viewBadge(v){
+  if(v==="moderation") return count("pending");
+  if(v==="publishing") return pubCount("ready");
+  if(v==="narrative")  return state.ndPending||0;
+  if(v==="oppsreview") return state.oppPending||0;
+  if(v==="eventsreview") return state.evPending||0;
+  return 0;
+}
+function sectionBadge(sec){ var t=0; sec.views.forEach(function(v){ t+=viewBadge(v); }); return t; }
 function renderNav(){
-  var side=document.getElementById("sidenav"), m=document.getElementById("mtabs");
-  var groups=[], seen={};
-  NAV.forEach(function(n){ if(!seen[n.grp]){seen[n.grp]=[];groups.push(n.grp);} seen[n.grp].push(n); });
-  side.innerHTML=groups.map(function(g){
-    return '<div class="grp">'+esc(g)+'</div>'+seen[g].map(navBtn).join("");
-  }).join("");
-  m.innerHTML=NAV.map(function(n){
-    var b=n.badgeFrom?badgeVal(n):0;
-    return '<button data-nav="'+n.id+'" aria-current="'+(state.view===n.id)+'">'+esc(n.label)+(b?'<span class="badge">'+b+'</span>':'')+'</button>';
-  }).join("");
+  var bottom=document.getElementById("bottomnav"), subs=document.getElementById("subtabs");
+  var active=sectionOf(state.view);
+  if(bottom){ bottom.innerHTML=SECTIONS.map(function(s){
+    var b=sectionBadge(s);
+    return '<button data-sec="'+s.id+'" aria-current="'+(s.id===active.id)+'">'+
+      '<svg class="ico" viewBox="0 0 24 24">'+s.icon+'</svg>'+esc(s.label)+
+      (b?'<span class="badge">'+b+'</span>':'')+'</button>';
+  }).join(""); }
+  if(subs){
+    if(active.views.length<=1){ subs.innerHTML=""; subs.style.display="none"; }
+    else { subs.style.display="flex"; subs.innerHTML=active.views.map(function(v){
+      var b=viewBadge(v);
+      return '<button data-sub="'+v+'" aria-current="'+(state.view===v)+'">'+esc(navLabel(v))+(b?'<span class="badge">'+b+'</span>':'')+'</button>';
+    }).join(""); }
+  }
   bindNav();
 }
-function badgeVal(n){ return n.badgeFrom==="pending"?count("pending"):(n.badgeFrom==="ready"?pubCount("ready"):(n.badgeFrom==="ndpending"?ndCount("pending"):(n.badgeFrom==="oppending"?(state.oppPending||0):(n.badgeFrom==="evpending"?(state.evPending||0):0)))); }
-function navBtn(n){
-  var b=n.badgeFrom?badgeVal(n):0;
-  return '<button data-nav="'+n.id+'" aria-current="'+(state.view===n.id)+'">'+
-    '<svg class="ico" viewBox="0 0 24 24">'+n.icon+'</svg>'+esc(n.label)+
-    (b?'<span class="badge">'+b+'</span>':'')+'</button>';
-}
 function bindNav(){
-  document.querySelectorAll("[data-nav]").forEach(function(el){
-    el.addEventListener("click",function(){ state.view=el.getAttribute("data-nav"); render(); });
+  document.querySelectorAll("[data-sec]").forEach(function(el){
+    el.addEventListener("click",function(){ var id=el.getAttribute("data-sec"), sec=null; SECTIONS.forEach(function(x){ if(x.id===id) sec=x; }); if(!sec) return; state.view=secMem[id]||sec.views[0]; render(); });
+  });
+  document.querySelectorAll("[data-sub]").forEach(function(el){
+    el.addEventListener("click",function(){ state.view=el.getAttribute("data-sub"); render(); });
   });
 }
 
 /* ============================ RENDER ============================ */
 function render(){
+  secMem[sectionOf(state.view).id]=state.view;
   renderNav();
   var v=state.view;
   if(v==="overview") app.innerHTML=viewOverview();
@@ -464,46 +494,65 @@ function viewPublishing(){
   return '<section class="view"><div class="page-head"><div><h2>Publish to raia</h2><p>Approved Voices and adapted hub briefs, queued for the public platform.</p></div></div>'+rows+'</section>';
 }
 
-function ndCount(st){ return NARR.filter(function(n){return n.status===st;}).length; }
-function ndById(id){ for(var i=0;i<NARR.length;i++) if(NARR[i].id===id) return NARR[i]; }
+/* ---- Narrative disinfo: real disinfo_items table (scanner + manual desk) ---- */
 function viewNarrative(){
   state.ndFilter = state.ndFilter||"pending";
   var pipe='<div class="ndpipe"><span class="np">Scanner</span><span class="npa">→</span><span class="np ai">Claude draft</span><span class="npa">→</span><span class="np hum">Human verify</span><span class="npa">→</span><span class="np live">On raia · shareable</span></div>';
-  var pills=[["pending","AI drafts · to verify"],["published","Published to raia"]].map(function(p){
-    return '<button class="pill" data-nd="'+p[0]+'" aria-pressed="'+(state.ndFilter===p[0])+'">'+p[1]+'<span class="c mono">'+ndCount(p[0])+'</span></button>';
+  var pills=[["pending","Drafts · to verify"],["published","Published to raia"]].map(function(p){
+    return '<button class="pill" data-nd="'+p[0]+'" aria-pressed="'+(state.ndFilter===p[0])+'">'+p[1]+'</button>';
   }).join("");
-  var list=NARR.filter(function(n){return n.status===state.ndFilter;});
-  var cards=list.length? list.map(ndCard).join("") : '<div class="panel muted">Nothing in this queue.</div>';
-  return '<section class="view"><div class="page-head"><div><h2>Narrative disinfo</h2><p>Fast-moving social-media framings flagged by the scanner. Claude drafts a rebuttal grounded only in the coalition\'s own evidence; a moderator verifies before it publishes to raia. Nothing is auto-published — sensitive claims need an editor.</p></div></div>'+
-    pipe+'<div class="pills">'+pills+'</div>'+cards+'</section>';
+  return '<section class="view"><div class="page-head"><div><h2>Narrative disinfo</h2><p>Disinformation flagged by the web scanner and the manual desk. Claude drafts a rebuttal grounded in the coalition\'s own evidence; a moderator verifies before anything publishes to raia. Nothing is auto-published.</p></div></div>'+
+    pipe+'<div class="pills">'+pills+'</div><div id="ndList" class="ndr-list">Loading…</div></section>';
 }
-function ndCard(n){
-  var head='<div class="qtop"><span class="qav" style="background:#0b0b0b;border:1px solid #333;color:#fff">'+esc(n.platform)+'</span>'+
-    '<span class="qwho"><span class="qnm">'+esc(n.handle)+'</span><span class="qmeta">'+esc(n.meta)+'</span></span>'+
-    '<span class="type-tag nd-'+n.tone+'">'+esc(n.type)+'</span></div>';
-  var post='<div class="nd-quote">"'+esc(n.claim)+'"</div>';
-  if(n.status==="pending"){
-    var sensitive = n.risk==="Sensitive";
-    var body='<div class="ndr-draft"><span class="ndr-lab">🤖 Claude draft · grounded, cite-only</span><p>'+esc(n.draft)+'</p></div>'+
-      '<p class="ndr-meta"><b>Sources used:</b> '+esc(n.sources)+'</p>'+
-      '<p class="ndr-meta">Grounding confidence: <b>'+esc(n.conf)+'</b> · Risk tier: <b>'+esc(n.risk)+'</b>'+(sensitive?' — names a death/allegation, so it needs an <b>editor</b> sign-off before publish':' — auto-eligible; you have the final say')+'</p>';
-    var acts='<div class="qact"><button class="btn reject" data-nda="reject:'+n.id+'">Reject</button>'+
-      '<button class="btn ghost" data-nda="edit:'+n.id+'">Edit draft</button>'+
-      '<button class="btn approve" data-nda="approve:'+n.id+'">'+(sensitive?'Approve (editor)':'Approve &amp; publish')+'</button></div>';
-    return '<div class="qcard nd-'+n.tone+'-edge">'+head+post+body+acts+'</div>';
+function loadNarrative(){
+  var host=document.getElementById("ndList"); if(!host) return;
+  if(!ASB){ host.textContent="Supabase unavailable — check the connection."; return; }
+  var wantPub = state.ndFilter==="published";
+  host.textContent="Loading…";
+  ASB.from("disinfo_items").select("*").eq("published",wantPub).order("created_at",{ascending:false}).then(function(res){
+    if(res.error){ host.textContent="Load failed: "+res.error.message; return; }
+    var data=res.data||[];
+    if(!data.length){ host.innerHTML='<p class="vsub" style="color:var(--muted)">Nothing in this queue.</p>'; return; }
+    host.innerHTML="";
+    data.forEach(function(row){ host.appendChild(ndCard(row,wantPub)); });
+  });
+}
+function ndCard(row,isPub){
+  var wrap=document.createElement("div"); wrap.className="qcard"; wrap.style.padding="14px 15px";
+  function mkbtn(t,cls){ var b=document.createElement("button"); b.type="button"; b.className="btn "+(cls||""); b.textContent=t; return b; }
+  function fld(label,node){ var l=document.createElement("label"); l.style.cssText="display:block;font-size:.7rem;color:var(--muted);margin:6px 0 0"; l.textContent=label; node.style.cssText="width:100%;margin-top:2px;background:#0a1712;border:1px solid var(--line-2);color:var(--text);border-radius:8px;padding:8px;font-family:inherit"; l.appendChild(node); return l; }
+  function viewMode(){
+    var src=esc(row.name||row.handle||"Circulating on X");
+    var meta=[(row.name&&row.handle)?esc(row.handle):"", row.posted_at?esc(row.posted_at):"", row.eng?esc(row.eng):""].filter(Boolean).join(" · ");
+    wrap.innerHTML='<div class="qtop" style="padding:0 0 8px"><span class="qwho"><span class="qnm">'+src+'</span>'+(meta?'<span class="qmeta">'+meta+'</span>':"")+'</span>'+(row.verdict?'<span class="type-tag">'+esc(row.verdict)+'</span>':"")+'</div>'+
+      '<div class="nd-quote" style="margin:0 0 8px">"'+esc(row.body||"")+'"</div>'+
+      '<p class="ndr-meta" style="font-size:.86rem;margin:0"><b>Rebuttal:</b> '+esc(row.rebuttal||"(none yet)")+'</p>'+
+      '<div class="qact" style="padding:12px 0 0;border:0"></div>';
+    var acts=wrap.querySelector(".qact");
+    if(!isPub){
+      var pub=mkbtn("Publish to raia","approve"); pub.onclick=function(){ pub.disabled=true; ASB.from("disinfo_items").update({published:true}).eq("id",row.id).then(function(r){ if(r.error){pub.disabled=false;toast("Publish failed: "+r.error.message);return;} toast("Published to raia"); wrap.remove(); state.ndPending=Math.max(0,(state.ndPending||1)-1); renderNav(); }); };
+      acts.appendChild(pub);
+    } else {
+      var un=mkbtn("Unpublish","ghost"); un.onclick=function(){ un.disabled=true; ASB.from("disinfo_items").update({published:false}).eq("id",row.id).then(function(r){ if(r.error){un.disabled=false;toast("Failed: "+r.error.message);return;} toast("Unpublished"); wrap.remove(); state.ndPending=(state.ndPending||0)+1; renderNav(); }); };
+      acts.appendChild(un);
+    }
+    var eb=mkbtn("Edit","ghost"); eb.onclick=editMode; acts.appendChild(eb);
+    var db=mkbtn("Delete","reject"); db.onclick=function(){ if(!confirm("Delete this item?"))return; db.disabled=true; ASB.from("disinfo_items").delete().eq("id",row.id).then(function(r){ if(r.error){db.disabled=false;toast("Delete failed: "+r.error.message);return;} toast("Deleted"); wrap.remove(); if(!isPub){ state.ndPending=Math.max(0,(state.ndPending||1)-1); renderNav(); } }); };
+    acts.appendChild(db);
+    if(row.tweet_url){ var a=document.createElement("a"); a.className="btn ghost"; a.href=row.tweet_url; a.target="_blank"; a.rel="noopener noreferrer"; a.textContent="View source"; acts.appendChild(a); }
   }
-  var share='<div class="ndshare"><div class="ndshare-h">📣 Live on raia · shareable by the public</div>'+
-    '<div class="ndshare-b"><span class="ndshare-flag">Debunked · '+esc(n.type)+'</span><p>'+esc(n.draft)+'</p>'+
-    '<div class="ndshare-btns"><span class="ndshare-btn x">Share on X</span><span class="ndshare-btn wa">WhatsApp</span><span class="ndshare-btn cp">Copy</span></div></div></div>';
-  return '<div class="qcard nd-'+n.tone+'-edge">'+head+post+'<span class="status-tag st-live">on raia</span>'+share+'</div>';
-}
-function ndAct(a){
-  var p=a.split(":"), op=p[0], n=ndById(p[1]); if(!n) return;
-  if(op==="approve"){ n.status="published"; state.ndFilter="published";
-    PUBLISH.unshift({id:"nd"+Date.now(),source:"Narrative desk",title:"Debunk — "+n.type+" ("+n.platform+")",target:"raia · Truth · shareable card",status:"live",by:"A. Mwangi"});
-    toast("Verified → live on raia & shareable"); render(); }
-  else if(op==="reject"){ NARR.splice(NARR.indexOf(n),1); toast("Rejected — not published"); render(); }
-  else if(op==="edit"){ toast("Edit the draft inline, then approve"); }
+  function editMode(){
+    wrap.innerHTML="";
+    var vd=document.createElement("input"); vd.value=row.verdict||"";
+    var bd=document.createElement("textarea"); bd.rows=2; bd.value=row.body||"";
+    var rb=document.createElement("textarea"); rb.rows=3; rb.value=row.rebuttal||"";
+    wrap.appendChild(fld("Verdict",vd)); wrap.appendChild(fld("Claim / narrative",bd)); wrap.appendChild(fld("Rebuttal",rb));
+    var acts=document.createElement("div"); acts.className="qact"; acts.style.cssText="padding:12px 0 0;border:0";
+    var sv=mkbtn("Save","pub"); sv.onclick=function(){ sv.disabled=true; ASB.from("disinfo_items").update({verdict:vd.value,body:bd.value,rebuttal:rb.value}).eq("id",row.id).then(function(r){ if(r.error){sv.disabled=false;toast("Save failed: "+r.error.message);return;} row.verdict=vd.value;row.body=bd.value;row.rebuttal=rb.value; toast("Saved"); viewMode(); }); };
+    var cn=mkbtn("Cancel","ghost"); cn.onclick=viewMode;
+    acts.appendChild(sv); acts.appendChild(cn); wrap.appendChild(acts);
+  }
+  viewMode(); return wrap;
 }
 
 function viewContent(){
@@ -538,7 +587,6 @@ function viewMembers(){
 function bindView(){
   app.querySelectorAll("[data-mod]").forEach(function(el){ el.addEventListener("click",function(){ state.modFilter=el.getAttribute("data-mod"); render(); }); });
   app.querySelectorAll("[data-nd]").forEach(function(el){ el.addEventListener("click",function(){ state.ndFilter=el.getAttribute("data-nd"); render(); }); });
-  app.querySelectorAll("[data-nda]").forEach(function(el){ el.addEventListener("click",function(){ ndAct(el.getAttribute("data-nda")); }); });
   app.querySelectorAll("[data-act]").forEach(function(el){ el.addEventListener("click",function(){ modAct(el.getAttribute("data-act")); }); });
   app.querySelectorAll("[data-pub]").forEach(function(el){ el.addEventListener("click",function(){ pubAct(el.getAttribute("data-pub")); }); });
   app.querySelectorAll("[data-feat]").forEach(function(el){ el.addEventListener("click",function(){ setFeatured(el.getAttribute("data-feat")); }); });
@@ -547,6 +595,7 @@ function bindView(){
   app.querySelectorAll("[data-active]").forEach(function(el){ el.addEventListener("click",function(){ var i=+el.getAttribute("data-active"); MEMBERS[i].active=!MEMBERS[i].active; el.setAttribute("aria-pressed",MEMBERS[i].active); toast(MEMBERS[i].active?"Member activated":"Member suspended"); }); });
   var add=document.getElementById("addMember"); if(add) add.addEventListener("click",openAddMember);
   bindUpload();
+  if(state.view==="narrative") loadNarrative();
   if(state.view==="resources") loadResources();
   if(state.view==="meetings") loadMeetings();
   if(state.view==="events") loadEvents();
@@ -576,13 +625,16 @@ function loadResources(){
       function mkbtn(t){ var b=document.createElement("button"); b.type="button"; b.className="btn btn--ghost"; b.textContent=t; return b; }
       function fld(label,node){ var l=document.createElement("label"); l.style.cssText="display:block;font-size:.7rem;color:var(--muted,#8aa);margin:4px 0 0"; l.textContent=label; node.style.cssText="width:100%;margin-top:2px"; l.appendChild(node); return l; }
       function viewMode(){
-        wrap.innerHTML='<div class="grow"><b>'+esc(row.title)+'</b> <span class="pill">'+esc(row.category)+'</span>'+
+        wrap.innerHTML='<div class="grow"><b>'+esc(row.title)+'</b> <span class="pill">'+esc(row.category)+'</span>'+(row.published===false?' <span class="pill" style="border-color:var(--gold);color:var(--gold)">hidden</span>':'')+
           '<div style="font-size:.78rem;opacity:.75;margin-top:3px">'+esc(row.meta||"")+
           (row.url?' · <a href="'+esc(row.url)+'" target="_blank" rel="noopener">link ↗</a>':"")+
           (row.by?' · by '+esc(row.by):"")+'</div><div class="ndr-match" hidden></div></div><div class="ndr-acts"></div>';
         var acts=wrap.querySelector(".ndr-acts");
         if(row.category==="Opportunities"){ var mn=mkbtn("Match & notify"); mn.onclick=function(){ oppMatch(row,wrap,mn); }; acts.appendChild(mn); }
         var eb=mkbtn("Edit"); eb.onclick=editMode; acts.appendChild(eb);
+        var hb=mkbtn(row.published===false?"Show":"Hide"); hb.onclick=function(){ var np=(row.published===false); hb.disabled=true;
+          ASB.from("resources").update({published:np}).eq("id",row.id).then(function(r){ if(r.error){hb.disabled=false;toast("Failed: "+r.error.message);return;} row.published=np; toast(np?"Now visible on the hub":"Hidden from the hub"); viewMode(); }); };
+        acts.appendChild(hb);
         var db=mkbtn("Delete"); db.onclick=function(){ if(!confirm("Delete \""+row.title+"\"?"))return; db.disabled=true;
           ASB.from("resources").delete().eq("id",row.id).then(function(r){ if(r.error){db.disabled=false;toast("Delete failed: "+r.error.message);return;} toast("Resource deleted"); wrap.remove(); }); };
         acts.appendChild(db);
@@ -853,6 +905,7 @@ function fetchWatchCounts(){
   if(!ASB) return;
   ASB.from("resources").select("id",{count:"exact",head:true}).eq("published",false).eq("category","Opportunities").then(function(r){ if(!r.error){ state.oppPending=r.count||0; renderNav(); } });
   ASB.from("calendar_events").select("id",{count:"exact",head:true}).eq("published",false).then(function(r){ if(!r.error){ state.evPending=r.count||0; renderNav(); } });
+  ASB.from("disinfo_items").select("id",{count:"exact",head:true}).eq("published",false).then(function(r){ if(!r.error){ state.ndPending=r.count||0; renderNav(); } });
 }
 
 /* ==================== PARTNERS — contacts + focus tags for opportunity matching ==================== */
