@@ -250,10 +250,8 @@ button{font-family:inherit;cursor:pointer}
 <!-- APP SHELL -->
 <div class="shell" id="shell">
   <header class="topbar">
-    <div class="brand">Mazingira<span style="color:var(--green)">Kenya</span> <span class="tag">Admin</span></div>
+    <div class="brand">Mazingira<span style="color:var(--green)">Kenya</span></div>
     <div class="who">
-      <div style="text-align:right"><div class="nm">A. Mwangi</div><div class="rl">Coalition admin</div></div>
-      <div class="avatar">AM</div>
       <button class="signout" id="toHub" title="Open the members' hub carrying your sign-in">Members' hub ↗</button>
       <button class="signout" id="signout">Sign out</button>
     </div>
@@ -305,7 +303,7 @@ var SUBMISSIONS = [
 var PUBLISH = [
   {id:"p1", source:"Voices", title:"Wanjiku M. — “We want to be part of progress”", target:"raia · Voices wall", status:"ready", by:"—"},
   {id:"p2", source:"Hub", title:"Dangote Lamu refinery — plain-language brief", target:"raia · In The News · lamu-refinery", status:"ready", by:"—"},
-  {id:"p3", source:"Hub", title:"Lake Turkana wind ruling explainer", target:"raia · Truth · turkana-wind", status:"live", by:"A. Mwangi"},
+  {id:"p3", source:"Hub", title:"Lake Turkana wind ruling explainer", target:"raia · Truth · turkana-wind", status:"live", by:"Coalition desk"},
   {id:"p4", source:"Voices", title:"Amina H. — Lamu fisher (video)", target:"raia · Voices wall", status:"live", by:"F. Odhiambo"}
 ];
 
@@ -341,7 +339,7 @@ var BIGQ_N = 4, MYTH_N = 8;
 var MEMBERS = [
   {org:"Save Lamu", person:"Fatma Said", role:"Moderator", active:true, seen:"Today"},
   {org:"LAWA (youth desk)", person:"Kevin Otieno", role:"Contributor", active:true, seen:"Today"},
-  {org:"Community Media Trust", person:"A. Mwangi", role:"Admin", active:true, seen:"Now"},
+  {org:"Community Media Trust", person:"Coalition desk", role:"Admin", active:true, seen:"Now"},
   {org:"Natural Justice", person:"Grace Wangui", role:"Editor", active:true, seen:"Yesterday"},
   {org:"deCOALonize", person:"Omar Elmawi", role:"Editor", active:true, seen:"2d ago"},
   {org:"Katiba Institute", person:"J. Kamau", role:"Contributor", active:false, seen:"3w ago"}
@@ -351,9 +349,9 @@ var ROLES = ["Admin","Editor","Moderator","Contributor"];
 var LANG_STATS = [{k:"Swahili",v:48,c:"var(--green)"},{k:"English",v:34,c:"var(--ember)"},{k:"Sheng",v:18,c:"var(--gold)"}];
 var ACTIVITY = [
   {c:"var(--green)", t:"Approved Amina H. (Lamu) video", w:"F. Odhiambo · 12m"},
-  {c:"var(--ember)", t:"Published wind-ruling explainer to raia", w:"A. Mwangi · 40m"},
+  {c:"var(--ember)", t:"Published wind-ruling explainer to raia", w:"Coalition desk · 40m"},
   {c:"var(--red)", t:"Rejected unverified accusation clip", w:"G. Wangui · 1h"},
-  {c:"var(--gold)", t:"Kevin Otieno (LAWA) added as Contributor", w:"A. Mwangi · 3h"}
+  {c:"var(--gold)", t:"Kevin Otieno (LAWA) added as Contributor", w:"Coalition desk · 3h"}
 ];
 
 /* ============================ HELPERS ============================ */
@@ -1201,7 +1199,7 @@ function modAct(a){
 function pubById(id){ for(var i=0;i<PUBLISH.length;i++) if(PUBLISH[i].id===id) return PUBLISH[i]; }
 function pubAct(a){
   var p=a.split(":"), op=p[0], it=pubById(p[1]); if(!it) return;
-  if(op==="pub"){ it.status="live"; it.by="A. Mwangi"; toast("Published to raia"); render(); }
+  if(op==="pub"){ it.status="live"; it.by="Coalition desk"; toast("Published to raia"); render(); }
   else if(op==="unpub"){ it.status="ready"; it.by="—"; toast("Unpublished"); render(); }
 }
 function setFeatured(id){ ISSUES.forEach(function(is){ is.featured = (is.id===id); }); toast("Featured story updated"); render(); }
