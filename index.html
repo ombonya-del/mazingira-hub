@@ -668,6 +668,8 @@ a.res-link:hover{ background:var(--panel-2); text-decoration:none; }
 /* voices */
 .voice{ display:flex; gap:12px; align-items:flex-start; }
 .voice-badge{ flex:none; width:34px; height:34px; border-radius:50%; background:var(--ember-wash); color:var(--ember); display:grid; place-items:center; }
+.voice-src{ display:inline-block; margin-top:9px; font-size:.75rem; font-weight:700; color:var(--green); text-decoration:none; }
+.voice-src:hover{ text-decoration:underline; }
 
 /* aje sasa */
 .aje-q{ font-family:Lora,serif; font-style:italic; font-weight:600; font-size:.98rem; color:var(--text); }
@@ -2299,6 +2301,11 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
           <button type="button" class="btn btn--ghost" id="v-preview">Preview</button></div>
         <p class="mini">Paste a real post link to see exactly how it will appear.</p>
         <div id="v-embedPreview" class="voice-embed"></div>
+      </div>
+      <div class="field full" id="v-sourceRow">
+        <label for="v-source">Source link <span class="opt">(optional)</span></label>
+        <input id="v-source" type="url" placeholder="https://… — original post, article or page this came from">
+        <p class="mini">A link readers can follow to verify where this came from.</p>
       </div>
       <div class="qf-grid">
         <div class="field"><label for="v-name">Your name</label><input id="v-name" type="text" required placeholder="So we can credit you"></div>
@@ -5113,13 +5120,39 @@ function renderVoices(){
     var c = el("div","card");
     var icon = ICONS[v.i] || ICONS.doc;
     c.innerHTML = '<div class="voice"><div class="voice-badge" aria-hidden="true">'+icon+'</div>'+
-      '<div style="flex:1; min-width:0"><h3>'+v.t+'</h3><span class="meta">'+v.m+'</span></div></div><p>'+v.p+'</p>'+
-      (v.embed ? '<div class="voice-embed" data-embed="'+v.embed.replace(/"/g,'')+'"></div>' : '');
+      '<div style="flex:1; min-width:0"><h3>'+escE(v.t)+'</h3><span class="meta">'+escE(v.m)+'</span></div></div><p>'+escE(v.p)+'</p>'+
+      (v.embed ? '<div class="voice-embed" data-embed="'+String(v.embed).replace(/"/g,'')+'"></div>' : '')+
+      (v.src ? '<a class="voice-src" href="'+escE(v.src)+'" target="_blank" rel="noopener noreferrer">View source ↗</a>' : '');
     vWrap.appendChild(c);
     if(v.embed){ mountEmbed(c.querySelector(".voice-embed"), v.embed); }
   });
 }
 renderVoices();
+
+/* ---- load approved community voices from the privacy-safe view (no email / minor flags) ---- */
+(function(){
+  var C3 = window.HAUTH || window.MZ_SB || (typeof SB!=="undefined" ? SB : null);
+  if(!C3 || !C3.from) return;
+  C3.from("voices_public").select("*").order("created_at",{ascending:false}).limit(12)
+    .then(function(r){
+      if(!r || r.error || !r.data || !r.data.length) return;
+      VOICES = r.data.map(function(row){
+        var k = row.kind || "doc";
+        var isEmbed = (k==="embed") && !!row.source_url;
+        var dt = row.created_at ? new Date(row.created_at).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}) : "";
+        var kindLabel = {video:"Video",audio:"Audio",photo:"Photo",doc:"Report",embed:"Social post"}[k] || k;
+        return {
+          i: k,
+          t: row.submitter_name || "Community voice",
+          m: [row.county, kindLabel, dt].filter(Boolean).join(" · "),
+          p: row.body || "",
+          embed: isEmbed ? row.source_url : null,
+          src: (!isEmbed && row.source_url) ? row.source_url : null
+        };
+      });
+      renderVoices();
+    }, function(){});
+})();
 
 /* ---- voice submission form ---- */
 (function(){
@@ -5133,6 +5166,7 @@ renderVoices();
     var em = typeSel.value === "embed";
     document.getElementById("v-embedRow").style.display = em ? "" : "none";
     document.getElementById("v-fileRow").style.display = em ? "none" : "";
+    var sr = document.getElementById("v-sourceRow"); if(sr) sr.style.display = em ? "none" : "";  // embed carries its own link
   }
   typeSel.addEventListener("change", syncType); syncType();
   document.getElementById("v-preview").addEventListener("click", function(){
@@ -5142,9 +5176,29 @@ renderVoices();
   vf.addEventListener("submit", function(e){
     e.preventDefault();
     if(!vf.checkValidity()){ vf.reportValidity(); return; }
+    var type = typeSel.value;
+    var embedU = (document.getElementById("v-embed").value||"").trim();
+    var srcU   = (document.getElementById("v-source").value||"").trim();
+    var files  = document.getElementById("v-file").files;
+    var names=[]; if(files){ for(var i=0;i<files.length;i++) names.push(files[i].name); }
+    var rec = {
+      kind: type,
+      county: (document.getElementById("v-county").value||"") || null,
+      body: (document.getElementById("v-what").value||"").trim(),
+      submitter_name: (document.getElementById("v-name").value||"").trim() || null,
+      submitter_email: (document.getElementById("v-email").value||"").trim() || null,
+      consent: !!document.getElementById("v-consent").checked,
+      source_url: (type==="embed" ? embedU : srcU) || null,
+      media_path: names.length ? names.join(", ") : null,
+      status: "pending"
+    };
     document.getElementById("vRef").textContent =
       "MZG-"+String(new Date().getFullYear()).slice(2)+"-"+(Math.floor(Math.random()*9000)+1000);
-    vf.style.display="none"; document.getElementById("voiceOk").classList.add("show");
+    var submit=vf.querySelector('[type="submit"]'); if(submit) submit.disabled=true;
+    var finish=function(){ vf.style.display="none"; document.getElementById("voiceOk").classList.add("show"); if(submit) submit.disabled=false; };
+    var C2 = window.HAUTH || window.MZ_SB || (typeof SB!=="undefined" ? SB : null);
+    if(C2 && C2.from){ C2.from("submissions").insert(rec).then(finish, finish); }
+    else finish();
   });
   document.getElementById("vAgain").addEventListener("click", function(){
     vf.reset(); syncType(); document.getElementById("v-embedPreview").innerHTML="";
