@@ -234,9 +234,16 @@ button{font-family:inherit;cursor:pointer}
     <div class="lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#62C79B" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
     <h1>MazingiraKenya Admin</h1>
     <p>Moderation &amp; operations console. Authorised coalition staff only.</p>
-    <input id="gcode" type="password" placeholder="Access code" autocomplete="off" aria-label="Access code">
-    <button id="gbtn">Sign in</button>
-    <p class="hint">Authorised coalition staff only. Production sign-in uses Supabase Auth + access control.</p>
+    <div id="gstep1">
+      <input id="gcode" type="password" placeholder="Access code" autocomplete="off" aria-label="Access code">
+      <button id="gbtn">Continue</button>
+    </div>
+    <div id="gstep2" style="display:none">
+      <input id="gemail" type="email" placeholder="Your admin email" autocomplete="email" aria-label="Admin email">
+      <button id="glink">Email me a sign-in link</button>
+      <p class="hint" id="gmsg2" style="margin-top:10px"></p>
+    </div>
+    <p class="hint" id="ghint">Authorised coalition staff only. Production sign-in uses Supabase Auth + access control.</p>
   </div>
 </div>
 
@@ -1256,16 +1263,53 @@ function unlock(){
     document.getElementById("gcode").value="";
     return;
   }
-  try{ sessionStorage.setItem("mzk_auth","1"); }catch(e){}
-  showConsole();
+  try{ sessionStorage.setItem("mzk_gate","1"); }catch(e){}
+  var s1=document.getElementById("gstep1"), s2=document.getElementById("gstep2"), gh=document.getElementById("ghint");
+  if(s1) s1.style.display="none"; if(s2) s2.style.display=""; if(gh) gh.textContent="Enter your admin email — we'll send a one-time sign-in link. Open it on this device.";
+  var ge=document.getElementById("gemail"); if(ge) ge.focus();
 }
 document.getElementById("gbtn").addEventListener("click",unlock);
 document.getElementById("gcode").addEventListener("keydown",function(e){ if(e.key==="Enter") unlock(); });
+
+/* Step 2: email the admin a Supabase magic link. Only allow-listed admins exist
+   (signup disabled), so a real session + is_admin() is what actually opens the data. */
+function gateSendLink(){
+  var em=((document.getElementById("gemail")||{}).value||"").trim(), m=document.getElementById("gmsg2");
+  if(!/.+@.+\..+/.test(em)){ if(m){ m.style.color="#E5625A"; m.textContent="Enter a valid email."; } return; }
+  if(!ASB || !ASB.auth){ if(m){ m.style.color="#E5625A"; m.textContent="Auth unavailable — reconnect and retry."; } return; }
+  var b=document.getElementById("glink"); if(b) b.disabled=true; if(m){ m.style.color=""; m.textContent="Sending…"; }
+  ASB.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+location.pathname,shouldCreateUser:false}})
+    .then(function(r){ if(b) b.disabled=false; if(!m)return;
+      if(r.error){ m.style.color="#E5625A"; m.textContent="Couldn't send: "+r.error.message; }
+      else{ m.style.color="#3FB984"; m.textContent="Check your inbox — click the link on this device to finish signing in."; } });
+}
+var glinkBtn=document.getElementById("glink"); if(glinkBtn) glinkBtn.addEventListener("click",gateSendLink);
+var gemailEl=document.getElementById("gemail"); if(gemailEl) gemailEl.addEventListener("keydown",function(e){ if(e.key==="Enter") gateSendLink(); });
+
+/* An established admin session opens the console (covers the magic-link return and a
+   still-valid session on reload). A signed-in non-admin is told they lack access. */
+var gateChecking=false;
+function gateTryAdminSession(){
+  if(!ASB || !ASB.auth || gateChecking) return; gateChecking=true;
+  ASB.rpc("whoami").then(function(r){ gateChecking=false; var d=r&&r.data;
+    if(!r.error && d && d.is_admin){ showConsole(); }
+    else if(!r.error && d && (d.jwt_email||d.meta_email)){ var m=document.getElementById("gmsg2"); if(m){ m.style.color="#E5625A"; m.textContent="Signed in as "+(d.jwt_email||d.meta_email)+" — that account isn't an admin."; } }
+  }, function(){ gateChecking=false; });
+}
+if(ASB && ASB.auth){
+  ASB.auth.getSession().then(function(r){ if(r&&r.data&&r.data.session) gateTryAdminSession(); });
+  ASB.auth.onAuthStateChange(function(_e,session){ if(session) gateTryAdminSession(); });
+}
+
 document.getElementById("signout").addEventListener("click",function(){
-  try{ sessionStorage.removeItem("mzk_auth"); }catch(e){}
+  try{ sessionStorage.removeItem("mzk_gate"); }catch(e){}
+  if(ASB && ASB.auth) ASB.auth.signOut();
   document.getElementById("shell").classList.remove("on");
   document.getElementById("gate").classList.remove("hidden");
-  document.getElementById("gcode").value="";
+  var s1=document.getElementById("gstep1"), s2=document.getElementById("gstep2"), gh=document.getElementById("ghint");
+  if(s1) s1.style.display=""; if(s2) s2.style.display="none";
+  if(gh) gh.textContent="Authorised coalition staff only. Production sign-in uses Supabase Auth + access control.";
+  var gc=document.getElementById("gcode"); if(gc) gc.value="";
 });
 /* Cross over to the members' hub carrying the admin's Supabase session, so an admin
    (e.g. one who signed in by magic link and never set a password) lands straight in. */
@@ -1287,7 +1331,8 @@ document.getElementById("toHub").addEventListener("click",function(){
     }
   }, function(){ btn.disabled=false; window.open(base,"_blank","noopener"); });
 });
-try{ if(sessionStorage.getItem("mzk_auth")==="1") showConsole(); }catch(e){}
+/* No code-only bypass: the console opens only once gateTryAdminSession() confirms a
+   real admin Supabase session (handled by the getSession / onAuthStateChange hooks above). */
 
 if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
   window.addEventListener("load",function(){
