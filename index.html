@@ -647,6 +647,12 @@ section.band{ padding:36px 0; border-bottom:1px solid var(--line); scroll-margin
 .res-row h3{ font-size:.88rem; margin-bottom:3px; }
 .res-row .meta{ font-size:.68rem; color:var(--muted-dim); }
 .res-dl{ flex:none; align-self:center; font-family:var(--mono); font-size:.68rem; color:var(--green); }
+.opp-facts{ display:flex; flex-wrap:wrap; gap:6px; margin:5px 0 3px; }
+.opp-chip{ font-size:.66rem; font-weight:700; padding:2px 8px; border-radius:999px; background:var(--panel-2); border:1px solid var(--line); color:inherit; }
+.opp-chip.opp-type{ background:var(--green-wash); border-color:transparent; color:var(--green); text-transform:uppercase; letter-spacing:.06em; font-size:.6rem; }
+.opp-chip.opp-due{ background:var(--ember-wash); border-color:transparent; color:var(--ember); }
+.opp-elig{ display:block; font-size:.72rem; color:var(--muted); margin-top:3px; }
+.opp-elig b{ color:var(--muted-dim); font-weight:800; text-transform:uppercase; font-size:.58rem; letter-spacing:.06em; }
 a.res-link{ text-decoration:none; color:inherit; transition:background .15s ease; }
 a.res-link:hover{ background:var(--panel-2); text-decoration:none; }
 .res-new{ display:inline-block; margin-left:6px; font-size:.5rem; font-weight:800; letter-spacing:.08em;
@@ -4288,8 +4294,21 @@ function renderDesk(k){
     if(r.url){ row.href=r.url; row.target="_blank"; row.rel="noopener noreferrer"; }
     var isDl = /^(PDF|DOC|DOCX|ZIP|XLS|XLSX|PPT|PPTX|IMG)$/i.test(r.k||"");
     var label = r.url ? (isDl?"Download ↓":"Open →") : "";
+    var body;
+    if(r.cat==="Opportunities" && (r.opp||r.dl||r.amount||r.elig)){
+      var chips="";
+      if(r.opp) chips+='<span class="opp-chip opp-type">'+r.opp+'</span>';
+      if(r.dl) chips+='<span class="opp-chip opp-due">'+(/rolling/i.test(r.dl)?"Rolling":("Closes "+r.dl))+'</span>';
+      if(r.amount) chips+='<span class="opp-chip opp-amt">'+r.amount+'</span>';
+      body='<h3>'+r.t+(r._new?' <span class="res-new">New</span>':'')+'</h3>'+
+        (r.by?'<span class="meta">'+r.by+'</span>':'')+
+        (chips?'<div class="opp-facts">'+chips+'</div>':'')+
+        (r.elig?'<span class="opp-elig"><b>Who can apply</b> '+r.elig+'</span>':'');
+    } else {
+      body='<h3>'+r.t+(r._new?' <span class="res-new">New</span>':'')+'</h3><span class="meta">'+r.m+'</span>';
+    }
     row.innerHTML = '<div class="res-icon'+(r.g?" g":"")+'" aria-hidden="true">'+r.k+'</div>'+
-      '<div class="grow"><h3>'+r.t+(r._new?' <span class="res-new">New</span>':'')+'</h3><span class="meta">'+r.m+'</span></div>'+
+      '<div class="grow">'+body+'</div>'+
       '<span class="res-dl">'+label+'</span>';
     panel.appendChild(row);
   });
@@ -4311,7 +4330,7 @@ window.renderDeskActive = function(){
         if(r.error || !r.data || !r.data.length) return;
         r.data.forEach(function(row){
           var cat = DESK[row.category] ? row.category : "Resources";
-          DESK[cat].unshift({ t:row.title, m:row.meta||"", dl:"—", k:row.kind||"LINK", url:row.url||"", _new:true, _id:row.id });
+          DESK[cat].unshift({ t:row.title, m:row.meta||"", dl:row.deadline||"", amount:row.amount||"", elig:row.eligibility||"", opp:row.opp_type||"", by:row.by||"", cat:cat, k:row.kind||"LINK", url:row.url||"", _new:true, _id:row.id });
         });
         if(window.renderDeskActive) window.renderDeskActive();
       }, function(){});
