@@ -127,6 +127,9 @@ button{font-family:inherit;cursor:pointer}
 .qcard .qmeta{font-size:.72rem;color:var(--muted);font-weight:700}
 .qcard .qbody{padding:0 15px 10px;font-size:.94rem}
 .qcard .qmedia{margin:0 15px 10px;height:96px;border-radius:10px;background:#0a1712;border:1px dashed var(--line-2);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.76rem;font-weight:800;letter-spacing:.04em}
+.qcard .qembed{margin:0 15px 10px}
+.qcard .qembed iframe{display:block;max-width:100%}
+.qcard .qembed blockquote{margin:0}
 .flags{display:flex;flex-wrap:wrap;gap:6px;padding:0 15px 10px}
 .flag{font-size:.66rem;font-weight:900;letter-spacing:.03em;padding:3px 8px;border-radius:999px;border:1px solid}
 .flag.ok{color:var(--green);border-color:var(--green-deep);background:rgba(98,199,155,.08)}
@@ -462,13 +465,35 @@ function viewModeration(){
 }
 /* Live Moderation — reads the real `submissions` table (status pending/approved/rejected).
    Approve sets status='approved' → the Voice appears on the hub via the voices_public view. */
+/* Inline preview for a Voice's source link — YouTube plays in-place; X/TikTok/IG
+   render via their embed SDKs; anything else falls back to a plain source link. */
+function voiceEmbedHTML(url){
+  if(!url) return "";
+  var yt = String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{6,})/);
+  if(yt) return '<div class="qembed"><iframe src="https://www.youtube-nocookie.com/embed/'+yt[1]+'" title="Voice video" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;aspect-ratio:16/9;border:0;border-radius:10px"></iframe></div>';
+  if(/(twitter\.com|x\.com)/i.test(url)) return '<div class="qembed"><blockquote class="twitter-tweet" data-theme="dark"><a href="'+esc(url)+'">'+esc(url)+'</a></blockquote></div>';
+  if(/tiktok\.com/i.test(url)) return '<div class="qembed"><blockquote class="tiktok-embed" cite="'+esc(url)+'" style="max-width:100%"><a href="'+esc(url)+'">'+esc(url)+'</a></blockquote></div>';
+  if(/instagram\.com/i.test(url)) return '<div class="qembed"><blockquote class="instagram-media" data-instgrm-permalink="'+esc(url)+'" data-instgrm-version="14"><a href="'+esc(url)+'">'+esc(url)+'</a></blockquote></div>';
+  return "";
+}
+function modReparseEmbeds(url){
+  if(/(twitter\.com|x\.com)/i.test(url)) modLoadSDK("https://platform.twitter.com/widgets.js", function(){ if(window.twttr&&twttr.widgets) twttr.widgets.load(); });
+  else if(/tiktok\.com/i.test(url)) modLoadSDK("https://www.tiktok.com/embed.js");
+  else if(/instagram\.com/i.test(url)) modLoadSDK("https://www.instagram.com/embed.js", function(){ if(window.instgrm&&instgrm.Embeds) instgrm.Embeds.process(); });
+}
+var _modSDK={};
+function modLoadSDK(src, cb){
+  if(_modSDK[src]){ if(cb) setTimeout(cb,300); return; }
+  _modSDK[src]=1; var s=document.createElement("script"); s.async=true; s.src=src; if(cb) s.onload=function(){ setTimeout(cb,300); }; document.body.appendChild(s);
+}
 function modCard(r){
   var name=r.submitter_name||"Anonymous", type=r.kind||"text";
   var when=r.created_at ? new Date(r.created_at).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "";
   var flags = r.consent ? '<span class="flag ok">✓ Consent given</span>' : '<span class="flag bad">✕ No consent</span>';
   if(r.has_minor) flags+='<span class="flag warn">⚠ Possible minor — guardian consent</span>';
   if(r.lang) flags+='<span class="flag ok" style="color:var(--muted);border-color:var(--line-2);background:none">'+esc(r.lang)+'</span>';
-  var media = (type==="text"||type==="embed") ? "" : '<div class="qmedia">'+esc(String(type).toUpperCase())+(r.media_path?' · '+esc(r.media_path):' attachment')+'</div>';
+  var emb = voiceEmbedHTML(r.source_url);
+  var media = emb ? emb : ((type==="text"||type==="embed") ? "" : '<div class="qmedia">'+esc(String(type).toUpperCase())+(r.media_path?' · '+esc(r.media_path):' attachment')+'</div>');
   var srcLink = r.source_url ? '<a class="btn ghost" href="'+esc(r.source_url)+'" target="_blank" rel="noopener noreferrer">View source ↗</a>' : '';
   var acts;
   if(r.status==="pending"){
@@ -494,6 +519,7 @@ function loadModeration(){
     var rows=res.data||[];
     host.innerHTML = rows.length ? rows.map(modCard).join("") : '<div class="panel muted">Nothing in this queue.</div>';
     host.querySelectorAll("[data-modact]").forEach(function(el){ el.addEventListener("click",function(){ modAct(el.getAttribute("data-modact")); }); });
+    rows.forEach(function(r){ if(r.source_url) modReparseEmbeds(r.source_url); });
   }, function(){ host.innerHTML='<div class="panel muted">Couldn\'t reach the database.</div>'; });
   ["pending","approved","rejected"].forEach(function(st){
     ASB.from("submissions").select("id",{count:"exact",head:true}).eq("status",st).then(function(r){

@@ -5138,7 +5138,9 @@ renderVoices();
       if(!r || r.error || !r.data || !r.data.length) return;
       VOICES = r.data.map(function(row){
         var k = row.kind || "doc";
-        var isEmbed = (k==="embed") && !!row.source_url;
+        // Embed inline when the source is an embeddable platform (YouTube, X, TikTok, IG),
+        // whatever the upload type; otherwise keep it as a plain "View source" link.
+        var isEmbed = !!row.source_url && !!detectEmbed(row.source_url);
         var dt = row.created_at ? new Date(row.created_at).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}) : "";
         var kindLabel = {video:"Video",audio:"Audio",photo:"Photo",doc:"Report",embed:"Social post"}[k] || k;
         return {
