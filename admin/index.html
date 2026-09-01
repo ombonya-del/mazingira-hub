@@ -375,7 +375,7 @@ var secMem = {};
 function navLabel(id){ for(var i=0;i<NAV.length;i++) if(NAV[i].id===id) return NAV[i].label; return id; }
 function sectionOf(view){ for(var i=0;i<SECTIONS.length;i++) if(SECTIONS[i].views.indexOf(view)>=0) return SECTIONS[i]; return SECTIONS[0]; }
 function viewBadge(v){
-  if(v==="moderation") return count("pending");
+  if(v==="moderation") return state.modPending||0;
   if(v==="publishing") return pubCount("ready");
   if(v==="narrative")  return state.ndPending||0;
   if(v==="oppsreview") return state.oppPending||0;
@@ -453,13 +453,55 @@ function viewOverview(){
 
 function viewModeration(){
   state.modFilter = state.modFilter||"pending";
+  var mc = state.modCounts||{};
   var pills=[["pending","Pending"],["approved","Approved"],["rejected","Rejected"]].map(function(p){
-    return '<button class="pill" data-mod="'+p[0]+'" aria-pressed="'+(state.modFilter===p[0])+'">'+p[1]+'<span class="c mono">'+count(p[0])+'</span></button>';
+    return '<button class="pill" data-mod="'+p[0]+'" aria-pressed="'+(state.modFilter===p[0])+'">'+p[1]+'<span class="c mono">'+(mc[p[0]]!=null?mc[p[0]]:"·")+'</span></button>';
   }).join("");
-  var list=SUBMISSIONS.filter(function(s){return s.status===state.modFilter;});
-  var cards=list.length? list.map(subCard).join("") : '<div class="panel muted">Nothing in this queue.</div>';
   return '<section class="view"><div class="page-head"><div><h2>Moderation</h2><p>Review citizen Voices before anything is published. Check consent and privacy (Kenya DPA 2019).</p></div></div>'+
-    '<div class="pills">'+pills+'</div>'+cards+'</section>';
+    '<div class="pills">'+pills+'</div><div id="modList"><div class="panel muted">Loading…</div></div></section>';
+}
+/* Live Moderation — reads the real `submissions` table (status pending/approved/rejected).
+   Approve sets status='approved' → the Voice appears on the hub via the voices_public view. */
+function modCard(r){
+  var name=r.submitter_name||"Anonymous", type=r.kind||"text";
+  var when=r.created_at ? new Date(r.created_at).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "";
+  var flags = r.consent ? '<span class="flag ok">✓ Consent given</span>' : '<span class="flag bad">✕ No consent</span>';
+  if(r.has_minor) flags+='<span class="flag warn">⚠ Possible minor — guardian consent</span>';
+  if(r.lang) flags+='<span class="flag ok" style="color:var(--muted);border-color:var(--line-2);background:none">'+esc(r.lang)+'</span>';
+  var media = (type==="text"||type==="embed") ? "" : '<div class="qmedia">'+esc(String(type).toUpperCase())+(r.media_path?' · '+esc(r.media_path):' attachment')+'</div>';
+  var srcLink = r.source_url ? '<a class="btn ghost" href="'+esc(r.source_url)+'" target="_blank" rel="noopener noreferrer">View source ↗</a>' : '';
+  var acts;
+  if(r.status==="pending"){
+    var canApprove = r.consent && !r.has_minor;
+    acts='<button class="btn approve" data-modact="approve:'+r.id+'"'+(canApprove?'':' disabled title="Resolve consent/privacy first"')+'>Approve</button>'+
+      '<button class="btn reject" data-modact="reject:'+r.id+'">Reject</button>'+srcLink;
+  } else {
+    acts='<span class="status-tag st-'+esc(r.status)+'">'+esc(r.status)+'</span>'+srcLink+
+      '<button class="btn ghost" data-modact="reopen:'+r.id+'" style="margin-left:auto">Reopen</button>';
+  }
+  return '<div class="qcard"><div class="qtop"><span class="qav" style="background:'+(AVCOLORS[type]||"#62C79B")+'">'+esc(String(name).charAt(0))+'</span>'+
+    '<span class="qwho"><span class="qnm">'+esc(name)+'</span><span class="qmeta">'+esc(r.county||"—")+' · '+esc(when)+'</span></span>'+
+    '<span class="type-tag">'+esc(type)+'</span></div>'+
+    media+'<div class="qbody">'+esc(r.body||"")+'</div><div class="flags">'+flags+'</div>'+
+    '<div class="qact">'+acts+'</div></div>';
+}
+function loadModeration(){
+  if(!ASB) return;
+  var host=document.getElementById("modList"); if(!host) return;
+  var want=state.modFilter||"pending";
+  ASB.from("submissions").select("*").eq("status",want).order("created_at",{ascending:false}).then(function(res){
+    if(res.error){ host.innerHTML='<div class="panel muted">Couldn\'t load submissions: '+esc(res.error.message)+'</div>'; return; }
+    var rows=res.data||[];
+    host.innerHTML = rows.length ? rows.map(modCard).join("") : '<div class="panel muted">Nothing in this queue.</div>';
+    host.querySelectorAll("[data-modact]").forEach(function(el){ el.addEventListener("click",function(){ modAct(el.getAttribute("data-modact")); }); });
+  }, function(){ host.innerHTML='<div class="panel muted">Couldn\'t reach the database.</div>'; });
+  ["pending","approved","rejected"].forEach(function(st){
+    ASB.from("submissions").select("id",{count:"exact",head:true}).eq("status",st).then(function(r){
+      if(r.error) return; state.modCounts=state.modCounts||{}; state.modCounts[st]=r.count||0;
+      if(st==="pending"){ state.modPending=r.count||0; renderNav(); }
+      var pill=document.querySelector('.pills [data-mod="'+st+'"] .c'); if(pill) pill.textContent=r.count||0;
+    });
+  });
 }
 function subCard(s){
   var flags="";
@@ -600,6 +642,7 @@ function bindView(){
   app.querySelectorAll("[data-active]").forEach(function(el){ el.addEventListener("click",function(){ var i=+el.getAttribute("data-active"); MEMBERS[i].active=!MEMBERS[i].active; el.setAttribute("aria-pressed",MEMBERS[i].active); toast(MEMBERS[i].active?"Member activated":"Member suspended"); }); });
   var add=document.getElementById("addMember"); if(add) add.addEventListener("click",openAddMember);
   bindUpload();
+  if(state.view==="moderation") loadModeration();
   if(state.view==="narrative") loadNarrative();
   if(state.view==="resources") loadResources();
   if(state.view==="meetings") loadMeetings();
@@ -911,6 +954,7 @@ function fetchWatchCounts(){
   ASB.from("resources").select("id",{count:"exact",head:true}).eq("published",false).eq("category","Opportunities").then(function(r){ if(!r.error){ state.oppPending=r.count||0; renderNav(); } });
   ASB.from("calendar_events").select("id",{count:"exact",head:true}).eq("published",false).then(function(r){ if(!r.error){ state.evPending=r.count||0; renderNav(); } });
   ASB.from("disinfo_items").select("id",{count:"exact",head:true}).eq("published",false).then(function(r){ if(!r.error){ state.ndPending=r.count||0; renderNav(); } });
+  ASB.from("submissions").select("id",{count:"exact",head:true}).eq("status","pending").then(function(r){ if(!r.error){ state.modPending=r.count||0; state.modCounts=state.modCounts||{}; state.modCounts.pending=r.count||0; renderNav(); } });
 }
 
 /* ==================== PARTNERS — contacts + focus tags for opportunity matching ==================== */
@@ -1186,15 +1230,16 @@ function publishUpload(btn){
     });
   } else { doInsert(); }
 }
-function subById(id){ for(var i=0;i<SUBMISSIONS.length;i++) if(SUBMISSIONS[i].id===id) return SUBMISSIONS[i]; }
 function modAct(a){
-  var p=a.split(":"), op=p[0], s=subById(p[1]); if(!s&&op!=="view") return;
-  if(op==="approve"){ s.status="approved"; PUBLISH.unshift({id:"pv"+Date.now(),source:"Voices",title:s.name+" — "+s.area,target:"raia · Voices wall",status:"ready",by:"—"}); toast("Approved → sent to publish queue"); render(); }
-  else if(op==="reject"){ s.status="rejected"; toast("Rejected"); render(); }
-  else if(op==="changes"){ toast("Change request noted to contributor"); }
-  else if(op==="reopen"){ s.status="pending"; toast("Reopened for review"); render(); }
-  else if(op==="queue"){ PUBLISH.unshift({id:"pv"+Date.now(),source:"Voices",title:s.name+" — "+s.area,target:"raia · Voices wall",status:"ready",by:"—"}); toast("Queued for publishing"); render(); }
-  else if(op==="view"){ openReview(s); }
+  if(!ASB){ toast("Not connected."); return; }
+  var p=a.split(":"), op=p[0], id=p.slice(1).join(":");
+  var newStatus = op==="approve"?"approved" : op==="reject"?"rejected" : op==="reopen"?"pending" : null;
+  if(!newStatus) return;
+  ASB.from("submissions").update({status:newStatus}).eq("id",id).then(function(r){
+    if(r.error){ toast(op+" failed: "+r.error.message); return; }
+    toast(op==="approve"?"Approved → live on the hub" : op==="reject"?"Rejected" : "Reopened for review");
+    loadModeration();
+  }, function(){ toast(op+" failed — network error"); });
 }
 function pubById(id){ for(var i=0;i<PUBLISH.length;i++) if(PUBLISH[i].id===id) return PUBLISH[i]; }
 function pubAct(a){
