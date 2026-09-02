@@ -11,7 +11,9 @@
 //   https://<project-ref>.functions.supabase.co/inbound-email?secret=<INBOUND_SECRET>
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
-const FORWARD_TO     = Deno.env.get("FORWARD_TO") ?? "ombonya@gmail.com";
+// FORWARD_TO may be a comma-separated list — mail is forwarded to every address.
+const FORWARD_TO = (Deno.env.get("FORWARD_TO") ?? "mazingirakhub@gmail.com,ombonya@gmail.com")
+  .split(",").map((s) => s.trim()).filter(Boolean);
 const INBOUND_SECRET = Deno.env.get("INBOUND_SECRET") ?? "";
 const FROM = "MazingiraKenya (admin inbox) <admin@mazingirakenya.org>";
 
@@ -54,7 +56,7 @@ Deno.serve(async (req) => {
       method: "POST",
       headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: FROM, to: [FORWARD_TO], reply_to: from.email || undefined,
+        from: FROM, to: FORWARD_TO, reply_to: from.email || undefined,
         subject: `[admin@] ${subject}`, html: bodyHtml, text: text_body || undefined,
       }),
     });
