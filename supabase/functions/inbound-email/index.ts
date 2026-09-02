@@ -40,6 +40,13 @@ Deno.serve(async (req) => {
   try {
     if (!RESEND_API_KEY) return json({ error: "RESEND_API_KEY not set" }, 500);
     const payload = await req.json().catch(() => ({}));
+
+    // LOOP GUARD 1 — only act on genuine inbound/received events. If the webhook is
+    // (mis)subscribed to sending events, our own forward would re-trigger this and
+    // loop forever; ignore anything that isn't a received-email event.
+    const evType = String(payload?.type ?? payload?.event ?? "").toLowerCase();
+    if (evType && !/receiv|inbound/.test(evType)) return json({ ok: true, ignored: evType });
+
     // Resend Inbound wraps the message in { type, data:{...} }; accept a bare shape too.
     const d = (payload && typeof payload === "object" && payload.data) ? payload.data : payload;
 
@@ -47,6 +54,12 @@ Deno.serve(async (req) => {
     const subject = String(d.subject ?? d.Subject ?? "(no subject)");
     const text_body = String(d.text ?? d.text_body ?? d["body-plain"] ?? "");
     const html_body = String(d.html ?? d.html_body ?? d["body-html"] ?? "");
+
+    // LOOP GUARD 2 — never forward our own forwards or mail from our own addresses.
+    const self = new Set([...FORWARD_TO.map((a) => a.toLowerCase()),
+      "admin@mazingirakenya.org", "admin@mail.mazingirakenya.org"]);
+    if (self.has(from.email.toLowerCase())) return json({ ok: true, skipped: "self-sender" });
+    if (/^\s*\[admin@\]/i.test(subject)) return json({ ok: true, skipped: "already-forwarded" });
 
     const banner = `<div style="font:13px system-ui;color:#555;border-left:3px solid #E2552F;padding:6px 10px;margin-bottom:12px">`
       + `Forwarded from <b>admin@mazingirakenya.org</b> · originally from ${esc(from.name || from.email)} &lt;${esc(from.email)}&gt;</div>`;
