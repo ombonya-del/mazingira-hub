@@ -1301,10 +1301,31 @@ function openEdit(what){
 }
 function openAddMember(){
   openModal('<div class="mh"><h3>Add member</h3><button class="mx">×</button></div><div class="mb">'+
-    '<label>Organisation</label><input placeholder="e.g. Greenpeace Africa">'+
-    '<label>Person</label><input placeholder="Full name">'+
-    '<label>Role</label><select>'+ROLES.map(function(r){return '<option>'+r+'</option>';}).join("")+'</select>'+
-    '</div><div class="mf"><button class="btn ghost mx">Cancel</button><button class="btn approve" id="modalSave">Send invite</button></div>');
+    '<label>Email</label><input id="amEmail" type="email" placeholder="name@org.org" autocomplete="off">'+
+    '<label>Organisation</label><input id="amOrg" placeholder="e.g. Greenpeace Africa">'+
+    '<label>Person</label><input id="amPerson" placeholder="Full name">'+
+    '<label>Role</label><select id="amRole">'+ROLES.map(function(r){return '<option>'+r+'</option>';}).join("")+'</select>'+
+    '<p class="muted" id="amMsg" style="font-size:.85rem;margin-top:8px"></p>'+
+    '</div><div class="mf"><button class="btn ghost mx">Cancel</button><button class="btn approve" id="amSend">Send invite</button></div>');
+  var btn=document.getElementById("amSend");
+  btn.addEventListener("click",function(){
+    var email=(document.getElementById("amEmail").value||"").trim().toLowerCase();
+    var org=(document.getElementById("amOrg").value||"").trim();
+    var person=(document.getElementById("amPerson").value||"").trim();
+    var role=(document.getElementById("amRole").value||"");
+    var msg=document.getElementById("amMsg");
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ msg.style.color="#E5625A"; msg.textContent="Enter a valid email address."; return; }
+    if(!ASB){ msg.style.color="#E5625A"; msg.textContent="Not connected to Supabase."; return; }
+    btn.disabled=true; msg.style.color="var(--muted)"; msg.textContent="Sending…";
+    ASB.functions.invoke("invite-member",{ body:{ email:email, org:org, person:person, role:role } }).then(function(r){
+      btn.disabled=false;
+      var d=r&&r.data, e=r&&r.error;
+      if(e){ msg.style.color="#E5625A"; msg.textContent="Couldn't send: "+(e.message||"error (are you signed in as an admin?)"); return; }
+      if(d&&d.ok===false){ msg.style.color="#E5625A"; msg.textContent="Couldn't send: "+(d.message||"unknown"); return; }
+      toast(d&&d.status==="magic_link_sent" ? ("Already a member — sign-in link sent to "+email) : ("Invite sent to "+email));
+      closeModal();
+    }).catch(function(err){ btn.disabled=false; msg.style.color="#E5625A"; msg.textContent="Couldn't send: "+String(err); });
+  });
 }
 document.getElementById("overlay").addEventListener("click",function(e){ if(e.target===this) closeModal(); });
 document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeModal(); });
