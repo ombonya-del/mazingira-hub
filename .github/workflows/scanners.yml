@@ -5,8 +5,8 @@ name: MazingiraKenya Scanners
 # Mirrors the ImaarishaSRHR scanner workflows.
 #
 # Weekly scanners (schedule):  opportunity-scanner · resource-scanner · event-scanner · disinfo-scanner
-# One-off maintenance (manual, target=cleanup):  opportunity-cleanup  — reviews the existing
-#   pending Opportunity drafts, deletes stale/off-topic ones, enriches the survivors.
+# Cleanup pass (runs weekly after the scan job, and manually via target=cleanup): opportunity-cleanup
+#   reviews the pending Opportunity drafts, deletes stale/off-topic ones, enriches the survivors.
 #
 # Required repo secret:  MAZINGIRA_CRON_SECRET  (must match CRON_SECRET set on the Supabase functions)
 
@@ -50,9 +50,12 @@ jobs:
           [ "$CODE" = "200" ] || exit 1
 
   cleanup:
-    # One-off: review + enrich the existing pending Opportunity drafts. Loops the
-    # opportunity-cleanup function (12 drafts per call) until nothing is left un-reviewed.
-    if: github.event_name == 'workflow_dispatch' && inputs.target == 'cleanup'
+    # Review + enrich the pending Opportunity drafts. Loops the opportunity-cleanup
+    # function (12 drafts per call) until nothing is left un-reviewed. Runs on the
+    # weekly schedule right after the scanners insert new drafts, and on manual
+    # dispatch with target=cleanup (or all).
+    needs: scan
+    if: always() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.target == 'cleanup' || inputs.target == 'all')))
     runs-on: ubuntu-latest
     steps:
       - name: Review & enrich pending opportunities

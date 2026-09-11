@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       const deadline = (x.deadline && String(x.deadline).trim()) || "Rolling";
       const meta = [x.opp_type, row.by, deadline !== "Rolling" ? `closes ${deadline}` : "Rolling"].filter(Boolean).join(" · ");
       const { error: ue } = await sb.from("resources").update({
-        opp_type: x.opp_type ?? null, deadline, amount: x.amount ?? null, eligibility: x.eligibility ?? null, meta,
+        opp_type: x.opp_type ?? null, deadline, deadline_iso: x.deadline_iso ?? null, amount: x.amount ?? null, eligibility: x.eligibility ?? null, meta,
       }).eq("id", row.id);
       if (!ue) enriched++; else { skipped++; if (!sample_error) sample_error = "upd:" + ue.message; }
     }

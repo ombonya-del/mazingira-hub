@@ -19,13 +19,19 @@ const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SE
 const CRON_SECRET = Deno.env.get("CRON_SECRET") ?? "";
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY") ?? "";
 const APP = "mazingira-hub";
-const MAX_CANDIDATES = 20;   // bound per-run fetch + LLM cost
+const MAX_CANDIDATES = 40;   // bound per-run fetch + LLM cost
 
 const RSS_FEEDS = [
   { url: "https://www.opportunitiesforafricans.com/feed/", org: "OpportunitiesForAfricans" },
+  { url: "https://www.opportunitiesforafricans.com/category/grants/feed/", org: "OpportunitiesForAfricans" },
+  { url: "https://www.opportunitiesforafricans.com/category/fellowship/feed/", org: "OpportunitiesForAfricans" },
   { url: "https://opportunitydesk.org/feed/", org: "OpportunityDesk" },
+  { url: "https://opportunitydesk.org/category/fellowships/feed/", org: "OpportunityDesk" },
   { url: "https://www2.fundsforngos.org/feed/", org: "FundsforNGOs" },
+  { url: "https://www2.fundsforngos.org/category/latest-funds-for-ngos/feed/", org: "FundsforNGOs" },
   { url: "https://news.google.com/rss/search?q=Africa+(climate+OR+environment+OR+conservation+OR+%22just+transition%22)+(%22call+for+proposals%22+OR+grant+OR+fellowship+OR+scholarship)&hl=en&gl=KE&ceid=KE:en", org: "Google News" },
+  { url: "https://news.google.com/rss/search?q=(Kenya+OR+%22East+Africa%22)+(climate+OR+environment+OR+conservation+OR+biodiversity)+(grant+OR+%22call+for+proposals%22+OR+fund+OR+funding)&hl=en&gl=KE&ceid=KE:en", org: "Google News" },
+  { url: "https://news.google.com/rss/search?q=Africa+(climate+OR+environmental)+(fellowship+OR+scholarship+OR+accelerator+OR+%22grant+opportunity%22)&hl=en&gl=KE&ceid=KE:en", org: "Google News" },
 ];
 const QUERY = "climate OR environment OR conservation OR biodiversity OR renewable OR drought OR " +
   "adaptation OR resilience OR deforestation OR carbon OR 'just transition' OR land rights OR water OR " +
@@ -92,7 +98,7 @@ async function extract(today: string, title: string, url: string, body: string):
           `Given an opportunity's title, URL and page text, reply ONLY with compact JSON: ` +
           `{"keep":bool,"opp_type":"Grant|Fellowship|Scholarship|Accreditation|Fund|Call|Consultancy","deadline":"human e.g. 31 Aug 2026 or Rolling or null","deadline_iso":"YYYY-MM-DD or null","amount":"e.g. Up to USD 20,000 or null","eligibility":"one line: who can apply / geographic focus or null"}. ` +
           `Set keep=true ONLY if ALL hold: (a) genuinely about climate/environment/conservation/climate-justice; (b) open to Kenyan / East African / African applicants; (c) STILL OPEN — deadline_iso is today (${today}) or later, OR clearly rolling/ongoing. ` +
-          `If the deadline has passed, or it is off-topic, or it is just news coverage rather than an actual opportunity to apply for, set keep=false.`,
+          `Set keep=false for ANYTHING that is not an open application people can apply to, including: a news article, press release, blog post, roundup/listicle, results or winners announcement, report about a programme, or general org promotion. keep=true requires a concrete, still-open call with an application route (deadline_iso today or later, or explicitly rolling). If the deadline has passed, it is off-topic, or you are not sure it is a real open opportunity, set keep=false.`,
         messages: [{ role: "user", content: `TITLE: ${title}\nURL: ${url}\n\nPAGE:\n${body}`.slice(0, 5000) }],
       }),
       signal: AbortSignal.timeout(25000),
@@ -131,7 +137,7 @@ Deno.serve(async (req) => {
       const { error } = await sb.from("resources").insert({
         category: "Opportunities", title: String(c.title).slice(0, 300),
         meta, url: c.link, kind: "LINK", by: c.org, published: false,
-        opp_type: x.opp_type ?? null, deadline, amount: x.amount ?? null, eligibility: x.eligibility ?? null,
+        opp_type: x.opp_type ?? null, deadline, deadline_iso: x.deadline_iso ?? null, amount: x.amount ?? null, eligibility: x.eligibility ?? null,
       });
       if (!error) { inserted++; have.add(c.link); }
     }
