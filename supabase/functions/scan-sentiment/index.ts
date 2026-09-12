@@ -12,7 +12,7 @@ const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
 
 // curated source list — extend freely
 const FEEDS = [
-  { url: "https://nation.africa/kenya/climate/rss",            type: "news", source: "Daily Nation" },
+  { url: "https://news.google.com/rss/search?q=(Kenya+OR+%22East+Africa%22)+(climate+OR+environment+OR+conservation+OR+coal+OR+drought+OR+%22land+rights%22)&hl=en&gl=KE&ceid=KE:en", type: "news", source: "Google News (Kenya climate)" },
   { url: "https://www.standardmedia.co.ke/rss/headlines.php",  type: "news", source: "The Standard" },
   { url: "https://news.mongabay.com/feed/",                    type: "news", source: "Mongabay" },
   { url: "https://www.climatechangenews.com/feed/",            type: "news", source: "Climate Home News" },

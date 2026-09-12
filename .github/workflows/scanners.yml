@@ -4,7 +4,7 @@ name: MazingiraKenya Scanners
 # admin review queue (Accept/Reject) — no Claude task, no Terminal, no device needed.
 # Mirrors the ImaarishaSRHR scanner workflows.
 #
-# Weekly scanners (schedule):  opportunity-scanner · resource-scanner · event-scanner · disinfo-scanner
+# Weekly scanners (schedule):  opportunity-scanner · resource-scanner · event-scanner · disinfo-scanner · scan-sentiment
 # Cleanup pass (runs weekly after the scan job, and manually via target=cleanup): opportunity-cleanup
 #   reviews the pending Opportunity drafts, deletes stale/off-topic ones, enriches the survivors.
 #
@@ -20,7 +20,7 @@ on:
         required: false
         default: 'all'
         type: choice
-        options: [all, opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner, cleanup]
+        options: [all, opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner, scan-sentiment, cleanup]
 
 env:
   SUPABASE_URL: https://uueemckdoozsuowcqkhl.supabase.co
@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        fn: [opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner]
+        fn: [opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner, scan-sentiment]
     steps:
       - name: Run ${{ matrix.fn }}
         if: github.event_name == 'schedule' || inputs.target == 'all' || inputs.target == matrix.fn
