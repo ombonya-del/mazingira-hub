@@ -1,3 +1,70 @@
+# Opportunities Watch — Review Log — 2026-09-19
+
+MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya / East Africa / pan-African climate justice. All deadlines below are **on or after 2026-09-19** (or a firm upcoming window). These items were **written straight into Supabase as drafts (published=false)** via a connected browser and now await admin Accept/Reject in **admin → Opportunities review**. Nothing here is public until an admin accepts.
+
+> ✅ **Queueing status:** 5/5 drafts inserted successfully (HTTP 201) via the connected-Chrome write path. The Mac device shell and the cloud container are both proxy-blocked from `uueemckdoozsuowcqkhl.supabase.co` (HTTP 403 from proxy) — the browser JS `fetch` from the hub origin is the reliable writer. Re-runnable commands: `scripts/queue-opportunities-2026-09-19.sh`.
+
+## New verified-open opportunities queued (5)
+
+### 1. SEWA Grants 2026 — Strengthening Early Warning in Africa
+- **Funder / host:** European Centre for Medium-Range Weather Forecasts (ECMWF), funded by the EU (Global Gateway)
+- **Type:** Grant (up to ~€1.25M per regional project, 24 months)
+- **Deadline:** 30 Sep 2026 (14:00 CEST)
+- **Eligibility:** Regional consortia of African + European orgs working with African WMO Regional Climate Centres / National Meteorological & Hydrological Services; Sub-Saharan Africa incl. East Africa/Kenya.
+- **URL:** https://www.ecmwf.int/en/about/grants/sewa-grants
+- **Verified:** msmeafricaonline.com + africanngos.org roundup (Sept–Oct 2026).
+
+### 2. Aqua for All — Kenya Call 2026 (Water & Sanitation Enterprises)
+- **Funder / host:** Aqua for All
+- **Type:** Call (growth-stage enterprise support; climate-resilience cross-cutting)
+- **Deadline:** 20 Sep 2026  ⚠️ *very tight — may lapse before admin review*
+- **Eligibility:** Registered Kenyan water/sanitation enterprises, 3+ yrs operating, revenue-generating, SDG 6 mission.
+- **URL:** https://aquaforall.org/call-for-applications-kenya
+- **Verified:** aquaforall.org + africanngos.org roundup.
+
+### 3. Voices for Climate Justice — Accountability Storytellers
+- **Funder / host:** Africa No Filter (with Comic Relief)
+- **Type:** Fellowship (12-month; grants up to US$4,000 + training/mentorship)
+- **Deadline:** 25 Sep 2026 (18:00 GMT)
+- **Eligibility:** Individual storytellers (18+) in Mozambique, Uganda, Nigeria, Angola, Chad, Rep. Congo, Tanzania, South Sudan, Malawi, Zambia. **NB: Kenya is NOT on the eligible list** — included here for the pan-African / East African (Uganda, Tanzania) climate-justice audience; admin to decide relevance.
+- **URL:** https://africanofilter.org/what-we-do/community/voices-for-climate-justice
+- **Verified:** africanofilter.org call page.
+
+### 4. Global EbA Fund — Small-Size Grants (Ecosystem-based Adaptation)
+- **Funder / host:** Global EbA Fund (IUCN & partners)
+- **Type:** Grant (up to US$250,000; max 24 months)
+- **Deadline:** 26 Oct 2026 (submission window **opens 28 Sep 2026**; portal link published then)
+- **Eligibility:** NGOs, INGOs, academic/research institutes, CBOs, Indigenous orgs, consortia in ODA-eligible countries — Kenya eligible (priority to SIDS/LDCs, but other ODA countries considered for exceptional EbA).
+- **URL:** https://globalebafund.org/small-size-grants
+- **Verified:** globalebafund.org + africanngos.org roundup.
+
+### 5. CFC 29th Call — Thriving Farmers, Resilient Ecosystems, Empowered Communities
+- **Funder / host:** Common Fund for Commodities (CFC)
+- **Type:** Grant (up to US$1.5M regular / US$300k Fast-Track)
+- **Deadline:** 1 Oct 2026
+- **Eligibility:** SMEs, cooperatives, social enterprises, NGOs, public/private entities in CFC's 101 member countries (Kenya included); 3+ yrs operating. Focus: regenerative agriculture, biodiversity, climate-smart practices, forest conservation.
+- **URL:** https://www.common-fund.org/call-for-proposals
+- **Verified:** common-fund.org + africanngos.org roundup.
+
+---
+
+## Checked and DROPPED this run (closed, out of scope, or already logged)
+- **EEP Africa 2026 Call for Proposals** — CLOSED (EoI deadline 16 Mar 2026).
+- **Mountains ADAPT Small Grants (UNEP)** — closed 15 Sep 2026.
+- **Sowing the Seeds of Change – Roots Track / KCDF** — closed 15 Sep 2026.
+- **GEF SGP CSO Challenge (GEF & IUCN)** — closed 15 Sep 2026.
+- **Uganda Climate Innovation Challenge 2026 (GAYO)** — closed 10 Sep 2026.
+- **ACE Microgrants 2026 (Pulitzer Center)** — closed 30 Apr 2026.
+- **GEF SGP Kenya (UNDP)** — closed 21 Jun 2026.
+- **African Water Facility Water & Sanitation CfP** — deadline now 25 Sep 2026 but already logged in the 2026-08-17 run; treated as a duplicate, not re-queued.
+- **Rufford Small Grants** — rolling, already logged (2026-08-17 run); not re-queued.
+- **Clean Cooking in Ethiopian Schools (Education Cannot Wait)** — Ethiopia-only, schools-specific; out of coalition scope.
+
+_Approved items go live only when a human admin clicks Accept in admin → Opportunities review._
+
+---
+---
+
 # Opportunities Watch — Review Log — 2026-08-17
 
 MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya and Africa. All deadlines are **on or after 2026-08-17** (or explicitly Rolling). These are **drafts for admin review only** — nothing here is published to the live site.

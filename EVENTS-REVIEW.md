@@ -1,5 +1,42 @@
 # Events Watch — Admin Review Queue
 
+**Run date (TODAY): 2026-09-19**
+Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
+Scope: upcoming climate & environmental-justice events on or after 2026-09-19, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
+
+> ✅ **Queueing status:** All 9 verified events below were written **straight to Supabase as drafts (`published=false`)** via the connected-browser write path — every insert returned **HTTP 201**. No 409 duplicates, which confirms the 2026-08-17 items had never actually reached the DB (that run's inserts failed). The public calendar was empty (anon `select` returned `[]`, i.e. 0 published events) before this run. Review and Accept/Reject them in **admin → Events review**. Nothing is public until an admin Accepts.
+
+**Verification notes:** Each event was confirmed against a primary/organiser source and is future-dated. Two items carried over from the 2026-08-17 backlog were **dropped as unverified** — the "Pre-COP31 Ministerial (Fiji/Tuvalu)" and a separate "COP31 World Leaders' Summit (11–12 Nov)" are **not** listed on the official UNFCCC road-to-Antalya page, so they were not queued. Two 2026-08-17 items are now **past** (UNCCD COP17, WCPH 2026) and were skipped.
+
+---
+
+## Drafts queued this run (9) — all published=false, source=watch
+
+| # | Event | Date(s) | Location | Mode | Host | Status |
+|---|-------|---------|----------|------|------|--------|
+| 1 | African Symposium on Climate Reparations | 30 Sep – 1 Oct 2026 | Mombasa, Kenya | In person | African Climate Reparations Collective / African Futures Lab | INSERTED 201 |
+| 2 | African Energy Week 2026 | 12–16 Oct 2026 | Cape Town, South Africa | In person | African Energy Chamber | INSERTED 201 |
+| 3 | Africa Climate Forum (ACF) 2026 | 13–14 Oct 2026 | Abuja, Nigeria | In person | GCLBE | INSERTED 201 |
+| 4 | CBD COP17 — 2026 UN Biodiversity Conference | 19–30 Oct 2026 | Yerevan, Armenia | Hybrid | Convention on Biological Diversity | INSERTED 201 |
+| 5 | GreenShift Forum 2026 | 22 Oct 2026 | Nairobi, Kenya | In person | TechTrends Media & Ardena Consulting | INSERTED 201 |
+| 6 | Global Off-Grid Solar Forum & Expo 2026 | 27–29 Oct 2026 | Kigali, Rwanda | In person | GOGLA & World Bank ESMAP | INSERTED 201 |
+| 7 | 5th EIK International Environmental Conference & Expo 2026 | 28–30 Oct 2026 | Mombasa, Kenya | In person | Environment Institute of Kenya (EIK) | INSERTED 201 |
+| 8 | COP31 — 31st UNFCCC Conference of the Parties | 9–20 Nov 2026 | Antalya, Türkiye | Hybrid | UNFCCC / COP31 Presidency | INSERTED 201 |
+| 9 | 2nd Annual ESG and Climate Africa Summit 2026 | 24–25 Nov 2026 | Nairobi, Kenya | In person | Leadvent Group | INSERTED 201 |
+
+**New this run (not previously logged):** African Energy Week (2), Africa Climate Forum (3), Global Off-Grid Solar Forum (6), 5th EIK Conference (7), ESG & Climate Africa Summit (9).
+**Re-queued from 2026-08-17 backlog (verified still-upcoming, never actually inserted):** Reparations Symposium (1), CBD COP17 (4), GreenShift (5), COP31 (8).
+
+Reproducible record: `scripts/queue-events-2026-09-19.sh`.
+
+*Approved events go live only when a human admin clicks Accept in the admin Events review tab. This log is a draft queue, not a publication.*
+
+---
+
+<!-- ================= PREVIOUS RUNS BELOW ================= -->
+
+# Events Watch — Admin Review Queue
+
 **Run date (TODAY): 2026-08-17**
 Coalition: MazingiraKenya · Prepared by: Events Watch (automated)
 Scope: upcoming climate & environmental-justice events on or after 2026-08-17, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
