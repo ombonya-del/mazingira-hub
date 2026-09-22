@@ -1,3 +1,48 @@
+# Resources Watch — Review Log — 2026-09-22 (SUPPLEMENTARY, 08:08 UTC)
+
+A second firing of the weekly task ran ~30 min after the 07:34 run (which queued 7). This supplementary run added **4 genuinely new, previously-missed** climate/environmental-justice knowledge resources — deduped against all 15 items already in this log. All 4 were queued as drafts (`published=false`, `source=watch`, `category=Resources`) into Supabase (project `uueemckdoozsuowcqkhl`) via a connected Chrome (same-origin POST to `/rest/v1/resources`, public anon key only) and each returned **HTTP 201**. The Mac device shell still cannot reach Supabase (curl 56 / proxy 403 — host not on the device egress allowlist). Replay commands: `scripts/queue-resources-2026-09-22b.sh`.
+
+## Verified new resources (4) — 2026-09-22 (supplementary)
+
+Each URL was fetched and confirmed to load with real content before queueing. All new to the queue (not in any prior log below).
+
+### 1. Unlocking Africa's Energy Future: Integrating the COP28 Energy Package into the NDC 3.0 Framework
+- **Source:** Power Shift Africa
+- **Type:** Policy brief (2025)
+- **URL:** https://www.powershiftafrica.org/publications/unlocking-africas-energy-future-integrating-the-cop28-energy-package-into-the-ndc-30-framework
+- **Why:** Links the COP28 energy package (tripling renewables, doubling efficiency) to NDC 3.0 design — directly relevant to Kenya's NDC 3.0 and African energy-transition finance.
+- **Verified:** fetched directly; landing page + download confirmed.
+
+### 2. PIDA Master Plan Assessment Report — Currents of Integration: Africa's Path to a Shared, Resilient Grid
+- **Source:** Power Shift Africa
+- **Type:** Report (Jan 2026)
+- **URL:** https://www.powershiftafrica.org/publications/pida-assessment
+- **Why:** Assesses PIDA and the Continental Power Systems Master Plan for regional grid integration, renewables and a unified African electricity market — pan-African just-transition / energy-infrastructure reference.
+- **Verified:** fetched directly; landing page + PDF download confirmed.
+
+### 3. African Priorities for COP30 Policy Brief
+- **Source:** Power Shift Africa
+- **Type:** Policy brief (Nov 2025)
+- **URL:** https://www.powershiftafrica.org/publications/african-priorities-for-cop30-policy-brief
+- **Why:** African negotiating priorities and implementation strategies for COP30 — advocacy reference complementing the already-queued COP30 Scorecard.
+- **Verified:** fetched directly; landing page + download confirmed.
+
+### 4. Mission 300: A Step Change for Africa?
+- **Source:** Power Shift Africa
+- **Type:** Policy brief (2025)
+- **URL:** https://www.powershiftafrica.org/publications/mission-300-a-step-change-for-africa
+- **Why:** Critical pan-African assessment of the World Bank/AfDB Mission 300 energy-access initiative (equity, private-capital dependency, community engagement) — companion to the already-queued Kenya-specific Mission 300 brief.
+- **Verified:** fetched directly; landing page + PDF download confirmed.
+
+### Notes for next run (dedupe)
+- The 4 items above are now pending drafts — do **not** re-queue them, in addition to the 7 (07:34) + 8 (2026-09-19) already logged = **19 total** deduped drafts.
+- Power Shift Africa items still NOT queued (intentionally skipped this run — revisit if desired): the two *Shifting Power Quarterly* newsletters (Mar/Jun 2026, not knowledge resources); *The Empty Promises of Nuclear Energy in South Africa* (Oct 2025, SA-specific); *AFREXIM Campaign Fact Sheet* (Oct 2025); *PACAR Third Annual Workshop Report* (Jul 2025); *Assessment of COP29 Outcomes* (Jun 2025); *What is the Missing Ingredient? German Agriculture & Food Strategy for Africa* (Mar 2025).
+- Still unverified (carried from 07:34 run): WMO *State of the Climate in Africa 2025* (still 404, not yet posted); Kenya *NDC 3.0* canonical direct link; CPI *Landscape of Climate Finance in Africa* (live page still the 2022 edition — too old; watch for a refresh).
+- WebSearch remains disabled for this org (HTTP 403); research via WebFetch on authoritative domains.
+
+---
+---
+
 # Resources Watch — Review Log — 2026-09-22
 
 MazingiraKenya coalition · weekly scan of **new climate & environmental-justice knowledge resources** (reports, policy briefs, toolkits, guidelines, research, datasets) relevant to Kenya / East Africa / pan-African climate justice. These are **drafts for admin review only** — nothing here is published to the live site until an admin Accepts it in **admin → Resources review**.
