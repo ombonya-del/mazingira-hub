@@ -15,6 +15,50 @@ Classification key: `vf` = false / bad-faith (red) · `vm` = misleading (amber) 
 
 ---
 
+## 2026-09-22 — 4 new drafts queued
+
+Queue script: `scripts/queue-disinfo-2026-09-22.sh`. All four written to Supabase as drafts
+via the connected Chrome (POST /rest/v1/disinfo_items, 201). Status: **awaiting admin review**.
+Source this week: PesaCheck (Code for Africa) climate desk, Aug 2026 fact-checks — global
+denialist talking points that also circulate in the Kenyan/East African infosphere.
+
+1. **Climate denial / data manipulation (`vf`) — "CO₂ was only 345 ppm in 2025"**
+   - Narrative (social media): atmospheric CO₂ stood at ~345 ppm in 2025, far below what
+     scientists claim.
+   - Fuller picture: credible monitoring (Mauna Loa / Scripps) puts 2025 CO₂ at ~425→430 ppm.
+     345 ppm was last seen in the early 1980s; CO₂ stayed below ~300 ppm for 800,000 years until
+     the 1960s. Today's level is unprecedented and fossil-fuel driven.
+   - Source: PesaCheck (13 Aug 2026) — https://pesacheck.org/false-atmospheric-carbon-dioxide-was-not-345ppm-in-2025/
+
+2. **Climate denial / cooling myth (`vf`) — "A new Little Ice Age has begun"**
+   - Narrative (social media): Earth has entered a Little Ice Age / "30 cold years", so warming
+     is over.
+   - Fuller picture: the historical Little Ice Age (~1300–1850) was a modest ~0.6°C natural
+     cooling. Today the planet is warming — recent years are the hottest on record. Orbital
+     cycles that drive real ice ages act over tens of thousands of years; anthropogenic warming
+     may even delay the next one.
+   - Source: PesaCheck (13 Aug 2026) — https://pesacheck.org/false-a-little-ice-age-has-not-begun/
+
+3. **Cherry-picking / denial (`vf`) — "Surging glaciers prove climate change is a scam"**
+   - Narrative (X): glaciers are suddenly surging/growing, proving climate change is a scam.
+   - Fuller picture: "surging" glaciers are a rare special type (<1% of glaciers) that flow fast
+     for internal reasons unrelated to short-term climate; warming can even make a thinning
+     glacier look "longer". Globally glaciers have lost mass for decades and the loss is
+     accelerating; East Africa's ice (Mt Kenya, Kilimanjaro, Rwenzori) is nearly gone. Cherry-
+     picking the exception to dismiss the trend.
+   - Source: PesaCheck (26 Aug 2026) — https://pesacheck.org/false-surging-glaciers-do-not-mean-climate-change-is-a-scam/
+
+4. **Misleading / CO₂-is-good framing (`vm`) — "More CO₂ greens the planet, so climate change doesn't hurt crops"**
+   - Narrative (social media): it's "crazy" to say climate change cuts crop yields because extra
+     CO₂ greens the planet and boosts harvests.
+   - Fuller picture: CO₂ aids photosynthesis and some regions have greened, but warming is
+     already cutting staple yields via heat stress, drought, erratic rainfall, pests and disease.
+     For East Africa's largely rain-fed farming, hotter, more erratic seasons threaten maize and
+     other staples far more than any CO₂ "fertilisation" helps. Greener ≠ harvests safe.
+   - Source: PesaCheck (13 Aug 2026) — https://pesacheck.org/fact-checked-does-climate-change-reduce-crop-yields/
+
+---
+
 ## 2026-09-19 — 3 new drafts queued
 
 Queue script: `scripts/queue-disinfo-2026-09-19.sh`. All three written to Supabase as
