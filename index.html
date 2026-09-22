@@ -4953,8 +4953,9 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
     }, function(){ hubToast("Couldn't set password — try again"); });
   });
 })();
-(async function(){
+(function(){
   if(!SB) return;                                  // CDN blocked / offline → keep in-file content
+  async function loadPulse(){
   try{
     var r = await SB.from("sentiment_items").select("source,title,url,stance,published_at").order("published_at",{ascending:false}).limit(8);
     if(r.error || !r.data || !r.data.length) return;   // empty table → keep in-file fallback
@@ -4970,6 +4971,9 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
     var feed=document.querySelector("#sp-pulse .sent-feed"); if(feed) feed.innerHTML=html;
     var kick=document.querySelector('#sp-pulse .sec-head .kicker'); if(kick) kick.textContent="Latest scanned items · live from Supabase";
   }catch(e){ /* keep in-file fallback */ }
+  }
+  if(SB.auth&&SB.auth.getSession){ SB.auth.getSession().then(loadPulse,loadPulse); } else { loadPulse(); }
+  if(SB.auth&&SB.auth.onAuthStateChange){ SB.auth.onAuthStateChange(function(_e,s){ if(s) loadPulse(); }); }
 })();
 
 /* ---- Manual uploads: Community Pulse + Narrative Disinfo from Supabase ----
