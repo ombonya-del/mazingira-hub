@@ -1,3 +1,65 @@
+# Opportunities Watch — Review Log — 2026-09-22
+
+MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya / East Africa / pan-African climate justice. All deadlines below are **on or after 2026-09-22**. These items were **written straight into Supabase as drafts (published=false)** via the connected-Chrome JS write path and now await admin Accept/Reject in **admin → Opportunities review**. Nothing here is public until an admin accepts.
+
+> ✅ **Queueing status:** 4/4 new drafts inserted successfully (HTTP 201) via the connected-Chrome write path. The Mac device shell and the cloud container remain proxy-blocked from `uueemckdoozsuowcqkhl.supabase.co` (fetch fails / HTTP 000), so the browser JS `fetch` is again the reliable writer. Re-runnable commands: `scripts/queue-opportunities-2026-09-22.sh`.
+
+## New verified-open opportunities queued (4)
+
+### 1. Nairobi Youth Climate Action Fund (YCAF) 2026–2027
+- **Funder / host:** Nairobi City County (Youth Climate Action Fund — Bloomberg Philanthropies programme; Nairobi selected among 300 cities)
+- **Type:** Grant (US$50,000 city pool; ≥8 youth-led projects get micro-grants of US$1,000–5,000)
+- **Deadline:** 16 Oct 2026 (public call opened 4 Sep 2026, open six weeks)
+- **Eligibility:** Youth-led organisations, applicants aged 15–24, with practical ideas addressing climate challenges in Nairobi.
+- **URL:** https://nairobi.go.ke/nairobi-selected-for-2026-2027-youth-climate-action-fund-unlocking-50000-for-youth-led-climate-solutions
+- **Verified:** directly on nairobi.go.ke official announcement.
+
+### 2. Commonwealth Foundation Grants 2026–27
+- **Funder / host:** Commonwealth Foundation
+- **Type:** Grant (£15,000–£30,000 per year, up to two years)
+- **Deadline:** 26 Oct 2026, 12:00 GMT (call opens 23 Sep 2026, 12:00 GMT)
+- **Eligibility:** Civil society organisations across eligible Commonwealth countries (Kenya eligible); UK/Australia/Canada/NZ orgs cannot be lead applicants. **Climate & environmental justice** is an explicit theme.
+- **URL:** https://commonwealthfoundation.com/grants/annual
+- **Verified:** directly on commonwealthfoundation.com (Open grants call).
+
+### 3. AFD 2026 CSO Call for Expressions of Project Intentions
+- **Funder / host:** Agence Française de Développement (AFD) — CSO Initiatives (CSO-I) mechanism
+- **Type:** Call for Expressions of Project Intentions (co-financing; projects financed in 2027)
+- **Deadline:** 9 Oct 2026, 18:00 Paris time (submit via OSCar platform)
+- **Eligibility:** French CSOs and locally governed CSOs registered in OECD-DAC ODA-eligible countries (Kenya included; priority to LDCs and climate-vulnerable countries). ⚠️ **Caveats:** OSCar account-creation requests closed 15 Sep 2026; locally governed CSOs are eligible only if they have previously received AFD-Group (or French-embassy >€100k) financing for a completed project. Admin to weigh member relevance / partnership route.
+- **URL:** https://www.afd.fr/en/calls-for-projects/2026-cso-call-expressions-project-intentions
+- **Verified:** directly on afd.fr (status: ONGOING).
+
+### 4. AGNES–Bayer Research Grant 2026 (Biodiversity & Sustainable Agriculture)
+- **Funder / host:** African-German Network of Excellence in Science (AGNES) & Bayer Foundation
+- **Type:** Research grant (up to €7,000 per applicant)
+- **Deadline:** 16 Oct 2026, 23:59 GMT
+- **Eligibility:** Doctoral students who are nationals of sub-Saharan African countries and registered for a PhD at a sub-Saharan African university (Kenya eligible); ≥1 published paper; focus on biodiversity conservation and/or sustainable agriculture. (Narrow — individual PhD researchers only.)
+- **URL:** https://agnes-h.org/agnes-bayer-research-grant/
+- **Verified:** directly on agnes-h.org.
+
+---
+
+## Checked and DROPPED this run (closed, out of scope, unverifiable, or already logged)
+- **Climate Intervention Environmental Impact Fund (CIEIF)** — deadline 1 Dec 2026, but US-based (Bethesda, MD) climate-intervention / geoengineering & CDR field-testing research funding; out of scope for a grassroots climate-justice coalition (and contested within climate-justice circles).
+- **Adaptation Fund Climate Innovation Accelerator (AFCIA / WFP)** — deadline 7 Oct 2026, but the 2026 cohorts are region-locked to Asia-Pacific and to the Dominican Republic/El Salvador/Peru; not Africa-eligible this cycle.
+- **AICS Water Resource Management in Ethiopia (Awash / Wabi Shebele basins)** — deadline 9 Oct 2026, but Ethiopia-only government basin-management tender; out of coalition scope.
+- **e-MOVE Cashew Value Chain (COMESA)** — deadline 30 Oct 2026, but agribusiness/agripreneur value-chain support, not climate/environmental-justice.
+- **AfricaLics PhD Visiting Fellowship** — deadline 2 Oct 2026, but innovation-studies academic fellowship, not environmental.
+- **Africa Climate Collaborative PhD Fellowships 2027** — deadline 15 Oct 2026, but academic PhD programme, not an env-justice opportunity.
+- **"Climate Justice Impact Fund"** — recurring aggregator boilerplate (KCDF/fundsforNGOs social posts) with inconsistent deadlines (7 Nov 2025 / 23 Sep / 31 Dec 2026) and no single authoritative call page; unverifiable → not queued.
+- **African Climate Creatives Fellowship 2026** — CLOSED (26 May 2026).
+- **SHARE Small Grants Mechanism** — CLOSED (15 Sep 2026).
+- **AWARD Leadership Program 2026** — CLOSED (20 Sep 2026); also agri-research, not env-justice.
+- **Resilient Futures Call 2026** (4 Sep), **Ethiopiaid Small Grants** (7 Sep), **Uganda Climate Innovation Challenge** (10 Sep), **Mountains ADAPT / Sowing the Seeds (KCDF) / GEF SGP CSO Challenge / Shine for Cities** (all 15 Sep) — CLOSED.
+- **Aqua for All — Kenya Call** (20 Sep) — now closed; was queued in the 2026-09-19 run.
+- **Voices for Climate Justice (Africa No Filter)** (25 Sep), **African Water Facility WASH** (25 Sep), **Global EbA Fund Small Grants** (26 Oct), **CFC 29th Call** (1 Oct), **SEWA Grants** (30 Sep), **Rufford Small Grants** (rolling) — still open but already logged/queued in prior runs (2026-08-17 / 2026-09-19); deduped, not re-queued.
+
+_Approved items go live only when a human admin clicks Accept in admin → Opportunities review._
+
+---
+---
+
 # Opportunities Watch — Review Log — 2026-09-19
 
 MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya / East Africa / pan-African climate justice. All deadlines below are **on or after 2026-09-19** (or a firm upcoming window). These items were **written straight into Supabase as drafts (published=false)** via a connected browser and now await admin Accept/Reject in **admin → Opportunities review**. Nothing here is public until an admin accepts.
