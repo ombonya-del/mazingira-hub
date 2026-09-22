@@ -1,5 +1,36 @@
 # Events Watch — Admin Review Queue
 
+**Run date (TODAY): 2026-09-22**
+Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
+Scope: upcoming climate & environmental-justice events on or after 2026-09-22, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
+
+> ✅ **Queueing status:** 2 NEW verified events below were written **straight to Supabase as drafts (`published=false`, `source=watch`)** via the connected-browser write path — both inserts returned **HTTP 201**. Review and Accept/Reject them in **admin → Events review**. Nothing is public until an admin Accepts. (Anon `select` still returns 0 published rows, as expected — the 2026-09-19 drafts remain pending admin review and are not re-inserted here; dedupe is against this log.)
+
+**Verification notes:** Each event was confirmed against a primary/organiser source and is future-dated (on/after 2026-09-22). Several candidates surfaced this run were **dropped as not future-dated or unverifiable**: UNEA-7 (a 10times/aggregator listing showed Dec 2026, but the authoritative UNEP source confirms UNEA-7 was **8–12 Dec 2025** — past); ICRECC Eldoret (April 2026 — past); Kenya Green Energy Conference & Expo (March 2026 — past); AISA 2026 Nairobi (July 2026 — past); Pan-African Conference on Environment, Climate Change & Health (Oct 2025 — past); Africa Clean Energy Summit 2026 and Just Transition Conference Africa 2026 (no firm future date/venue found — unverifiable, skipped per verified-only rule).
+
+---
+
+## Drafts queued this run (2) — all published=false, source=watch
+
+| # | Event | Date(s) | Location | Mode | Host | Status |
+|---|-------|---------|----------|------|------|--------|
+| 1 | Carbon Markets Africa Summit (CMAS) 2026 | 13–15 Oct 2026 | Kigali, Rwanda | In person | VUKA Group / Rwanda Min. of Environment, UNDP & AfDB | INSERTED 201 |
+| 2 | 9th GLF Investment Case Symposium | 18 Nov 2026 | Antalya, Türkiye (& online) | Hybrid | Global Landscapes Forum & Govt of Luxembourg | INSERTED 201 |
+
+**New this run (not previously logged):** Carbon Markets Africa Summit (CMAS) 2026 (1), 9th GLF Investment Case Symposium (2).
+
+**Dedupe:** All 9 events from the 2026-09-19 run (Reparations Symposium, African Energy Week, Africa Climate Forum, CBD COP17, GreenShift Forum, Global Off-Grid Solar Forum, 5th EIK Conference, COP31, ESG & Climate Africa Summit) were checked and **not re-queued** — they remain in the review queue from that run.
+
+Reproducible record: `scripts/queue-events-2026-09-22.sh`.
+
+*Approved events go live only when a human admin clicks Accept in the admin Events review tab. This log is a draft queue, not a publication.*
+
+---
+
+<!-- ================= PREVIOUS RUNS BELOW ================= -->
+
+# Events Watch — Admin Review Queue
+
 **Run date (TODAY): 2026-09-19**
 Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
 Scope: upcoming climate & environmental-justice events on or after 2026-09-19, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.

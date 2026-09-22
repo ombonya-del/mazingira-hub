@@ -1,3 +1,73 @@
+# Resources Watch — Review Log — 2026-09-22
+
+MazingiraKenya coalition · weekly scan of **new climate & environmental-justice knowledge resources** (reports, policy briefs, toolkits, guidelines, research, datasets) relevant to Kenya / East Africa / pan-African climate justice. These are **drafts for admin review only** — nothing here is published to the live site until an admin Accepts it in **admin → Resources review**.
+
+> ✅ **Queueing status (2026-09-22):** All 7 items below were queued as drafts (`published=false`, `source=watch`, `category=Resources`) straight into Supabase (project `uueemckdoozsuowcqkhl`) and each returned HTTP 201. The Mac device shell still could **not** reach Supabase (curl exit 56 — host not on the device egress allowlist), so the writes were made through a connected Chrome (same-origin POST to `/rest/v1/resources` with the public anon key only). The exact replay commands are in `scripts/queue-resources-2026-09-22.sh`.
+
+## Verified new resources (7) — 2026-09-22
+
+Each URL was fetched and confirmed to load with real content before queueing. All were deduped against every item in the 2026-09-19 log below.
+
+### 1. Adaptation Gap Report 2025
+- **Source:** UN Environment Programme (UNEP)
+- **Type:** Report (2025 edition — supersedes the 2024 edition queued 2026-09-19)
+- **URL:** https://www.unep.org/resources/adaptation-gap-report-2025
+- **Why:** Latest global adaptation-finance gap figures (needs ~US$310–365bn/yr vs ~US$26bn received) — central to African adaptation-finance advocacy.
+- **Verified:** fetched directly; page loads with 2025 findings.
+
+### 2. Emissions Gap Report 2025
+- **Source:** UN Environment Programme (UNEP)
+- **Type:** Report (2025 edition — supersedes the 2024 edition queued 2026-09-19)
+- **URL:** https://www.unep.org/resources/emissions-gap-report-2025
+- **Why:** Latest mitigation benchmark (pledges track to ~2.3–2.5°C) framing climate-justice arguments.
+- **Verified:** fetched directly; page loads with 2025 findings.
+
+### 3. Implications of the ICJ Advisory Opinion on the Climate Obligations of African States
+- **Source:** Power Shift Africa
+- **Type:** Policy brief (2025)
+- **URL:** https://www.powershiftafrica.org/publications/icj-advisory-opinion-policy-brief-for-africa
+- **Why:** Analyses the July 2025 ICJ advisory opinion on state climate obligations from an African standpoint — a landmark climate-justice / climate-litigation resource.
+- **Verified:** fetched directly; loads with brief content.
+
+### 4. COP30 Scorecard: Technical Assessment of Outcomes Against the African Agenda
+- **Source:** Power Shift Africa
+- **Type:** Report (2025)
+- **URL:** https://www.powershiftafrica.org/publications/cop30scorecard
+- **Why:** Assesses COP30 outcomes against African priorities (finance, adaptation, loss & damage, just transition) — advocacy reference.
+- **Verified:** fetched directly; loads with assessment content.
+
+### 5. African Energy Leadership Report: The Case for 100% Renewable Energy
+- **Source:** Power Shift Africa
+- **Type:** Report (2025)
+- **URL:** https://www.powershiftafrica.org/publications/african-energy-leadership-report
+- **Why:** Argues 100% renewable energy across Africa is technically feasible and economically advantageous — just-transition / energy-access resource.
+- **Verified:** fetched directly; loads with report content.
+
+### 6. The Africa Green Industrialization Initiative (AGII) — Policy Brief
+- **Source:** Power Shift Africa
+- **Type:** Policy brief (2025)
+- **URL:** https://www.powershiftafrica.org/publications/the-africa-green-industrialization-initiative-agii-policy-brief
+- **Why:** Examines the AGII launched around the Second Africa Climate Summit (Addis Ababa, 2025) and African green-growth finance — pan-African just-transition resource.
+- **Verified:** fetched directly; loads with brief content.
+
+### 7. Why Carbon Markets Are a Dangerous Distraction for Africa
+- **Source:** Power Shift Africa
+- **Type:** Policy brief (2024)
+- **URL:** https://www.powershiftafrica.org/publications/policy-brief-why-carbon-markets-are-a-dangerous-distraction-for-africa
+- **Why:** Critiques carbon markets as inadequate African climate finance — a core climate-justice argument (new to the queue).
+- **Verified:** fetched directly; loads with brief content.
+
+---
+
+## Notes for next run (dedupe)
+- The 7 items above (2026-09-22) plus the 8 items in the 2026-09-19 log below are all now pending/queued drafts. Do **not** re-queue any of them.
+- The UNEP 2025 Adaptation Gap and Emissions Gap reports queued this run are the newer editions of the 2024 reports queued 2026-09-19 — both editions are intentionally in the queue; the admin can keep the latest and Reject the older if desired.
+- Could not verify this run (revisit next week): **WMO State of the Climate in Africa 2025** (https://wmo.int/publication-series/state-of-climate-africa-2025 → 404; 2025 edition not yet posted); **Kenya NDC 3.0** canonical document URL (still no verified direct link); **CPI Landscape of Climate Finance in Africa** (current live page is the 2022 edition — too old; watch for a refresh).
+- Environment: WebSearch remains disabled for this org (HTTP 403). Research was done via WebFetch on authoritative domains. Some domains (reliefweb, IIED, IPCC, World Bank openknowledge) block the fetch bot — use the connected Chrome for those next time. Power Shift Africa and UNEP fetch reliably.
+
+---
+---
+
 # Resources Watch — Review Log — 2026-09-19
 
 MazingiraKenya coalition · weekly scan of **new climate & environmental-justice knowledge resources** (reports, policy briefs, toolkits, guidelines, research, datasets) relevant to Kenya / East Africa / pan-African climate justice. These are **drafts for admin review only** — nothing here is published to the live site until an admin Accepts it in **admin → Resources review**.
