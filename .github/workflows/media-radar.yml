@@ -1,0 +1,37 @@
+name: MazingiraKenya Media Radar
+
+# Frequent, weekday-daytime refresh of the media/sentiment radar ONLY (scan-sentiment),
+# so the hub's live "Community Pulse" news feed catches items as they break instead of
+# waiting for the Monday sweep. The full weekly run of ALL scanners stays in scanners.yml.
+# scan-sentiment upserts on url (ignoreDuplicates), so frequent runs add only genuinely
+# new items — no duplicates, no admin review needed (the radar feed is live, not drafts).
+#
+# Required repo secret: MAZINGIRA_CRON_SECRET (same one scanners.yml already uses).
+
+on:
+  schedule:
+    # 06:00, 09:00, 12:00, 15:00, 18:00 EAT (UTC+3), Monday–Friday
+    - cron: '0 3,6,9,12,15 * * 1-5'
+  workflow_dispatch:   # allow a manual run anytime from the Actions tab
+
+env:
+  SUPABASE_URL: https://uueemckdoozsuowcqkhl.supabase.co
+  ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA
+
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run scan-sentiment
+        env:
+          CRON_SECRET: ${{ secrets.MAZINGIRA_CRON_SECRET }}
+        run: |
+          set -e
+          RESP=$(curl -sS -w '\n%{http_code}' -X POST \
+            "$SUPABASE_URL/functions/v1/scan-sentiment" \
+            -H "Authorization: Bearer $ANON_KEY" -H "apikey: $ANON_KEY" \
+            -H "x-cron-secret: $CRON_SECRET" -H "Content-Type: application/json" \
+            -d '{}' --max-time 300)
+          BODY=$(echo "$RESP" | head -n -1); CODE=$(echo "$RESP" | tail -n 1)
+          echo "scan-sentiment -> HTTP $CODE"; echo "$BODY"
+          [ "$CODE" = "200" ] || exit 1
