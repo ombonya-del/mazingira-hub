@@ -1,5 +1,38 @@
 # Events Watch — Admin Review Queue
 
+**Run date (TODAY): 2026-09-29**
+Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
+Scope: upcoming climate & environmental-justice events on or after 2026-09-29, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
+
+> ✅ **Queueing status:** 4 NEW verified events below were written **straight to Supabase as drafts (`published=false`, `source=watch`)** via the connected-browser write path — all four inserts returned **HTTP 201**. Review and Accept/Reject them in **admin → Events review**. Nothing is public until an admin Accepts. (The Mac device-bridge shell could not reach Supabase this run — proxy returned HTTP 403 on CONNECT — so the connected Chrome was used as the writer, as designed.)
+
+**Verification notes:** Each event was confirmed against a primary/organiser source and is future-dated (on/after 2026-09-29). MOP38 dates/venue confirmed via the UNEP Ozone Secretariat. UNEA-8 dates confirmed via the Geneva Environment Network / UNEP. COP32 host (Addis Ababa, Ethiopia) confirmed via Wikipedia, ENA and the African Union; **exact dates are provisional** (UNFCCC has not yet published them — flagged in the draft). African Green Investment Forum announced by Kenya's National Treasury (2026/27 budget); firm month (Oct 2026) and city (Nairobi), **exact day TBC** (flagged in the draft). Candidates **dropped this run:** AISA 2026 (Adaptation Investment Summit for Africa, Jul 2026) and the Kenya–France 'Africa Forward' Summit (May 2026) — both **past**; UNEA-7 (Dec 2025) — past; UN Water Conference 2026 (UAE), UN World Data Forum (Riyadh) and the Global Framework on Chemicals conference (Geneva) — skipped as not sufficiently relevant to African climate justice.
+
+---
+
+## Drafts queued this run (4) — all published=false, source=watch
+
+| # | Event | Date(s) | Location | Mode | Host | Status |
+|---|-------|---------|----------|------|------|--------|
+| 1 | African Green Investment Forum 2026 | Oct 2026 (dates TBC) | Nairobi, Kenya | In person | Government of Kenya — National Treasury | INSERTED 201 |
+| 2 | MOP38 — 38th Meeting of the Parties to the Montreal Protocol | 2–6 Nov 2026 | Kigali, Rwanda | In person | UNEP Ozone Secretariat / Govt of Rwanda | INSERTED 201 |
+| 3 | COP32 — 32nd UNFCCC Conference of the Parties | Nov 2027 (provisional) | Addis Ababa, Ethiopia | Hybrid | UNFCCC / COP32 Presidency (Ethiopia) | INSERTED 201 |
+| 4 | UNEA-8 — Eighth Session of the UN Environment Assembly | 6–10 Dec 2027 | Nairobi, Kenya (UNEP HQ) | In person | UN Environment Programme (UNEP) | INSERTED 201 |
+
+**New this run (not previously logged):** all 4 above.
+
+**Dedupe:** Checked against the 2026-09-22 run (Carbon Markets Africa Summit, 9th GLF Investment Case Symposium) and the 2026-09-19 run (Reparations Symposium, African Energy Week, Africa Climate Forum, CBD COP17, GreenShift Forum, Global Off-Grid Solar Forum, 5th EIK Conference, COP31, ESG & Climate Africa Summit) — **none re-queued**; they remain in the review queue from those runs.
+
+Reproducible record: `scripts/queue-events-2026-09-29.sh`.
+
+*Approved events go live only when a human admin clicks Accept in the admin Events review tab. This log is a draft queue, not a publication.*
+
+---
+
+<!-- ================= PREVIOUS RUNS BELOW ================= -->
+
+# Events Watch — Admin Review Queue
+
 **Run date (TODAY): 2026-09-22**
 Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
 Scope: upcoming climate & environmental-justice events on or after 2026-09-22, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
