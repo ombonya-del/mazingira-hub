@@ -1,3 +1,37 @@
+# Opportunities Watch — Review Log — 2026-09-29
+
+MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya / East Africa / pan-African climate justice. All deadlines below are **on or after 2026-09-29**. New items are **written straight into Supabase as drafts (published=false)** via the connected-Chrome JS write path and now await admin Accept/Reject in **admin → Opportunities review**. Nothing here is public until an admin accepts.
+
+> ✅ **Queueing status:** 1/1 new draft inserted successfully (HTTP 201) via the connected-Chrome write path (Browser 1). The Mac device shell and the cloud container remain proxy-blocked from `uueemckdoozsuowcqkhl.supabase.co`, so the browser JS `fetch` is again the reliable writer. Re-runnable commands: `scripts/queue-opportunities-2026-09-29.sh`.
+
+## New verified-open opportunities queued (1)
+
+### 1. Whitley Awards 2027 (Whitley Fund for Nature)
+- **Funder / host:** Whitley Fund for Nature (WFN)
+- **Type:** Award / project funding (£50,000 over one year per winner)
+- **Deadline:** 30 Oct 2026, 23:59 GMT
+- **Eligibility:** Grassroots conservation leaders who are nationals working in their own country in the Global South (Africa/Kenya eligible); science-based conservation embedded in local communities, with potential to scale. Apply via the WFN portal (wfn.eformsolutions.com).
+- **URL:** https://whitleyaward.org/apply-for-conservation-funding/apply-for-a-whitley-award/
+- **Verified:** directly on whitleyaward.org — applications OPEN, deadline 30 Oct 2026.
+
+---
+
+## Checked and DROPPED this run (closed, out of scope, unverifiable, or already logged)
+- **Whitley Award vs. Wangari Maathai Forest Champions Award** — Wangari Maathai (FAO / Collaborative Partnership on Forests, US$20,000): only a stale 2024 cycle (deadline 10 Feb 2024) is retrievable on FAO/decadeonrestoration; a "deadline extended to 15 Oct" list thread could not be tied to a verifiable open 2026 cycle → not queued (unverifiable open deadline).
+- **Switch Kenya Green (EU, EuropeAid/183773/DD/ACT/KE)** — Kenya-specific green/circular-economy CfP, but concept-note deadline was 29 May 2025 → CLOSED.
+- **Green RISE East Africa Fellowship 2026 (Acumen / Mastercard Foundation)** — East-Africa/Kenya eligible but applications CLOSED (11 May 2026); next cycle opens ~May 2027.
+- **Climate Justice Resilience Fund (CJRF)** — no open 2026 grant call (latest news is recruitment/hiring; last small-grants pilot partners announced Nov 2025) → nothing to queue.
+- **CEPF open calls** — current open Letters-of-Inquiry are Sri Lanka (9 Oct) and Saint Vincent & the Grenadines (1 Nov); no East Africa / Kenya hotspot call open → out of region.
+- **Earth Journalism Network opportunities** — all current listings show "Application closed"; upcoming Africa workshops (Mining & Human Rights, Nov 2026) are events, not grants → none queued.
+- **Africa No Filter — Voices for Climate Justice** (25 Sep) — now closed; already logged in prior runs.
+- **AGNES–Bayer Research Grant 2026** (16 Oct), **Nairobi YCAF** (16 Oct), **Commonwealth Foundation Grants** (26 Oct), **AFD 2026 CSO Call** (9 Oct), **SEWA Grants** (30 Sep), **CFC 29th Call** (1 Oct), **Global EbA Fund Small Grants** (26 Oct), **COP31 Media/Focal-Point Accreditation**, **Rufford Small Grants** (rolling) — still open but already logged/queued in the 2026-08-17 / 09-19 / 09-22 runs; deduped, not re-queued.
+- **African Climate Collaborative PhD Fellowships 2026** — academic PhD programme, not an env-justice opportunity (already dropped in a prior run).
+
+_Approved items go live only when a human admin clicks Accept in admin → Opportunities review._
+
+---
+---
+
 # Opportunities Watch — Review Log — 2026-09-22
 
 MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya / East Africa / pan-African climate justice. All deadlines below are **on or after 2026-09-22**. These items were **written straight into Supabase as drafts (published=false)** via the connected-Chrome JS write path and now await admin Accept/Reject in **admin → Opportunities review**. Nothing here is public until an admin accepts.

@@ -15,6 +15,65 @@ Classification key: `vf` = false / bad-faith (red) · `vm` = misleading (amber) 
 
 ---
 
+## 2026-09-29 — 6 new drafts queued
+
+Queue script: `scripts/queue-disinfo-2026-09-29.sh`. All six written to Supabase as drafts via
+the connected Chrome (POST /rest/v1/disinfo_items, 201). Status: **awaiting admin review**.
+Source this week: PesaCheck (Code for Africa) climate desk, Aug 2026 fact-checks — global
+denialist and false-attribution talking points that also circulate in the Kenyan/East African
+infosphere. Deduped against published `disinfo_items` and the 2026-09-19 / 2026-09-22 logs.
+
+1. **Climate denial / natural-cause myth (`vf`) — "Ocean warming is just a natural cycle"**
+   - Narrative (social media): the ocean is warming but it's a natural cycle, unrelated to human
+     emissions.
+   - Fuller picture: oceans have absorbed >90% of the excess heat from human emissions; ocean
+     heat content is at record highs and accelerating since the 1970s — natural cycles (El Niño,
+     solar) would have cooled, not warmed. Drives Indian Ocean cyclones, Kenyan/Tanzanian coral
+     bleaching and Indian Ocean Dipole rainfall disruption.
+   - Source: PesaCheck — https://pesacheck.org/false-the-heating-of-the-ocean-is-not-natural/
+
+2. **Fabricated / misattributed to IPCC (`vf`) — "IPCC admits no evidence climate affects extreme weather"**
+   - Narrative (social media): the IPCC itself says there's no evidence climate change affects
+     extreme weather.
+   - Fuller picture: the IPCC AR6 says the opposite — human emissions have made heat extremes,
+     heavy rain and drought more frequent/intense in many regions. No IPCC report contains the
+     quoted claim. East Africa's drought↔flood swings match the documented trends.
+   - Source: PesaCheck — https://pesacheck.org/false-the-ipcc-did-not-say-theres-no-evidence-that-climate-change-is-affecting-extreme-weather/
+
+3. **Misrepresented study (`vf`) — "New study proves human emissions have zero climate impact"**
+   - Narrative (social media): a peer-reviewed study proves human emissions have zero impact on
+     climate.
+   - Fuller picture: no credible study shows this; the claim rests on a fringe/misrepresented
+     paper. CO₂ up from ~280 to >420 ppm with a fossil-fuel isotopic signature, tracking observed
+     warming; every major science academy agrees. One contrarian paper doesn't overturn that.
+   - Source: PesaCheck — https://pesacheck.org/false-this-study-does-not-confirm-human-emissions-have-zero-impact-on-climate-change/
+
+4. **Fabricated quote / false attribution (`vf`) — "Bill Gates admitted climate change is a hoax"**
+   - Narrative (social media): Bill Gates now admits climate change is a hoax and a lie.
+   - Fuller picture: no record of him saying this; it contradicts his published pro-climate
+     position and funding. Attaching a famous name to a fabricated "admission" is a recurring
+     disinformation tactic; the quote traces to no verifiable source.
+   - Source: PesaCheck — https://pesacheck.org/false-bill-gates-did-not-say-climate-change-is-a-hoax-or-a-lie/
+
+5. **Pseudo-scientific denial (`vf`) — "The lapse rate proves greenhouse gases can't cause warming"**
+   - Narrative (social media/blogs): the atmosphere's tropospheric lapse rate disproves the
+     greenhouse origin of warming.
+   - Fuller picture: the lapse rate (air cooling with altitude) is real physics but describes a
+     different thing from the greenhouse effect; greenhouse gases absorb/re-emit outgoing heat and
+     adding them warms the surface. Warming actually alters the lapse rate in an amplifying
+     feedback. A talking point, not a finding.
+   - Source: PesaCheck (27 Aug 2026) — https://pesacheck.org/false-this-atmospheric-process-does-not-disprove-the-greenhouse-gas-origin-of-global-warming/
+
+6. **False attribution / misinformation (`vf`) — "Magnitude-6 earthquakes are increasing due to climate change"**
+   - Narrative (social media): climate change is causing a rise in magnitude-6 earthquakes.
+   - Fuller picture: the rate of large quakes is roughly stable (better instruments record more
+     small ones); quakes are tectonic, unrelated to atmospheric warming. Over-attributing to
+     climate both overstates data and misassigns cause — as corrosive to public understanding as
+     denial. (Flagged to show the scan catches misleading pro-climate framings too.)
+   - Source: PesaCheck — https://pesacheck.org/false-magnitude-6-earthquakes-are-not-increasing-and-are-not-linked-to-climate-change/
+
+---
+
 ## 2026-09-22 — 4 new drafts queued
 
 Queue script: `scripts/queue-disinfo-2026-09-22.sh`. All four written to Supabase as drafts
