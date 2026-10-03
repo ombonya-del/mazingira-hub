@@ -833,7 +833,7 @@ function render(){
   if(v==="disinfo") fetchDisinfo();
   if(v==="petitions") fetchPetitions();
   if(v==="ninini"){ fetchRadar(); fetchOpps(); fetchEvents(); }
-  if(v==="voices") fetchPoll();
+  if(v==="voices"){ fetchPoll(); fetchVoices(); }
 }
 var RSB = (window.supabase && window.supabase.createClient)
   ? window.supabase.createClient("https://uueemckdoozsuowcqkhl.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA")
@@ -892,6 +892,26 @@ function fetchPoll(){
     var pc=document.querySelector("#app .poll");
     if(pc){ var t=document.createElement("div"); t.innerHTML=pollCard(); var nn=t.firstChild; pc.parentNode.replaceChild(nn,pc);
       nn.querySelectorAll("[data-poll]").forEach(function(el){ el.addEventListener("click",function(){ votePoll(el.getAttribute("data-poll")); }); }); }
+  }, function(){});
+}
+function liveVoiceCard(row){
+  var name=row.submitter_name||L({en:"Community voice",sw:"Sauti ya jamii",sh:"Voice ya community"});
+  var initial=(name.charAt(0)||"•").toUpperCase();
+  var color=AV_COLORS[(name.charCodeAt(0)||0)%AV_COLORS.length];
+  var kindLabel={video:"🎥",audio:"🎙",photo:"📷",embed:"🔗",doc:"✍️"}[row.kind]||"✍️";
+  var dt=row.created_at?new Date(row.created_at).toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"";
+  var meta=[row.county,dt].filter(Boolean).join(" · ");
+  var srcLink=row.source_url?'<a href="'+esc(row.source_url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--green-ink);font-weight:700;font-size:.8rem">'+esc(L({en:"View source ↗",sw:"Ona chanzo ↗",sh:"View source ↗"}))+'</a>':'';
+  return '<div class="voice"><div class="vtop"><span class="avatar" style="background:'+color+'">'+esc(initial)+'</span>'+
+    '<span class="who"><span class="nm">'+esc(name)+'</span><span class="pl">'+esc(meta)+'</span></span>'+
+    '<span class="vtype">'+kindLabel+'</span></div>'+
+    '<p class="msg">'+esc(dec(row.body||""))+'</p>'+(srcLink?'<div class="reacts">'+srcLink+'</div>':'')+'</div>';
+}
+function fetchVoices(){
+  var host=document.getElementById("wall"); if(!host||!RSB) return;
+  RSB.from("voices_public").select("*").order("created_at",{ascending:false}).limit(12).then(function(r){
+    if(r.error||!r.data||!r.data.length) return;
+    host.innerHTML=r.data.map(liveVoiceCard).join("");
   }, function(){});
 }
 function viewDisinfo(){
@@ -963,6 +983,11 @@ function viewNiNini(){
     '<div class="grid">'+ISSUES.filter(function(x){return !x.featured;}).map(function(is){return issueCard(is,"mixed",L(is.summary));}).join("")+'</div>'+
     '<div id="oppsBody"></div>'+
     '<div id="eventsBody"></div>'+
+    '<div class="shead"><h2>'+esc(L({en:"Act now",sw:"Chukua hatua",sh:"Act now"}))+'</h2><span class="rule"></span></div>'+
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;padding:0 16px 4px">'+
+      '<button data-nav="petitions" style="flex:1;min-width:140px;background:var(--green,#1b7a3e);color:#fff;border:0;border-radius:11px;padding:13px 16px;font-weight:800;cursor:pointer">'+esc(L({en:"Sign a petition",sw:"Saini ombi",sh:"Sign petition"}))+'</button>'+
+      '<button id="raiaShare" style="flex:1;min-width:140px;background:var(--paper,#faf7f2);color:var(--ink,#1a1a1a);border:1px solid rgba(0,0,0,.12);border-radius:11px;padding:13px 16px;font-weight:800;cursor:pointer">'+esc(L({en:"Share raia",sw:"Sambaza raia",sh:"Share raia"}))+'</button>'+
+    '</div>'+
     footer()+
   '</section>';
 }
@@ -1227,6 +1252,7 @@ function bind(){
   app.querySelectorAll("[data-poll]").forEach(function(el){ el.addEventListener("click",function(){ votePoll(el.getAttribute("data-poll")); }); });
   app.querySelectorAll("[data-stype]").forEach(function(el){ el.addEventListener("click",function(){ state.shareType=el.getAttribute("data-stype"); render(); }); });
   var post=document.getElementById("vpost"); if(post) post.addEventListener("click",postVoice);
+  var sh=document.getElementById("raiaShare"); if(sh) sh.addEventListener("click",function(){ var u=location.origin+location.pathname; var d={title:"MazingiraKenya Raia",text:L({en:"Kenya’s climate & environmental justice, in plain language.",sw:"Haki ya tabianchi na mazingira Kenya, kwa lugha rahisi.",sh:"Climate & environmental justice ya Kenya, kwa lugha ya kawaida."}),url:u}; if(navigator.share){ navigator.share(d).catch(function(){}); } else { try{ navigator.clipboard.writeText(u); sh.textContent=L({en:"Link copied ✓",sw:"Kiungo kimenakiliwa ✓",sh:"Link imecopiwa ✓"}); }catch(e){} } });
   app.querySelectorAll(".voice").forEach(function(vc){
     vc.querySelectorAll("[data-react]").forEach(function(btn){
       btn.addEventListener("click",function(){ var id=vc.getAttribute("data-vid"), r=btn.getAttribute("data-react");
@@ -1248,10 +1274,14 @@ function postVoice(){
   var pb=document.getElementById("vpost");
   if(!msg||!consent){ pb.textContent=L({en:"Add a message + tick consent",sw:"Ongeza ujumbe + kubali",sh:"Ongeza message + kubali"});
     setTimeout(function(){ pb.textContent=L({en:"Post to the wall",sw:"Chapisha ukutani",sh:"Post kwa wall"}); },1600); return; }
-  var name=(document.getElementById("vname").value||"").trim()||L({en:"Anonymous",sw:"Bila jina",sh:"Anon"});
-  var place=(document.getElementById("vplace").value||"").trim()||L({en:"Kenya",sw:"Kenya",sh:"Kenya"});
-  VOICES.unshift({ id:"u"+Date.now(), name:name, place:place, type:state.shareType, msg:msg, react:{fire:0,heart:0,angry:0}, isNew:true });
-  state.shareType="text"; render();
+  var rawname=(document.getElementById("vname").value||"").trim();
+  var place=(document.getElementById("vplace").value||"").trim()||null;
+  if(RSB){ RSB.from("submissions").insert({ kind:state.shareType, county:place, body:msg, submitter_name:(rawname||null), consent:true, status:"pending" }).then(function(){},function(){}); }
+  var card=pb.closest(".share");
+  if(card){ card.innerHTML='<div style="text-align:center;padding:14px 10px"><div style="font-size:1.8rem;line-height:1">✓</div>'+
+    '<h3 style="margin:6px 0 4px">'+esc(L({en:"Thank you — sent for review",sw:"Asante — imetumwa kwa ukaguzi",sh:"Asante — imetumwa kwa review"}))+'</h3>'+
+    '<p class="s">'+esc(L({en:"Your voice appears on the wall once the team approves it.",sw:"Sauti yako itaonekana ukutani timu ikiidhinisha.",sh:"Voice yako itaonekana kwa wall team ikiapprove."}))+'</p></div>'; }
+  state.shareType="text";
 }
 function openIssue(id){ state.id=id; state.lens="happening"; state.view="issue"; render(); }
 function go(v){ state.view=v; render(); }
