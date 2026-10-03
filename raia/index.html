@@ -832,10 +832,27 @@ function render(){
   if(v==="flag") loadTweetWidget();
   if(v==="disinfo") fetchDisinfo();
   if(v==="petitions") fetchPetitions();
+  if(v==="ninini") fetchRadar();
 }
 var RSB = (window.supabase && window.supabase.createClient)
   ? window.supabase.createClient("https://uueemckdoozsuowcqkhl.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA")
   : null;
+function dec(s){ s=String(s==null?"":s); return s.replace(/&#(\d+);/g,function(_,n){return String.fromCharCode(+n);}).replace(/&#x([0-9a-fA-F]+);/g,function(_,n){return String.fromCharCode(parseInt(n,16));}).replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,"&"); }
+function stanceTag(s){ var m={supportive:["#1b7a3e","\u25B2"],critical:["#C0202A","\u25BC"],neutral:["#6b7280","\u25A0"]}; var x=m[s]||m.neutral; return '<span title="'+esc(s||"neutral")+'" style="flex:0 0 auto;font-size:.66rem;font-weight:900;line-height:1.4;color:'+x[0]+'">'+x[1]+'</span>'; }
+function fetchRadar(){
+  var host=document.getElementById("radarBody"); if(!host) return;
+  if(!RSB){ host.innerHTML=""; return; }
+  RSB.from("sentiment_items").select("source,title,url,stance,published_at").order("published_at",{ascending:false}).limit(14).then(function(r){
+    if(r.error||!r.data||!r.data.length){ host.innerHTML='<p class="muted" style="padding:0 16px">'+esc(L({en:"Nothing scanned yet \u2014 check back soon.",sw:"Hakuna bado \u2014 angalia tena hivi punde.",sh:"Hakuna kitu bado \u2014 check tena soon."}))+'</p>'; return; }
+    host.innerHTML='<div style="display:grid;gap:8px;padding:0 16px">'+r.data.map(function(i){
+      return '<a href="'+esc(i.url||"#")+'" target="_blank" rel="noopener noreferrer" style="display:flex;gap:10px;align-items:baseline;text-decoration:none;background:var(--paper,#faf7f2);border:1px solid rgba(0,0,0,.08);border-radius:11px;padding:10px 13px">'+
+        stanceTag(i.stance)+
+        '<span style="flex:1;color:var(--ink,#1a1a1a);font-weight:600;font-size:.9rem;line-height:1.35">'+esc(dec(i.title))+'</span>'+
+        '<span style="flex:0 0 auto;font-size:.56rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted,#6b7280);max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(i.source||"")+'</span>'+
+      '</a>';
+    }).join("")+'</div>';
+  }, function(){ host.innerHTML=""; });
+}
 function viewDisinfo(){
   return '<section class="wrap" style="max-width:620px;margin:0 auto;padding:18px 16px 44px">'+
     '<a class="lie-backhub" href="https://hub.mazingirakenya.org/#narrative" target="mzk_hub">&larr; '+esc(L({en:"Back to the hub",sw:"Rudi kwa hub",sh:"Rudi hub"}))+'</a>'+
@@ -896,6 +913,9 @@ function viewNiNini(){
           sh:"Maneno kama ‘carbon credits’, ‘just transition’ na ‘EIA’ yanashape future ya ardhi, maji na hewa yetu — lakini yamezama kwa jargon. Raia inaweka story kwa lugha ya kawaida: habari, jinsi inavyoongewa, na picha kamili — ili uifollow, na uone unapofit."}))+'</p></div>'+
       '<div><div class="snav">'+snav+'</div></div>'+
     '</div></div></div>'+
+    '<div class="shead"><h2>'+esc(L({en:"Media radar \u2014 live",sw:"Rada ya habari \u2014 moja kwa moja",sh:"Media radar \u2014 live"}))+'</h2><span class="rule"></span></div>'+
+    '<p class="muted" style="padding:0 16px 8px;margin:-6px 0 0;font-size:.82rem">'+esc(L({en:"What Kenya\u2019s newsrooms are saying on climate, land, coal, the Lamu refinery and the Siaya nuclear plant \u2014 refreshed through the day.",sw:"Yale vyombo vya habari vya Kenya vinasema kuhusu tabianchi, ardhi, makaa, kiwanda cha Lamu na mtambo wa nyuklia Siaya \u2014 yanasasishwa mchana kutwa.",sh:"Vile newsrooms za Kenya zinasema kuhusu climate, ardhi, coal, refinery ya Lamu na nuclear plant ya Siaya \u2014 inarefreshiwa mchana mzima."}))+'</p>'+
+    '<div id="radarBody"><p class="muted" style="padding:0 16px">'+esc(L({en:"Loading the latest\u2026",sw:"Inapakia mpya\u2026",sh:"Inaload latest\u2026"}))+'</p></div>'+
     '<div class="shead"><h2>'+esc(L(UI.featured))+'</h2><span class="rule"></span></div>'+
     featuredCard(f)+
     '<div class="shead"><h2>'+esc(L(UI.issues))+'</h2><span class="rule"></span></div>'+
