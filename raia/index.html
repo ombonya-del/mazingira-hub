@@ -803,7 +803,7 @@ var VOICES = [
 ];
 var POLL = { q:{en:"In your area, has climate change hit your water, land or harvest?",
   sw:"Katika eneo lako, je mabadiliko ya tabianchi yameathiri maji, ardhi au mavuno yako?",
-  sh:"Kwa area yako, je climate change imeaffect maji, ardhi ama mavuno yako?"}, yes:1284, no:206, voted:null };
+  sh:"Kwa area yako, je climate change imeaffect maji, ardhi ama mavuno yako?"}, yes:0, no:0, voted:null, key:"area-climate-impact" };
 var TYPES = {
   video:{en:"🎥 Video",sw:"🎥 Video",sh:"🎥 Video"}, photo:{en:"📷 Photo",sw:"📷 Picha",sh:"📷 Photo"},
   audio:{en:"🎙 Audio",sw:"🎙 Sauti",sh:"🎙 Audio"}, text:{en:"✍️ Text",sw:"✍️ Maandishi",sh:"✍️ Text"}
@@ -832,7 +832,8 @@ function render(){
   if(v==="flag") loadTweetWidget();
   if(v==="disinfo") fetchDisinfo();
   if(v==="petitions") fetchPetitions();
-  if(v==="ninini") fetchRadar();
+  if(v==="ninini"){ fetchRadar(); fetchOpps(); fetchEvents(); }
+  if(v==="voices") fetchPoll();
 }
 var RSB = (window.supabase && window.supabase.createClient)
   ? window.supabase.createClient("https://uueemckdoozsuowcqkhl.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA")
@@ -852,6 +853,46 @@ function fetchRadar(){
       '</a>';
     }).join("")+'</div>';
   }, function(){ host.innerHTML=""; });
+}
+function fetchOpps(){
+  var host=document.getElementById("oppsBody"); if(!host||!RSB) return;
+  RSB.from("resources").select("title,meta,url,category,by").eq("published",true).order("created_at",{ascending:false}).limit(6).then(function(r){
+    if(r.error||!r.data||!r.data.length){ host.innerHTML=""; return; }
+    host.innerHTML='<div class="shead"><h2>'+esc(L({en:"Opportunities & resources",sw:"Fursa na rasilimali",sh:"Opportunities & resources"}))+'</h2><span class="rule"></span></div>'+
+      '<div style="display:grid;gap:8px;padding:0 16px">'+r.data.map(function(i){
+        return '<a href="'+esc(i.url||"#")+'" target="_blank" rel="noopener noreferrer" style="display:block;text-decoration:none;background:var(--paper,#faf7f2);border:1px solid rgba(0,0,0,.08);border-radius:11px;padding:11px 13px">'+
+          '<span style="display:block;color:var(--ink,#1a1a1a);font-weight:700;font-size:.92rem;line-height:1.3">'+esc(dec(i.title||""))+'</span>'+
+          (i.meta?'<span style="display:block;color:var(--muted,#6b7280);font-size:.76rem;margin-top:3px">'+esc(dec(i.meta))+'</span>':'')+
+        '</a>';
+      }).join("")+'</div>';
+  }, function(){ host.innerHTML=""; });
+}
+function fetchEvents(){
+  var host=document.getElementById("eventsBody"); if(!host||!RSB) return;
+  var today=new Date().toISOString().slice(0,10);
+  RSB.from("calendar_events").select("title,start_date,location,mode,org,link").eq("published",true).gte("start_date",today).order("start_date",{ascending:true}).limit(6).then(function(r){
+    if(r.error||!r.data||!r.data.length){ host.innerHTML=""; return; }
+    host.innerHTML='<div class="shead"><h2>'+esc(L({en:"Upcoming events",sw:"Matukio yajayo",sh:"Events zinazokuja"}))+'</h2><span class="rule"></span></div>'+
+      '<div style="display:grid;gap:8px;padding:0 16px">'+r.data.map(function(i){
+        var meta=[i.start_date,i.location,i.mode].filter(Boolean).join(" \u00b7 ");
+        return (i.link?'<a href="'+esc(i.link)+'" target="_blank" rel="noopener noreferrer"':'<div')+' style="display:block;text-decoration:none;background:var(--paper,#faf7f2);border:1px solid rgba(0,0,0,.08);border-radius:11px;padding:11px 13px">'+
+          '<span style="display:block;color:var(--ink,#1a1a1a);font-weight:700;font-size:.92rem;line-height:1.3">'+esc(dec(i.title||""))+'</span>'+
+          '<span style="display:block;color:var(--muted,#6b7280);font-size:.76rem;margin-top:3px">'+esc(meta)+(i.org?' \u00b7 '+esc(dec(i.org)):'')+'</span>'+
+        (i.link?'</a>':'</div>');
+      }).join("")+'</div>';
+  }, function(){ host.innerHTML=""; });
+}
+function fetchPoll(){
+  if(!RSB) return;
+  try{ var v=localStorage.getItem("raia.poll."+POLL.key); if(v) POLL.voted=v; }catch(e){}
+  RSB.from("poll_tallies").select("choice,votes").eq("poll_key",POLL.key).then(function(r){
+    if(r.error||!r.data) return;
+    var y=0,n=0; r.data.forEach(function(x){ if(x.choice==="yes")y=x.votes; else if(x.choice==="no")n=x.votes; });
+    POLL.yes=y; POLL.no=n;
+    var pc=document.querySelector("#app .poll");
+    if(pc){ var t=document.createElement("div"); t.innerHTML=pollCard(); var nn=t.firstChild; pc.parentNode.replaceChild(nn,pc);
+      nn.querySelectorAll("[data-poll]").forEach(function(el){ el.addEventListener("click",function(){ votePoll(el.getAttribute("data-poll")); }); }); }
+  }, function(){});
 }
 function viewDisinfo(){
   return '<section class="wrap" style="max-width:620px;margin:0 auto;padding:18px 16px 44px">'+
@@ -920,6 +961,8 @@ function viewNiNini(){
     featuredCard(f)+
     '<div class="shead"><h2>'+esc(L(UI.issues))+'</h2><span class="rule"></span></div>'+
     '<div class="grid">'+ISSUES.filter(function(x){return !x.featured;}).map(function(is){return issueCard(is,"mixed",L(is.summary));}).join("")+'</div>'+
+    '<div id="oppsBody"></div>'+
+    '<div id="eventsBody"></div>'+
     footer()+
   '</section>';
 }
@@ -1050,12 +1093,12 @@ function viewVoices(){
     '<div id="wall">'+wall+'</div>'+footer()+'</div></section>';
 }
 function pollCard(){
-  var tot=POLL.yes+POLL.no, yp=Math.round(POLL.yes/tot*100), np=100-yp;
+  var tot=POLL.yes+POLL.no, yp=tot?Math.round(POLL.yes/tot*100):0, np=tot?100-yp:0;
   return '<div class="poll" style="margin-top:16px"><h3>'+esc(L(POLL.q))+'</h3>'+
     '<div class="btns"><button class="yes" data-poll="yes" aria-pressed="'+(POLL.voted==="yes")+'">'+esc(L({en:"Yes, it has",sw:"Ndio, imeathiri",sh:"Ndio, imeaffect"}))+'</button>'+
       '<button class="no" data-poll="no" aria-pressed="'+(POLL.voted==="no")+'">'+esc(L({en:"Not yet",sw:"Bado",sh:"Bado"}))+'</button></div>'+
     '<div class="pollbar"><span class="yy" style="width:'+yp+'%">'+yp+'%</span><span class="nn">'+np+'%</span></div>'+
-    '<p class="tot">'+tot.toLocaleString()+' '+esc(L({en:"neighbours have answered",sw:"majirani wamejibu",sh:"majirani wamejibu"}))+'</p></div>';
+    (tot?'<p class="tot">'+tot.toLocaleString()+' '+esc(L({en:"neighbours have answered",sw:"majirani wamejibu",sh:"majirani wamejibu"}))+'</p>':'<p class="tot">'+esc(L({en:"Be the first in your area to answer.",sw:"Kuwa wa kwanza eneo lako kujibu.",sh:"Kuwa wa kwanza area yako kujibu."}))+'</p>')+'</div>';
 }
 function shareCard(){
   var types=Object.keys(TYPES).map(function(t){ return '<button data-stype="'+t+'" aria-pressed="'+(state.shareType===t)+'">'+esc(L(TYPES[t]))+'</button>'; }).join("");
@@ -1191,7 +1234,14 @@ function bind(){
     });
   });
 }
-function votePoll(choice){ if(POLL.voted===choice) return; if(POLL.voted){ POLL[POLL.voted]--; } POLL[choice]++; POLL.voted=choice; render(); }
+function votePoll(choice){
+  if(POLL.voted) return;
+  try{ var prev=localStorage.getItem("raia.poll."+POLL.key); if(prev){ POLL.voted=prev; render(); return; } }catch(e){}
+  POLL[choice]=(POLL[choice]||0)+1; POLL.voted=choice;
+  try{ localStorage.setItem("raia.poll."+POLL.key,choice); }catch(e){}
+  if(RSB){ RSB.from("poll_votes").insert({poll_key:POLL.key,choice:choice}).then(function(){},function(){}); }
+  render();
+}
 function postVoice(){
   var msg=(document.getElementById("vmsg").value||"").trim();
   var consent=document.getElementById("vconsent").checked;
