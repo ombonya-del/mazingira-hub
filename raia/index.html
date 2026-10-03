@@ -833,6 +833,9 @@ function render(){
   if(v==="disinfo") fetchDisinfo();
   if(v==="petitions") fetchPetitions();
   if(v==="ninini"){ fetchRadar(); fetchOpps(); fetchEvents(); }
+  if(v==="news") fetchStream("news");
+  if(v==="hearsay") fetchStream("hearsay");
+  if(v==="truth") fetchStream("truth");
   if(v==="voices"){ fetchPoll(); fetchVoices(); }
 }
 var RSB = (window.supabase && window.supabase.createClient)
@@ -913,6 +916,54 @@ function fetchVoices(){
     if(r.error||!r.data||!r.data.length) return;
     host.innerHTML=r.data.map(liveVoiceCard).join("");
   }, function(){});
+}
+function radarItem(i){
+  return '<a href="'+esc(i.url||"#")+'" target="_blank" rel="noopener noreferrer" style="display:flex;gap:10px;align-items:baseline;text-decoration:none;background:var(--paper,#faf7f2);border:1px solid rgba(0,0,0,.08);border-radius:11px;padding:10px 13px">'+
+    stanceTag(i.stance)+
+    '<span style="flex:1;color:var(--ink,#1a1a1a);font-weight:600;font-size:.9rem;line-height:1.35">'+esc(dec(i.title))+'</span>'+
+    '<span style="flex:0 0 auto;font-size:.56rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted,#6b7280);max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(i.source||"")+'</span>'+
+  '</a>';
+}
+function hearsayCard(i){
+  var vmap={vf:"#C0202A",vm:"#DC9A18",vc:"#2C4B59",vp:"#B4531A"}, color=vmap[i.verdict_class]||"#C0202A";
+  return '<article style="background:var(--paper,#faf7f2);border:1px solid rgba(0,0,0,.08);border-radius:13px;padding:14px 15px">'+
+    '<span style="display:inline-block;background:'+color+';color:#fff;font-weight:800;font-size:.62rem;text-transform:uppercase;letter-spacing:.04em;padding:4px 10px;border-radius:999px;margin-bottom:8px">\u26a0 '+esc(i.verdict||"Flagged")+'</span>'+
+    ((i.name||i.handle)?'<p class="muted" style="margin:0 0 6px;font-weight:700;font-size:.78rem">'+esc(i.name||"")+' '+esc(i.handle||"")+(i.posted_at?' \u00b7 '+esc(i.posted_at):'')+'</p>':'')+
+    '<p style="margin:0 0 10px;font-size:.98rem;line-height:1.45">\u201c'+esc(dec(i.body||""))+'\u201d</p>'+
+    '<a data-disinfo="'+esc(i.id)+'" href="javascript:void 0" style="color:var(--green-ink);font-weight:800;font-size:.85rem">'+esc(L(UI.factcheck))+' \u2192</a>'+
+  '</article>';
+}
+function truthCard(i){
+  return '<article style="background:var(--paper,#faf7f2);border:1px solid rgba(0,0,0,.08);border-left:4px solid var(--green,#1b7a3e);border-radius:13px;padding:14px 15px">'+
+    '<div style="font-weight:900;font-size:.64rem;text-transform:uppercase;letter-spacing:.05em;color:var(--green-ink);margin-bottom:6px">\u21b3 '+esc(L({en:"The fuller picture",sw:"Picha kamili",sh:"Picha kamili"}))+'</div>'+
+    (i.verdict?'<p class="muted" style="margin:0 0 6px;font-weight:700;font-size:.78rem">'+esc(L(UI.whatsTrue))+' \u2014 '+esc(i.verdict)+'</p>':'')+
+    '<p style="margin:0 0 10px;line-height:1.5">'+esc(dec(i.rebuttal||i.body||""))+'</p>'+
+    (i.source_url?'<a href="'+esc(i.source_url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--green-ink);font-weight:800;font-size:.85rem">'+esc(i.source_label||L({en:"Source",sw:"Chanzo",sh:"Source"}))+' \u2197</a>':'')+
+  '</article>';
+}
+function fetchStream(brand){
+  var host=document.getElementById("streamBody"); if(!host) return;
+  var empty='<p class="muted" style="padding:0 16px">'+esc(L({en:"Nothing here yet \u2014 check back soon.",sw:"Hakuna bado \u2014 angalia tena.",sh:"Hakuna bado \u2014 check tena."}))+'</p>';
+  if(!RSB){ host.innerHTML=empty; return; }
+  function fail(){ host.innerHTML=empty; }
+  if(brand==="news"){
+    RSB.from("sentiment_items").select("source,title,url,stance,published_at").order("published_at",{ascending:false}).limit(30).then(function(r){
+      if(r.error||!r.data||!r.data.length){ host.innerHTML=empty; return; }
+      host.innerHTML='<div style="display:grid;gap:8px;padding:0 16px">'+r.data.map(radarItem).join("")+'</div>';
+    }, fail);
+  } else if(brand==="hearsay"){
+    RSB.from("disinfo_items").select("*").eq("published",true).order("created_at",{ascending:false}).limit(24).then(function(r){
+      if(r.error||!r.data||!r.data.length){ host.innerHTML=empty; return; }
+      host.innerHTML='<div style="display:grid;gap:12px;padding:0 16px">'+r.data.map(hearsayCard).join("")+'</div>';
+    }, fail);
+  } else {
+    RSB.from("disinfo_items").select("*").eq("published",true).order("created_at",{ascending:false}).limit(24).then(function(r){
+      if(r.error||!r.data){ host.innerHTML=empty; return; }
+      var rows=r.data.filter(function(x){ return x.rebuttal; });
+      if(!rows.length){ host.innerHTML=empty; return; }
+      host.innerHTML='<div style="display:grid;gap:12px;padding:0 16px">'+rows.map(truthCard).join("")+'</div>';
+    }, fail);
+  }
 }
 function viewDisinfo(){
   return '<section class="wrap" style="max-width:620px;margin:0 auto;padding:18px 16px 44px">'+
@@ -1032,8 +1083,9 @@ function bigqLabel(id){ for(var i=0;i<BIGQ.length;i++) if(BIGQ[i].id===id) retur
 function mythLabel(id){ for(var i=0;i<MYTHS.length;i++) if(MYTHS[i].id===id) return L(MYTHS[i].m).replace(/[“”"]/g,""); return id; }
 
 function viewStream(lens,brand){
-  var cards=ISSUES.map(function(is){ var c=is[lens]; var v=L(c); var first=Array.isArray(v)?v[0]:v; return issueCard(is,brand,first); }).join("");
-  return '<section class="view">'+streamHero(brand)+'<div class="grid" style="margin-top:16px">'+cards+'</div>'+footer()+'</section>';
+  return '<section class="view">'+streamHero(brand)+
+    '<div id="streamBody" style="margin-top:16px"><p class="muted" style="padding:0 16px">'+esc(L({en:"Loading\u2026",sw:"Inapakia\u2026",sh:"Inaload\u2026"}))+'</p></div>'+
+    footer()+'</section>';
 }
 function streamHero(brand){
   return '<div class="streamhero '+brand+'"><div class="eye">'+esc(L({en:"Stream",sw:"Mkondo",sh:"Stream"}))+'</div>'+
@@ -1244,6 +1296,7 @@ function bind(){
   }); });
   app.querySelectorAll("[data-back]").forEach(function(el){ el.addEventListener("click",function(){ go("ninini"); }); });
   app.querySelectorAll("[data-nav]").forEach(function(el){ el.addEventListener("click",function(){ go(el.getAttribute("data-nav")); }); });
+  app.querySelectorAll("[data-disinfo]").forEach(function(el){ el.addEventListener("click",function(){ state.disinfoId=el.getAttribute("data-disinfo"); go("disinfo"); }); });
   app.querySelectorAll(".tabs [data-lens]").forEach(function(el){ el.addEventListener("click",function(){ state.lens=el.getAttribute("data-lens"); render(); }); });
   app.querySelectorAll("[data-ltab]").forEach(function(el){ el.addEventListener("click",function(){ state.learnTab=el.getAttribute("data-ltab"); state.openAcc=null; state.focusLie=null; render(); }); });
   app.querySelectorAll("[data-lieall]").forEach(function(el){ el.addEventListener("click",function(){ state.focusLie=null; if(location.hash) history.replaceState(null,"",location.pathname); render(); }); });
