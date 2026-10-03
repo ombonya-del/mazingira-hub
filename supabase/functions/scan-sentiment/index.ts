@@ -16,8 +16,10 @@ const FEEDS = [
   { url: "https://www.standardmedia.co.ke/rss/headlines.php",  type: "news", source: "The Standard" },
   { url: "https://news.mongabay.com/feed/",                    type: "news", source: "Mongabay" },
   { url: "https://www.climatechangenews.com/feed/",            type: "news", source: "Climate Home News" },
+  { url: "https://news.google.com/rss/search?q=(Siaya+OR+Kenya)+(nuclear+OR+NuPEA+OR+%22nuclear+power%22+OR+%22nuclear+plant%22)&hl=en&gl=KE&ceid=KE:en", type: "news", source: "Google News (Kenya nuclear)" },
+  { url: "https://news.google.com/rss/search?q=(Lamu+OR+Kenya)+(Dangote+OR+refinery+OR+%22oil+refinery%22)&hl=en&gl=KE&ceid=KE:en", type: "news", source: "Google News (Lamu/Dangote refinery)" },
 ];
-const KW = /(climate|carbon|coal|refinery|geotherm|drought|floods|conservanc|land rights|Lamu|Turkana|environment|Dangote)/i;
+const KW = /(climate|carbon|coal|refinery|geotherm|drought|floods|conservanc|land rights|Lamu|Turkana|environment|Dangote|nuclear|Siaya|NuPEA|atomic|uranium)/i;
 
 Deno.serve(async () => {
   let added = 0;
