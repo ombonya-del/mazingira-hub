@@ -15,6 +15,57 @@ Classification key: `vf` = false / bad-faith (red) · `vm` = misleading (amber) 
 
 ---
 
+## 2026-10-03 — 4 new drafts queued
+
+Queue script: `scripts/queue-disinfo-2026-10-03.sh`. All four written to Supabase as drafts via the
+connected Chrome (POST /rest/v1/disinfo_items, 201) — the Mac device-bridge shell could not reach
+supabase.co this run (proxy 403), so Chrome was the writer. Status: **awaiting admin review**.
+Deduped against published `disinfo_items` (26 rows read via anon GET) and the 2026-09-19 / -22 / -29
+logs. Mix of a global denialist talking point and three Kenya/East-Africa-specific framings
+(carbon-market greenwashing, tree-planting accountability, El Niño conflation).
+
+1. **Climate denial / warming minimised (`vf`) — "Earth hasn't warmed 1.5°C since 1900"**
+   - Narrative (social media): the 1.5°C warming figure is exaggerated; the planet hasn't really
+     warmed that much.
+   - Fuller picture: global mean surface temperature is ~1.3–1.5°C above the 1850–1900 baseline;
+     2024 was the first full year averaging ~1.5°C. NASA, NOAA, Berkeley Earth and the Met
+     Office/Copernicus agree within ~0.1°C. The trend is non-linear, so cherry-picking hides it.
+     East Africa signal: heatwaves, Mt Kenya/Kilimanjaro ice loss, drought↔flood swings.
+   - Source: PesaCheck — https://pesacheck.org/false-the-earths-temperature-did-not-rise-by-1-5-since-1900/
+
+2. **Greenwashing / misleading framing (`vm`) — "Northern Kenya Grassland Carbon project is a model community climate solution"**
+   - Narrative (carbon-market promotion): the world's largest soil-carbon scheme delivers verified
+     offsets and real benefits to local pastoralists.
+   - Fuller picture: NRT-run, Verra-certified; sold millions of credits to Meta/Netflix. Suspended
+     by Verra in 2023 and 2025 (a court found two credit-supplying conservancies unconstitutional);
+     Maasai & Rendille herders are in court alleging coerced agreements and grazing restrictions
+     without FPIC; soil-carbon permanence questioned. Verra reinstated it June 2026 despite the
+     ongoing case. A suspended, litigated scheme sold as proven and community-backed.
+   - Source: Survival International / REDD-Monitor — https://www.survivalinternational.org/news/14571
+
+3. **Needs context / unverified claim (`vc`) — "Kenya has planted hundreds of millions of trees, so it's reversing deforestation"**
+   - Narrative (government climate messaging): headline planting numbers prove Kenya is reversing
+     deforestation and leading on climate.
+   - Fuller picture: the 15 Billion Trees campaign is real, but figures like ~981M "tree-growing
+     contributions" (since 2011) count trees planted, not survived. Environmentalists (Dr Isaac
+     Kalua Green) demand site-level survival verification; seedlings die from drought/pests/poor
+     sites and losses may not show in tallies. The 2023 logging-moratorium lift also allows felling
+     of mature forest. Seedlings planted ≠ restored forest cover.
+   - Source: Kenyans.co.ke (13 Sep 2026) — https://www.kenyans.co.ke/news/127033-environmentalists-pile-pressure-govt-verify-survival-over-981m-trees
+
+4. **Needs context / misconception (`vc`) — "El Niño means guaranteed catastrophic floods everywhere in Kenya"**
+   - Narrative (social media): El Niño is here, so the whole country faces certain catastrophic
+     floods in the coming weeks.
+   - Fuller picture: Kenya Met forecasts above-normal Oct–Dec 2026 rains and real flood risk, but
+     has corrected the conflation — "El Niño is not rainfall"; it's a tropical-Pacific warming
+     pattern (every 2–7 yrs) that shifts odds wetter, not a uniform-disaster guarantee. Effects
+     vary by region/timing; onset wasn't yet declared in early Oct. Over-certainty fuels panic and
+     fake "forecasts"/evacuation notices — trust official Kenya Met advisories, not viral posts.
+   - Source: Kenya Met (KEMSA) / Kenyans.co.ke — https://www.kenyans.co.ke/news/125577-kenya-met-releases-el-nino-forecast-says-rains-increase-october-2026
+
+---
+
+
 ## 2026-09-29 — 6 new drafts queued
 
 Queue script: `scripts/queue-disinfo-2026-09-29.sh`. All six written to Supabase as drafts via
