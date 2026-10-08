@@ -18,6 +18,10 @@ const FEEDS = [
   { url: "https://www.climatechangenews.com/feed/",            type: "news", source: "Climate Home News" },
   { url: "https://news.google.com/rss/search?q=(Siaya+OR+Kenya)+(nuclear+OR+NuPEA+OR+%22nuclear+power%22+OR+%22nuclear+plant%22)&hl=en&gl=KE&ceid=KE:en", type: "news", source: "Google News (Kenya nuclear)" },
   { url: "https://news.google.com/rss/search?q=(Lamu+OR+Kenya)+(Dangote+OR+refinery+OR+%22oil+refinery%22)&hl=en&gl=KE&ceid=KE:en", type: "news", source: "Google News (Lamu/Dangote refinery)" },
+  { url: "https://news.google.com/rss/search?q=site:nation.africa+(climate+OR+environment+OR+coal+OR+refinery+OR+nuclear+OR+drought+OR+conservation+OR+%22land+rights%22+OR+Lamu+OR+Turkana+OR+geothermal+OR+pollution)&hl=en&gl=KE&ceid=KE:en", type: "news", source: "Nation (Kenya)" },
+  { url: "https://news.google.com/rss/search?q=site:the-star.co.ke+(climate+OR+environment+OR+coal+OR+refinery+OR+nuclear+OR+drought+OR+conservation+OR+%22land+rights%22+OR+Lamu+OR+Turkana+OR+geothermal+OR+pollution)&hl=en&gl=KE&ceid=KE:en", type: "news", source: "The Star (Kenya)" },
+  { url: "https://news.google.com/rss/search?q=site:citizen.digital+(climate+OR+environment+OR+coal+OR+refinery+OR+nuclear+OR+drought+OR+conservation+OR+%22land+rights%22+OR+Lamu+OR+Turkana+OR+geothermal+OR+pollution)&hl=en&gl=KE&ceid=KE:en", type: "news", source: "Citizen Digital" },
+  { url: "https://news.google.com/rss/search?q=site:tuko.co.ke+(climate+OR+environment+OR+coal+OR+refinery+OR+nuclear+OR+drought+OR+conservation+OR+%22land+rights%22+OR+Lamu+OR+Turkana+OR+geothermal+OR+pollution)&hl=en&gl=KE&ceid=KE:en", type: "news", source: "Tuko" },
 ];
 const KW = /(climate|carbon|coal|refinery|geotherm|drought|floods|conservanc|land rights|Lamu|Turkana|environment|Dangote|nuclear|Siaya|NuPEA|atomic|uranium)/i;
 
