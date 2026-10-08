@@ -3120,7 +3120,8 @@ document.getElementById("yr").textContent = new Date().getFullYear();
 /* =================================================================
    TICKER
    ================================================================= */
-var tickItems = [];
+function buildTicker(){
+  var tickItems = [];
 STREAMS.forEach(function(s){
   s.pool.slice(0,4).forEach(function(p){
     tickItems.push('<span class="tick-item"><span class="tick-cat '+(s.accent==="g"?"g":"")+'">'+s.nm+'</span>'+p+'</span>');
@@ -3138,7 +3139,10 @@ STREAMS.forEach(function(s){
   });
 })();
 tickItems.sort(function(){ return Math.random()-.5; });
-document.getElementById("tickTrack").innerHTML = tickItems.join("") + tickItems.join("");
+var __tt=document.getElementById("tickTrack"); if(__tt) __tt.innerHTML = tickItems.join("") + tickItems.join("");
+}
+window.buildTicker = buildTicker;
+buildTicker();
 
 /* =================================================================
    LIVE STREAMS
@@ -5002,6 +5006,7 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
           +'<div class="xorig-embed" hidden></div></div>';
       }).join(""));
       while(feed.children.length>6) feed.removeChild(feed.lastElementChild);
+      if(window.buildTicker) window.buildTicker();   // refresh the header ticker with the live Pulse rows
     }, function(){});
 
   sb.from("disinfo_items").select("*").eq("published",true).order("created_at",{ascending:false}).limit(6)

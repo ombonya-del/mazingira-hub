@@ -23,7 +23,7 @@ const FEEDS = [
   { url: "https://news.google.com/rss/search?q=site:citizen.digital+(climate+OR+environment+OR+coal+OR+refinery+OR+nuclear+OR+drought+OR+conservation+OR+%22land+rights%22+OR+Lamu+OR+Turkana+OR+geothermal+OR+pollution)&hl=en&gl=KE&ceid=KE:en", type: "news", source: "Citizen Digital" },
   { url: "https://news.google.com/rss/search?q=site:tuko.co.ke+(climate+OR+environment+OR+coal+OR+refinery+OR+nuclear+OR+drought+OR+conservation+OR+%22land+rights%22+OR+Lamu+OR+Turkana+OR+geothermal+OR+pollution)&hl=en&gl=KE&ceid=KE:en", type: "news", source: "Tuko" },
 ];
-const KW = /(climate|carbon|coal|refinery|geotherm|drought|floods|conservanc|land rights|Lamu|Turkana|environment|Dangote|nuclear|Siaya|NuPEA|atomic|uranium)/i;
+const ENV = /(climate|carbon|emission|coal|fossil|refinery|petroleum|geotherm|solar|renewable|hydropower|nuclear|NuPEA|atomic|uranium|drought|flood|\brain|weather|Kenya Met|El Ni|famine|locust|forest|deforest|logging|mangrove|wetland|conservan|wildlife|elephant|rhino|poach|biodivers|ecosystem|mining|\bgold\b|quarry|sand harvest|charcoal|pollution|\bwaste\b|plastic|sewage|\bwater|river|\blake|\bdam\b|land rights|eviction|displac|Lamu|Turkana|Siaya|Dangote|environment|\boil\b|\bgas\b|green energy)/i;
 
 Deno.serve(async () => {
   let added = 0;
@@ -31,10 +31,10 @@ Deno.serve(async () => {
     try {
       const xml = await (await fetch(f.url)).text();
       const items = parseRss(xml);
-      // Google-News search feeds already topic-scope via the ?q= query, so the title KW filter
-      // just drops on-topic articles whose headline lacks an exact keyword. Skip KW for those.
-      const prefiltered = f.url.includes("news.google.com/rss/search");
-      const picked = (prefiltered ? items : items.filter((i) => KW.test(i.title))).slice(0, 20);
+      // Keep only genuinely environmental headlines. ENV is broad (forests, mining, weather,
+      // water, wildlife, energy, El Nino...) so on-topic Kenyan stories pass, but tangential
+      // outlet noise (accidents, disease outbreaks, celebrity/business items) is dropped.
+      const picked = items.filter((i) => ENV.test(i.title)).slice(0, 20);
       for (const it of picked) {
         const stance = await scoreStance(it.title);
         const { error } = await supabase.from("sentiment_items").upsert(
