@@ -30,7 +30,12 @@ Deno.serve(async () => {
   for (const f of FEEDS) {
     try {
       const xml = await (await fetch(f.url)).text();
-      for (const it of parseRss(xml).filter((i) => KW.test(i.title)).slice(0, 15)) {
+      const items = parseRss(xml);
+      // Google-News search feeds already topic-scope via the ?q= query, so the title KW filter
+      // just drops on-topic articles whose headline lacks an exact keyword. Skip KW for those.
+      const prefiltered = f.url.includes("news.google.com/rss/search");
+      const picked = (prefiltered ? items : items.filter((i) => KW.test(i.title))).slice(0, 20);
+      for (const it of picked) {
         const stance = await scoreStance(it.title);
         const { error } = await supabase.from("sentiment_items").upsert(
           { source: f.source, source_type: f.type, title: it.title, url: it.link, published_at: it.pubDate, stance },
