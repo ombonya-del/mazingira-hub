@@ -23,7 +23,7 @@ const FEEDS = [
   { url: "https://news.google.com/rss/search?q=site:citizen.digital+(climate+OR+environment+OR+coal+OR+refinery+OR+nuclear+OR+drought+OR+conservation+OR+%22land+rights%22+OR+Lamu+OR+Turkana+OR+geothermal+OR+pollution)&hl=en&gl=KE&ceid=KE:en", type: "news", source: "Citizen Digital" },
   { url: "https://news.google.com/rss/search?q=site:tuko.co.ke+(climate+OR+environment+OR+coal+OR+refinery+OR+nuclear+OR+drought+OR+conservation+OR+%22land+rights%22+OR+Lamu+OR+Turkana+OR+geothermal+OR+pollution)&hl=en&gl=KE&ceid=KE:en", type: "news", source: "Tuko" },
 ];
-const ENV = /(climate|carbon|emission|coal|fossil|refinery|petroleum|geotherm|solar|renewable|hydropower|nuclear|NuPEA|atomic|uranium|drought|flood|\brain|weather|Kenya Met|El Ni|famine|locust|forest|deforest|logging|mangrove|wetland|conservan|wildlife|elephant|rhino|poach|biodivers|ecosystem|mining|\bgold\b|quarry|sand harvest|charcoal|pollution|\bwaste\b|plastic|sewage|\bwater|river|\blake|\bdam\b|land rights|eviction|displac|Lamu|Turkana|Siaya|Dangote|environment|\boil\b|\bgas\b|green energy)/i;
+const ENV = /(climate|carbon|emission|coal|fossil|refinery|petroleum|geotherm|solar|renewable|hydropower|nuclear|NuPEA|atomic|uranium|drought|flood|\brain|weather|Kenya Met|El Ni|famine|locust|forest|deforest|reforest|afforest|\btree|seedling|logging|mangrove|wetland|conservan|wildlife|elephant|rhino|poach|biodivers|ecosystem|mining|\bgold\b|quarry|sand harvest|charcoal|pollution|\bwaste\b|plastic|sewage|\bwater|river|\blake|\bdam\b|land rights|eviction|displac|Lamu|Turkana|Siaya|Dangote|environment|\boil\b|\bgas\b|green energy)/i;
 
 Deno.serve(async () => {
   let added = 0;
