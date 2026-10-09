@@ -1,3 +1,44 @@
+# Resources Watch — Review Log — 2026-10-09 (SUPPLEMENTARY, second firing)
+
+A second firing of the weekly task ran later on 2026-10-09 (the canonical run earlier the same day queued 5 — see the section below). This supplementary run added **4 genuinely new** climate / environmental-justice knowledge resources, deduped against all **33** distinct drafts already logged (the 5 from the earlier 2026-10-09 run + the 28 from prior logs). All 4 were queued as drafts (`published=false`, `source=watch`, `category=Resources`) into Supabase (project `uueemckdoozsuowcqkhl`) via a connected Chrome (same-origin POST to `/rest/v1/resources`, public anon key only) and each returned **HTTP 201**. The Mac device shell still cannot reach Supabase (curl 56 / proxy 403 — host not on the device egress allowlist). Replay commands: `scripts/queue-resources-2026-10-09b.sh`. WebSearch was available this run; each URL was fetched and confirmed to load with real content before queueing.
+
+## Verified new resources (4) — 2026-10-09 (supplementary)
+
+### 1. WMO State of the Global Climate 2025
+- **Source:** World Meteorological Organization (WMO)
+- **Type:** Report (flagship annual; 45 pp; posted 23 Mar 2026)
+- **URL:** https://www.preventionweb.net/publication/documents-and-publications/state-global-climate-2025
+- **Why:** Closes the gap flagged in the earlier 2026-10-09 run ("no clean fetchable full-report page"). WMO's authoritative annual assessment of the global climate system in 2025 — greenhouse gases, temperatures, ocean heat, sea-level rise. Fetchable landing page with DOI (10.59327/WMO/S/CRI/SOC1) and a 6.2 MB PDF.
+- **Verified:** fetched directly; page loads with full summary + working download links.
+
+### 2. 2026 Africa Sustainable Development Report (ASDR)
+- **Source:** African Union Commission, UN Economic Commission for Africa, African Development Bank & UNDP (joint)
+- **Type:** Report (annual flagship; 15 Jul 2026)
+- **URL:** https://www.undp.org/africa/publications/2026-africa-sustainable-development-report
+- **Why:** Pan-African flagship on progress to 2030 across SDGs 6 (water), 7 (energy), 9 (infrastructure/industrialization), 11 (sustainable cities) and 17 — strong environmental/sustainability dimensions and a standing continental reference.
+- **Verified:** fetched directly; publication page loads with full description and co-producer attribution.
+
+### 3. Carbon Markets in Kenya: A Simplified Community Guide
+- **Source:** National Environment Management Authority (NEMA), Kenya — with WWF-Kenya
+- **Type:** Community guide / training material (ISBN 978-9914-9940-2-5; Government of Kenya, 2025; PDF posted Feb 2026)
+- **URL:** https://nema.go.ke/wp-content/uploads/2026/02/Carbon-markets-In-Kenya-a-Simplified-Community-Guide_.pdf
+- **Why:** Plain-language Kenya guide to carbon markets and credits — legal/institutional frameworks, carbon-project development procedure, Community Development Agreements, benefit-sharing and grievance redress. A direct environmental-justice / community-empowerment toolkit.
+- **Verified:** fetched directly; PDF loads with full content (frameworks, steps, checklists).
+
+### 4. Kenya Guide for Strategic Engagement in Carbon Markets
+- **Source:** Republic of Kenya — Ministry of Environment, Climate Change & Forestry (Climate Change Directorate)
+- **Type:** Government guideline (Version 1, July 2026)
+- **URL:** https://kcckp.go.ke/api/media/file/KENYA%20GUIDE%20FOR%20STRATEGIC%20ENGAGEMENT%20IN%20CARBON%20MARKETS%202026%20V.1%20[FINAL]-3.pdf
+- **Why:** Kenya's strategic decision guidance for carbon-market activity under Paris Article 6 — No-Objection/Approval/Authorisation criteria, a 2021–2030 national carbon budget for trading, a whitelist of priority activity types, and DNA/Climate Change Directorate roles. Anchored in the Climate Change Act (Cap. 387A) and the Climate Change (Carbon Markets) Regulations, 2024. Canonical Kenya carbon-market policy reference.
+- **Verified:** fetched directly; official PDF loads with full policy content.
+
+## Notes for next run (dedupe)
+- The 4 items above (2026-10-09 supplementary) bring the **running total to 37 distinct drafts**. Do **not** re-queue any of them, nor the 33 below.
+- Still open / watch next week: **UNEP *Adaptation Gap Report 2026* / *Emissions Gap Report 2026*** — 2026 full editions still not published (only 2025 editions + a preliminary assessment are live); check next run. **CPI *Landscape of Climate Finance in Africa*** refresh still pending (live page remains 2022). **World Bank *Kenya Country Climate and Development Report*** update (current live doc still the 2023 edition).
+- Skipped as off-scope/too thin this run: Mo Ibrahim Foundation *COP30 outcomes for Africa* (news/blog); AfriCGE *Africa Climate & Sustainable Development Outlook 2026* (web analytical article, no downloadable report); Mashariki RPC *Climate Adaptation and DRR Across Greater Eastern Africa* (signed policy commentary/opinion, not a formal resource); ICPAC *Climate Watch Advisory — Aug 2026 Update* (monitoring advisory, superseded by a Sept 2026 update; the ICPAC OND 2026 seasonal outlook is already queued from the earlier 2026-10-09 run).
+
+---
+---
 # Resources Watch — Review Log — 2026-10-09
 
 MazingiraKenya coalition · weekly scan of **new climate & environmental-justice knowledge resources** (reports, policy briefs, toolkits, guidelines, research, datasets) relevant to Kenya / East Africa / pan-African climate justice. These are **drafts for admin review only** — nothing here is published to the live site until an admin Accepts it in **admin → Resources review**.
