@@ -13,7 +13,7 @@ const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPAB
 const SECTORS = [
   {
     table: "extractive_signals",
-    rx: /(mining|miner|prospect|quarr|licen[cs]e|fluorspar|\bgold\b|titanium|sand harvest|chromite|explorat|mineral|drilling|seismic|tailings|\bcoal\b|refinery|extractive)/i,
+    rx: /(mining|miner|prospect|quarr|licen[cs]e|fluorspar|gold (?:min|deposit|field|rush|site|block|prospect)|titanium|sand harvest|chromite|explorat|mineral|drilling|seismic|tailings|\bcoal\b|refinery|extractive)/i,
     feeds: [
       "https://news.google.com/rss/search?q=Kenya+(mining+OR+prospecting+OR+quarry+OR+%22mining+licence%22+OR+fluorspar+OR+gold+OR+titanium+OR+%22sand+harvesting%22+OR+chromite+OR+exploration+OR+mineral)&hl=en&gl=KE&ceid=KE:en",
     ],
