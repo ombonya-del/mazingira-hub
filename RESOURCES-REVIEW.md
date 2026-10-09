@@ -1,3 +1,55 @@
+# Resources Watch — Review Log — 2026-10-09
+
+MazingiraKenya coalition · weekly scan of **new climate & environmental-justice knowledge resources** (reports, policy briefs, toolkits, guidelines, research, datasets) relevant to Kenya / East Africa / pan-African climate justice. These are **drafts for admin review only** — nothing here is published to the live site until an admin Accepts it in **admin → Resources review**.
+
+> ✅ **Queueing status (2026-10-09):** All 5 items below were queued as drafts (`published=false`, `source=watch`, `category=Resources`) straight into Supabase (project `uueemckdoozsuowcqkhl`) and each returned **HTTP 201**. The Mac device shell still cannot reach Supabase (curl 56 / proxy 403 — host not on the device egress allowlist), so the writes were made through a connected Chrome (same-origin POST to `/rest/v1/resources` with the public anon key only). Replay commands: `scripts/queue-resources-2026-10-09.sh`. WebSearch was available this run (no 403); each URL was also fetched and confirmed to load with real content before queueing.
+
+## Verified new resources (5) — 2026-10-09
+
+All 5 are new to the queue, deduped against the 28 distinct items in the 2026-09-29, 2026-09-22 and 2026-09-19 logs below.
+
+### 1. Kenya's First Biennial Transparency Report (BTR1) to the UNFCCC
+- **Source:** Government of Kenya
+- **Type:** Report (102 pp; Kenya's first BTR under the Paris Agreement Enhanced Transparency Framework, 2024)
+- **URL:** https://alliancebioversityciat.org/publications-data/kenyas-first-biennial-transparency-report-btr-first-btr-united-nations-framework
+- **Why:** Kenya's first BTR — national GHG inventory, progress on the first updated NDC, adaptation actions and support needs across state/non-state actors. A canonical Kenya climate-transparency / policy reference; companion to the NDC and AdCom already queued.
+- **Verified:** fetched directly; publication page loads with full citation + description.
+
+### 2. Africa Civil Society Position Paper for COP30
+- **Source:** Climate Action Network Africa (CAN Africa)
+- **Type:** Position paper (issued 3 Nov 2025; from the Pre-COP30 African Civil Society Convening, Nairobi, 21–22 Oct 2025)
+- **URL:** https://can-africa.org/wp-content/uploads/2025/11/Africa-CSOs_COP30-Position-Paper.pdf
+- **Why:** Africa's civil-society demands for COP30 (Belém) — climate finance, loss & damage, adaptation, just energy transition, Article 6 carbon markets, gender justice and systemic reform. Core pan-African climate-justice advocacy text.
+- **Verified:** fetched directly; PDF loads with full content (sections 1–2.8 + closing statement).
+
+### 3. Road to Belém: Key Takeaways and Main Outcomes of COP29 and the Road to COP30
+- **Source:** African Union ECOSOCC (Economic, Social and Cultural Council)
+- **Type:** Report (12 Nov 2025)
+- **URL:** https://ecosocc.au.int/en/documents/2025-11-12/road-belem
+- **Why:** AU civil-society body's synthesis of COP29 (Baku) outcomes and Africa's collective preparation for COP30 (Belém) — pan-African negotiating / advocacy reference.
+- **Verified:** fetched directly; document page loads with metadata, summary and PDF download (~731 KB).
+
+### 4. Greater Horn of Africa Climate Outlook — October–December (OND) 2026 Season
+- **Source:** IGAD Climate Prediction and Applications Centre (ICPAC)
+- **Type:** Seasonal climate outlook / forecast (Press Release 301, Kigali, 18 Aug 2026)
+- **URL:** https://www.icpac.net/news/the-greater-horn-of-africa-is-expected-to-experience-a-wetter-than-normal-october-december-ond-2026-season-as-el-niño-strengthens/
+- **Why:** Regional OND 2026 seasonal outlook — wetter-than-normal forecast tied to a strengthening El Niño and positive Indian Ocean Dipole, with warmer-than-average temperatures; links to the GHACOF 74 Technical Statement and the FSNWG El Niño Special Report. A fresh East-Africa-specific climate dataset/forecast resource.
+- **Verified:** fetched directly; press release loads with full forecast content.
+
+### 5. Operationalizing the Loss and Damage Fund: learning from the intended beneficiaries
+- **Source:** Stockholm Environment Institute (SEI) & ICCCAD
+- **Type:** Report (26 Jul 2023)
+- **URL:** https://www.sei.org/publications/operationalizing-loss-and-damage-fund-for-beneficiaries/
+- **Why:** Recommendations for setting up the international Loss and Damage Fund, grounded in focus groups with those working with potential fund applicants across Africa, Asia, Latin America and SIDS — climate-justice / loss-and-damage reference new to the queue.
+- **Verified:** fetched directly; publication page loads with summary, key recommendations and download link.
+
+## Notes for next run (dedupe)
+- The 5 items above (2026-10-09) plus the 28 distinct items in the logs below are all now pending/queued drafts. Do **not** re-queue any of them. **Running total: 33 distinct drafts.**
+- Still open / watch next week: **WMO *State of the Global Climate 2025*** — advisory confirmed (embargo lifted 23 Mar 2026) but no clean fetchable full-report page this run (both candidate URLs returned the media advisory / a client error); re-try via Chrome next week. **CPI *Landscape of Climate Finance in Africa*** refresh still pending (live page remains the 2022 edition; CPI's 2025 *South African Climate Finance Landscape* is SA-specific and intentionally skipped). **World Bank *Kenya Country Climate and Development Report*** update (current live doc still the 2023 edition). **UNEP *Adaptation Gap Report 2026* / *Emissions Gap Report 2026*** — not yet published (typically released early–mid November); check next run.
+- Skipped as off-scope/too thin this run: *African Economic Outlook 2026* (AfDB — macroeconomic, not climate-specific); *Review of Current and Planned Adaptation Action in Kenya* (IISD, 2016 — dated); *Climate Finance in Kenya: Review and future outlook* (Ada Consortium — 2019 PDF, page has template placeholder text); *Adaptation in focus: Kenya's efforts in climate reporting and resilience* (Alliance Bioversity/CIAT blog — secondary summary of the BTR, which is queued above); IPCC AR7 Synthesis (still in progress, not published).
+
+---
+---
 # Resources Watch — Review Log — 2026-09-29 (SUPPLEMENTARY / concurrent-run reconciliation)
 
 > ⚠️ **Two firings of this weekly task ran at once on 2026-09-29.** The concurrent session (`session_013f5xxB`, commit `bb1e638`) committed the canonical run of **8** items (the section immediately below). **This session** (`session_013uusXk`) had independently researched and queued **4** drafts to Supabase (each HTTP 201 via connected Chrome) before that commit landed. Overlap check against bb1e638's 8:
