@@ -1,5 +1,37 @@
 # Events Watch — Admin Review Queue
 
+**Run date (TODAY): 2026-10-09**
+Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
+Scope: upcoming climate & environmental-justice events on or after 2026-10-09, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
+
+> ✅ **Queueing status:** 3 NEW verified events below were written **straight to Supabase as drafts (`published=false`, `source=watch`)** via the connected-Chrome write path — all three inserts returned **HTTP 201**. Review and Accept/Reject them in **admin → Events review**. Nothing is public until an admin Accepts. (The Mac device-bridge shell could not reach Supabase this run — the proxy blocked the host — so the connected Chrome was used as the writer, as designed.)
+
+**Verification notes:** Each event was confirmed against a primary/organiser or reputable-news source and is future-dated (on/after 2026-10-09). Solarexpo / Power & Energy 2026 dates (10–12 Nov 2026, Sarit Expo Centre) confirmed via the organiser site plus Citizen Digital and The Star. IMPAC6 (first African edition, Dakar, Feb 2027) confirmed via Afrik21 and APS/allAfrica (national organising committee installed Oct 2025) — **exact days still TBC** (flagged in the draft). 3rd Eastern Africa Agroecology Conference (16–19 Mar 2027, Kampala) confirmed via the conference site; organising partners include Biovision Africa Trust, KALRO and CIFOR-ICRAF. **Candidates dropped this run (not future-dated or out of scope):** Innovate4Cities 2026 Nairobi (concluded late Sep 2026 — past), CCDA XIV (7–9 Sep 2026 — past), Africa Food Systems Forum 2026 Kigali (1–4 Sep 2026 — past), Africa Blue Economy Week 2026 Luanda (22–25 Jul 2026 — past), Powering Futures 2026 & Power & Energy World Energy Council Nairobi (10–12 Feb 2026 — past), Kenya Green Energy Conference & Expo (Mar 2026 — past), 6th Africa Climate Talks & SDGs Forum (2025 — past); IUCN World Protected and Conserved Areas Congress (Panama City, 4–10 Sep 2027) — skipped as not sufficiently African / climate-justice focused.
+
+---
+
+## Drafts queued this run (3) — all published=false, source=watch
+
+| # | Event | Date(s) | Location | Mode | Host | Status |
+|---|-------|---------|----------|------|------|--------|
+| 1 | Solarexpo, Power & Energy 2026 (East Africa Solar & Energy Exhibition) | 10–12 Nov 2026 | Sarit Expo Centre, Nairobi, Kenya | In person | VeriFair (Power & Elec Kenya) | INSERTED 201 |
+| 2 | IMPAC6 — 6th International Congress on Marine Protected Areas | Feb 2027 (days TBC) | Dakar, Senegal | In person | Government of Senegal / IUCN | INSERTED 201 |
+| 3 | 3rd Eastern Africa Agroecology Conference | 16–19 Mar 2027 | Kampala, Uganda | Hybrid | Biovision Africa Trust, KALRO, CIFOR-ICRAF & partners | INSERTED 201 |
+
+**New this run (not previously logged):** all 3 above.
+
+**Dedupe:** Checked against the 2026-09-29 run (African Green Investment Forum, MOP38, COP32, UNEA-8), the 2026-09-22 run (Carbon Markets Africa Summit, 9th GLF Investment Case Symposium) and the 2026-09-19 run (Reparations Symposium, African Energy Week, Africa Climate Forum, CBD COP17, GreenShift Forum, Global Off-Grid Solar Forum, 5th EIK Conference, COP31, ESG & Climate Africa Summit) — **none re-queued**; they remain in the review queue from those runs.
+
+Reproducible record: `scripts/queue-events-2026-10-09.sh`.
+
+*Approved events go live only when a human admin clicks Accept in the admin Events review tab. This log is a draft queue, not a publication.*
+
+---
+
+<!-- ================= PREVIOUS RUNS BELOW ================= -->
+
+# Events Watch — Admin Review Queue
+
 **Run date (TODAY): 2026-09-29**
 Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
 Scope: upcoming climate & environmental-justice events on or after 2026-09-29, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.

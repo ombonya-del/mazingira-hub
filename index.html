@@ -3174,7 +3174,7 @@ STREAMS.forEach(function(s){
     '<div class="stream-head"><span class="s-ico '+s.accent+'" aria-hidden="true"><svg viewBox="0 0 24 24">'+STREAM_ICON[s.id]+'</svg></span>'+
       '<span class="nm">'+s.nm+'</span></div>'+
     '<div class="stream-metric" id="num-'+s.id+'"><span class="n '+s.accent+'">0</span>'+
-      '<span class="s-unit">'+STREAM_UNIT[s.id]+' · past 30 days</span></div>'+
+      '<span class="s-unit">'+STREAM_UNIT[s.id]+((s.id==="media"||s.id==="community")?' · live':' · tracked')+'</span></div>'+
     '<div class="s-src '+s.prov+'"><span class="s-dot" aria-hidden="true"></span>'+STREAM_SRC[s.prov]+'</div>'+
     '<ul class="feed" id="feed-'+s.id+'"></ul>';
   streamWrap.appendChild(box);
@@ -3192,40 +3192,67 @@ function renderFeed(id){
   });
 }
 
-function pushItem(){
-  var s = STREAMS[Math.floor(Math.random()*STREAMS.length)];
-  var msg = s.pool[Math.floor(Math.random()*s.pool.length)];
-  state[s.id].items.unshift({ tx:msg, t:Date.now(), fresh:true });
-  state[s.id].items = state[s.id].items.slice(0,6);
-  state[s.id].count += 1;
-  var numBox = document.getElementById("num-"+s.id);
-  numBox.querySelector(".n").textContent = state[s.id].count.toLocaleString();
-  renderFeed(s.id);
+function setNum(id, n){
+  var box = document.getElementById("num-"+id); if(!box) return;
+  var node = box.querySelector(".n"); if(node) node.textContent = Number(n).toLocaleString();
+}
+
+/* Live streams — Media <- sentiment_items (the radar) and Community <- pulse_items (the
+   Pulse that also feeds the ticker). Real counts + newest items, re-polled so the board is
+   genuinely live. The other four streams stay curated/static (no simulated ticking). */
+function liveSB(){ return window.MZ_SB || (typeof SB!=="undefined" && SB) || null; }
+async function refreshLive(){
+  var sb = liveSB(); if(!sb) return;
+  var since = new Date(Date.now() - 30*864e5).toISOString();
+  try {
+    var mc = await sb.from("sentiment_items").select("*",{count:"exact",head:true}).gte("published_at",since);
+    if(mc && mc.count!=null){ state.media.count = mc.count; setNum("media", mc.count); }
+    var mi = await sb.from("sentiment_items").select("title,source,published_at").order("published_at",{ascending:false}).limit(6);
+    if(mi && mi.data && mi.data.length){
+      state.media.items = mi.data.map(function(r){
+        return { tx: escE(r.title) + (r.source ? ' <span class="src">- '+escE(r.source)+'</span>' : ''), t: Date.parse(r.published_at)||Date.now() };
+      });
+      renderFeed("media");
+    }
+  } catch(e){}
+  try {
+    var cc = await sb.from("pulse_items").select("*",{count:"exact",head:true}).eq("published",true);
+    if(cc && cc.count!=null){ state.community.count = cc.count; setNum("community", cc.count); }
+    var ci = await sb.from("pulse_items").select("name,handle,body,posted_at,created_at").eq("published",true).order("created_at",{ascending:false}).limit(6);
+    if(ci && ci.data && ci.data.length){
+      state.community.items = ci.data.map(function(r){
+        var txt = String(r.body||"").replace(/\s+/g," ").trim(); if(txt.length>92) txt = txt.slice(0,92)+"…";
+        var who = r.handle || r.name || "";
+        return { tx: (who ? '<b>'+escE(who)+'</b> ' : '') + escE(txt), t: Date.parse(r.created_at||r.posted_at)||Date.now() };
+      });
+      renderFeed("community");
+    }
+  } catch(e){}
   bumpSync();
 }
 
-var streaming = !reduce, streamTimer = null;
-function schedule(){
-  if(!streaming) return;
-  streamTimer = setTimeout(function(){ pushItem(); schedule(); }, 5200 + Math.random()*6500);
-}
-schedule();
+/* The Pause button now pauses/resumes the live DB re-poll (the simulation is gone). */
+var livePolling = !reduce, liveTimer = null;
+function scheduleLive(){ if(!livePolling) return; liveTimer = setTimeout(function(){ refreshLive().then(scheduleLive); }, 75000); }
+setTimeout(function(){ refreshLive().then(scheduleLive); }, 300);
 
 var pauseBtn = document.getElementById("pauseBtn");
-if(reduce){ pauseBtn.textContent = "Stream paused (reduced motion)"; pauseBtn.setAttribute("aria-pressed","true"); }
-pauseBtn.addEventListener("click", function(){
-  streaming = !streaming;
-  pauseBtn.setAttribute("aria-pressed", String(!streaming));
-  pauseBtn.textContent = streaming ? "Pause stream" : "Resume stream";
-  if(streaming) schedule(); else clearTimeout(streamTimer);
-});
+if(pauseBtn){
+  if(reduce){ pauseBtn.textContent = "Live updates paused"; pauseBtn.setAttribute("aria-pressed","true"); }
+  pauseBtn.addEventListener("click", function(){
+    livePolling = !livePolling;
+    pauseBtn.setAttribute("aria-pressed", String(!livePolling));
+    pauseBtn.textContent = livePolling ? "Pause live updates" : "Resume live updates";
+    if(livePolling) scheduleLive(); else clearTimeout(liveTimer);
+  });
+}
 
-/* sync clock + relative time refresh */
+/* sync clock + relative-time refresh (keeps the "ago" stamps current) */
 var lastSync = Date.now();
 function bumpSync(){ lastSync = Date.now(); }
 setInterval(function(){
   var s = Math.floor((Date.now()-lastSync)/1000);
-  document.getElementById("sync").textContent = s < 5 ? "Synced" : "Synced " + s + "s ago";
+  var syncEl = document.getElementById("sync"); if(syncEl) syncEl.textContent = s < 5 ? "Synced" : "Synced " + s + "s ago";
   STREAMS.forEach(function(st){ renderFeed(st.id); });
 }, 5000);
 
