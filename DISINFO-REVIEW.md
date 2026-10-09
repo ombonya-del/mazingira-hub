@@ -15,6 +15,61 @@ Classification key: `vf` = false / bad-faith (red) · `vm` = misleading (amber) 
 
 ---
 
+## 2026-10-09 — 4 new drafts queued
+
+Queue script: `scripts/queue-disinfo-2026-10-09.sh`. All four written to Supabase as drafts via the
+connected Chrome (POST /rest/v1/disinfo_items, 201) — the Mac device-bridge shell could not reach
+supabase.co this run (HTTP 000), so Chrome was the writer. Status: **awaiting admin review**.
+Deduped against published `disinfo_items` (30 rows read via anon GET) and the 2026-09-19 / -22 / -29 /
+10-03 logs. Mix of two global denialist talking points and two East-Africa-specific framings
+(Kenya water-tower deforestation denial, Tanzania Maasai soil-carbon greenwashing).
+
+1. **Climate denial / consensus denial (`vf`) — "The climate consensus is only 0.3%, not 97%"**
+   - Narrative (social media): scientists are lying about agreement; only 0.3% of studies say humans
+     cause climate change.
+   - Fuller picture: independent studies put agreement among publishing climate scientists at 97%+,
+     recent reviews above 99%. The "0.3%" re-slices one 2013 survey (Cook et al., ~12,000 abstracts)
+     down to the narrowest sub-category, then presents it as the whole. NASA/NOAA/IPCC and every major
+     academy agree. Cherry-picking one restrictive count = textbook denial tactic.
+   - Source: PesaCheck — https://pesacheck.org/false-the-scientific-consensus-that-human-activity-causes-climate-change-is-not-just-0-3-per-cent/
+
+2. **Climate denial / retracted study (`vf`) — "A peer-reviewed study proves warming is solar, not CO2"**
+   - Narrative (social media / skeptic blogs): a published study shows recent warming is caused by the
+     Sun; the CO2 link is just an assumption.
+   - Fuller picture: the 2023 paper (retired geographer, MDPI *Atmosphere*) was retracted 16 Sep 2026
+     for "unsupported conclusions" and data errors — it misnamed Mauna Loa as "Mount Kea," misstated
+     when CO2 measurements began, and put the Neanderthal extinction at ~3,200 yrs (was ~40,000). Solar
+     output has been flat/declining since the 1980s while temps rose; the warming's fingerprints point
+     to fossil CO2. A retracted, error-ridden paper kept circulating after withdrawal.
+   - Source: Retraction Watch (2 Oct 2026) — https://retractionwatch.com/2026/10/02/paper-questioning-co2-and-climate-change-retracted
+
+3. **Misleading framing / minimisation (`vm`) — "Viral forest-destruction videos are misleading; no public forest has been lost"**
+   - Narrative (official forestry messaging): reports and viral videos of forest destruction are
+     misleading; no public forest has been lost, grabbed or hived off.
+   - Fuller picture: Oct 2026 footage geolocated to Keraita Forest (Kiambu), others pointing to the
+     Aberdares, showed lorries hauling felled indigenous trees from gazetted water-tower forest, amid
+     criticism that enforcement weakened after the 2023 logging-ban lift. KFS's own record cuts against
+     a blanket denial: 154+ irregular title deeds revoked (2017) and Karura land recovered with the
+     EACC — proof forest land HAS been irregularly allocated. Blanket "misleading" dismissal while
+     located footage shows active logging downplays verifiable losses; the fix is site-level
+     verification and published permit records.
+   - Source: Citizen Digital — https://citizen.digital/article/public-outrage-as-viral-videos-reveal-massive-deforestation-in-kenyas-key-water-towers-n391643
+
+4. **Greenwashing / misleading framing (`vm`) — "Tanzania's Maasai soil-carbon projects are a win-win model"**
+   - Narrative (carbon-market promotion): soil-carbon projects on Maasai rangelands in northern
+     Tanzania protect land, store carbon and pay communities — a model East Africa climate solution.
+   - Fuller picture: the Longido & Monduli Rangelands Carbon Project (Soils for the Future Tanzania +
+     Volkswagen ClimatePartner; ~970,000 ha, 40-yr contracts) is contested by Maasai groups — contracts
+     signed without legal advice, translation or proper FPIC; fixed 14-day grazing clashes with
+     rain-driven herding; 100+ objections filed with Verra; villages reportedly get ~US$2/ha while
+     credits sell for many times that. FAO/peer-reviewed work: dryland soil-carbon gains are uncertain
+     and easily reversed. Critics call it "carbon colonialism." Similar deals reported in Kenya's
+     Kajiado & Laikipia. A consent-disputed, scientifically shaky scheme sold as proven and
+     community-backed.
+   - Source: Greenpeace Africa (3 Jun 2026) — https://www.greenpeace.org/africa/en/blog/60812/when-the-land-speaks-back-tanzanias-maasai-are-rejecting-carbon-credits-on-their-land-the-world-should-pay-attention/
+
+---
+
 ## 2026-10-03 — 4 new drafts queued
 
 Queue script: `scripts/queue-disinfo-2026-10-03.sh`. All four written to Supabase as drafts via the
