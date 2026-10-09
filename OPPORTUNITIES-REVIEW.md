@@ -1,3 +1,46 @@
+# Opportunities Watch — Review Log — 2026-10-09
+
+MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya / East Africa / pan-African climate justice. All deadlines below are **on or after 2026-10-09**. New items are **written straight into Supabase as drafts (published=false)** via the connected-Chrome JS write path and now await admin Accept/Reject in **admin → Opportunities review**. Nothing here is public until an admin accepts.
+
+> ✅ **Queueing status:** 2/2 new drafts inserted successfully (HTTP 201) via the connected-Chrome write path (Browser 1). The Mac device shell and the cloud container remain proxy-blocked from `uueemckdoozsuowcqkhl.supabase.co` (curl → HTTP 000), so the browser JS `fetch` is again the reliable writer. Re-runnable commands: `scripts/queue-opportunities-2026-10-09.sh`.
+
+## New verified-open opportunities queued (2)
+
+### 1. Future Conservationist Award 2027 (Conservation Leadership Programme)
+- **Funder / host:** Conservation Leadership Programme (partnership of BirdLife International, Fauna & Flora International, and Wildlife Conservation Society)
+- **Type:** Award / project grant (up to US$15,000 per team; CLP funding must cover ≥50% of the project budget)
+- **Deadline:** 30 Oct 2026, 23:59 GMT (Stage 1 concept notes to clp.applications@birdlife.org)
+- **Eligibility:** Early-career conservation teams (≥3 people, each with ≤5 years' professional conservation experience); all team members nationals of the project's (eligible developing) country, one justified non-national allowed; projects 6–12 months, beyond academic research. Africa/Kenya historically eligible — admin to confirm the current eligible-country list in the guidelines PDF.
+- **URL:** https://www.conservationleadershipprogramme.org/awards-opportunities/team-awards/future-conservationist-award
+- **Verified:** directly on conservationleadershipprogramme.org — call OPEN, Stage 1 deadline 30 Oct 2026.
+
+### 2. Global EbA Fund — Medium-size Grants (Ecosystem-based Adaptation)
+- **Funder / host:** Global EbA Fund (IUCN & UNEP)
+- **Type:** Grant (up to US$500,000 per grant; projects up to 24 months)
+- **Deadline:** 16 Nov 2026 (submission window 12 Oct – 16 Nov 2026; portal link shared 12 Oct)
+- **Eligibility:** NGOs, CBOs, Indigenous Peoples' organisations and consortia in ODA-eligible countries (Kenya is OECD-DAC ODA-eligible); projects must build on existing work with local institutions. Focus: ecosystem-based adaptation, innovative finance, human security. Distinct from the already-logged EbA Small-size Grants (26 Oct).
+- **URL:** https://globalebafund.org/medium-size-grants
+- **Verified:** directly on globalebafund.org and corroborated via Justice Funds listing.
+
+---
+
+## Checked and DROPPED this run (closed, out of scope, unverifiable, or already logged)
+- **Yale Emerging Climate Leaders Fellowship 2027** — CLOSED (30 Jul 2026).
+- **Youth Climate Justice Fund 2026** — up to US$40,000, youth groups worldwide (Kenya eligible), but the 2026 cycle deadline was 1 Mar 2026 → CLOSED; next cycle not yet open.
+- **Resilience Fellowship 2026 (The Resilience Project)** — Kenya/Uganda/Rwanda/Tanzania youth (18–28), but deadline 31 May 2026 → CLOSED.
+- **UK PACT — Nature-Based Solutions in Kenya** — Kenya-specific (£400k–£650k), but the only retrievable call closed 26 Sep 2025; no open 2026 call confirmed.
+- **WWF Russell E. Train EFN — Environmental & Social Impact Grant** (Kenya/Tanzania/Madagascar) — CLOSED (15 Apr 2026).
+- **African Climate Collaborative PhD / Doctoral Training Fellowships 2027** & **UCT Postdoctoral Fellowships 2027** — academic programmes, not env-justice opportunities (PhD route already dropped in prior runs).
+- **AICS Water Resource Management in Ethiopia** (9 Oct) — Ethiopia-only government basin tender; out of coalition scope (also dropped in a prior run).
+- **GEF Small Grants Programme — Ethiopia** (31 Oct) — Ethiopian NGOs only; out of region.
+- **Future Conservationist amount note** — one aggregator mis-stated the grant as US$1.5m; the official CLP page confirms up to US$15,000 per team (used above).
+- **Global EbA Fund — Small-Size Grants** (26 Oct), **Commonwealth Foundation Grants 2026–27** (26 Oct), **Rufford Small Grants** (rolling), **Mountains ADAPT**, **CFC 29th Call**, **AFD 2026 CSO Call**, **AGNES–Bayer** (16 Oct), **Nairobi YCAF** (16 Oct), **SEWA / Voices for Climate Justice / Whitley Awards 2027** — still open/recent but already logged or queued in prior runs (2026-08-17 / 09-19 / 09-22 / 09-29); deduped, not re-queued.
+
+_Approved items go live only when a human admin clicks Accept in admin → Opportunities review._
+
+---
+---
+
 # Opportunities Watch — Review Log — 2026-09-29
 
 MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya / East Africa / pan-African climate justice. All deadlines below are **on or after 2026-09-29**. New items are **written straight into Supabase as drafts (published=false)** via the connected-Chrome JS write path and now await admin Accept/Reject in **admin → Opportunities review**. Nothing here is public until an admin accepts.
