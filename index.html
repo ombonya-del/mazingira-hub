@@ -2778,70 +2778,12 @@ var RADAR_SIGNALS = [
    LIVE STREAM DATA
    ================================================================= */
 var STREAMS = [
-  { id:"extract", nm:"Extractive activity", accent:"e", prov:"radar", base:38, spark:[3,5,4,7,6,9,8,11,10,13,12,15],
-    pool:[
-      "New prospecting licence lodged over <b>Kerio Valley</b> fluorspar block",
-      "Deadly clashes force shutdown of 13 <b>Hillo</b> gold sites, Marsabit; 10,000+ miners in 59 cooperatives",
-      "Strategic chromite EOIs opened at <b>Wamba &amp; Kang'ura</b>, Samburu",
-      "Rotor Systems files 114km² gold prospecting bid over <b>Samburu</b>",
-      "~70 gold blocks mapped without consent spark protests in <b>Dabel/Moyale</b>, Marsabit",
-      "July 2026 crackdown arrests foreign operators in <b>Migori &amp; Narok</b>",
-      "Kishushe Ranching pulls consent over a Sh150m royalty default, <b>Taita Taveta</b>",
-      "Kimwarer fluorspar revived under Sofax/Fujax, <b>Elgeyo Marakwet</b>",
-      "'Hanging homes' quarry protests over unreclaimed pits, <b>Nakuru</b>",
-      "Seismic survey vessel reported off <b>Lamu</b> archipelago",
-      "Quarry expansion notice published for <b>Machakos</b>",
-      "Titanium sands tailings discharge reported, <b>Kwale</b>",
-      "Sand harvesting trucks recorded on <b>Makueni</b> riverbed at night",
-      "Exploration block boundaries redrawn in <b>Wajir</b>",
-      "Gold processing site expansion, <b>Migori</b>",
-      "Borehole drilling permits spike in <b>Mandera</b>"
-    ]},
-  { id:"legal", nm:"Litigation &amp; courts", accent:"g", prov:"radar", base:9, spark:[4,4,5,5,6,6,7,7,8,8,9,9],
-    pool:[
-      "Mention date set in <b>Mui Basin</b> judicial review",
-      "Replying affidavit filed, <b>Kilifi</b> community land matter",
-      "Court of Appeal ruling cited in a new <b>Taita Taveta</b> filing",
-      "Interim conservatory orders sought over <b>Kerio Valley</b> works",
-      "NEMA licence appeal lodged at the Tribunal",
-      "Judgment reserved in coastal land tenure matter"
-    ]},
-  { id:"policy", nm:"Policy &amp; regulation", accent:"e", prov:"radar", base:23, spark:[2,3,3,4,6,5,7,8,7,9,11,10],
-    pool:[
-      "<b>Energy (Amendment) Bill 2026</b> committee sitting scheduled",
-      "Public participation window opens on carbon markets rules",
-      "County assembly tables <b>Kitui</b> mining benefit-sharing motion",
-      "NEMA publishes revised EIA guideline draft",
-      "Senate committee requests coalition submission on water abstraction",
-      "Gazette notice: new mineral rights register published"
-    ]},
-  { id:"community", nm:"Community reports", accent:"g", prov:"partner", base:342, spark:[18,22,26,24,31,29,35,38,34,41,45,44],
-    pool:[
-      "Field situation report received from <b>Laikipia</b> — MKNF",
-      "Video dispatch uploaded from <b>Mkomani Ward</b> — LAWA",
-      "Audio testimony logged, Aweer community elders",
-      "Photographic documentation of riverbed extraction, <b>Tharaka-Nithi</b>",
-      "Baraza notice submitted from <b>Lamu</b>",
-      "Farmer testimony on dry season losses, <b>Laikipia</b>",
-      "Community mapping data received from <b>Kwale</b>"
-    ]},
-  { id:"funding", nm:"Funding &amp; opportunities", accent:"g", prov:"desk", base:14, spark:[1,2,2,3,3,4,5,5,6,7,7,8],
-    pool:[
-      "AJWS narrative reporting window opens",
-      "FIMI Ayni Fund call — indigenous-led content production",
-      "County documentation sub-grant applications close in 28 days",
-      "New climate justice fund announced for East Africa",
-      "Pre-COP31 delegate accreditation support available"
-    ]},
-  { id:"media", nm:"Media &amp; discourse", accent:"e", prov:"radar", base:76, spark:[5,8,6,11,9,14,12,17,15,19,22,20],
-    pool:[
-      "National daily covers <b>Mui Basin</b> concession dispute",
-      "Coalition spokesperson interviewed on the Lamu precedent",
-      "Citizen journalism clip crosses 40,000 views",
-      "Op-ed placed on just transition financing",
-      "Regional wire picks up coastal land tenure story",
-      "Radio segment on sand harvesting airs in <b>Ukambani</b>"
-    ]}
+  { id:"extract",   nm:"Extractive activity",        accent:"e", prov:"radar"   },
+  { id:"legal",     nm:"Litigation &amp; courts",     accent:"g", prov:"radar"   },
+  { id:"policy",    nm:"Policy &amp; regulation",     accent:"e", prov:"radar"   },
+  { id:"community", nm:"Community reports",           accent:"g", prov:"partner" },
+  { id:"funding",   nm:"Funding &amp; opportunities", accent:"g", prov:"desk"    },
+  { id:"media",     nm:"Media &amp; discourse",       accent:"e", prov:"radar"   },
 ];
 
 /* ---------- other content ---------- */
@@ -3121,25 +3063,16 @@ document.getElementById("yr").textContent = new Date().getFullYear();
    TICKER
    ================================================================= */
 function buildTicker(){
+  if (typeof state === "undefined" || !state) return;   // nothing until the live data has loaded
   var tickItems = [];
-STREAMS.forEach(function(s){
-  s.pool.slice(0,4).forEach(function(p){
-    tickItems.push('<span class="tick-item"><span class="tick-cat '+(s.accent==="g"?"g":"")+'">'+s.nm+'</span>'+p+'</span>');
+  STREAMS.forEach(function(s){
+    var items = (state[s.id] && state[s.id].items) || [];
+    items.slice(0,3).forEach(function(it){
+      if(it && it.tx) tickItems.push('<span class="tick-item"><span class="tick-cat '+(s.accent==="g"?"g":"")+'">'+s.nm+'</span>'+it.tx+'</span>');
+    });
   });
-});
-/* Community pulse rides the ticker too — pulled live from the "Community pulse · from X"
-   block, so it refreshes automatically whenever the CoalHub scan updates it. */
-(function(){
-  var cp=document.getElementById("communityPulse"); if(!cp) return;
-  Array.prototype.slice.call(cp.querySelectorAll(".pulse-card")).forEach(function(a){
-    var who=(a.querySelector(".pc-who span")||{}).textContent||""; var handle=who.split("·")[0].trim();
-    var t=((a.querySelector(".pc-text")||{}).textContent||"").replace(/\s+/g," ").trim();
-    if(t.length>92) t=t.slice(0,92)+"…";
-    if(t) tickItems.push('<span class="tick-item"><span class="tick-cat g">Community · '+handle+'</span>'+t+'</span>');
-  });
-})();
-tickItems.sort(function(){ return Math.random()-.5; });
-var __tt=document.getElementById("tickTrack"); if(__tt) __tt.innerHTML = tickItems.join("") + tickItems.join("");
+  tickItems.sort(function(){ return Math.random()-.5; });
+  var __tt=document.getElementById("tickTrack"); if(__tt) __tt.innerHTML = tickItems.join("") + tickItems.join("");
 }
 window.buildTicker = buildTicker;
 buildTicker();
@@ -3164,11 +3097,7 @@ var STREAM_UNIT = { extract:"signals", legal:"matters", policy:"updates", commun
 var STREAM_SRC  = { radar:"Media & registry scan", partner:"Community-reported", desk:"Coalition desk" };
 
 STREAMS.forEach(function(s){
-  state[s.id] = { count:s.base, items:[] };
-  var seedTimes = [1000*60*4, 1000*60*23, 1000*60*71];
-  for(var i=0;i<3;i++){
-    state[s.id].items.push({ tx:s.pool[i % s.pool.length], t:Date.now() - seedTimes[i] });
-  }
+  state[s.id] = { count:0, items:[] };   // no hardcoded seed — refreshLive fills every stream live from the DB
   var box = el("div","stream");
   box.innerHTML =
     '<div class="stream-head"><span class="s-ico '+s.accent+'" aria-hidden="true"><svg viewBox="0 0 24 24">'+STREAM_ICON[s.id]+'</svg></span>'+
@@ -3178,7 +3107,6 @@ STREAMS.forEach(function(s){
     '<div class="s-src '+s.prov+'"><span class="s-dot" aria-hidden="true"></span>'+STREAM_SRC[s.prov]+'</div>'+
     '<ul class="feed" id="feed-'+s.id+'"></ul>';
   streamWrap.appendChild(box);
-  countUp(box.querySelector(".n"), s.base, 1100);
   renderFeed(s.id);
 });
 
@@ -3242,6 +3170,7 @@ async function refreshLive(){
       }
     } catch(e){}
   }
+  if(window.buildTicker) window.buildTicker();
   bumpSync();
 }
 
