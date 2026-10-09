@@ -3174,7 +3174,7 @@ STREAMS.forEach(function(s){
     '<div class="stream-head"><span class="s-ico '+s.accent+'" aria-hidden="true"><svg viewBox="0 0 24 24">'+STREAM_ICON[s.id]+'</svg></span>'+
       '<span class="nm">'+s.nm+'</span></div>'+
     '<div class="stream-metric" id="num-'+s.id+'"><span class="n '+s.accent+'">0</span>'+
-      '<span class="s-unit">'+STREAM_UNIT[s.id]+((s.id==="media"||s.id==="community")?' · live':' · tracked')+'</span></div>'+
+      '<span class="s-unit">'+STREAM_UNIT[s.id]+' · live'+'</span></div>'+
     '<div class="s-src '+s.prov+'"><span class="s-dot" aria-hidden="true"></span>'+STREAM_SRC[s.prov]+'</div>'+
     '<ul class="feed" id="feed-'+s.id+'"></ul>';
   streamWrap.appendChild(box);
@@ -3228,6 +3228,20 @@ async function refreshLive(){
       renderFeed("community");
     }
   } catch(e){}
+  // Sector streams — each reads its own dedicated table (Extractive/Litigation/Policy/Funding).
+  var SECTOR = { extract:"extractive_signals", legal:"litigation_updates", policy:"policy_updates", funding:"funding_opportunities" };
+  for (var sid in SECTOR){
+    try {
+      var tbl = SECTOR[sid];
+      var sc = await sb.from(tbl).select("*",{count:"exact",head:true}).eq("published",true);
+      if(sc && sc.count!=null){ state[sid].count = sc.count; setNum(sid, sc.count); }
+      var si = await sb.from(tbl).select("headline,happened_at").eq("published",true).order("happened_at",{ascending:false}).limit(6);
+      if(si && si.data && si.data.length){
+        state[sid].items = si.data.map(function(r){ return { tx: r.headline, t: Date.parse(r.happened_at)||Date.now() }; });
+        renderFeed(sid);
+      }
+    } catch(e){}
+  }
   bumpSync();
 }
 
