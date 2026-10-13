@@ -461,7 +461,7 @@ var KITS = {
 /* ---- BUILD lane ---- */
 "Coastal Citizen Journalism Expansion": {
   id:"coastal-citizen-journalism",
-  description:"Communities on Kenya's south and north coast face pressure from mining and land conversion with little independent local documentation. In Kwale, about 480 households were moved from Maumba village for the titanium sands project now run by Base Titanium; residents later reported unfair or missing compensation and more than 100 unresolved land disputes. Nearby Mrima Hill — a sacred Digo forest — holds rare-earth deposits now drawing foreign interest, and residents fear eviction or exclusion from benefits. In Magarini, Kilifi, salt-farm expansion has been linked to salinised farmland and contaminated freshwater, documented by the KNCHR. In each case evidence such as dead coconut trees, flooded plots and missed meetings fades before regulators act. A trained, permanent network of local youth reporters — built on the Lamu experience, where community documentation fed the 2019 tribunal ruling against the coal plant — gives affected families a lasting way to record, verify and publish what is happening.",
+  description:"Communities on Kenya's south and north coast face pressure from mining and land conversion with little independent local documentation. In Kwale, about 480 households were moved from Maumba village for the titanium sands project now run by Base Titanium; residents later reported unfair or missing compensation and more than 100 unresolved land disputes. Nearby Mrima Hill — a sacred Digo forest — holds rare-earth deposits now drawing foreign interest, and residents fear eviction or exclusion from benefits. In Magarini, Kilifi, salt-farm expansion has been linked to salinised farmland and contaminated freshwater, documented by the KNCHR. In each case evidence such as dead coconut trees, flooded plots and missed meetings fades before regulators act. LAWA (Lamu Women Alliance) already runs a youth citizen-journalism project in Lamu, funded by AJWS through deCOALonize, working with Aweer/Boni, Sanye, Bajuni, Orma and Swahili communities — and Lamu's community documentation fed the 2019 tribunal ruling against the coal plant. Extending that proven model to Kwale and Kilifi gives affected families a lasting way to record, verify and publish what is happening.",
   objectives:[
     "Set up trained citizen-journalist cells in Kwale (Msambweni, Lunga Lunga) and Kilifi (Magarini)",
     "Produce verified, evidence-grade records of land, compensation and environmental harms around mining and salt sites",
@@ -469,7 +469,7 @@ var KITS = {
     "Transfer the Lamu peer-mentoring model so the cells can run on their own"],
   activities:[
     "Recruit and train 20–30 youth reporters in mobile video, safe documentation and fact-checking (WITNESS Video as Evidence)",
-    "Run peer exchanges with Lamu documenters",
+    "Run peer exchanges and mentoring with LAWA's Lamu youth citizen journalists",
     "Track and publish a case log of compensation, CDA benefit-sharing and Mrima Hill land issues",
     "File ATI requests to NEMA, the Mining Ministry and county planning offices",
     "Hold quarterly community screenings and feedback forums",
@@ -479,7 +479,7 @@ var KITS = {
     "A public, verifiable archive used in complaints, litigation and media",
     "More community voice in CDA committees, ESIA consultations and licensing"],
   partners:[
-    ["Lamu Women Alliance (LAWA)","Lamu coalition of women-led groups; peer mentor"],
+    ["Lamu Women Alliance (LAWA)","Runs the AJWS-funded (via deCOALonize) youth citizen-journalism project in Lamu; model owner and peer mentor"],
     ["Natural Justice","Legal support; documented Kilifi salt-farm harms and the Lamu coal case"],
     ["Transparency International Kenya / Kwale Mining Alliance","Mining-governance network; CDA monitoring"],
     ["Kenya National Commission on Human Rights (KNCHR)","Complaints; investigated Magarini salt-sector abuses"],
@@ -695,7 +695,7 @@ var KITS = {
 var FUNDERS = {
   "AJWS":{n:"American Jewish World Service — Africa programme",u:"https://ajws.org/where-we-work/africa/",how:"Relationship-based",note:"Kenya is a core AJWS country and 'Land, Water and Climate Justice' is an issue area. No open call is published — approach through AJWS staff (ajws@ajws.org)."},
   "FIMI Ayni":{n:"FIMI — AYNI Fund (International Indigenous Women's Forum)",u:"https://fimi-iiwf.org/en/convocatorias/ayni-call-for-proposals-2026/",how:"Annual open call",note:"For groups led by Indigenous women, with grant + accompaniment (land rights and climate resilience themes). The 2026 round ran in June — watch for the next call and check eligibility."},
-  "Africa Climate Fund":{n:"African Climate Foundation (closest match)",u:"https://africanclimatefoundation.org/grant-making",how:"Invitation only",note:"Africa-led climate funder that does not accept unsolicited proposals. Treat as an introductions target; confirm this is the intended funder."},
+  "Africa Climate Fund":{n:"Africa Climate Fund",u:"https://africanclimatefoundation.org/grant-making",how:"Existing relationship",note:"Already in the coalition's funder network (funds MKNF community adaptation — see Directory), so approach through that relationship. The link is the closest public grant page found (African Climate Foundation, invitation-only)."},
   "CivFund":{n:"CivFund — CivSource Africa",u:"https://www.civsourceafrica.com/civfund-1",how:"Calls / contact",note:"'Fund of funds' incl. the Zishaye Grassroots Fund (land, water and climate justice). Several funds are Uganda-focused; watch CivSource calls for proposals."},
   "HBS":{n:"Heinrich Böll Stiftung — Nairobi office",u:"https://ke.boell.org/en",how:"Partnership-based",note:"Funds Kenyan partners through its Sustainable Development and Democratic Spaces programmes. No open calls — approach programme staff."},
   "FEMNET":{n:"FEMNET — African Women's Development and Communication Network",u:"https://www.femnet.org/2025/06/policy-influencing-and-advocacy-grants/",how:"Members' calls",note:"Occasional re-granting (e.g. 2025 climate-advocacy grants, members only). Fits women-led partners that join FEMNET."},

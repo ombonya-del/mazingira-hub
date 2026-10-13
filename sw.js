@@ -1,10 +1,10 @@
 /* MazingiraKenya Communications Hub — service worker
    App-shell caching for offline + fast loads. Bump CACHE to force an update. */
-const CACHE = "mazingira-hub-v121";
+const CACHE = "mazingira-hub-v122";
 const SHELL = [
   "/", "/index.html", "/manifest.webmanifest",
   "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png",
-  "/project-kits.js?v=1"
+  "/project-kits.js?v=2"
 ];
 
 self.addEventListener("install", function(e){

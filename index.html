@@ -2599,7 +2599,7 @@ function cleanEmail(v){
   </div>
 </footer>
 
-<script src="/project-kits.js?v=1"></script>
+<script src="/project-kits.js?v=2"></script>
 
 <script>
 (function(){
@@ -2902,7 +2902,7 @@ var LEGAL = [
 var MEMBERS = [
  {n:"deCOALonize",c:"Coalition",loc:"Nairobi",d:"Convening secretariat coordinating legal advocacy, campaigns, and communications across the network.",e:true},
  {n:"Save Lamu",c:"Community",loc:"Lamu",d:"Community umbrella body that led the challenge against the Lamu coal plant from its inception."},
- {n:"LAWA — Lamu Women Alliance",c:"Community",loc:"Mkomani Ward, Lamu West",d:"Women-led organisation running a youth citizen journalism programme with Aweer/Boni, Sanye, Bajuni, Orma and Swahili coastal communities."},
+ {n:"LAWA — Lamu Women Alliance",c:"Community",loc:"Mkomani Ward, Lamu West",d:"Women-led organisation running a youth citizen journalism programme (funded by AJWS through deCOALonize) with Aweer/Boni, Sanye, Bajuni, Orma and Swahili coastal communities."},
  {n:"MKNF — Mount Kenya Network of Farmers",c:"Community",loc:"Laikipia",d:"Farmer and pastoralist network documenting climate impact, land pressure, and local advocacy."},
  {n:"Katiba Institute",c:"Legal",loc:"Nairobi",d:"Constitutional litigation and public interest law, including strategic environmental cases."},
  {n:"Friends of Lake Turkana",c:"Community",loc:"Turkana",d:"Indigenous-led advocacy on water rights, extractive industry, and the ecology of Lake Turkana."},
@@ -3827,7 +3827,7 @@ var PROJECTS = [
    gap:"Taita Taveta: highest county response gap, minerals pressure with no organised presence.",
    county:"Taita Taveta", sector:"Minerals", budget:"KES 2.8M / 12 mo", funder:"Africa Climate Fund" },
  { lane:"document", title:"Kerio Valley Fluorspar Log", status:"idea",
-   pitch:"Document the resumed fluorspar operations and escarpment degradation, with consented community testimony feeding the Hub's evidence layer.",
+   pitch:"Document the Sofax Fluorspar revival of the former Kenya Fluorspar Company mine at Kimwarer and the escarpment degradation around it, with consented community testimony feeding the Hub's evidence layer.",
    gap:"Elgeyo-Marakwet minerals: newly reactivated, currently unmonitored.",
    county:"Elgeyo-Marakwet", sector:"Minerals", budget:"KES 2.4M / 9 mo", funder:"Pooled sub-grant" },
  { lane:"challenge", title:"Dangote Refinery ESIA Intervention", status:"dev",
@@ -3843,9 +3843,9 @@ var PROJECTS = [
    gap:"Kitui coal: live litigation, national reach only, no embedded local documentation.",
    county:"Kitui", sector:"Coal", budget:"KES 3.5M / 12 mo", funder:"Strategic litigation fund" },
  { lane:"build", title:"Coastal Citizen Journalism Expansion", status:"dev",
-   pitch:"Extend LAWA's youth citizen-journalism model down the coast to Kilifi and Kwale — proven format, new geography, high-value indigenous community content.",
+   pitch:"Extend LAWA's (Lamu Women Alliance) youth citizen-journalism project — funded by AJWS through deCOALonize — down the coast to Kilifi and Kwale: proven format, new geography, high-value indigenous community content.",
    gap:"Coast minerals & land: pressure across Kilifi/Kwale, response concentrated only in Lamu.",
-   county:"Kilifi · Kwale", sector:"Minerals · Land", budget:"KES 5.0M / 18 mo", funder:"FIMI Ayni" },
+   county:"Kilifi · Kwale", sector:"Minerals · Land", budget:"KES 5.0M / 18 mo", funder:"AJWS · FIMI Ayni" },
  { lane:"build", title:"Gap-County Response Fund", status:"idea",
    pitch:"A pooled sub-grant that seeds one documentation partner into each of the top-five gap counties, chosen from the national map's ranking and reviewed each quarter.",
    gap:"Twenty counties have no organised response. This funds the five that matter most.",
@@ -3856,7 +3856,7 @@ var PROJECTS = [
    county:"Baringo · Nakuru", sector:"Water · Energy", budget:"KES 4.0M / 12 mo", funder:"Africa Climate Fund" },
 
  { lane:"document", title:"Western Gold Belt Monitor", status:"dev",
-   pitch:"Independent documentation of the Shanta Gold open-pit expansion across Ikolomani, Gem-Ramula and Vihiga — evictions, deaths and consultation failures — building a court-ready evidence base with KHRC.",
+   pitch:"Independent documentation of Shanta Gold's mining expansion (Isulu–Bushiangala in Ikolomani, Ramula–Mwibona in Gem-Ramula and Vihiga) — evictions, deaths and consultation failures — building a court-ready evidence base with KHRC.",
    gap:"Kakamega/Siaya/Vihiga minerals: severe live pressure, deaths in 2026, response mostly national.",
    county:"Kakamega · Siaya · Vihiga", sector:"Minerals", budget:"KES 5.5M / 18 mo", funder:"AJWS · CivFund" },
  { lane:"document", title:"Coastal Plastics & Marine Watch", status:"idea",
@@ -3866,12 +3866,12 @@ var PROJECTS = [
  { lane:"document", title:"Renewables Justice Tracker", status:"idea",
    pitch:"Track community land and consent outcomes at the big renewable-energy sites — Lake Turkana Wind, Kipeto, Menengai and the proposed Siaya nuclear — so 'green' projects don't repeat the displacement pattern.",
    gap:"Renewables & energy: pressure spread across the north and Rift with only national scrutiny.",
-   county:"Marsabit · Nakuru · Siaya · Kajiado", sector:"Renewables & energy", budget:"KES 4.2M / 18 mo", funder:"HBS · VJCA" },
+   county:"Marsabit · Nakuru · Siaya · Kajiado", sector:"Renewables & energy", budget:"KES 4.2M / 18 mo", funder:"HBS · HIVOS" },
 
  { lane:"challenge", title:"EACOP Finance & Solidarity Brief", status:"dev",
    pitch:"Compile the Kenyan-relevant evidence into the regional StopEACOP finance-withdrawal case — connecting the pipeline's precedent to Kenya's own oil ambitions and the just-transition argument.",
    gap:"Oil & gas: a regional mega-project with active Kenya links and no Kenya-specific brief.",
-   county:"Regional · Kenya node", sector:"Oil & gas", budget:"KES 3.0M / 12 mo", funder:"350 Africa · FFNPT" },
+   county:"Regional · Kenya node", sector:"Oil & gas", budget:"KES 3.0M / 12 mo", funder:"AJWS · HBS" },
  { lane:"challenge", title:"NRT Conservancy Accountability", status:"idea",
    pitch:"Support northern communities documenting and challenging contested conservancy land practices, displacement and wildlife–community conflict — turning grievances into a reviewable record.",
    gap:"Marsabit/Isiolo/Samburu land: a contested actor operating with thin community legal support.",
@@ -5914,7 +5914,8 @@ var PROGRAMS = {
     ["Lamu","c","Co-counsel, Lamu coal litigation","litigation"]],
   "AJWS — American Jewish World Service":[
     ["Lamu","c","Grant: Save Lamu — litigation & mobilisation","grant"],
-    ["Kitui","c","Grant (via deCOALonize): CHRCE","grant"]],
+    ["Kitui","c","Grant (via deCOALonize): CHRCE","grant"],
+    ["Lamu","l","Grant (via deCOALonize): LAWA youth citizen journalism","grant"]],
   "FIMI Ayni Fund":[
     ["Lamu","l","Grant: LAWA indigenous women-led content","grant"]],
   "Africa Climate Fund":[
