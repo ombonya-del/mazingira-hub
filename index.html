@@ -1363,6 +1363,14 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
   </div>
 </div>
 <script>
+/* Clean an email pasted from WhatsApp/Word/signatures: drop invisible chars,
+   "Name <x@y>" wrappers, mailto:, quotes and stray spaces; lowercase. */
+function cleanEmail(v){
+  v=String(v||"").replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF\u00AD]/g,"").replace(/\u00A0/g," ");
+  var m=v.match(/<([^>]+)>/); if(m) v=m[1];
+  return v.replace(/^\s*mailto:/i,"").replace(/["'`\u2018\u2019\u201C\u201D,;]/g,"").replace(/\s+/g,"").toLowerCase();
+}
+
 (function(){
   var g=document.getElementById("gate"); if(!g) return;
   /* Members-only hub: every real host is gated behind Supabase auth (magic-link or
@@ -1393,7 +1401,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 
   document.getElementById("gateForm").addEventListener("submit", function(ev){
     ev.preventDefault();
-    var em=(document.getElementById("gateEmail").value||"").trim();
+    var em=cleanEmail(document.getElementById("gateEmail").value);
     var pw=document.getElementById("gatePass").value;
     if(!em){ err("Enter your email."); return; }
     if(!pw){ err("Enter your password, or use the sign-in link below."); return; }
@@ -1404,7 +1412,7 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
     });
   });
   document.getElementById("gateLinkBtn").addEventListener("click", function(){
-    var em=(document.getElementById("gateEmail").value||"").trim();
+    var em=cleanEmail(document.getElementById("gateEmail").value);
     if(!em){ err("Enter your email first, then request the link."); return; }
     ok("Sending your sign-in link…");
     HAUTH.auth.signInWithOtp({ email:em, options:{ shouldCreateUser:false, emailRedirectTo:location.origin+location.pathname } }).then(function(r){

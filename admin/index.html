@@ -1184,7 +1184,7 @@ function bindUpload(){
   if(state.view!=="upload" || !ASB) return;
   var send=document.getElementById("uplSend");
   if(send) send.addEventListener("click",function(){
-    var em=((document.getElementById("uplEmail")||{}).value||"").trim(), msg=document.getElementById("uplAuthMsg");
+    var em=cleanEmail((document.getElementById("uplEmail")||{}).value), msg=document.getElementById("uplAuthMsg");
     if(!/.+@.+\..+/.test(em)){ if(msg) msg.textContent="Enter a valid email."; return; }
     send.disabled=true; if(msg) msg.textContent="Sending…";
     ASB.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.origin+location.pathname}})
@@ -1299,6 +1299,13 @@ function openEdit(what){
     '<label>Status</label><select><option>Just announced</option><option>Ongoing</option><option>Active threat</option><option>Won</option><option>Proposed</option><option>Court-decided</option></select>'+
     '</div><div class="mf"><button class="btn ghost mx">Cancel</button><button class="btn approve" id="modalSave">Save</button></div>');
 }
+/* Clean an email pasted from WhatsApp/Word/signatures: drop invisible chars,
+   "Name <x@y>" wrappers, mailto:, quotes and stray spaces; lowercase. */
+function cleanEmail(v){
+  v=String(v||"").replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF\u00AD]/g,"").replace(/\u00A0/g," ");
+  var m=v.match(/<([^>]+)>/); if(m) v=m[1];
+  return v.replace(/^\s*mailto:/i,"").replace(/["'`\u2018\u2019\u201C\u201D,;]/g,"").replace(/\s+/g,"").toLowerCase();
+}
 function openAddMember(){
   openModal('<div class="mh"><h3>Add member</h3><button class="mx">×</button></div><div class="mb">'+
     '<label>Email</label><input id="amEmail" type="email" placeholder="name@org.org" autocomplete="off">'+
@@ -1309,7 +1316,7 @@ function openAddMember(){
     '</div><div class="mf"><button class="btn ghost mx">Cancel</button><button class="btn approve" id="amSend">Send invite</button></div>');
   var btn=document.getElementById("amSend");
   btn.addEventListener("click",function(){
-    var email=(document.getElementById("amEmail").value||"").trim().toLowerCase();
+    var email=cleanEmail(document.getElementById("amEmail").value); document.getElementById("amEmail").value=email;
     var org=(document.getElementById("amOrg").value||"").trim();
     var person=(document.getElementById("amPerson").value||"").trim();
     var role=(document.getElementById("amRole").value||"");
@@ -1364,7 +1371,7 @@ document.getElementById("gcode").addEventListener("keydown",function(e){ if(e.ke
 /* Step 2: email the admin a Supabase magic link. Only allow-listed admins exist
    (signup disabled), so a real session + is_admin() is what actually opens the data. */
 function gateSendLink(){
-  var em=((document.getElementById("gemail")||{}).value||"").trim(), m=document.getElementById("gmsg2");
+  var em=cleanEmail((document.getElementById("gemail")||{}).value), m=document.getElementById("gmsg2");
   if(!/.+@.+\..+/.test(em)){ if(m){ m.style.color="#E5625A"; m.textContent="Enter a valid email."; } return; }
   if(!ASB || !ASB.auth){ if(m){ m.style.color="#E5625A"; m.textContent="Auth unavailable — reconnect and retry."; } return; }
   var b=document.getElementById("glink"); if(b) b.disabled=true; if(m){ m.style.color=""; m.textContent="Sending…"; }
