@@ -1,3 +1,37 @@
+# Resources Watch — Review Log — 2026-10-13 (weekly firing)
+
+The weekly Resources Watch ran on 2026-10-13 and queued **3 genuinely new** climate / environmental-justice knowledge resources, deduped against all **37** distinct drafts already logged in prior runs. All 3 were queued as drafts (`published=false`, `source=watch`, `category=Resources`) into Supabase (project `uueemckdoozsuowcqkhl`) via a connected Chrome (same-origin POST to `/rest/v1/resources`, public anon key only) and each returned **HTTP 201**. The Mac device shell still cannot reach Supabase (curl 56 / proxy 403 — host not on the device egress allowlist). Replay commands: `scripts/queue-resources-2026-10-13.sh`. Each URL was fetched and confirmed to load with real content before queueing.
+
+## Verified new resources (3) — 2026-10-13
+
+### 1. New Data for Africa's Changing Climate: Mapping Risks, Readiness and Policy Action
+- **Source:** OECD & World Bank (joint; draws on GGGI, OECD, OECD Sahel and West Africa Club, and World Bank datasets)
+- **Type:** Report (2026; DOI 10.1787/27d083ca-en)
+- **URL:** https://www.oecd.org/en/publications/new-data-for-africa-s-changing-climate_27d083ca-en.html
+- **Why:** Maps climate hazards, adaptation readiness and mitigation policies across 28 African countries using new datasets built to fill Africa's climate-data gaps — a standing pan-African reference for risk/readiness mapping.
+- **Verified:** fetched directly; publication page loads with summary metadata, DOI and a working PDF link.
+
+### 2. Building Forests and Farms: Accelerating Tree Adoption for Climate and Livelihood Gains (PB017)
+- **Source:** Kenya Institute for Public Policy Research and Analysis (KIPPRA)
+- **Type:** Policy brief (PB017; 2025/26; 1.64 MB PDF, posted Aug 2026)
+- **URL:** https://kippra.or.ke/download/building-forests-and-farms-accelerating-tree-adoption-for-climate-and-livelihood-gains-pb017/
+- **Why:** Kenya policy brief on expanding tree planting / agroforestry for both climate mitigation and rural livelihoods — directly relevant to Kenya's 15-billion-tree agenda and community land-use.
+- **Verified:** fetched directly; download page loads with the file (PB017 - 2025-2026.pdf, 1.64 MB) and working download link.
+
+### 3. African Leaders' Addis Ababa Declaration on Climate Change and Call to Action
+- **Source:** African Union — Heads of State and Government, adopted at the Second Africa Climate Summit (ACS2), Addis Ababa, 10 Sept 2025
+- **Type:** Declaration (official AU document; full text, 157 numbered paragraphs; posted Nov 2025)
+- **URL:** https://au.int/sites/default/files/pressreleases/45673-pr-Climate_Change_Declaration.pdf
+- **Why:** Canonical pan-African climate-justice policy text out of ACS2 — calls for climate finance delivered mainly as grants, faster adaptation and energy-access investment, just transitions and African-led solutions. Distinct from the earlier (first-summit) AU Climate Change Declaration already logged (doc 45674).
+- **Verified:** fetched directly from au.int; official PDF loads with the full declaration text (preamble, paras 1–157, call to action).
+
+## Notes for next run (dedupe)
+- The 3 items above (2026-10-13) bring the **running total to 40 distinct drafts**. Do **not** re-queue any of them, nor the 37 below.
+- Still open / watch next week: **UNEP *Adaptation Gap Report 2026* / *Emissions Gap Report 2026*** — 2026 full editions still not published as of this run (only 2025 editions + a preliminary assessment are live); check next run. **CPI *Landscape of Climate Finance in Africa*** refresh still pending (live page remains 2022). **World Bank *Kenya Country Climate and Development Report*** update (current live doc still the 2023 edition). **KIPPRA–UNICEF *Climate Finance: Its Implications for Children in Kenya*** (launched May 2026) — no downloadable file on the launch page yet; re-check for a published PDF.
+- Skipped as off-scope/not-fetchable this run: Loss & Damage Collaboration *From Crisis to Leadership (ACS2)* (web commentary; PDF button is a dead "#" placeholder); KIPPRA *County Climate Change Readiness Index for Laikipia County 2024/25* (download preview returns "No such file" / 0 KB; also dated Oct 2024, not new); Greenpeace Africa Annual Report 2025 (org annual report, not a knowledge resource); AU/Ethiopia ACS2 pre-summit press release (news, not a resource).
+
+---
+
 # Resources Watch — Review Log — 2026-10-09 (SUPPLEMENTARY, second firing)
 
 A second firing of the weekly task ran later on 2026-10-09 (the canonical run earlier the same day queued 5 — see the section below). This supplementary run added **4 genuinely new** climate / environmental-justice knowledge resources, deduped against all **33** distinct drafts already logged (the 5 from the earlier 2026-10-09 run + the 28 from prior logs). All 4 were queued as drafts (`published=false`, `source=watch`, `category=Resources`) into Supabase (project `uueemckdoozsuowcqkhl`) via a connected Chrome (same-origin POST to `/rest/v1/resources`, public anon key only) and each returned **HTTP 201**. The Mac device shell still cannot reach Supabase (curl 56 / proxy 403 — host not on the device egress allowlist). Replay commands: `scripts/queue-resources-2026-10-09b.sh`. WebSearch was available this run; each URL was fetched and confirmed to load with real content before queueing.
