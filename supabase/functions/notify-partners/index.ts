@@ -8,7 +8,13 @@
 //   supabase secrets set RESEND_API_KEY=re_xxx
 //
 // Called from the admin console:
-//   ASB.functions.invoke("notify-partners", { body: { opportunity, partners:[{name,emails:[...]}] } })
+//   opportunity (default):
+//     { opportunity, partners:[{name,emails:[...]}] }
+//   fundable project (Je, Hatua?) — one email per partner, proposal templates attached:
+//     { kind:"project", project:{title,lane,county,sector,budget,funder,pitch,gap,description,kitUrl,sources:[{t,u,s}]},
+//       attachments:[{filename,content(base64)}], note?, partners:[{name,emails}] }
+//   project digest — each partner gets ONE email listing the projects matched to them:
+//     { kind:"digest", note?, partners:[{name,emails,projects:[{title,lane,county,sector,budget,funder,pitch,kitUrl}]}] }
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -38,8 +44,13 @@ Deno.serve(async (req) => {
     const { data: isAdmin, error: adminErr } = await supa.rpc("is_admin");
     if (adminErr || !isAdmin) return json({ error: "admin only" }, 403);
 
-    const { opportunity: o, partners } = await req.json();
+    const body = await req.json();
+    const { opportunity: o, partners } = body;
     const list = (partners ?? []).filter((p: any) => p && Array.isArray(p.emails) && p.emails.filter((e: string) => e && /@/.test(e)).length);
+    if (body.kind === "project" || body.kind === "digest") {
+      if (!list.length) return json({ error: "partners[] required" }, 400);
+      return json(await sendProjects(body, list));
+    }
     if (!o || !o.title || !list.length) return json({ error: "opportunity.title + partners[] required" }, 400);
 
     const rows = [
@@ -77,3 +88,77 @@ Deno.serve(async (req) => {
     return json({ error: String(e) }, 500);
   }
 });
+
+/* ==================== Je, Hatua? fundable projects ==================== */
+const btn = (href: string, label: string, bg: string, fg = "#ffffff") =>
+  `<a href="${esc(href)}" style="display:inline-block;background:${bg};color:${fg};padding:11px 20px;border-radius:8px;text-decoration:none;font-weight:700;margin:0 8px 8px 0">${label}</a>`;
+const noteBlock = (note?: string) => note && String(note).trim()
+  ? `<div style="border-left:3px solid #EE9455;padding:6px 12px;margin:14px 0;color:#333;white-space:pre-wrap">${esc(String(note).trim())}</div>` : "";
+const interestLink = (title: string, url: string, name: string, email: string) =>
+  `${SUPABASE_URL}/functions/v1/register-interest?t=${encodeURIComponent("Fundable project: " + title)}&u=${encodeURIComponent(url || "")}&n=${encodeURIComponent(name || "")}&e=${encodeURIComponent(email || "")}`;
+const factRows = (p: any) => [
+  p.lane ? `<li><b>Lane:</b> ${esc(p.lane)}</li>` : "",
+  p.county ? `<li><b>Counties:</b> ${esc(p.county)}</li>` : "",
+  p.sector ? `<li><b>Sector:</b> ${esc(p.sector)}</li>` : "",
+  p.budget ? `<li><b>Indicative budget:</b> ${esc(p.budget)}</li>` : "",
+  p.funder ? `<li><b>Funder fit:</b> ${esc(p.funder)}</li>` : "",
+].join("");
+
+async function sendProjects(body: any, list: any[]) {
+  let sent = 0;
+  const errors: unknown[] = [];
+  const atts = Array.isArray(body.attachments)
+    ? body.attachments.filter((a: any) => a && a.filename && a.content).slice(0, 4) : [];
+  for (const p of list) {
+    const to = p.emails.filter((e: string) => e && /@/.test(e));
+    let subject = "", html = "";
+    const hello = `<p>Hello${p.name ? " " + esc(p.name) : ""},</p>`;
+    const sign = `<p>&mdash; deCOALonize / MazingiraKenya</p>`;
+    if (body.kind === "project") {
+      const pr = body.project || {};
+      if (!pr.title) return { error: "project.title required" };
+      const src = Array.isArray(pr.sources) && pr.sources.length
+        ? `<p style="margin:14px 0 4px"><b>Supporting evidence to start from:</b></p><ul>` +
+          pr.sources.slice(0, 5).map((r: any) => `<li><a href="${esc(r.u)}">${esc(r.t)}</a>${r.s ? ` <span style="color:#666">— ${esc(r.s)}</span>` : ""}</li>`).join("") + `</ul>` : "";
+      subject = `Fundable project: ${pr.title} — proposal kit inside`;
+      html = hello +
+        `<p>The <strong>MazingiraKenya</strong> coalition has mapped a fundable project that matches your work, and prepared a proposal kit to help you apply — alone or with other partners.</p>` +
+        noteBlock(body.note) +
+        `<p style="font-size:1.1rem;margin:16px 0 4px"><strong>${esc(pr.title)}</strong></p>` +
+        (pr.pitch ? `<p style="margin:0 0 8px">${esc(pr.pitch)}</p>` : "") +
+        (pr.gap ? `<p style="color:#A34612;margin:0 0 8px"><b>Gap it closes:</b> ${esc(pr.gap)}</p>` : "") +
+        (factRows(pr) ? `<ul>${factRows(pr)}</ul>` : "") +
+        (pr.description ? `<p style="color:#333">${esc(pr.description)}</p>` : "") + src +
+        (atts.length ? `<p><b>Attached:</b> pre-filled proposal templates (Word) for an individual organisation and for a consortium. Grey italic text is guidance — adapt the rest in your own voice.</p>` : "") +
+        `<p style="margin:18px 0 6px">` +
+          btn(interestLink(pr.title, pr.kitUrl, p.name, to[0]), "I'm interested in this project &#10003;", "#1B6B4A") +
+          (pr.kitUrl ? btn(pr.kitUrl, "Open the full kit on the hub", "#EDEAE0", "#0F2A20") : "") + `</p>` +
+        `<p style="color:#666;font-size:.9em">Registering interest tells the coalition you may apply, so we can coordinate partners and avoid two applications to the same funder for the same gap. The hub link works for coalition members.</p>` +
+        `<p style="color:#666;font-size:.9em">Budgets are indicative planning figures, not quotes.</p>` + sign;
+    } else {
+      const prs = (Array.isArray(p.projects) ? p.projects : []).filter((x: any) => x && x.title);
+      if (!prs.length) continue;
+      subject = prs.length === 1 ? `Fundable project for you: ${prs[0].title}` : `${prs.length} fundable projects matched to your work`;
+      html = hello +
+        `<p>The <strong>MazingiraKenya</strong> coalition's <em>Je, Hatua?</em> desk maps specific, fundable projects that close gaps in Kenya's climate-justice response. ` +
+        `Based on your focus and region, ${prs.length === 1 ? "this one matches" : "these match"} your work:</p>` + noteBlock(body.note) +
+        prs.map((pr: any) =>
+          `<div style="border:1px solid #D9E2DC;border-radius:8px;padding:12px 14px;margin:0 0 12px">` +
+          `<p style="margin:0 0 4px;font-size:1.05rem"><strong>${esc(pr.title)}</strong></p>` +
+          `<p style="margin:0 0 6px;color:#555;font-size:.9em">${[pr.lane, pr.county, pr.sector, pr.budget].filter(Boolean).map(esc).join(" · ")}${pr.funder ? ` · <span style="color:#1B6B4A">${esc(pr.funder)}</span>` : ""}</p>` +
+          (pr.pitch ? `<p style="margin:0 0 8px">${esc(pr.pitch)}</p>` : "") +
+          btn(interestLink(pr.title, pr.kitUrl, p.name, to[0]), "I'm interested &#10003;", "#1B6B4A") +
+          `</div>`).join("") +
+        `<p style="color:#666;font-size:.9em">Click "I'm interested" on any project and we'll send you its full proposal kit — description, evidence, funder notes, and Word templates for applying alone or as a consortium.</p>` + sign;
+    }
+    const payload: any = { from: FROM, to, subject, html };
+    if (body.kind === "project" && atts.length) payload.attachments = atts;
+    const r = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (r.ok) sent++; else errors.push(await r.json().catch(() => r.status));
+  }
+  return { sent, partners: list.length, errors: errors.length ? errors : undefined };
+}

@@ -2599,7 +2599,7 @@ function cleanEmail(v){
   </div>
 </footer>
 
-<script src="/project-kits.js?v=2"></script>
+<script src="/project-kits.js?v=3"></script>
 
 <script>
 (function(){
@@ -3817,7 +3817,8 @@ var LANES = {
   build:{ n:"Build", q:"What lasting response do we fund into a gap county?",
     d:"Stand up or extend local response infrastructure." }
 };
-var PROJECTS = [
+/* project-kits.js holds the canonical portfolio (shared with the admin console); this inline copy is the offline fallback */
+var PROJECTS = window.MZK_PROJECTS || [
  { lane:"document", title:"North-Eastern Water Watch", status:"idea",
    pitch:"Place a documentation partner across Wajir, Mandera and Garissa — the coalition's largest blind spot — to record aquifer depletion, unregulated drilling and exploration blocks.",
    gap:"North Eastern water: real pressure, no local response, and the radar barely registers it.",

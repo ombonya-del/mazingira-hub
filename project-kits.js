@@ -4,6 +4,87 @@
    Loaded by index.html; wired via MZK_KITS.boot(PROJECTS). Sources checked Oct 2026. */
 (function(){
 "use strict";
+/* The fundable-project portfolio — single source of truth for the hub (Je, Hatua?) and the admin console (Match & notify). */
+var PROJECTS = [
+ { lane:"document", title:"North-Eastern Water Watch", status:"idea",
+   pitch:"Place a documentation partner across Wajir, Mandera and Garissa — the coalition's largest blind spot — to record aquifer depletion, unregulated drilling and exploration blocks.",
+   gap:"North Eastern water: real pressure, no local response, and the radar barely registers it.",
+   county:"Wajir · Mandera · Garissa", sector:"Water", budget:"KES 3.2M / 12 mo", funder:"FIMI Ayni · AJWS" },
+ { lane:"document", title:"Taita Taveta Minerals Monitor", status:"idea",
+   pitch:"Community documentation of gemstone and iron mining and the water conflict with large estates — the single widest county gap on the national map.",
+   gap:"Taita Taveta: highest county response gap, minerals pressure with no organised presence.",
+   county:"Taita Taveta", sector:"Minerals", budget:"KES 2.8M / 12 mo", funder:"Africa Climate Fund" },
+ { lane:"document", title:"Kerio Valley Fluorspar Log", status:"idea",
+   pitch:"Document the Sofax Fluorspar revival of the former Kenya Fluorspar Company mine at Kimwarer and the escarpment degradation around it, with consented community testimony feeding the Hub's evidence layer.",
+   gap:"Elgeyo-Marakwet minerals: newly reactivated, currently unmonitored.",
+   county:"Elgeyo-Marakwet", sector:"Minerals", budget:"KES 2.4M / 9 mo", funder:"Pooled sub-grant" },
+ { lane:"challenge", title:"Dangote Refinery ESIA Intervention", status:"dev",
+   pitch:"Fund legal and community review of the proposed 700,000 bpd Lamu refinery's environmental and social impact assessment before it is licensed — the window is open now. Legal partner: Katiba Institute.",
+   gap:"Lamu oil: a nationally significant proposed project with no organised scrutiny yet.",
+   county:"Lamu", sector:"Oil & gas", budget:"KES 6.0M / 18 mo", funder:"AJWS" },
+ { lane:"challenge", title:"Siaya Nuclear FPIC Campaign", status:"idea",
+   pitch:"Support Luanda Kotieno lake communities to secure free, prior and informed consent on the proposed nuclear plant. They are already protesting — without legal backing. Legal partner: Katiba Institute.",
+   gap:"Siaya nuclear: proposed on Lake Victoria, community opposition with no legal support.",
+   county:"Siaya", sector:"Nuclear", budget:"KES 4.5M / 12 mo", funder:"AJWS · Africa Climate Fund" },
+ { lane:"challenge", title:"Mui Basin Community Evidence", status:"dev",
+   pitch:"Compile community documentation into an evidentiary record for the pending judicial review of the coal concessions — turning field reports into court-usable primary sources. Legal partner: Katiba Institute.",
+   gap:"Kitui coal: live litigation, national reach only, no embedded local documentation.",
+   county:"Kitui", sector:"Coal", budget:"KES 3.5M / 12 mo", funder:"Strategic litigation fund" },
+ { lane:"build", title:"Coastal Citizen Journalism Expansion", status:"dev",
+   pitch:"Extend LAWA's (Lamu Women Alliance) youth citizen-journalism project — funded by AJWS through deCOALonize — down the coast to Kilifi and Kwale: proven format, new geography, high-value indigenous community content.",
+   gap:"Coast minerals & land: pressure across Kilifi/Kwale, response concentrated only in Lamu.",
+   county:"Kilifi · Kwale", sector:"Minerals · Land", budget:"KES 5.0M / 18 mo", funder:"AJWS · FIMI Ayni" },
+ { lane:"build", title:"Gap-County Response Fund", status:"idea",
+   pitch:"A pooled sub-grant that seeds one documentation partner into each of the top-five gap counties, chosen from the national map's ranking and reviewed each quarter.",
+   gap:"Twenty counties have no organised response. This funds the five that matter most.",
+   county:"Top-5 gap counties", sector:"Cross-sector", budget:"KES 12M / 24 mo", funder:"Pooled donor facility" },
+ { lane:"build", title:"Rift Lakes Response Node", status:"idea",
+   pitch:"Stand up a node covering rising Rift-lake displacement (Baringo), geothermal expansion (Nakuru) and abstraction — a region with pressure across three sectors and thin coverage.",
+   gap:"Rift Valley water & energy: multi-sector pressure, only intermittent regional presence.",
+   county:"Baringo · Nakuru", sector:"Water · Energy", budget:"KES 4.0M / 12 mo", funder:"Africa Climate Fund" },
+
+ { lane:"document", title:"Western Gold Belt Monitor", status:"dev",
+   pitch:"Independent documentation of Shanta Gold's mining expansion (Isulu–Bushiangala in Ikolomani, Ramula–Mwibona in Gem-Ramula and Vihiga) — evictions, deaths and consultation failures — building a court-ready evidence base with KHRC.",
+   gap:"Kakamega/Siaya/Vihiga minerals: severe live pressure, deaths in 2026, response mostly national.",
+   county:"Kakamega · Siaya · Vihiga", sector:"Minerals", budget:"KES 5.5M / 18 mo", funder:"AJWS · CivFund" },
+ { lane:"document", title:"Coastal Plastics & Marine Watch", status:"idea",
+   pitch:"Community monitoring of marine and urban plastic pollution from Mombasa to Lamu, feeding the new plastics layer with real data and linking to the Break Free From Plastic campaign.",
+   gap:"Coast plastics: the widest gap on the matrix — pressure with almost no organised response.",
+   county:"Mombasa · Kilifi · Kwale · Lamu", sector:"Plastics", budget:"KES 3.6M / 12 mo", funder:"HBS · FEMNET" },
+ { lane:"document", title:"Renewables Justice Tracker", status:"idea",
+   pitch:"Track community land and consent outcomes at the big renewable-energy sites — Lake Turkana Wind, Kipeto, Menengai and the proposed Siaya nuclear — so 'green' projects don't repeat the displacement pattern.",
+   gap:"Renewables & energy: pressure spread across the north and Rift with only national scrutiny.",
+   county:"Marsabit · Nakuru · Siaya · Kajiado", sector:"Renewables & energy", budget:"KES 4.2M / 18 mo", funder:"HBS · HIVOS" },
+
+ { lane:"challenge", title:"EACOP Finance & Solidarity Brief", status:"dev",
+   pitch:"Compile the Kenyan-relevant evidence into the regional StopEACOP finance-withdrawal case — connecting the pipeline's precedent to Kenya's own oil ambitions and the just-transition argument.",
+   gap:"Oil & gas: a regional mega-project with active Kenya links and no Kenya-specific brief.",
+   county:"Regional · Kenya node", sector:"Oil & gas", budget:"KES 3.0M / 12 mo", funder:"AJWS · HBS" },
+ { lane:"challenge", title:"NRT Conservancy Accountability", status:"idea",
+   pitch:"Support northern communities documenting and challenging contested conservancy land practices, displacement and wildlife–community conflict — turning grievances into a reviewable record.",
+   gap:"Marsabit/Isiolo/Samburu land: a contested actor operating with thin community legal support.",
+   county:"Marsabit · Isiolo · Samburu", sector:"Land & forest", budget:"KES 4.8M / 18 mo", funder:"NAMATI · UAF-Africa" },
+
+ { lane:"build", title:"Northern Rangelands Documentation Corps", status:"dev",
+   pitch:"Fund the Wajir, Marsabit and Mandera groups now on the map to run a shared documentation and early-warning corps across the ASAL north — the region the media never covers.",
+   gap:"North Eastern & Eastern water/land: newly-mapped local groups, no shared reporting capacity.",
+   county:"Wajir · Marsabit · Mandera", sector:"Water · Land", budget:"KES 9.0M / 24 mo", funder:"FIMI Ayni · HIVOS" },
+ { lane:"build", title:"Lake Victoria Basin Response Hub", status:"idea",
+   pitch:"A shared hub for the lake basin covering industrial effluent, gold-mining runoff, the nuclear proposal and plastic pollution — one node for four overlapping pressures across Nyanza.",
+   gap:"Nyanza water & plastics & nuclear: stacked pressure, coverage split across single-issue groups.",
+   county:"Kisumu · Siaya · Homa Bay · Migori", sector:"Water · Plastics", budget:"KES 6.5M / 24 mo", funder:"Pooled donor facility" },
+
+ { lane:"challenge", title:"River Yala Gold-Cyanide Enforcement Petition", status:"idea",
+   pitch:"Back a public-interest petition to compel enforcement against the cyanide and mercury discharge from illegal gold processing poisoning the River Yala and its wetland — built on NEMA's own effluent rules and the clean-environment right in Articles 42 and 69. Legal partner: Katiba Institute.",
+   gap:"Nyanza/Rift gold: rivers being poisoned with no enforcement case yet filed.",
+   county:"Siaya · Vihiga · Nandi", sector:"Minerals · Water", budget:"KES 3.8M / 12 mo", funder:"Strategic litigation fund" },
+ { lane:"build", title:"Western Gold-Belt Mercury Watch", status:"idea",
+   pitch:"Stand up a shared community-monitoring node across the Western gold belt — Kakamega, Migori and Vihiga — testing water and soil for mercury and cyanide, training citizen samplers, and feeding verified readings into the platform's water and minerals layers so the harm is documented as it happens.",
+   gap:"Western gold belt: severe mercury and water pressure, monitoring scattered and un-pooled.",
+   county:"Kakamega · Migori · Vihiga", sector:"Minerals · Water", budget:"KES 7.5M / 24 mo", funder:"Pooled donor facility" }
+];
+window.MZK_PROJECTS = PROJECTS;
+
 var KITS = {
 /* ---- DOCUMENT lane ---- */
 "North-Eastern Water Watch": {
@@ -1085,5 +1166,14 @@ function boot(projects){
   }catch(_){}
 }
 
-window.MZK_KITS = { open:open, boot:boot, kits:KITS, buildDoc:buildDoc };
+/* helpers for the admin console */
+var HUB = "https://hub.mazingirakenya.org/";
+function kitUrl(p){ var k=KITS[p.title]; return HUB + (k ? "?project="+k.id : "") + "#ajesasa"; }
+function templateB64(p, mode){
+  var html = "\ufeff" + buildDoc(p, KITS[p.title], mode);
+  return btoa(unescape(encodeURIComponent(html)));
+}
+function templateName(p, mode){ return "Proposal-" + (mode==="collective"?"Consortium":"Individual") + "-" + slug(p.title) + ".doc"; }
+
+window.MZK_KITS = { open:open, boot:boot, kits:KITS, projects:PROJECTS, buildDoc:buildDoc, kitUrl:kitUrl, templateB64:templateB64, templateName:templateName, lanes:LANE_NAME };
 })();

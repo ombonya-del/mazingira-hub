@@ -284,6 +284,7 @@ var NAV = [
   {id:"meetings", label:"Meetings", grp:"Manage", icon:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/>'},
   {id:"events", label:"Events", grp:"Manage", icon:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/>'},
   {id:"partners", label:"Partners", grp:"Manage", icon:'<rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="2.5"/><path d="M8 17a4 4 0 0 1 8 0"/>'},
+  {id:"projects", label:"Fundable projects", grp:"Manage", icon:'<path d="M13 2 5 13.5h6L10 22l9-12h-6z"/>'},
   {id:"interest", label:"Interest", grp:"Manage", icon:'<path d="M4 5h16v11H4z"/><path d="m4 7 8 5 8-5"/><path d="m15 18 2 2 4-4"/>'},
   {id:"members", label:"Members", grp:"Manage", icon:'<circle cx="9" cy="8" r="3"/><path d="M4 20a5 5 0 0 1 10 0"/><path d="M16 6a3 3 0 0 1 0 6M14 20a5 5 0 0 1 6-3"/>'}
 ];
@@ -371,7 +372,7 @@ var SECTIONS = [
   {id:"overview", label:"Overview", icon:'<path d="M4 13h6V4H4zM14 20h6v-9h-6zM14 4v4h6V4zM4 20h6v-4H4z"/>', views:["overview"]},
   {id:"voices",   label:"Voices",   icon:'<path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/>', views:["moderation","upload","narrative","publishing"]},
   {id:"exchange", label:"Exchange", icon:'<path d="M4 7h16M4 12h16M4 17h10"/>', views:["resources","meetings","events"]},
-  {id:"network",  label:"Network",  icon:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6a3 3 0 0 1 0 6M15 20a6 6 0 0 1 6-4"/>', views:["partners","interest","members"]},
+  {id:"network",  label:"Network",  icon:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6a3 3 0 0 1 0 6M15 20a6 6 0 0 1 6-4"/>', views:["partners","projects","interest","members"]},
   {id:"review",   label:"Review",   icon:'<path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/>', views:["content","oppsreview","eventsreview"]}
 ];
 var secMem = {};
@@ -430,6 +431,7 @@ function render(){
   else if(v==="meetings") app.innerHTML=viewMeetings();
   else if(v==="events") app.innerHTML=viewEvents();
   else if(v==="partners") app.innerHTML=viewPartners();
+  else if(v==="projects") app.innerHTML=viewProjects();
   else if(v==="interest") app.innerHTML=viewInterest();
   else if(v==="members") app.innerHTML=viewMembers();
   bindView();
@@ -674,6 +676,7 @@ function bindView(){
   if(state.view==="meetings") loadMeetings();
   if(state.view==="events") loadEvents();
   if(state.view==="partners") loadPartners();
+  if(state.view==="projects") loadProjects();
   if(state.view==="interest") loadInterest();
   if(state.view==="oppsreview") loadOppsReview();
   if(state.view==="eventsreview") loadEventsReview();
@@ -1058,10 +1061,177 @@ function oppMatch(row, wrap, btn){
   });
 }
 
+/* ==================== FUNDABLE PROJECTS (Je, Hatua?) — match & notify partners ==================== */
+/* The 18-project portfolio + proposal kits live in the hub's project-kits.js (single source of truth). */
+var KITS_SRC = "https://hub.mazingirakenya.org/project-kits.js?v=3";
+var PJ_REGION = {
+  coast:["mombasa","kilifi","kwale","lamu","taita taveta","tana river"],
+  "north eastern":["wajir","mandera","garissa"],
+  northern:["marsabit","isiolo","samburu","turkana","wajir","mandera"],
+  eastern:["marsabit","isiolo","kitui","machakos","makueni","embu","meru"],
+  "rift valley":["baringo","nakuru","elgeyo-marakwet","nandi","samburu","kajiado","turkana","narok","laikipia"],
+  nyanza:["kisumu","siaya","homa bay","migori","kisii","nyamira"],
+  western:["kakamega","vihiga","bungoma","busia"],
+  "lake victoria":["kisumu","siaya","homa bay","migori","busia"]
+};
+var PJ_LANE_WORDS = {
+  document:"documentation monitoring monitor evidence research data media journalism",
+  challenge:"legal litigation law policy advocacy court rights campaign",
+  build:"community capacity grassroots network organising organizing response"
+};
+function loadKits(cb){
+  if(window.MZK_KITS && window.MZK_KITS.projects) return cb(null, window.MZK_KITS);
+  var s=document.createElement("script"); s.src=KITS_SRC; s.async=true;
+  s.onload=function(){ cb(window.MZK_KITS&&window.MZK_KITS.projects ? null : "kits file loaded but empty", window.MZK_KITS); };
+  s.onerror=function(){ cb("could not load the project portfolio from the hub"); };
+  document.head.appendChild(s);
+}
+function pjHay(p){ return [p.title,p.sector,p.county,p.pitch,p.gap,p.funder].join(" ").toLowerCase(); }
+function pjRx(w){ return new RegExp("(^|[^a-z0-9])"+w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"([^a-z0-9]|$)"); }
+function pjNames(partner){
+  /* full name + short forms, e.g. "LAWA — Lamu Women Alliance" -> ["lawa — lamu women alliance","lawa","lamu women alliance"] */
+  var n=String(partner.name||"").toLowerCase().trim(), out=[n];
+  n.split(/\s+[—–-]\s+|[()]/).forEach(function(x){ x=x.trim(); if(x.length>=3 && out.indexOf(x)<0) out.push(x); });
+  return out.filter(function(x){ return x.length>=3; });
+}
+function pjScore(p, partner){
+  var hay=pjHay(p), raw=[p.title,p.pitch,p.gap].join(" ").toLowerCase();
+  var tags=(partner.focus||"").toLowerCase().split(/[,;]+/).map(function(t){return t.trim();}).filter(function(t){return t.length>2;});
+  var hits=tags.filter(function(t,i){ return tags.indexOf(t)===i && pjRx(t).test(hay); });
+  /* a tag that only fits the lane's kind of work (e.g. "legal" for Challenge) is a weak signal: 1 point, once */
+  var laneHay=PJ_LANE_WORDS[p.lane]||"";
+  var laneHit=tags.filter(function(t,i){ return tags.indexOf(t)===i && hits.indexOf(t)<0 && pjRx(t).test(laneHay); })[0];
+  var counties=(p.county||"").toLowerCase();
+  var regs=(partner.region||"").toLowerCase().split(/[,;\/]+/).map(function(r){return r.trim();}).filter(Boolean);
+  var regionHit=regs.filter(function(r){
+    if(r.length>2 && pjRx(r).test(counties)) return true;
+    var list=PJ_REGION[r]; return !!(list && list.some(function(c){ return counties.indexOf(c)>=0; }));
+  });
+  var named=pjNames(partner).some(function(n){ return pjRx(n).test(raw); });
+  return { hits:hits.concat(laneHit?[laneHit+" (lane)"]:[]), region:regionHit, named:named, score:hits.length*2+(laneHit?1:0)+(regionHit.length?2:0)+(named?4:0) };
+}
+var PJ_DIGEST_MIN=4;   /* digest: named in the project, or 2 focus tags, or a focus tag + region */
+function pjPayload(K, p){
+  var kit=K.kits[p.title]||{};
+  return { title:p.title, lane:(K.lanes[p.lane]||p.lane)+" lane", county:p.county, sector:p.sector, budget:p.budget, funder:p.funder,
+    pitch:p.pitch, gap:p.gap, description:kit.description||"", kitUrl:K.kitUrl(p),
+    sources:(kit.resources||[]).slice(0,5).map(function(r){ return {t:r.t,u:r.u,s:r.s}; }) };
+}
+function pjInvoke(body, stat, btn, okMsg){
+  btn.disabled=true; stat.textContent="Sending…";
+  ASB.functions.invoke("notify-partners",{ body:body }).then(function(r){ btn.disabled=false;
+    if(r.error){ stat.textContent="Failed: "+(r.error.message||r.error); return; }
+    var d=r.data||{}; if(d.error){ stat.textContent="Failed: "+(typeof d.error==="string"?d.error:JSON.stringify(d.error)); return; }
+    var n=d.sent||0; stat.textContent=okMsg(n)+(d.errors?" ("+d.errors.length+" failed)":"");
+    toast(okMsg(n)); }, function(e){ btn.disabled=false; stat.textContent="Failed: "+e; });
+}
+function pjBtn(t){ var b=document.createElement("button"); b.type="button"; b.className="btn ghost"; b.textContent=t; return b; }
+var PJ_BOX='margin-top:8px;padding:10px 12px;background:rgba(126,176,216,.10);border-radius:8px;font-size:.82rem;line-height:1.5';
+function pjNote(){ return '<label style="display:block;font-size:.7rem;color:var(--muted,#8aa);margin:8px 0 2px">Personal note (optional — appears at the top of the email)</label>'+
+  '<textarea class="pjnote" rows="2" style="width:100%;padding:8px 10px;border:1px solid var(--line,#2a3a33);border-radius:7px;background:transparent;color:inherit;font:inherit" placeholder="e.g. We think LAWA and your team could apply together — happy to connect you."></textarea>'; }
+
+function viewProjects(){
+  return '<div class="view"><div class="vhead"><h2>Fundable projects</h2>'+
+    '<p class="vsub">The Je, Hatua? portfolio. Match each project to partners by focus tags and region, then email them a proposal kit — description, evidence, funder fit and Word templates (individual + consortium) attached. Replies land under <b>Interest</b>.</p></div>'+
+    '<div id="projHost">Loading portfolio…</div></div>';
+}
+function loadProjects(){
+  var host=document.getElementById("projHost"); if(!host) return;
+  if(!ASB){ host.textContent="Supabase unavailable — check the connection."; return; }
+  loadKits(function(err, K){
+    if(err){ host.innerHTML='<p class="vsub">Could not load the portfolio: '+esc(err)+'.</p>'; return; }
+    Promise.all([
+      ASB.from("partners").select("*").eq("active",true),
+      ASB.from("opportunity_interest").select("opportunity_title").like("opportunity_title","Fundable project:%").limit(1000)
+    ]).then(function(rs){
+      if(rs[0].error){ host.innerHTML='<p class="vsub">Partners load failed: '+esc(rs[0].error.message)+'</p>'; return; }
+      var partners=(rs[0].data||[]).filter(function(p){ return partnerEmails(p).length; });
+      var interest={}; ((rs[1]&&rs[1].data)||[]).forEach(function(r){ var k=String(r.opportunity_title||"").replace(/^Fundable project:\s*/,""); interest[k]=(interest[k]||0)+1; });
+      renderProjects(host, K, partners, interest);
+    });
+  });
+}
+function renderProjects(host, K, partners, interest){
+  host.innerHTML="";
+  /* digest card */
+  var dg=document.createElement("div"); dg.className="ndr-draft";
+  dg.innerHTML='<div class="grow"><b>Send the portfolio</b> <span class="pill">'+K.projects.length+' projects · '+partners.length+' partners with email</span>'+
+    '<div style="font-size:.8rem;opacity:.75;margin-top:3px">One email per partner listing only the projects matched to them, each with an "I\'m interested" button. Use the per-project button below to send a full kit with templates.</div>'+
+    '<div class="ndr-match" hidden></div></div><div class="ndr-acts"></div>';
+  var db=pjBtn("Match & send digest"); dg.querySelector(".ndr-acts").appendChild(db);
+  db.onclick=function(){ pjDigest(K, partners, dg, db); };
+  host.appendChild(dg);
+  if(!partners.length){ var w0=document.createElement("p"); w0.className="vsub"; w0.innerHTML='No partners with an email yet — add them under <b>Partners</b> with focus tags and a region.'; host.appendChild(w0); }
+  ["document","challenge","build"].forEach(function(lane){
+    var h=document.createElement("h3"); h.style.cssText="margin:18px 0 8px;font-size:.95rem"; h.textContent=(K.lanes[lane]||lane)+" lane"; host.appendChild(h);
+    K.projects.filter(function(p){ return p.lane===lane; }).forEach(function(p){
+      var nMatch=partners.filter(function(pt){ return pjScore(p,pt).score>0; }).length, nStrong=partners.filter(function(pt){ return pjScore(p,pt).score>=PJ_DIGEST_MIN; }).length;
+      var w=document.createElement("div"); w.className="ndr-draft";
+      w.innerHTML='<div class="grow"><b>'+esc(p.title)+'</b> <span class="pill">'+(p.status==="dev"?"In development":"Idea")+'</span>'+
+        (interest[p.title]?' <span class="pill" style="border-color:var(--green);color:var(--green)">'+interest[p.title]+' interested</span>':'')+
+        '<div style="font-size:.78rem;opacity:.75;margin-top:3px">'+esc(p.county)+' · '+esc(p.sector)+' · '+esc(p.budget)+' · '+esc(p.funder)+
+        ' · <a href="'+esc(K.kitUrl(p))+'" target="_blank" rel="noopener">kit ↗</a> · '+nMatch+' partner match'+(nMatch===1?'':'es')+'</div>'+
+        '<div class="ndr-match" hidden></div></div><div class="ndr-acts"></div>';
+      var mb=pjBtn("Match & notify"); mb.onclick=function(){ pjMatch(K, p, partners, w, mb); };
+      w.querySelector(".ndr-acts").appendChild(mb);
+      host.appendChild(w);
+    });
+  });
+}
+function pjMatch(K, p, partners, wrap, btn){
+  var box=wrap.querySelector(".ndr-match");
+  if(box.innerHTML){ box.hidden=!box.hidden; btn.textContent=box.hidden?"Match & notify":"Hide match"; return; }
+  box.hidden=false; btn.textContent="Hide match";
+  if(!partners.length){ box.innerHTML='<div style="'+PJ_BOX+'">No partners with an email yet — add them under <b>Partners</b> first.</div>'; return; }
+  var scored=partners.map(function(pt){ var s=pjScore(p,pt); s.p=pt; return s; }).sort(function(a,b){ return b.score-a.score || String(a.p.name).localeCompare(b.p.name); });
+  var html='<div style="'+PJ_BOX+'"><div style="margin-bottom:6px"><b>Matched partners</b> — tick who to send the "'+esc(p.title)+'" proposal kit to:</div>';
+  scored.forEach(function(s){ var em=partnerEmails(s.p); var why=(s.named?["named in project"]:[]).concat(s.hits).concat(s.region.map(function(r){return "region: "+r;}));
+    html+='<label style="display:block;margin:3px 0"><input type="checkbox" class="pjp" data-email="'+esc(em.join(","))+'" data-name="'+esc(s.p.name||"")+'" '+(s.score>0?'checked':'')+'> '+esc(s.p.name)+
+      (em.length>1?' <span class="muted">('+em.length+' contacts)</span>':'')+(why.length?' <span style="color:#3FB984">· '+esc(why.join(", "))+'</span>':' <span class="muted">· no match</span>')+'</label>'; });
+  html+=pjNote()+'<label style="display:block;margin:8px 0 0"><input type="checkbox" class="pjatt" checked> Attach both proposal templates (Word)</label>'+
+    '<button class="btn pub pjsend" type="button" style="margin-top:8px">Send proposal kit</button> <span class="pjstat muted" style="margin-left:8px"></span></div>';
+  box.innerHTML=html;
+  var sbn=box.querySelector(".pjsend"), stat=box.querySelector(".pjstat");
+  sbn.onclick=function(){
+    var parts=[].slice.call(box.querySelectorAll(".pjp:checked")).map(function(c){ return {name:c.getAttribute("data-name")||"", emails:(c.getAttribute("data-email")||"").split(",").map(function(e){return e.trim();}).filter(Boolean)}; }).filter(function(x){return x.emails.length;});
+    if(!parts.length){ toast("Pick at least one partner"); return; }
+    if(!confirm("Email the \""+p.title+"\" proposal kit to "+parts.length+" partner(s)?")) return;
+    var body={ kind:"project", project:pjPayload(K,p), note:box.querySelector(".pjnote").value, partners:parts };
+    if(box.querySelector(".pjatt").checked){
+      try{ body.attachments=["individual","collective"].map(function(m){ return { filename:K.templateName(p,m), content:K.templateB64(p,m) }; }); }
+      catch(e){ toast("Templates could not be attached — sending without"); }
+    }
+    pjInvoke(body, stat, sbn, function(n){ return "Proposal kit sent to "+n+" partner(s)"; });
+  };
+}
+function pjDigest(K, partners, wrap, btn){
+  var box=wrap.querySelector(".ndr-match");
+  if(box.innerHTML){ box.hidden=!box.hidden; btn.textContent=box.hidden?"Match & send digest":"Hide digest"; return; }
+  box.hidden=false; btn.textContent="Hide digest";
+  var rows=partners.map(function(pt){
+    var ps=K.projects.map(function(p){ var s=pjScore(p,pt); s.proj=p; return s; }).filter(function(s){ return s.score>=PJ_DIGEST_MIN; })
+      .sort(function(a,b){ return b.score-a.score; }).slice(0,6);
+    return { p:pt, list:ps };
+  }).filter(function(r){ return r.list.length; });
+  if(!rows.length){ box.innerHTML='<div style="'+PJ_BOX+'">No partner is a strong match for any project yet (needs two focus tags, or a focus tag + region, or being named in the project). Add focus tags (e.g. coal, gold, water, nuclear, legal, media, plastics) and a region to partners.</div>'; return; }
+  var html='<div style="'+PJ_BOX+'"><div style="margin-bottom:6px"><b>'+rows.length+' partner(s) strongly matched</b> — each gets one email with up to 6 of their best-matched projects:</div>';
+  rows.forEach(function(r,i){ html+='<label style="display:block;margin:4px 0"><input type="checkbox" class="pjd" data-i="'+i+'" checked> <b>'+esc(r.p.name)+'</b> <span class="muted">→ '+esc(r.list.map(function(s){return s.proj.title;}).join("; "))+'</span></label>'; });
+  html+=pjNote()+'<button class="btn pub pjdsend" type="button" style="margin-top:8px">Send digest</button> <span class="pjdstat muted" style="margin-left:8px"></span></div>';
+  box.innerHTML=html;
+  var sbn=box.querySelector(".pjdsend"), stat=box.querySelector(".pjdstat");
+  sbn.onclick=function(){
+    var parts=[].slice.call(box.querySelectorAll(".pjd:checked")).map(function(c){ var r=rows[+c.getAttribute("data-i")];
+      return { name:r.p.name, emails:partnerEmails(r.p), projects:r.list.map(function(s){ var x=pjPayload(K,s.proj); delete x.description; delete x.sources; delete x.gap; return x; }) }; });
+    if(!parts.length){ toast("Pick at least one partner"); return; }
+    if(!confirm("Send the project digest to "+parts.length+" partner(s)?")) return;
+    pjInvoke({ kind:"digest", note:box.querySelector(".pjnote").value, partners:parts }, stat, sbn, function(n){ return "Digest sent to "+n+" partner(s)"; });
+  };
+}
+
 /* ==================== INTEREST — partners who clicked "Register interest" ==================== */
 function viewInterest(){
   return '<div class="view"><div class="vhead"><h2>Partner interest</h2>'+
-    '<p class="vsub">Partners who clicked “Register interest” in an opportunity email — the return loop. Follow up with these organisations.</p></div>'+
+    '<p class="vsub">Partners who clicked “Register interest” / “I’m interested” in an opportunity or fundable-project email — the return loop. Follow up with these organisations.</p></div>'+
     '<div id="interestList" class="ndr-list">Loading…</div></div>';
 }
 function loadInterest(){
@@ -1079,10 +1249,31 @@ function loadInterest(){
       var g=groups[k], w=document.createElement("div"); w.className="ndr-draft";
       var rows=g.map(function(r){ var when=""; try{ when=new Date(r.created_at).toLocaleString(); }catch(e){ when=r.created_at||""; }
         return '<div style="font-size:.82rem;margin-top:3px">• <b>'+esc(r.partner_name||r.partner_email||"—")+'</b>'+(r.partner_email?' <span class="muted">'+esc(r.partner_email)+'</span>':'')+' <span class="muted">· '+esc(when)+'</span></div>'; }).join("");
-      w.innerHTML='<div class="grow"><b>'+esc(k)+'</b> <span class="pill">'+g.length+' interested</span>'+(g[0].opportunity_url?' · <a href="'+esc(g[0].opportunity_url)+'" target="_blank" rel="noopener">link ↗</a>':'')+rows+'</div>';
+      w.innerHTML='<div class="grow"><b>'+esc(k)+'</b> <span class="pill">'+g.length+' interested</span>'+(g[0].opportunity_url?' · <a href="'+esc(g[0].opportunity_url)+'" target="_blank" rel="noopener">link ↗</a>':'')+rows+'<div class="pjistat muted" style="font-size:.78rem;margin-top:6px"></div></div><div class="ndr-acts"></div>';
+      if(/^Fundable project:/.test(k)) interestKitBtn(k.replace(/^Fundable project:\s*/,""), g, w);
       host.appendChild(w);
     });
   });
+}
+
+/* Close the loop on fundable projects: send the full kit (with Word templates) to everyone who clicked "I'm interested". */
+function interestKitBtn(title, rows, wrap){
+  var b=pjBtn("Send proposal kit"); wrap.querySelector(".ndr-acts").appendChild(b);
+  var stat=wrap.querySelector(".pjistat");
+  b.onclick=function(){
+    var seen={}, parts=[];
+    rows.forEach(function(r){ var e=String(r.partner_email||"").trim().toLowerCase(); if(!e || !/@/.test(e) || seen[e]) return; seen[e]=1; parts.push({ name:r.partner_name||"", emails:[e] }); });
+    if(!parts.length){ toast("No partner emails recorded for this project"); return; }
+    loadKits(function(err, K){
+      if(err){ toast("Could not load the portfolio: "+err); return; }
+      var p=K.projects.filter(function(x){ return x.title===title; })[0];
+      if(!p){ toast("Project not found in the portfolio: "+title); return; }
+      if(!confirm("Email the full \""+title+"\" proposal kit, with both Word templates, to "+parts.length+" interested partner(s)?")) return;
+      var body={ kind:"project", project:pjPayload(K,p), note:"Thank you for registering interest. Here is the full proposal kit, with pre-filled templates for applying alone or as a consortium.", partners:parts };
+      try{ body.attachments=["individual","collective"].map(function(m){ return { filename:K.templateName(p,m), content:K.templateB64(p,m) }; }); }catch(e){}
+      pjInvoke(body, stat, b, function(n){ return "Proposal kit sent to "+n+" interested partner(s)"; });
+    });
+  };
 }
 
 /* Auto-match + email focus-matched partners (used when an opportunity is Accepted from review). */
