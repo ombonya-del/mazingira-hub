@@ -2404,7 +2404,7 @@ function cleanEmail(v){
 
     <p class="brief-note" style="margin-top:20px">Every project below is anchored to a gap you can see
       elsewhere on this platform — a county with pressure and no response, or a proposed project with no
-      organised scrutiny. Budgets are indicative planning figures, not quotes.</p>
+      organised scrutiny. Budgets are indicative planning figures, not quotes. <b>Tap any project</b> for a full description, supporting research and case law, funder notes, and pre-filled proposal templates for individual or consortium applications.</p>
   </div>
 </section>
 
@@ -2599,6 +2599,7 @@ function cleanEmail(v){
   </div>
 </footer>
 
+<script src="/project-kits.js?v=1"></script>
 
 <script>
 (function(){
@@ -3938,6 +3939,8 @@ var PROJECTS = [
       }).join("") +'</div>';
     host.appendChild(block);
   });
+  /* make each project clickable: description, sources, funders, proposal templates (project-kits.js) */
+  if(window.MZK_KITS) window.MZK_KITS.boot(PROJECTS);
 })();
 
 /* ---- the intelligence brief, composed from live state ---- */
