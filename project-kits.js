@@ -904,6 +904,8 @@ function ensureShell(){
     if(tab) selectTab(tab.getAttribute("data-tab"));
     var dl = e.target.closest && e.target.closest("[data-pk-dl]");
     if(dl) download(dl.getAttribute("data-pk-dl"));
+    var ib = e.target.closest && e.target.closest("[data-pk-interest]");
+    if(ib) registerInterest(ib);
     var cp = e.target.closest && e.target.closest("[data-pk-copy]");
     if(cp) copyLink(cp);
   });
@@ -920,6 +922,7 @@ function open(p, tab){
   current = { p:p, kit:kit };
   lastFocus = document.activeElement;
   overlay.firstChild.innerHTML = render(p, kit);
+  if(INTEREST_DONE[p.title]){ var ib0 = overlay.querySelector("[data-pk-interest]"); if(ib0){ ib0.disabled = true; ib0.textContent = "Interest registered ✓ — we'll be in touch"; } }
   overlay.classList.add("on"); overlay.setAttribute("aria-hidden","false");
   document.body.classList.add("pk-lock");
   selectTab(tab || "overview");
@@ -933,6 +936,34 @@ function close(){
   document.body.classList.remove("pk-lock");
   try{ var u = new URL(location.href); u.searchParams.delete("project"); history.replaceState(null,"",u.pathname+u.search+u.hash); }catch(_){}
   if(lastFocus && lastFocus.focus) lastFocus.focus();
+}
+/* "I'm interested": logs the signed-in member against this project in opportunity_interest
+   (the same table the email buttons feed), so it appears under Interest in the admin console. */
+var INTEREST_DONE = {};
+function registerInterest(btn){
+  var p = current && current.p; if(!p) return;
+  var sb = window.HAUTH || window.MZ_SB;
+  var fallback = function(){
+    location.href = "mailto:admin@mazingirakenya.org?subject=" + encodeURIComponent("Interested in: " + p.title) +
+      "&body=" + encodeURIComponent("Hello,\n\nOur organisation is interested in the Je, Hatua? project \"" + p.title + "\".\n\nOrganisation:\nContact:\n");
+  };
+  if(!sb || !sb.auth){ fallback(); return; }
+  btn.disabled = true; btn.textContent = "Registering…";
+  sb.auth.getSession().then(function(r){
+    var u = r && r.data && r.data.session && r.data.session.user;
+    if(!u){ btn.disabled = false; btn.textContent = "I'm interested — tell the coalition"; fallback(); return; }
+    var md = u.user_metadata || {};
+    return sb.from("opportunity_interest").insert({
+      opportunity_title: "Fundable project: " + p.title,
+      opportunity_url: kitUrl(p),
+      partner_name: md.org || md.organisation || md.full_name || md.name || "",
+      partner_email: u.email || ""
+    }).then(function(res){
+      if(res && res.error) throw res.error;
+      INTEREST_DONE[p.title] = 1;
+      btn.textContent = "Interest registered ✓ — we'll be in touch";
+    });
+  }).catch(function(){ btn.disabled = false; btn.textContent = "I'm interested — tell the coalition"; fallback(); });
 }
 function copyLink(btn){
   var u = location.origin + location.pathname + "?project=" + current.kit.id + "#ajesasa";
@@ -993,7 +1024,7 @@ function render(p, kit){
   h += '</div>';
   h += '<div class="pk-foot"><p class="pk-note">Budgets are indicative planning figures, not quotes.</p>'+
        '<span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn--ghost" type="button" data-pk-copy>Copy link to this project</button>'+
-       '<a class="btn btn--ghost" href="#contribute" data-pk-close>Discuss with the coalition</a></span></div>';
+       '<button class="btn btn--green" type="button" data-pk-interest>I\'m interested — tell the coalition</button></span></div>';
   return h;
 }
 function tabBtn(k,l){ return '<button class="pk-tab" role="tab" type="button" data-tab="'+k+'" aria-selected="false">'+esc(l)+'</button>'; }
