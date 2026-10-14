@@ -1035,6 +1035,22 @@ function loadPartners(){
 /* All of a partner's emails: primary + up to two alternates (email_alt, comma-separated). */
 function partnerEmails(p){ var a=[p.email]; if(p.email_alt) a=a.concat(String(p.email_alt).split(/[,;\s]+/)); return a.filter(function(e){ return e && /@/.test(e); }); }
 
+/* Turn an Edge Function failure into a readable reason (the SDK only says "non-2xx status code"). */
+function fnFail(err, el){
+  var base = "Failed: "+((err&&err.message)||err);
+  var ctx = err && err.context;
+  if(!ctx || typeof ctx.text!=="function"){ el.textContent = base; return; }
+  ctx.text().then(function(t){
+    var msg=t; try{ var j=JSON.parse(t); msg=(typeof j.error==="string"?j.error:JSON.stringify(j.error||j)); }catch(_){}
+    var hint="";
+    if(ctx.status===401) hint=" — your sign-in has expired; sign out and back in.";
+    else if(/admin only/.test(msg)) hint=" — this login isn't marked as an admin (is_admin()).";
+    else if(/opportunity\.title/.test(msg)) hint=" — the notify-partners function on Supabase is the old version; redeploy it.";
+    else if(/RESEND|resend|domain|from/i.test(msg)) hint=" — email provider (Resend) rejected the send.";
+    el.textContent = "Failed ("+ctx.status+"): "+msg+hint;
+    toast("Send failed — see the message under the button");
+  }, function(){ el.textContent = base; });
+}
 /* Match an opportunity to partners by focus-tag overlap, then email them via the notify-partners function. */
 function oppMatch(row, wrap, btn){
   var box=wrap.querySelector(".ndr-match"); if(!box) return;
@@ -1055,7 +1071,7 @@ function oppMatch(row, wrap, btn){
     var stat=box.querySelector(".mnstat");
     box.querySelector(".mnsend").onclick=function(){ var sbn=box.querySelector(".mnsend"); var mnParts=[].slice.call(box.querySelectorAll(".mnp:checked")).map(function(c){ return {name:c.getAttribute("data-name")||"", emails:(c.getAttribute("data-email")||"").split(",").map(function(e){return e.trim();}).filter(Boolean)}; }).filter(function(p){return p.emails.length;}); if(!mnParts.length){ toast("Pick at least one partner"); return; } sbn.disabled=true; stat.textContent="Sending…";
       ASB.functions.invoke("notify-partners",{ body:{ opportunity:{ title:row.title, opp_type:row.opp_type, deadline:row.deadline, amount:row.amount, by:row.by, eligibility:row.eligibility, url:row.url }, partners:mnParts } }).then(function(r){ sbn.disabled=false;
-        if(r.error){ stat.textContent="Failed: "+(r.error.message||r.error); return; }
+        if(r.error){ fnFail(r.error, stat); return; }
         var d=r.data||{}; if(d.error){ stat.textContent="Failed: "+(typeof d.error==="string"?d.error:JSON.stringify(d.error)); return; }
         stat.textContent="Sent to "+(d.sent||mnParts.length)+" partner(s)."; toast("Interest email sent to "+(d.sent||mnParts.length)+" partner(s)"); }, function(e){ sbn.disabled=false; stat.textContent="Failed: "+e; }); };
   });
@@ -1120,7 +1136,7 @@ function pjPayload(K, p){
 function pjInvoke(body, stat, btn, okMsg){
   btn.disabled=true; stat.textContent="Sending…";
   ASB.functions.invoke("notify-partners",{ body:body }).then(function(r){ btn.disabled=false;
-    if(r.error){ stat.textContent="Failed: "+(r.error.message||r.error); return; }
+    if(r.error){ fnFail(r.error, stat); return; }
     var d=r.data||{}; if(d.error){ stat.textContent="Failed: "+(typeof d.error==="string"?d.error:JSON.stringify(d.error)); return; }
     var n=d.sent||0; stat.textContent=okMsg(n)+(d.errors?" ("+d.errors.length+" failed)":"");
     toast(okMsg(n)); }, function(e){ btn.disabled=false; stat.textContent="Failed: "+e; });
