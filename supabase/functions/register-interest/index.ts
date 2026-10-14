@@ -31,7 +31,10 @@ Deno.serve(async (req) => {
       opportunity_title: title, opportunity_url: oppUrl, partner_name: name, partner_email: email,
     });
   } catch (_e) { /* best-effort: still show thanks */ }
-  const msg = `Thank you${name ? ", " + esc(name) : ""} — your interest in <b>${esc(title)}</b> is registered with the MazingiraKenya coalition. We'll be in touch to support your application.`
-    + (oppUrl ? `<br><br><a href="${esc(oppUrl)}">Open the opportunity &rarr;</a>` : "");
-  return new Response(page("Interest registered ✓", msg), { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  // Supabase serves HTML from *.supabase.co as plain text, so hand off to a thank-you page on the hub.
+  const thanks = new URL("https://hub.mazingirakenya.org/interest.html");
+  thanks.searchParams.set("t", title);
+  if (name) thanks.searchParams.set("n", name);
+  if (/^https:\/\//.test(oppUrl)) thanks.searchParams.set("u", oppUrl);
+  return new Response(null, { status: 302, headers: { Location: thanks.toString(), "Cache-Control": "no-store" } });
 });

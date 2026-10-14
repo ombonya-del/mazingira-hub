@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Interest registered · MazingiraKenya</title>
+<link rel="icon" href="/icon-192.png">
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#0E1A15;color:#EDEAE0;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px;box-sizing:border-box}
+  .c{max-width:500px;width:100%;text-align:center;background:#13241D;border:1px solid #22392E;border-radius:16px;padding:34px 28px}
+  .tick{width:56px;height:56px;border-radius:50%;background:rgba(98,199,155,.15);color:#62C79B;display:grid;place-items:center;margin:0 auto 16px;font-size:1.6rem}
+  h1{color:#62C79B;font-size:1.35rem;margin:0 0 12px;font-family:Georgia,serif}
+  p{color:#B7C6BD;line-height:1.65;margin:0 0 12px}
+  b{color:#EDEAE0}
+  .btn{display:inline-block;margin-top:10px;background:#62C79B;color:#062018;padding:11px 18px;border-radius:8px;font-weight:700;text-decoration:none}
+  .small{font-size:.85rem;color:#7A8D83;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="c">
+  <div class="tick" aria-hidden="true">&#10003;</div>
+  <h1 id="h">Interest registered</h1>
+  <p id="msg">Thank you — your interest is registered with the MazingiraKenya coalition. We'll be in touch to support your application.</p>
+  <a class="btn" id="go" href="https://hub.mazingirakenya.org/#ajesasa" hidden>Open the opportunity &rarr;</a>
+  <p class="small" id="note">You can close this page.</p>
+</div>
+<script>
+(function(){
+  var q = new URLSearchParams(location.search);
+  var t = (q.get("t") || "").replace(/^Fundable project:\s*/, "");
+  var isProject = /^Fundable project:/.test(q.get("t") || "");
+  var n = q.get("n") || "", u = q.get("u") || "";
+  var msg = document.getElementById("msg");
+  msg.textContent = "";
+  msg.appendChild(document.createTextNode("Thank you" + (n ? ", " + n : "") + " — your interest in "));
+  var b = document.createElement("b"); b.textContent = t || "this opportunity"; msg.appendChild(b);
+  msg.appendChild(document.createTextNode(" is registered with the MazingiraKenya coalition. " +
+    (isProject ? "We'll send you the full proposal kit and connect you with other interested partners."
+               : "We'll be in touch to support your application.")));
+  if(/^https:\/\//.test(u)){
+    var go = document.getElementById("go");
+    go.href = u; go.hidden = false;
+    go.innerHTML = (isProject ? "Open the project kit" : "Open the opportunity") + " &rarr;";
+    if(isProject) document.getElementById("note").textContent = "The project kit opens on the members' hub — sign in if asked.";
+  }
+})();
+</script>
+</body>
+</html>
