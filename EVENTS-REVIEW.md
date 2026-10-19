@@ -1,5 +1,37 @@
 # Events Watch — Admin Review Queue
 
+**Run date (TODAY): 2026-10-19**
+Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
+Scope: upcoming climate & environmental-justice events on or after 2026-10-19, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
+
+> ✅ **Queueing status:** 3 NEW verified events below were written **straight to Supabase as drafts (`published=false`, `source=watch`)** via the connected-Chrome write path — all three inserts returned **HTTP 201**. Review and Accept/Reject them in **admin → Events review**. Nothing is public until an admin Accepts. (The Mac device-bridge shell could not reach Supabase this run — `curl` returned HTTP 000, host blocked by the proxy — so the connected Chrome was used as the writer, as designed.)
+
+**Verification notes:** Each event was confirmed against a primary/organiser source and is future-dated (on/after 2026-10-19). Global Youth Summit for Climate Change (15–18 Dec 2026, Nairobi) confirmed via UNITAR's United Nations Immersion Programmes page (registration via partner YCDP). 5th African Symposium on Climate Change Adaptation (18–19 Feb 2027, Addis Ababa University) confirmed via the HAW Hamburg newsroom (coordinators Prof. Walter Leal, HAW Hamburg, and Prof. Desalegn Ayal, Addis Ababa University). Africa Energy Indaba 2027 (19th edition, 2–4 Mar 2027, CTICC Cape Town) confirmed via the organiser site (dates announced). **Candidates dropped this run (not future-dated or out of scope):** Our Ocean Conference 2026 Kenya (11th edition, 16–18 Jun 2026 — **past**, confirmed via the Kenya govt accreditation portal and Capital FM); Innovate4Cities I4C26 Nairobi (21–24 Jun 2026 — past); AMCEN-20 Nairobi (14–18 Jul 2025 — past); Adaptation Futures 8th (Christchurch, Oct 2025 — past, no later edition announced); 2nd Africa Climate Summit (Addis Ababa, 8–10 Sep 2025 — past); Mission 300 Africa Energy Summit (Dar es Salaam, Jan 2025 — past, no 2027 edition announced).
+
+---
+
+## Drafts queued this run (3) — all published=false, source=watch
+
+| # | Event | Date(s) | Location | Mode | Host | Status |
+|---|-------|---------|----------|------|------|--------|
+| 1 | Global Youth Summit for Climate Change 2026 | 15–18 Dec 2026 | Nairobi, Kenya | In person | UNITAR UN Immersion Programmes & YCDP | INSERTED 201 |
+| 2 | 5th African Symposium on Climate Change Adaptation | 18–19 Feb 2027 | Addis Ababa University, Ethiopia | In person | HAW Hamburg & Addis Ababa University | INSERTED 201 |
+| 3 | Africa Energy Indaba 2027 (19th edition) | 2–4 Mar 2027 | CTICC, Cape Town, South Africa | In person | Africa Energy Indaba | INSERTED 201 |
+
+**New this run (not previously logged):** all 3 above.
+
+**Dedupe:** Checked against the 2026-10-09 run (Solarexpo/Power & Energy 2026, IMPAC6 Dakar, 3rd Eastern Africa Agroecology Conference), the 2026-09-29 run (African Green Investment Forum, MOP38, COP32, UNEA-8), the 2026-09-22 run (Carbon Markets Africa Summit, 9th GLF Investment Case Symposium) and the 2026-09-19 run (Reparations Symposium, African Energy Week, Africa Climate Forum, CBD COP17, GreenShift Forum, Global Off-Grid Solar Forum, 5th EIK Conference, COP31, ESG & Climate Africa Summit) — **none re-queued**; still-upcoming items remain in the review queue from those runs.
+
+Reproducible record: `scripts/queue-events-2026-10-19.sh`.
+
+*Approved events go live only when a human admin clicks Accept in the admin Events review tab. This log is a draft queue, not a publication.*
+
+---
+
+<!-- ================= PREVIOUS RUNS BELOW ================= -->
+
+# Events Watch — Admin Review Queue
+
 **Run date (TODAY): 2026-10-09**
 Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
 Scope: upcoming climate & environmental-justice events on or after 2026-10-09, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
