@@ -1,3 +1,60 @@
+# Opportunities Watch — Review Log — 2026-10-19
+
+MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya / East Africa / pan-African climate justice. All deadlines below are **on or after 2026-10-19**. New items are **written straight into Supabase as drafts (published=false)** via the connected-Chrome JS write path and now await admin Accept/Reject in **admin → Opportunities review**. Nothing here is public until an admin accepts.
+
+> ✅ **Queueing status:** 4/4 new drafts inserted successfully (HTTP 201) via the connected-Chrome write path (Browser 1). The Mac device shell and the cloud container remain proxy-blocked from `uueemckdoozsuowcqkhl.supabase.co` (curl → HTTP 000), so the browser JS `fetch` is again the reliable writer. Re-runnable commands: `scripts/queue-opportunities-2026-10-19.sh`.
+
+## New verified-open opportunities queued (4)
+
+### 1. UNEP Small Grants Programme — Community-based Marine & Coastal Ecosystem Restoration
+- **Funder / host:** UN Environment Programme (UNEP)
+- **Type:** Grant (community-based small grants)
+- **Deadline:** 2 Nov 2026 (implementation 1 Feb 2027 – 29 Dec 2028; notifications 1 Jan 2027)
+- **Eligibility:** Community-led groups — CSOs, CBOs, women's groups, youth organisations and Indigenous Peoples. Focus: restoring/managing mangroves, seagrasses and coral reefs; blue-carbon & carbon-finance mechanisms supporting coastal livelihoods; inclusion of women, youth and Indigenous Peoples. ⚠️ Priority to **LDCs and SIDS** and other vulnerable coastal regions — Kenya is **not** an LDC, so admin to confirm whether Kenyan coastal CBOs qualify under "other vulnerable coastal regions" with the responsible officer (michael.ndiary@un.org).
+- **URL:** https://www.unep.org/calls-for-proposals
+- **Verified:** directly on unep.org/calls-for-proposals — call OPEN, deadline 2 Nov 2026.
+
+### 2. African Climate Alliance 2027 Ambassador Programme
+- **Funder / host:** African Climate Alliance (ACA)
+- **Type:** Programme / fellowship — 9-month hybrid climate-justice leadership training, community organising & advocacy, peer mentorship, localised climate-action projects, certification (no stipend specified)
+- **Deadline:** 1 Nov 2026, 23:59 CAT (opened 9 Oct 2026; no late submissions)
+- **Eligibility:** Emerging climate-justice activists. No formal country restriction or age limit stated in the call; ACA is pan-African. ⚠️ Admin to confirm Kenya/East Africa eligibility on the official application form. Note: ACA has a zero-tolerance policy on AI-generated application responses.
+- **URL:** https://cloud.seatable.io/dtable/forms/31493685-e7e3-4f67-9081-f0873f94c633/
+- **Verified:** via ACA 2027 Ambassador call (careersandopportunities.com, citing ACA's official application form) — applications OPEN, deadline 1 Nov 2026.
+
+### 3. International Blue Carbon Institute (IBCI) Fellowship 2026
+- **Funder / host:** International Blue Carbon Institute (IBCI), in collaboration with Conservation International
+- **Type:** Research/practitioner fellowship — US$60,000 over two years (one fellow in the 2026 cycle; supports programme/research activities, not personal income)
+- **Deadline:** 23 Nov 2026 (window opened 12 Oct 2026; fellows announced March 2027)
+- **Eligibility:** Experienced researchers/practitioners on blue-carbon ecosystems (mangroves, salt marshes, seagrass, kelp); Master's or PhD + ≥5 years' expertise, past early career. Open to all regions; **"Applicants working in Africa are particularly encouraged to apply for the 2026 cycle."** Highly relevant to Kenya's coastal/blue-carbon work.
+- **URL:** https://www.conservation.org/ibci/fellowship
+- **Verified:** directly on conservation.org/ibci/fellowship — call window 12 Oct–23 Nov 2026, US$60,000, Africa encouraged.
+
+### 4. IKI Medium Grants 2026 (Climate & Biodiversity)
+- **Funder / host:** International Climate Initiative (IKI), German Federal Government
+- **Type:** Grant — €300,000–€800,000 per project, 2–3 years (total call budget up to €8m)
+- **Deadline:** 12 Jan 2027, 11:59 CET (outlines via "Submit Project Outline"; call launched 13 Oct 2026; info seminar 19 Nov 2026)
+- **Eligibility:** ⚠️ **Lead applicants must be CSOs / academic / not-for-profit organisations based in Germany**, working with **local partner organisations in the Global South** (one or two implementing countries). Kenyan/East African orgs participate as **local implementing partners**, not lead applicants. Two priorities: (I) Green skills for local climate action; (II) Future-proof coasts (marine & coastal ecosystem protection/restoration). Strong partnership route for Kenyan coastal/community orgs — admin to weigh partnership relevance.
+- **URL:** https://www.international-climate-initiative.com/en/find-funding/medium-grants/medium-grants-2026/
+- **Verified:** directly on international-climate-initiative.com — call opens 13 Oct 2026, closes 12 Jan 2027.
+
+---
+
+## Checked and DROPPED this run (closed, out of scope, unverifiable, or already logged)
+- **Mohamed bin Zayed Species Conservation Fund** — up to US$25,000, global/Africa eligible, but the grants page states **"Applications are currently closed"**; next windows ~Jan 2027 / May 2027 → not queued (re-check in a later run).
+- **GLF Restoration Stewards 2027 (Global Landscapes Forum)** — EUR 5,000 youth (18–35) restoration programme, Africa prioritised, but **CLOSED** (deadline 31 Jul 2026).
+- **National Geographic Society — The Climate Pledge 2026** — up to US$100,000 storytelling grant, but **CLOSED** (25 May 2026).
+- **Equator Prize** — last cycle was 2025; no 2027 call confirmed open yet → not queued.
+- **CEPF open calls (Saint Vincent & the Grenadines GEF-SGP, 1 Nov; Indo-Burma 2nd CfP, 2 Nov)** — open but **out of region** (not Kenya/East Africa hotspots).
+- **AmplifyChange Strengthening Grants** — SRHR advocacy, **out of scope** (not climate/environment).
+- **GEF SGP — Malawi (30 Oct) / Ethiopia (31 Oct)** — country-specific, Kenya not eligible; out of region.
+- **Future Conservationist Award 2027** (30 Oct), **Global EbA Fund Medium-size** (16 Nov) & **Small-size** (26 Oct), **Whitley Awards 2027** (30 Oct), **Commonwealth Foundation Grants 2026–27** (26 Oct), **Rufford Small Grants** (rolling), **SEWA / CFC 29th Call / AFD CSO Call / AGNES–Bayer / Nairobi YCAF / COP31 Accreditation** — still open/recent but **already logged or queued** in prior runs (2026-08-17 / 09-19 / 09-22 / 09-29 / 10-09); deduped, not re-queued.
+
+_Approved items go live only when a human admin clicks Accept in admin → Opportunities review._
+
+---
+---
+
 # Opportunities Watch — Review Log — 2026-10-09
 
 MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya / East Africa / pan-African climate justice. All deadlines below are **on or after 2026-10-09**. New items are **written straight into Supabase as drafts (published=false)** via the connected-Chrome JS write path and now await admin Accept/Reject in **admin → Opportunities review**. Nothing here is public until an admin accepts.
