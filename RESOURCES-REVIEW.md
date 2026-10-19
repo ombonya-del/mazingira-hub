@@ -398,3 +398,45 @@ Each URL was fetched and confirmed to load with real content before queueing.
 - The 8 items above are now pending drafts. Do **not** re-queue them.
 - Could not verify this run (revisit next week): World Bank *Kenya Country Climate and Development Report* (candidate URLs 404/403); Kenya *NDC 3.0 (2025)* direct document link (referenced by climate-laws.org but no verified canonical PDF yet).
 - WebSearch is disabled for this org; research was done via WebFetch on authoritative domains. Some domains (reliefweb, IIED, IPCC, World Bank openknowledge) block the fetch bot — use the connected Chrome for those next time.
+
+---
+
+## Run 2026-10-19 (weekly firing) — 4 new drafts queued
+
+All 4 POSTed to Supabase as drafts (published=false, source=watch, category=Resources)
+via connected Chrome (device shell blocked from Supabase: curl 56 / proxy 403). Each
+returned HTTP 201. Deduped against all URLs previously logged. Awaiting admin Accept/Reject.
+
+### 1. Kenya's Adaptation Communication to the UNFCCC
+- **Source:** Ministry of Environment, Climate Change & Forestry (hosted by NAP Global Network / IISD)
+- **Type:** Report (Kenya's first Adaptation Communication) — Dec 2025
+- **URL:** https://napglobalnetwork.org/resource/kenyas-adaptation-communication-to-the-united-nations-framework-convention-on-climate-change/
+- **Why:** Kenya's official adaptation priorities, risks and finance/technology/capacity needs under the UNFCCC — a core national reference.
+- **Verified:** fetched directly; landing page + PDF link confirmed.
+
+### 2. Intersectional Climate Justice in Eastern Africa
+- **Source:** Bloomsbury Academic (eds. Crawford, Nanduddu, McQuaid & Nyukuri); open access on OAPEN / Bloomsbury Collections (CC BY-NC-ND 4.0)
+- **Type:** Open-access edited book (17 chapters) — 2025
+- **URL:** https://library.oapen.org/handle/20.500.12657/112339
+- **Why:** Region-specific scholarship on climate justice in Eastern Africa (floods, displacement, land rights, energy poverty, Indigenous knowledge) — free to read.
+- **Verified:** fetched directly; OAPEN record loads with full metadata + OA rights.
+
+### 3. Enhancing Access to Climate Finance for Vulnerable Communities (Position Paper 3)
+- **Source:** African Union ECOSOCC — Thematic Working Group on Climate Change, Climate Finance Subgroup
+- **Type:** Position brief (PDF) — 2025 (COP30)
+- **URL:** https://ecosocc.au.int/sites/default/files/files/2025-11/climate-finance-position-paper-3.pdf
+- **Why:** Pan-African civil-society case for climate finance as a right, with simplified/decentralised access for local communities.
+- **Verified:** fetched directly; PDF text extracted (distinct from the ECOSOCC Belém roadmap already logged).
+
+### 4. Kenya's NDC 3.0 (2025) — Agrifood Systems Case Study
+- **Source:** WWF — Nature Positive Agrifood Systems Toolkit
+- **Type:** Toolkit case study — 2025
+- **URL:** https://agrifood-systems-toolkit.panda.org/case-studies/kenyas-ndc-30-2025
+- **Why:** Summarises how Kenya's updated NDC treats agriculture (climate-smart farming, smallholder support, costing, governance); links to the source NDC.
+- **Verified:** fetched directly; full case-study text loads.
+
+### Checked but NOT queued this run (dedupe / quality)
+- KMD "State of the Climate Report, Kenya (2025)" (meteo.go.ke) — same underlying report as the SEI "State of the Climate in Kenya 2025" already logged. Skipped as duplicate.
+- IISD "Review of Current and Planned Adaptation Action in Kenya" — dated 2016, too old. Skipped.
+- ICPAC GHACOF 73 technical statement (JJAS 2026) — past-season seasonal outlook, ephemeral. Skipped.
+- Kenya green-jobs / "240,000 green jobs by 2030" FSD figure — only secondary news coverage found, no fetchable primary report. Revisit if the FSD Kenya report URL surfaces.
