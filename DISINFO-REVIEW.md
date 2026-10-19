@@ -15,6 +15,68 @@ Classification key: `vf` = false / bad-faith (red) · `vm` = misleading (amber) 
 
 ---
 
+## 2026-10-19 — 4 new drafts queued
+
+Queue script: `scripts/queue-disinfo-2026-10-19.sh`. All four written to Supabase as drafts via the
+connected Chrome (POST /rest/v1/disinfo_items, 201) — the Mac device-bridge shell could not reach
+supabase.co this run (proxy 403 / HTTP 000), so Chrome was the writer. Status: **awaiting admin review**.
+Deduped against published `disinfo_items` (37 rows read via anon GET) and the 2026-09-19 / -22 / -29 /
+10-03 / 10-09 logs. Mix of two Kenya/East-Africa-specific greenwashing items (clean-cooking carbon
+credits, TotalEnergies/EACOP), one global denialist health-minimisation talking point, and one
+false-dilemma framing cluster circulating heavily in the region.
+
+1. **Greenwashing / misleading framing (`vm`) — "Kenya's clean-cooking carbon market worked exactly as claimed"**
+   - Narrative (carbon-market / clean-cooking promotion): firms like KOKO Networks genuinely cut
+     millions of tonnes of emissions by switching households from charcoal to clean cookstoves, just
+     as their credits claimed — a model Kenyan climate-finance success.
+   - Fuller picture: Kenya declined KOKO a required Letter of Authorization over its planned credit
+     volume, and the firm collapsed into administration in 2026 after 11 years. Independent analysis
+     found the benefit badly overstated — a 93% non-renewable-biomass fraction vs ~38% realistic for
+     Nairobi (inflating credits >2.4x), a charcoal-only baseline ignoring LPG, and usage extrapolated
+     from a 159-household survey despite digital per-litre sales data. BeZero rated the credits "B"
+     overall and "D" for carbon accounting. Same inflated-baseline/overstated-reduction problems seen
+     across Kenya's carbon market; offsets should be verified, not taken at face value.
+   - Source: Down To Earth — https://www.downtoearth.org.in/africa/kenyas-latest-carbon-credit-crackdown-reveals-questionable-practices-players-sneaky-ways
+
+2. **Climate denial / health impacts minimised (`vf`) — "Climate change is not negatively impacting global health"**
+   - Narrative (social media): claims that climate change harms health are exaggerated; it isn't really
+     hurting global health.
+   - Fuller picture: WHO expects ~250,000 extra deaths/yr (2030–2050) from malnutrition, malaria,
+     diarrhoeal disease and heat; the Lancet Countdown tracks rising heat deaths and widening ranges
+     for malaria and dengue. East Africa already sees malaria pushed into cooler Kenyan/Ethiopian/
+     Rwandan highlands, drought-driven malnutrition in the Horn, and flood-borne cholera (incl. Kenya's
+     2026 floods). Contradicts WHO, IPCC and the medical literature.
+   - Source: PesaCheck — https://pesacheck.org/false-it-is-untrue-that-climate-change-is-not-negatively-impacting-global-health/
+
+3. **Greenwashing / misleading framing (`vm`) — "TotalEnergies/EACOP is a responsible, transition-aligned oil project"**
+   - Narrative (oil-industry / EACOP promotion): TotalEnergies is a major player in the energy
+     transition and its Ugandan EACOP pipeline and Tilenga field are developed responsibly and are
+     climate-compatible.
+   - Fuller picture: in Oct 2025 the Paris Judicial Court found TotalEnergies guilty of misleading
+     commercial practices — the first fossil major judicially sanctioned for greenwashing — ruling the
+     "major player in the energy transition" and net-zero-by-2050 claims misleading while it expands
+     oil and gas and its emissions rise. The same branding wraps EACOP/Tilenga, which analysts and
+     rights groups tie to large lifetime emissions, tens of thousands displaced with compensation
+     complaints, routes near the Lake Victoria basin and Murchison Falls, and ongoing litigation in
+     East Africa and the UK. A heated crude-export pipeline opening new oilfields is not an "energy
+     transition."
+   - Source: Paris greenwashing ruling / African climate litigation — https://ugbusiness.com/2025/11/energy-oil-gas/environment/totalenergies-greenwashing-verdict-opens-new-front-for-african-climate-litigation
+
+4. **Needs context / false dilemma (`vc`) — "Climate action is green colonialism to keep Africa poor"**
+   - Narrative (social media, #FossilFuelsForAfrica cluster): climate action is a Western plot to keep
+     Africa poor by denying it fossil fuels; Africa emits almost nothing so should burn its oil and gas
+     and ignore foreign climate demands.
+   - Fuller picture: the grievance is partly real — Africa is ~3–4% of cumulative emissions yet among
+     the hardest hit, and climate-finance/just-transition demands are legitimate. But "fossil fuels or
+     poverty" is a false dilemma: new solar and wind are now cheaper per kWh than new fossil generation
+     in most African markets, so clean energy often expands access faster. Code for Africa's ClimateWatch
+     "Toxic 10" investigation shows the green-colonialism/keep-Africa-poor frame is heavily amplified by
+     fossil-fuel-funded and dark-money actors (African Energy Chamber, #FossilFuelsForAfrica network) to
+     delay action. Energy-justice is valid; weaponising it to mandate fossil expansion serves the
+     industry. (Included to show the scan catches framing/delayism, not only outright denial.)
+   - Source: Code for Africa ClimateWatch "Toxic 10" — https://toxic10.investigate.africa/
+
+
 ## 2026-10-09 — 4 new drafts queued
 
 Queue script: `scripts/queue-disinfo-2026-10-09.sh`. All four written to Supabase as drafts via the
