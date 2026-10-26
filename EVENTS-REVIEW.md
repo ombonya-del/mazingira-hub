@@ -1,5 +1,37 @@
 # Events Watch — Admin Review Queue
 
+**Run date (TODAY): 2026-10-26**
+Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
+Scope: upcoming climate & environmental-justice events on or after 2026-10-26, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
+
+> ✅ **Queueing status:** 3 NEW verified events below were written **straight to Supabase as drafts (`published=false`, `source=watch`)** via the connected-Chrome write path — all three inserts returned **HTTP 201**. Review and Accept/Reject them in **admin → Events review**. Nothing is public until an admin Accepts. (The Mac device-bridge shell could not reach Supabase this run — `curl` returned HTTP 000, host blocked by the proxy — so the connected Chrome was used as the writer, as designed.)
+
+**Verification notes:** Each event was confirmed against a primary/organiser or reputable-news source and is future-dated (on/after 2026-10-26). 2nd Africa Clean Cooking Summit (27–28 Jan 2027, Nairobi) confirmed via allAfrica/The Star (Sep 2026) — President Ruto set the Jan 2027 dates after the mid-2026 edition was postponed; co-organised by Kenya, Norway and the USA with the African Union Commission, AfDB, IEA and the Clean Cooking Alliance. Africa's Green Economy Summit (AGES) 2027, 5th edition (23–26 Feb 2027, Cape Town) confirmed via the VUKA Group organiser site, City of Cape Town as host city. BACE 2027 — Blue Africa Conference & Exhibition (12–14 Aug 2027, Eko Hotel, Lagos) confirmed via the organiser site (blueeconomy.africa), hosted by Bahari Network with Nigeria's Ministry of Marine & Blue Economy. **Candidates reviewed and dropped this run:** Bonn Climate Change Conference (7–17 Jun 2027) and several 2027 UN convention meetings (Ramsar SC, World Water Forum, Minamata COP7, chemicals-and-waste COPs) — real and future-dated but only secondary-aggregator-sourced and/or not sufficiently African climate-justice-focused for the hub; OECPR-8 (29 Nov–3 Dec 2027, Nairobi) — preparatory committee for the already-queued UNEA-8, too technical/not a public-facing event.
+
+---
+
+## Drafts queued this run (3) — all published=false, source=watch
+
+| # | Event | Date(s) | Location | Mode | Host | Status |
+|---|-------|---------|----------|------|------|--------|
+| 1 | 2nd Africa Clean Cooking Summit | 27–28 Jan 2027 | Nairobi, Kenya | In person | Kenya, Norway & USA + AUC, AfDB, IEA, Clean Cooking Alliance | INSERTED 201 |
+| 2 | Africa's Green Economy Summit (AGES) 2027 | 23–26 Feb 2027 | Cape Town, South Africa | In person | VUKA Group (Go Green Africa) & City of Cape Town | INSERTED 201 |
+| 3 | BACE 2027 — Blue Africa Conference & Exhibition | 12–14 Aug 2027 | Eko Hotel, Lagos, Nigeria | In person | Bahari Network & Nigeria Ministry of Marine & Blue Economy | INSERTED 201 |
+
+**New this run (not previously logged):** all 3 above.
+
+**Dedupe:** Checked against the 2026-10-19 run (Global Youth Summit for Climate Change, 5th African Symposium on Climate Change Adaptation, Africa Energy Indaba 2027), the 2026-10-09 run (Solarexpo/Power & Energy 2026, IMPAC6 Dakar, 3rd Eastern Africa Agroecology Conference), the 2026-09-29 run (African Green Investment Forum, MOP38, COP32, UNEA-8), the 2026-09-22 run (Carbon Markets Africa Summit, 9th GLF Investment Case Symposium) and the 2026-09-19 run (Reparations Symposium, African Energy Week, Africa Climate Forum, CBD COP17, GreenShift Forum, Global Off-Grid Solar Forum, 5th EIK Conference, COP31, ESG & Climate Africa Summit) — **none re-queued**; still-upcoming items remain in the review queue from those runs.
+
+Reproducible record: `scripts/queue-events-2026-10-26.sh`.
+
+*Approved events go live only when a human admin clicks Accept in the admin Events review tab. This log is a draft queue, not a publication.*
+
+---
+
+<!-- ================= PREVIOUS RUNS BELOW ================= -->
+
+# Events Watch — Admin Review Queue
+
 **Run date (TODAY): 2026-10-19**
 Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
 Scope: upcoming climate & environmental-justice events on or after 2026-10-19, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
