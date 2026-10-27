@@ -2960,7 +2960,9 @@ var MEMBERS = [
  {n:"Rona Foundation",c:"Community",loc:"Siaya · Nyanza",d:"Human-rights organisation running Climate Justice Programs; bridges the climate-information gap for widows and smallholder farmers on food security and resource access."},
  {n:"Busia CSO Network",c:"Coalition",loc:"Busia · Western",d:"Umbrella network monitoring environmental funding and resource governance; raised red flags over transparency gaps in World Bank-funded FLLoCA climate initiatives."},
  {n:"Tira Small Scale Mining Association",c:"Community",loc:"Busia · Samia/Teso South",d:"Artisanal cooperative helping miners register formally and move from toxic mercury and cyanide toward safer borax processing."},
- {n:"Dhamira Moja",c:"Community",loc:"Busia · Western",d:"CSO working via MOU with the county government; trains youth in climate mitigation and holds duty-bearers accountable for budgets and resource management."}
+ {n:"Dhamira Moja",c:"Community",loc:"Busia · Western",d:"CSO working via MOU with the county government; trains youth in climate mitigation and holds duty-bearers accountable for budgets and resource management."},
+ {n:"JustAct Kenya",c:"Legal",loc:"Nairobi · national",d:"Citizen-led environmental action through civic education, advocacy and public-interest litigation. Co-petitioner (with EALS, Natural Justice and others) against luxury lodges in the Maasai Mara's protected zones, and coordinating a 4,600-plus citizen petition to stop construction in Nairobi National Park.",profile:true,serves:"Kenyan citizens and grassroots groups defending public land, parks, forests and green spaces"},
+ {n:"EarthLungs Reforestation Foundation",c:"Research",loc:"Nairobi · Kenya, Tanzania, Mozambique",d:"Community-led restoration of degraded public forests (with the Kenya Forest Service and Community Forest Associations) and coastal mangroves, paying local workers fair wages; founded 2021. Mangrove sites include Tudor Creek (Mombasa) and Takaungu (Kilifi).",profile:true,serves:"Forest-adjacent and coastal communities — prioritising widows, single mothers and youth; former charcoal burners and illegal loggers hired as planters"}
 ];
 
 var DESK = {
@@ -4229,7 +4231,9 @@ var ORG_WEB = {
   "Heinrich Böll Stiftung":"https://ke.boell.org",
   "Northern Rangelands Trust (NRT)":"https://www.nrt-kenya.org",
   "StopEACOP (Kenya hub)":"https://stopeacop.net",
-  "EACOP — East African Crude Oil Pipeline":"https://eacop.com"
+  "EACOP — East African Crude Oil Pipeline":"https://eacop.com",
+  "JustAct Kenya":"https://justactkenya.org",
+  "EarthLungs Reforestation Foundation":"https://www.earthlungs.org"
 };
 function renderMembers(cat){
   mList.innerHTML="";
@@ -4238,7 +4242,7 @@ function renderMembers(cat){
     var body = '<div class="member"><div class="avatar'+(m.e?" e":"")+'" aria-hidden="true">'+initials(m.n)+'</div>'+
       '<div style="flex:1; min-width:0"><h3>'+m.n+'</h3><span class="meta">'+m.c+' · '+m.loc+'</span></div></div>'+
       '<p>'+m.d+'</p>';
-    if(web){
+    if(web && !m.profile){
       c = el("a","card orgcard"); c.href = web; c.target = "_blank"; c.rel = "noopener noreferrer";
       c.setAttribute("aria-label","Open the "+m.n+" website (new tab)");
       go = '<span class="orgcard-go">Visit website ↗</span>';
@@ -5495,7 +5499,9 @@ var ORGS = [
   { n:"Rona Foundation",                     sec:["l","w"],         reg:["Nyanza"] },
   { n:"Busia CSO Network",                   sec:["m","w","l"],     reg:["Western"] },
   { n:"Tira Small Scale Mining Association", sec:["m","w"],         reg:["Western"] },
-  { n:"Dhamira Moja",                        sec:["l","e"],         reg:["Western"] }
+  { n:"Dhamira Moja",                        sec:["l","e"],         reg:["Western"] },
+  { n:"JustAct Kenya",                       sec:["l"],             reg:"national" },
+  { n:"EarthLungs Reforestation Foundation", sec:["l"],          reg:["Coast"] }
   /* The three funders (AJWS, FIMI Ayni Fund, Africa Climate Fund) finance response;
      they are not themselves ground responders, so they are deliberately left out of
      the coverage counts — they appear on the map and in the funding chains only. */
@@ -5680,7 +5686,9 @@ var ORG_LOC = {
   "Pastoralist Community Initiatives (PCI)": ["Mandera","Community",false],
   "Northern Rangelands Trust (NRT)":      ["Marsabit","Contested",true],
   "StopEACOP (Kenya hub)":                ["Nairobi","Coalition",true],
-  "EACOP — East African Crude Oil Pipeline": ["Nairobi","Contested",true]
+  "EACOP — East African Crude Oil Pipeline": ["Nairobi","Contested",true],
+  "JustAct Kenya":                        ["Nairobi","Legal",true],
+  "EarthLungs Reforestation Foundation": ["Nairobi","Research",true]
 };
 /* sectors for orgs not in the coverage list (funders + KeNRA already there) */
 var ORG_SEC = {}; ORGS.forEach(function(o){ ORG_SEC[o.n] = o.sec; });
@@ -5999,6 +6007,14 @@ var PROGRAMS = {
     ["Nairobi","o","Regional EACOP-opposition campaign; Kenyan members incl. 350 Africa &amp; the fossil-treaty movement","campaign"]],
   "EACOP — East African Crude Oil Pipeline":[
     ["Nairobi","o","Regional pressure — Kenya solidarity &amp; finance-withdrawal campaigning","program"]],
+  "JustAct Kenya":[
+    ["Nairobi","l","Nairobi National Park — 4,600+ citizens petition to halt construction in the park","litigation"],
+    ["Narok","l","Maasai Mara — petition against luxury lodges in protected zones (Ritz-Carlton, Marriott & others), with EALS &amp; Natural Justice","litigation"],
+    ["Nairobi","l","Public green spaces &amp; forests — civic education and advocacy (Uhuru &amp; Central parks)","campaign"]],
+  "EarthLungs Reforestation Foundation":[
+    ["Mombasa","l","Tudor Creek mangrove restoration (Mirarani site) — 40,000-propagule planting with KFS &amp; veritree, 2026","program"],
+    ["Kilifi","l","Takaungu mangrove nursery &amp; restoration","program"],
+    ["Nairobi","l","Degraded public-forest restoration with KFS &amp; Community Forest Associations (sites nationwide)","program"]],
   "Save Lamu":[], "LAWA — Lamu Women Alliance":[], "MKNF — Mount Kenya Network of Farmers":[],
   "KeNRA — Kenya National Rivers Association":[]
 };
@@ -6024,7 +6040,9 @@ var FUNDING = [
   ["CivFund","Defenders Coalition","Nairobi","l","Civic-space grant"],
   ["Defenders Coalition","Save Lamu","Lamu","c","Environmental defender support *"],
   ["Heinrich Böll Stiftung","deCOALonize","Nairobi","c","Coal & extractives research support"],
-  ["Heinrich Böll Stiftung","PACIDA — Pastoralist Community Initiative & Development Assistance","Marsabit","e","Pastoralist renewable-energy justice *"]
+  ["Heinrich Böll Stiftung","PACIDA — Pastoralist Community Initiative & Development Assistance","Marsabit","e","Pastoralist renewable-energy justice *"],
+  ["veritree","EarthLungs Reforestation Foundation","Mombasa","l","Restoration partner — business-funded planting + monitoring (MRV) platform"],
+  ["Climate Action Now","EarthLungs Reforestation Foundation","Nairobi","l","Tree-growing support since the first planting"]
 ];
 function shortName(nm){ return (nm.split("—")[0]).trim(); }
 function secListLabel(csv){ return csv.split(",").map(function(k){ return SECNAME[k]||k; }).join(" · "); }
@@ -6147,7 +6165,7 @@ function showNetOrg(nm){
     ? '<div class="contested-banner">⚠ Contested actor — mapped as a source of land-related pressure, '+
       'not as a coalition responder. It is <b>not</b> counted in response coverage.</div>' : '';
   var whereLine = l
-    ? '<p class="where">'+(contested?"Contested actor":l[1])+' · '+(l[2]?"operates across the north":"based in "+l[0])+
+    ? '<p class="where">'+(contested?"Contested actor":l[1])+' · '+(contested?(l[2]?"operates across the north":"based in "+l[0]):("based in "+l[0]+(l[2]?" · national reach":"")))+
         ' · '+(contested?"present in ":"active in ")+orgCounties(nm).length+(orgCounties(nm).length>1?" counties":" county")+'</p>'
     : '<p class="where">'+(m?m.c+' · '+m.loc:'Organisation')+'</p>';
   document.getElementById("netDetail").innerHTML =
@@ -6156,6 +6174,8 @@ function showNetOrg(nm){
     '<h3>'+nm+'</h3>'+
     contestedBanner+
     (m?'<p class="cnote">'+m.d+'</p>':'')+
+    (ORG_WEB[nm]?'<p style="margin:8px 0 0;font-size:.8rem"><a href="'+ORG_WEB[nm]+'" target="_blank" rel="noopener noreferrer" style="color:var(--green);font-weight:700">Visit website ↗</a></p>':'')+
+    (m&&m.serves?'<div class="respbox"><strong>Communities served</strong>'+m.serves+'</div>':'')+
     (contested?'' :'<div class="respbox"><strong>Works on</strong>'+secs+'</div>')+
     '<div class="respbox"><strong>'+(contested?"Where it operates":"Where it works")+'</strong>'+progHtml+'</div>'+
     fundsHtml + fundedHtml;
