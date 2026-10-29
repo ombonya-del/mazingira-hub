@@ -1454,6 +1454,7 @@ function cleanEmail(v){
     <a href="#accountability" data-view="explore" data-sub="accountability">Pledges</a>
     <a href="#cop"       data-view="cop">COP31</a>
     <a href="#voices"    data-view="voices">Voices</a>
+    <a href="#baraza"    data-view="baraza">Baraza</a>
     <a href="#ajesasa"   data-view="act">Je, Hatua?</a>
     <span class="nav-actions">
       <a class="btn btn--public" href="https://raia.mazingirakenya.org" target="mzk_raia" rel="noopener" title="Open raia — the public platform">raia ↗</a>
@@ -1469,6 +1470,7 @@ function cleanEmail(v){
     <a href="#explore" data-view="explore"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15 9-2.2 4.2L8.5 15l2.3-4.3z"/></svg><span>Explore</span></a>
     <a href="#cop" data-view="cop"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3.2 12h17.6M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>COP31</span></a>
     <a href="#voices" data-view="voices"><svg class="ico" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg><span>Voices</span></a>
+    <a href="#baraza" data-view="baraza"><svg class="ico" viewBox="0 0 24 24"><path d="M4 5h11v8H8l-4 3z"/><path d="M15 9h5v8l-3-2h-6v-2"/></svg><span>Baraza</span></a>
     <a href="#ajesasa" data-view="act"><svg class="ico" viewBox="0 0 24 24"><path d="M13 2 5 13.5h6L10 22l9-12h-6z"/></svg><span>Hatua</span></a>
   </div>
 </nav>
@@ -2333,6 +2335,11 @@ function cleanEmail(v){
   </div>
 </section>
 
+<!-- ============================ BARAZA (forum + socials wall) — rendered by baraza.js ============================ -->
+<section class="band" id="baraza" data-view="baraza">
+  <div class="wrap" id="barazaRoot"><p class="lede">Loading the Baraza…</p></div>
+</section>
+
 <!-- ============================ PETITIONS ============================ -->
 <section class="band" id="petitions" data-view="voices">
   <div class="wrap">
@@ -2600,6 +2607,7 @@ function cleanEmail(v){
 </footer>
 
 <script src="/project-kits.js?v=4"></script>
+<script src="/baraza.js?v=1" defer></script>
 
 <script>
 (function(){
@@ -6280,7 +6288,7 @@ form.addEventListener("submit", function(e){
 /* =================================================================
    TABBED VIEWS — each tab is its own screen, no endless scroll
    ================================================================= */
-var VIEWS = ["live","explore","cop","voices","act"];
+var VIEWS = ["live","explore","cop","voices","baraza","act"];
 /* Map / Directory (Gaps+Network) / Legal / Sentiment / Exchange (Desk+Events) now live
    inside the grouped "Explore" view. A hash may point at one of those section ids —
    route it to Explore and pick the sub. */
@@ -6288,7 +6296,7 @@ var HASH2VIEW = { live:"live", explore:"explore",
   map:"explore", directory:"explore", sectors:"explore", network:"explore",
   legal:"explore", disinfo:"explore", sentiment:"explore", narrative:"explore",
   exchange:"explore", desk:"explore", events:"explore", accountability:"explore",
-  cop:"cop", voices:"voices",
+  cop:"cop", voices:"voices", baraza:"baraza", forum:"baraza", wall:"baraza",
   ajesasa:"act", contribute:"act" };
 var HASH2SUB = { map:"map", directory:"directory", sectors:"directory", network:"directory",
   legal:"legal", disinfo:"sentiment", sentiment:"sentiment", narrative:"sentiment",
@@ -6326,6 +6334,7 @@ function showView(view, hash){
   catch(_){ try { window.scrollTo(0, 0); } catch(__){} }
   if(hash) history.replaceState(null, "", "#" + hash);
   if(view === "act" && typeof renderBrief === "function") renderBrief();   // refresh with full sector data
+  if(view === "baraza" && window.MZK_BARAZA) window.MZK_BARAZA.show();
 }
 
 /* route every in-page anchor (tabs, hero buttons, footer, Submit) through the switcher */
