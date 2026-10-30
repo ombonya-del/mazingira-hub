@@ -106,16 +106,18 @@ async function classify(p: any) {
     method: "POST",
     headers: { "content-type": "application/json", "x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01" },
     body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001", max_tokens: 300,
+      model: "claude-haiku-4-5-20251001", max_tokens: 450,
       system: "You sort posts from a Kenyan climate/environmental-justice coalition's members' forum and partners' social feeds. " +
         "Decide if the post should become a draft in another section of the coalition's hub:\n" +
         "- opportunity: an OPEN funding call, grant, fellowship, award or job relevant to climate/environment work (needs a link)\n" +
         "- event: a specific upcoming event (conference, forum, baraza, training, webinar) with a date\n" +
         "- resource: a report, study, policy, toolkit, guide or dataset (needs a link)\n" +
         "- media: a news article or media coverage about climate/environment issues in Kenya/East Africa (needs a link)\n" +
+        "- petition: a petition, memorandum or open letter people are asked to SIGN (needs a link)\n" +
+        "- action: a specific call to action other than signing — e.g. submit comments on an EIA/bill, attend public participation, write to an MP/MCA, join a march — with a link or a date\n" +
         "- none: discussion, opinion, greetings, questions, or anything unclear.\n" +
         "Be conservative: when unsure, answer none. Reply with ONLY compact JSON: " +
-        '{"type":"opportunity|event|resource|media|none","title":"clean title","meta":"short descriptor e.g. Grant · Funder · closes 12 Dec 2026","date":"YYYY-MM-DD or null","location":"place or null"}',
+        '{"type":"opportunity|event|resource|media|petition|action|none","title":"clean title","meta":"short descriptor e.g. Grant · Funder · closes 12 Dec 2026","date":"YYYY-MM-DD (event date, or petition/action deadline) or null","location":"place or null","target":"for petition/action: who it is addressed to, e.g. Ministry of Energy, Siaya County Assembly; else null","ask":"for petition/action: the ask in one or two plain sentences; else null","link":"for petition/action: the full https URL to sign or act, only if it appears complete in the text; else null"}',
       messages: [{ role: "user", content: text }],
     }),
     signal: AbortSignal.timeout(25000),
@@ -129,16 +131,30 @@ async function seed() {
   const since = new Date(Date.now() - 21 * 864e5).toISOString();
   const { data: posts } = await sb.from("baraza_posts").select("*")
     .eq("hidden", false).is("seeded_at", null).gte("created_at", since).order("created_at", { ascending: true }).limit(20);
-  const out: Record<string, number> = { opportunity: 0, event: 0, resource: 0, media: 0, none: 0, dup: 0 };
+  const out: Record<string, number> = { opportunity: 0, event: 0, resource: 0, media: 0, petition: 0, action: 0, none: 0, dup: 0 };
   await pool(posts || [], 5, async (p: any) => {
     let c: any = { type: "none" };
     try { c = await classify(p); } catch { c = { type: "none" }; }
-    let t = ["opportunity", "event", "resource", "media"].includes(c.type) ? c.type : "none";
+    let t = ["opportunity", "event", "resource", "media", "petition", "action"].includes(c.type) ? c.type : "none";
     const url = /^https:\/\//.test(p.url || "") ? p.url : null;
-    if (t !== "event" && t !== "none" && !url) t = "none";
+    const goodDate = /^\d{4}-\d{2}-\d{2}$/.test(c.date || "") && Date.parse(c.date) >= Date.now() - 864e5 ? c.date : null;
+    if (t !== "event" && t !== "action" && t !== "none" && !url) t = "none";
+    if (t === "action" && !url && !goodDate) t = "none";
     const by = p.source_name || p.author_org || p.author_name || "Baraza";
     const title = String(c.title || p.title || p.body || "").slice(0, 300);
-    if (t === "event") {
+    if (t === "petition" || t === "action") {
+      const link = /^https:\/\/[^\s…]+$/.test(c.link || "") && !/…/.test(c.link) ? c.link : url;
+      const { data: d } = link ? await sb.from("petitions").select("id").eq("action_url", link).limit(1) : { data: [] as any[] };
+      if (d && d.length) { out.dup++; t = "dup"; }
+      else {
+        const { error } = await sb.from("petitions").insert({
+          kind: t, title, target: String(c.target || "Duty-bearers").slice(0, 200),
+          summary: String(c.ask || p.body || title).slice(0, 600), body: (p.body || "").slice(0, 2000) || null,
+          action_url: link, deadline: goodDate, source: "baraza", source_name: by, goal: 0, published: false,
+        });
+        if (error) t = "none";
+      }
+    } else if (t === "event") {
       const date = /^\d{4}-\d{2}-\d{2}$/.test(c.date || "") && Date.parse(c.date) >= Date.now() - 864e5 ? c.date : null;
       if (!date) t = "none";
       else {

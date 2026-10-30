@@ -277,6 +277,7 @@ var NAV = [
   {id:"narrative", label:"Narrative disinfo", grp:"Publishing", icon:'<path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/><path d="M12 8v4M12 15h.01"/>', badgeFrom:"ndpending"},
   {id:"oppsreview", label:"Opportunities review", grp:"Publishing", icon:'<path d="M12 2v20M5 5l14 14M2 12h20M5 19 19 5"/>', badgeFrom:"oppending"},
   {id:"eventsreview", label:"Events review", grp:"Publishing", icon:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/>', badgeFrom:"evpending"},
+  {id:"petitionsreview", label:"Petitions & actions", grp:"Publishing", icon:'<path d="M9 3h9v18H6V6z"/><path d="M9 3v3H6"/><path d="M9 11h6M9 15h6"/>'},
   {id:"upload", label:"Manual upload", grp:"Publishing", icon:'<path d="M12 19V5M5 12l7-7 7 7"/>'},
   {id:"publishing", label:"Publish to raia", grp:"Publishing", icon:'<path d="M12 19V5M5 12l7-7 7 7"/>', badgeFrom:"ready"},
   {id:"content", label:"Content", grp:"Manage", icon:'<path d="M4 5h16M4 12h16M4 19h10"/>'},
@@ -374,7 +375,7 @@ var SECTIONS = [
   {id:"voices",   label:"Voices",   icon:'<path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/>', views:["moderation","upload","narrative","publishing"]},
   {id:"exchange", label:"Exchange", icon:'<path d="M4 7h16M4 12h16M4 17h10"/>', views:["resources","meetings","events"]},
   {id:"network",  label:"Network",  icon:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6a3 3 0 0 1 0 6M15 20a6 6 0 0 1 6-4"/>', views:["partners","projects","baraza","interest","members"]},
-  {id:"review",   label:"Review",   icon:'<path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/>', views:["content","oppsreview","eventsreview"]}
+  {id:"review",   label:"Review",   icon:'<path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/>', views:["content","oppsreview","eventsreview","petitionsreview"]}
 ];
 var secMem = {};
 function navLabel(id){ for(var i=0;i<NAV.length;i++) if(NAV[i].id===id) return NAV[i].label; return id; }
@@ -434,6 +435,7 @@ function render(){
   else if(v==="partners") app.innerHTML=viewPartners();
   else if(v==="projects") app.innerHTML=viewProjects();
   else if(v==="baraza") app.innerHTML=viewBaraza();
+  else if(v==="petitionsreview") app.innerHTML=viewPetitionsReview();
   else if(v==="interest") app.innerHTML=viewInterest();
   else if(v==="members") app.innerHTML=viewMembers();
   bindView();
@@ -680,6 +682,7 @@ function bindView(){
   if(state.view==="partners") loadPartners();
   if(state.view==="projects") loadProjects();
   if(state.view==="baraza") loadBaraza();
+  if(state.view==="petitionsreview") loadPetitionsReview();
   if(state.view==="interest") loadInterest();
   if(state.view==="oppsreview") loadOppsReview();
   if(state.view==="eventsreview") loadEventsReview();
@@ -1246,6 +1249,73 @@ function pjDigest(K, partners, wrap, btn){
     if(!confirm("Send the project digest to "+parts.length+" partner(s)?")) return;
     pjInvoke({ kind:"digest", note:box.querySelector(".pjnote").value, partners:parts }, stat, sbn, function(n){ return "Digest sent to "+n+" partner(s)"; });
   };
+}
+
+/* ==================== PETITIONS & CALLS TO ACTION — review seeded drafts, manage all ==================== */
+var PT_FILTERS=[["drafts","Drafts"],["live","Live"],["all","All"]];
+var ptFilter="drafts";
+function viewPetitionsReview(){
+  return '<div class="view"><div class="vhead"><h2>Petitions &amp; calls to action</h2>'+
+    '<p class="vsub">Partners\' petitions and calls to action picked up from the Baraza and the Socials Wall arrive here as <b>drafts</b>. Check the link and wording, then <b>Publish</b> to show them in the hub\'s Petitions section and on raia. Petitions members start in the hub are listed under <b>Live</b>.</p></div>'+
+    '<div id="ptFilters" style="display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px"></div><div id="ptHost">Loading…</div></div>';
+}
+function loadPetitionsReview(){
+  var host=document.getElementById("ptHost"), fh=document.getElementById("ptFilters"); if(!host) return;
+  if(!ASB){ host.textContent="Supabase unavailable — check the connection."; return; }
+  fh.innerHTML="";
+  PT_FILTERS.forEach(function(f){ var b=bzBtn(f[1], ptFilter===f[0]?"pub":"ghost"); b.onclick=function(){ ptFilter=f[0]; loadPetitionsReview(); }; fh.appendChild(b); });
+  host.textContent="Loading…";
+  ASB.from("petitions").select("*").order("created_at",{ascending:false}).limit(300).then(function(r){
+    if(r.error){ host.innerHTML='<p class="vsub">'+(/kind|action_url|column/i.test(r.error.message)?'Run supabase/baraza-phase3.sql in the SQL Editor first.':'Load failed: '+esc(r.error.message))+'</p>'; return; }
+    var rows=r.data||[];
+    var list=rows.filter(function(p){ return ptFilter==="all" ? true : ptFilter==="drafts" ? p.published===false : p.published!==false; });
+    host.innerHTML='<p class="vsub" style="margin:0 0 10px">'+rows.filter(function(p){return p.published===false;}).length+' draft(s) · '+rows.filter(function(p){return p.published!==false;}).length+' live</p>';
+    if(!list.length){ host.insertAdjacentHTML("beforeend",'<p class="vsub">Nothing here.</p>'); return; }
+    list.forEach(function(p){ host.appendChild(ptRow(p)); });
+  });
+}
+function ptRow(p){
+  var w=document.createElement("div"); w.className="ndr-draft";
+  function upd(f,after){ ASB.from("petitions").update(f).eq("id",p.id).then(function(r){ if(r.error){ toast("Failed: "+r.error.message); return; } Object.assign(p,f); toast("Saved"); after(); }); }
+  function view(){
+    var kind=p.kind==="action"?"Call to action":(p.action_url?"Partner petition":"Hub petition");
+    w.innerHTML='<div class="grow"><b>'+esc(p.title)+'</b> <span class="pill">'+kind+'</span>'+
+      (p.published===false?' <span class="pill" style="border-color:var(--gold);color:var(--gold)">draft</span>':' <span class="pill">live</span>')+
+      (p.source==="baraza"?' <span class="pill">via the Baraza</span>':'')+
+      '<div style="font-size:.78rem;opacity:.8;margin-top:3px">To: '+esc(p.target||"—")+(p.source_name?' · from '+esc(p.source_name):'')+(p.deadline?' · deadline '+esc(p.deadline):'')+(p.action_url?'':' · '+(p.sign_count||0)+' signatures')+'</div>'+
+      '<div style="font-size:.82rem;opacity:.85;margin-top:6px;white-space:pre-wrap">'+esc(p.summary||"")+'</div>'+
+      (p.action_url?'<div style="font-size:.78rem;margin-top:4px"><a href="'+esc(p.action_url)+'" target="_blank" rel="noopener">'+esc(p.action_url)+'</a></div>':'')+
+      '</div><div class="ndr-acts"></div>';
+    var a=w.querySelector(".ndr-acts");
+    var pb=bzBtn(p.published===false?"Publish":"Unpublish", p.published===false?"pub":"ghost"); pb.onclick=function(){ upd({published:p.published===false},view); }; a.appendChild(pb);
+    var eb=bzBtn("Edit"); eb.onclick=edit; a.appendChild(eb);
+    var db=bzBtn("Delete"); db.onclick=function(){ if(!confirm("Delete \""+p.title+"\"?"+(p.action_url?"":" Its signatures are deleted too."))) return;
+      ASB.from("petitions").delete().eq("id",p.id).then(function(r){ if(r.error){ toast("Delete failed: "+r.error.message); return; } w.remove(); toast("Deleted"); }); }; a.appendChild(db);
+  }
+  function edit(){
+    w.innerHTML=""; var box=document.createElement("div"); box.className="grow";
+    var t=pInput("Title"); t.value=p.title||"";
+    var k=document.createElement("select"); k.style.cssText="width:100%;margin-top:2px;padding:8px 10px;border:1px solid var(--line,#2a3a33);border-radius:7px;background:transparent;color:inherit;font:inherit";
+    k.innerHTML='<option value="petition"'+(p.kind!=="action"?" selected":"")+'>Petition</option><option value="action"'+(p.kind==="action"?" selected":"")+'>Call to action</option>';
+    var tg=pInput("Who it's addressed to"); tg.value=p.target||"";
+    var su=document.createElement("textarea"); su.rows=3; su.value=p.summary||""; su.style.cssText="width:100%;margin-top:2px;padding:8px 10px;border:1px solid var(--line,#2a3a33);border-radius:7px;background:transparent;color:inherit;font:inherit";
+    var u=pInput("https://… (partner's page to sign or act)"); u.value=p.action_url||"";
+    var dl=pInput("YYYY-MM-DD"); dl.type="date"; dl.value=p.deadline||"";
+    var sn=pInput("Partner"); sn.value=p.source_name||"";
+    box.appendChild(pLab("Title",t)); box.appendChild(pLab("Type",k)); box.appendChild(pLab("To",tg)); box.appendChild(pLab("The ask",su));
+    if(p.action_url||p.source==="baraza"){ box.appendChild(pLab("Link",u)); box.appendChild(pLab("Partner",sn)); }
+    box.appendChild(pLab("Deadline (optional)",dl));
+    w.appendChild(box);
+    var acts=document.createElement("div"); acts.className="ndr-acts";
+    var sv=bzBtn("Save","pub"); sv.onclick=function(){
+      var url=u.value.trim(); if(url && !/^https:\/\//i.test(url)){ toast("Links must start with https://"); return; }
+      if(!t.value.trim()||!tg.value.trim()||!su.value.trim()){ toast("Title, To and the ask are required"); return; }
+      var f={ title:t.value.trim(), kind:k.value, target:tg.value.trim(), summary:su.value.trim(), deadline:dl.value||null };
+      if(p.action_url||p.source==="baraza"){ f.action_url=url||null; f.source_name=sn.value.trim()||null; }
+      upd(f,view); };
+    var cn=bzBtn("Cancel"); cn.onclick=view; acts.appendChild(sv); acts.appendChild(cn); w.appendChild(acts);
+  }
+  view(); return w;
 }
 
 /* ==================== BARAZA — moderate the members' forum + Socials Wall ==================== */
