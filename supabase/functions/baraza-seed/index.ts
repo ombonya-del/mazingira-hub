@@ -40,6 +40,16 @@ async function verifySocials(partners: any[]) {
   return { published, rejected };
 }
 
+/* run fn over items, n at a time, stopping new work once the time budget is spent */
+let T0 = Date.now(); const BUDGET_MS = 110_000;
+const timeLeft = () => BUDGET_MS - (Date.now() - T0);
+async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
+  let i = 0;
+  await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => {
+    while (i < items.length && timeLeft() > 15_000) await fn(items[i++]);
+  }));
+}
+
 /* ---------- 2. partner YouTube channels ---------- */
 async function channelId(v: string): Promise<string | null> {
   const m = String(v).match(/UC[\w-]{22}/);
@@ -57,19 +67,19 @@ async function channelId(v: string): Promise<string | null> {
 async function youtube(partners: any[]) {
   let added = 0; const debug: Record<string, string> = {};
   const cutoff = Date.now() - 45 * 864e5;
-  for (const p of partners.filter((x) => x.youtube)) {
+  await pool(partners.filter((x) => x.youtube), 8, async (p) => {
     const id = await channelId(p.youtube);
-    if (!id) { debug[p.name] = "no channel id"; continue; }
+    if (!id) { debug[p.name] = "no channel id"; return; }
     try {
       const r = await fetch(`https://www.youtube.com/feeds/videos.xml?channel_id=${id}`, { signal: AbortSignal.timeout(12000) });
-      if (!r.ok) { debug[p.name] = "feed " + r.status; continue; }
+      if (!r.ok) { debug[p.name] = "feed " + r.status; return; }
       const xml = await r.text();
       const items = xml.split("<entry>").slice(1).map((e) => ({
         vid: (e.match(/<yt:videoId>([^<]+)<\/yt:videoId>/) || [])[1],
         title: ((e.match(/<title>([^<]*)<\/title>/) || [])[1] || "").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'"),
         published: (e.match(/<published>([^<]+)<\/published>/) || [])[1],
       })).filter((x) => x.vid && x.published && Date.parse(x.published) > cutoff).slice(0, 3);
-      if (!items.length) { debug[p.name] = "nothing recent"; continue; }
+      if (!items.length) { debug[p.name] = "nothing recent"; return; }
       const ids = items.map((x) => "yt:" + x.vid);
       const { data: have } = await sb.from("baraza_posts").select("ext_id").in("ext_id", ids);
       const known = new Set((have || []).map((h: any) => h.ext_id));
@@ -84,7 +94,7 @@ async function youtube(partners: any[]) {
       }
       debug[p.name] = `${items.length} recent`;
     } catch (e) { debug[p.name] = "err " + String(e).slice(0, 40); }
-  }
+  });
   return { added, debug };
 }
 
@@ -108,6 +118,7 @@ async function classify(p: any) {
         '{"type":"opportunity|event|resource|media|none","title":"clean title","meta":"short descriptor e.g. Grant · Funder · closes 12 Dec 2026","date":"YYYY-MM-DD or null","location":"place or null"}',
       messages: [{ role: "user", content: text }],
     }),
+    signal: AbortSignal.timeout(25000),
   });
   const j = await r.json();
   const raw = j?.content?.[0]?.text ?? "";
@@ -119,7 +130,7 @@ async function seed() {
   const { data: posts } = await sb.from("baraza_posts").select("*")
     .eq("hidden", false).is("seeded_at", null).gte("created_at", since).order("created_at", { ascending: true }).limit(20);
   const out: Record<string, number> = { opportunity: 0, event: 0, resource: 0, media: 0, none: 0, dup: 0 };
-  for (const p of posts || []) {
+  await pool(posts || [], 5, async (p: any) => {
     let c: any = { type: "none" };
     try { c = await classify(p); } catch { c = { type: "none" }; }
     let t = ["opportunity", "event", "resource", "media"].includes(c.type) ? c.type : "none";
@@ -146,12 +157,13 @@ async function seed() {
     }
     if (t in out && t !== "dup") out[t]++;
     await sb.from("baraza_posts").update({ seeded_at: new Date().toISOString(), seeded_to: t }).eq("id", p.id);
-  }
+  });
   return out;
 }
 
 Deno.serve(async (req) => {
   if (CRON_SECRET && req.headers.get("x-cron-secret") !== CRON_SECRET) return json({ error: "forbidden" }, 403);
+  T0 = Date.now();
   try {
     const { data: partners } = await sb.from("partners").select("name,x_handle,youtube").eq("active", true);
     const verified = await verifySocials(partners || []);
