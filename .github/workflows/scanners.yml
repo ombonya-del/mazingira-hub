@@ -20,7 +20,7 @@ on:
         required: false
         default: 'all'
         type: choice
-        options: [all, opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner, scan-sentiment, scan-sectors, cleanup]
+        options: [all, opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner, scan-sentiment, scan-sectors, baraza-seed, cleanup]
 
 env:
   SUPABASE_URL: https://uueemckdoozsuowcqkhl.supabase.co
@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        fn: [opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner, scan-sentiment, scan-sectors]
+        fn: [opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner, scan-sentiment, scan-sectors, baraza-seed]
     steps:
       - name: Run ${{ matrix.fn }}
         if: github.event_name == 'schedule' || inputs.target == 'all' || inputs.target == matrix.fn

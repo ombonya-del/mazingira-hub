@@ -285,6 +285,7 @@ var NAV = [
   {id:"events", label:"Events", grp:"Manage", icon:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/>'},
   {id:"partners", label:"Partners", grp:"Manage", icon:'<rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="2.5"/><path d="M8 17a4 4 0 0 1 8 0"/>'},
   {id:"projects", label:"Fundable projects", grp:"Manage", icon:'<path d="M13 2 5 13.5h6L10 22l9-12h-6z"/>'},
+  {id:"baraza", label:"Baraza", grp:"Manage", icon:'<path d="M4 5h11v8H8l-4 3z"/><path d="M15 9h5v8l-3-2h-6v-2"/>'},
   {id:"interest", label:"Interest", grp:"Manage", icon:'<path d="M4 5h16v11H4z"/><path d="m4 7 8 5 8-5"/><path d="m15 18 2 2 4-4"/>'},
   {id:"members", label:"Members", grp:"Manage", icon:'<circle cx="9" cy="8" r="3"/><path d="M4 20a5 5 0 0 1 10 0"/><path d="M16 6a3 3 0 0 1 0 6M14 20a5 5 0 0 1 6-3"/>'}
 ];
@@ -372,7 +373,7 @@ var SECTIONS = [
   {id:"overview", label:"Overview", icon:'<path d="M4 13h6V4H4zM14 20h6v-9h-6zM14 4v4h6V4zM4 20h6v-4H4z"/>', views:["overview"]},
   {id:"voices",   label:"Voices",   icon:'<path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/>', views:["moderation","upload","narrative","publishing"]},
   {id:"exchange", label:"Exchange", icon:'<path d="M4 7h16M4 12h16M4 17h10"/>', views:["resources","meetings","events"]},
-  {id:"network",  label:"Network",  icon:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6a3 3 0 0 1 0 6M15 20a6 6 0 0 1 6-4"/>', views:["partners","projects","interest","members"]},
+  {id:"network",  label:"Network",  icon:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6a3 3 0 0 1 0 6M15 20a6 6 0 0 1 6-4"/>', views:["partners","projects","baraza","interest","members"]},
   {id:"review",   label:"Review",   icon:'<path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/>', views:["content","oppsreview","eventsreview"]}
 ];
 var secMem = {};
@@ -432,6 +433,7 @@ function render(){
   else if(v==="events") app.innerHTML=viewEvents();
   else if(v==="partners") app.innerHTML=viewPartners();
   else if(v==="projects") app.innerHTML=viewProjects();
+  else if(v==="baraza") app.innerHTML=viewBaraza();
   else if(v==="interest") app.innerHTML=viewInterest();
   else if(v==="members") app.innerHTML=viewMembers();
   bindView();
@@ -677,6 +679,7 @@ function bindView(){
   if(state.view==="events") loadEvents();
   if(state.view==="partners") loadPartners();
   if(state.view==="projects") loadProjects();
+  if(state.view==="baraza") loadBaraza();
   if(state.view==="interest") loadInterest();
   if(state.view==="oppsreview") loadOppsReview();
   if(state.view==="eventsreview") loadEventsReview();
@@ -999,11 +1002,11 @@ function loadPartners(){
   if(!ASB){ host.textContent="Supabase unavailable — check the connection."; return; }
   host.innerHTML="";
   var af=document.createElement("div"); af.className="ndr-draft";
-  var nm=pInput("Organisation name"), em=pInput("info@org.org"), ea=pInput("alt1@org.org, alt2@org.org"), fo=pInput("coal, land, gold, nuclear, water, legal, gender, youth, media"), rg=pInput("Nyanza / Lamu / National");
-  af.appendChild(pLab("Name",nm)); af.appendChild(pLab("Contact email (primary)",em)); af.appendChild(pLab("Alternate emails (up to 2, comma-separated)",ea)); af.appendChild(pLab("Focus tags (comma-separated)",fo)); af.appendChild(pLab("Region",rg));
+  var nm=pInput("Organisation name"), em=pInput("info@org.org"), ea=pInput("alt1@org.org, alt2@org.org"), fo=pInput("coal, land, gold, nuclear, water, legal, gender, youth, media"), rg=pInput("Nyanza / Lamu / National"), xh=pInput("FoNNaPKenya (no @)"), yt=pInput("youtube.com/@channel or channel URL");
+  af.appendChild(pLab("Name",nm)); af.appendChild(pLab("Contact email (primary)",em)); af.appendChild(pLab("Alternate emails (up to 2, comma-separated)",ea)); af.appendChild(pLab("Focus tags (comma-separated)",fo)); af.appendChild(pLab("Region",rg)); af.appendChild(pLab("X handle — feeds the Baraza Socials Wall",xh)); af.appendChild(pLab("YouTube channel — feeds the Baraza Socials Wall",yt));
   var addb=document.createElement("button"); addb.className="btn pub"; addb.textContent="Add partner"; addb.style.marginTop="10px";
   addb.onclick=function(){ if(!nm.value.trim()){ toast("Name is required"); return; } addb.disabled=true;
-    ASB.from("partners").insert({name:nm.value.trim(),email:em.value.trim()||null,email_alt:ea.value.trim()||null,focus:fo.value.trim()||null,region:rg.value.trim()||null,active:true}).then(function(r){ addb.disabled=false; if(r.error){ toast("Add failed: "+r.error.message); return; } toast("Partner added"); loadPartners(); }); };
+    ASB.from("partners").insert({name:nm.value.trim(),email:em.value.trim()||null,email_alt:ea.value.trim()||null,focus:fo.value.trim()||null,region:rg.value.trim()||null,x_handle:xh.value.trim().replace(/^@/,"")||null,youtube:yt.value.trim()||null,active:true}).then(function(r){ addb.disabled=false; if(r.error){ toast("Add failed: "+r.error.message); return; } toast("Partner added"); loadPartners(); }); };
   af.appendChild(addb); host.appendChild(af);
   var listWrap=document.createElement("div"); host.appendChild(listWrap);
   ASB.from("partners").select("*").order("name",{ascending:true}).then(function(res){
@@ -1014,18 +1017,19 @@ function loadPartners(){
       var w=document.createElement("div"); w.className="ndr-draft";
       function view(){ w.innerHTML='<div class="grow"><b>'+esc(row.name)+'</b>'+(row.active?'':' <span class="pill">inactive</span>')+
         '<div style="font-size:.78rem;opacity:.8;margin-top:3px">'+(row.email?esc(row.email):'<span style="color:#E5625A">no email — add one to enable matching</span>')+(row.region?' · '+esc(row.region):'')+'</div>'+
-        (row.focus?'<div style="font-size:.75rem;opacity:.65;margin-top:2px">focus: '+esc(row.focus)+'</div>':'')+'</div><div class="ndr-acts"></div>';
+        (row.focus?'<div style="font-size:.75rem;opacity:.65;margin-top:2px">focus: '+esc(row.focus)+'</div>':'')+
+        ((row.x_handle||row.youtube)?'<div style="font-size:.75rem;opacity:.65;margin-top:2px">socials: '+(row.x_handle?'X @'+esc(row.x_handle):'')+(row.x_handle&&row.youtube?' · ':'')+(row.youtube?'YouTube '+esc(row.youtube):'')+'</div>':'')+'</div><div class="ndr-acts"></div>';
         var acts=w.querySelector(".ndr-acts");
         var eb=document.createElement("button"); eb.className="btn ghost"; eb.textContent="Edit"; eb.onclick=edit;
         var db=document.createElement("button"); db.className="btn ghost"; db.textContent="Delete"; db.onclick=function(){ if(!confirm("Delete "+row.name+"?"))return; db.disabled=true; ASB.from("partners").delete().eq("id",row.id).then(function(r){ if(r.error){db.disabled=false;toast("Delete failed: "+r.error.message);return;} toast("Partner deleted"); w.remove(); }); };
         acts.appendChild(eb); acts.appendChild(db);
       }
       function edit(){ w.innerHTML=""; var box=document.createElement("div"); box.className="grow";
-        var n2=pInput(""); n2.value=row.name||""; var e2=pInput("info@org.org"); e2.value=row.email||""; var a2=pInput("alt1@org.org, alt2@org.org"); a2.value=row.email_alt||""; var f2=pInput("focus tags"); f2.value=row.focus||""; var r2=pInput("region"); r2.value=row.region||"";
-        box.appendChild(pLab("Name",n2)); box.appendChild(pLab("Contact email (primary)",e2)); box.appendChild(pLab("Alternate emails",a2)); box.appendChild(pLab("Focus tags",f2)); box.appendChild(pLab("Region",r2)); w.appendChild(box);
-        var a2=document.createElement("div"); a2.className="ndr-acts";
-        var sv=document.createElement("button"); sv.className="btn pub"; sv.textContent="Save"; sv.onclick=function(){ sv.disabled=true; ASB.from("partners").update({name:n2.value.trim(),email:e2.value.trim()||null,email_alt:a2.value.trim()||null,focus:f2.value.trim()||null,region:r2.value.trim()||null}).eq("id",row.id).then(function(r){ if(r.error){sv.disabled=false;toast("Save failed: "+r.error.message);return;} row.name=n2.value;row.email=e2.value;row.email_alt=a2.value;row.focus=f2.value;row.region=r2.value; toast("Saved"); view(); }); };
-        var cn=document.createElement("button"); cn.className="btn ghost"; cn.textContent="Cancel"; cn.onclick=view; a2.appendChild(sv); a2.appendChild(cn); w.appendChild(a2);
+        var n2=pInput(""); n2.value=row.name||""; var e2=pInput("info@org.org"); e2.value=row.email||""; var a2=pInput("alt1@org.org, alt2@org.org"); a2.value=row.email_alt||""; var f2=pInput("focus tags"); f2.value=row.focus||""; var r2=pInput("region"); r2.value=row.region||""; var x2=pInput("X handle (no @)"); x2.value=row.x_handle||""; var y2=pInput("YouTube channel"); y2.value=row.youtube||"";
+        box.appendChild(pLab("Name",n2)); box.appendChild(pLab("Contact email (primary)",e2)); box.appendChild(pLab("Alternate emails",a2)); box.appendChild(pLab("Focus tags",f2)); box.appendChild(pLab("Region",r2)); box.appendChild(pLab("X handle — Baraza Socials Wall",x2)); box.appendChild(pLab("YouTube channel — Baraza Socials Wall",y2)); w.appendChild(box);
+        var pacts=document.createElement("div"); pacts.className="ndr-acts";
+        var sv=document.createElement("button"); sv.className="btn pub"; sv.textContent="Save"; sv.onclick=function(){ sv.disabled=true; ASB.from("partners").update({name:n2.value.trim(),email:e2.value.trim()||null,email_alt:a2.value.trim()||null,focus:f2.value.trim()||null,region:r2.value.trim()||null,x_handle:x2.value.trim().replace(/^@/,"")||null,youtube:y2.value.trim()||null}).eq("id",row.id).then(function(r){ if(r.error){sv.disabled=false;toast("Save failed: "+r.error.message);return;} row.name=n2.value;row.email=e2.value;row.email_alt=a2.value;row.focus=f2.value;row.region=r2.value;row.x_handle=x2.value.trim().replace(/^@/,"");row.youtube=y2.value.trim(); toast("Saved"); view(); }); };
+        var cn=document.createElement("button"); cn.className="btn ghost"; cn.textContent="Cancel"; cn.onclick=view; pacts.appendChild(sv); pacts.appendChild(cn); w.appendChild(pacts);
       }
       view(); listWrap.appendChild(w);
     });
@@ -1242,6 +1246,108 @@ function pjDigest(K, partners, wrap, btn){
     if(!confirm("Send the project digest to "+parts.length+" partner(s)?")) return;
     pjInvoke({ kind:"digest", note:box.querySelector(".pjnote").value, partners:parts }, stat, sbn, function(n){ return "Digest sent to "+n+" partner(s)"; });
   };
+}
+
+/* ==================== BARAZA — moderate the members' forum + Socials Wall ==================== */
+var BZ_FILTERS=[["all","All"],["discussion","Forum"],["wall","Wall"],["pending","Pending socials"],["hidden","Hidden"],["reported","Reported"]];
+var bzFilter="all";
+var BZ_CATS=["Ask the network","Updates & reports","Campaigns & actions","Funding","Legal","Media & stories","General"];
+function viewBaraza(){
+  return '<div class="view"><div class="vhead"><h2>Baraza</h2>'+
+    '<p class="vsub">Moderate the members\' forum and the Socials Wall: edit, pin, hide (pull down) or delete posts and replies, and deal with reports. Hidden posts disappear for members but stay here. <b>Pending socials</b> are partner X posts from the daily sweep waiting for the seeder to confirm the handle.</p></div>'+
+    '<div id="bzFilters" style="display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px"></div><div id="bzHost">Loading…</div></div>';
+}
+function bzAgo(ts){ try{ return new Date(ts).toLocaleString(); }catch(e){ return ts||""; } }
+function bzBtn(t,cls){ var b=document.createElement("button"); b.type="button"; b.className="btn "+(cls||"ghost"); b.textContent=t; return b; }
+function loadBaraza(){
+  var host=document.getElementById("bzHost"), fh=document.getElementById("bzFilters"); if(!host) return;
+  if(!ASB){ host.textContent="Supabase unavailable — check the connection."; return; }
+  fh.innerHTML="";
+  BZ_FILTERS.forEach(function(f){ var b=bzBtn(f[1], bzFilter===f[0]?"pub":"ghost"); b.onclick=function(){ bzFilter=f[0]; loadBaraza(); }; fh.appendChild(b); });
+  host.textContent="Loading…";
+  Promise.all([
+    ASB.from("baraza_posts").select("*").order("created_at",{ascending:false}).limit(400),
+    ASB.from("baraza_reports").select("*").order("created_at",{ascending:false}).limit(300)
+  ]).then(function(rs){
+    if(rs[0].error){ host.innerHTML='<p class="vsub">'+(/does not exist|relation/i.test(rs[0].error.message)?'Baraza isn\'t set up yet — run supabase/baraza.sql in the SQL Editor.':'Load failed: '+esc(rs[0].error.message))+'</p>'; return; }
+    var posts=rs[0].data||[], reports=(rs[1]&&rs[1].data)||[];
+    var repBy={}; reports.forEach(function(r){ if(r.post_id){ (repBy[r.post_id]=repBy[r.post_id]||[]).push(r); } });
+    var list=posts.filter(function(p){
+      if(bzFilter==="discussion") return p.kind==="discussion";
+      if(bzFilter==="wall") return p.kind!=="discussion";
+      if(bzFilter==="pending") return p.kind==="social" && p.hidden && !p.seeded_at;
+      if(bzFilter==="hidden") return p.hidden;
+      if(bzFilter==="reported") return !!repBy[p.id];
+      return true;
+    });
+    var n=function(k){ return posts.filter(k).length; };
+    host.innerHTML='<p class="vsub" style="margin:0 0 10px">'+posts.length+' posts · '+n(function(p){return p.kind==="discussion";})+' forum · '+n(function(p){return p.kind!=="discussion";})+' wall · '+n(function(p){return p.hidden;})+' hidden · '+reports.length+' open report(s)</p>';
+    if(!list.length){ host.insertAdjacentHTML("beforeend",'<p class="vsub">Nothing here.</p>'); return; }
+    list.forEach(function(p){ host.appendChild(bzRow(p, repBy[p.id]||[])); });
+  });
+}
+function bzRow(p, reps){
+  var w=document.createElement("div"); w.className="ndr-draft";
+  if(p.hidden) w.style.borderLeftColor="var(--muted,#8aa)";
+  if(reps.length) w.style.borderLeftColor="#E5625A";
+  function view(){
+    var kind=p.kind==="discussion"?"Forum":(p.kind==="social"?"Wall · swept":"Wall");
+    w.innerHTML='<div class="grow"><b>'+esc(p.title||p.source_name||p.url||"(untitled)")+'</b> <span class="pill">'+kind+'</span>'+
+      (p.platform?' <span class="pill">'+esc(p.platform)+'</span>':'')+(p.pinned?' <span class="pill" style="border-color:var(--ember);color:var(--ember)">pinned</span>':'')+
+      (p.hidden?' <span class="pill">hidden</span>':'')+(p.promoted_to?' <span class="pill">promoted → '+esc(p.promoted_to)+'</span>':'')+
+      (p.seeded_to&&p.seeded_to!=="none"?' <span class="pill">seeded → '+esc(p.seeded_to)+'</span>':'')+
+      (reps.length?' <span class="pill" style="border-color:#E5625A;color:#E5625A">'+reps.length+' report(s)</span>':'')+
+      '<div style="font-size:.78rem;opacity:.8;margin-top:3px">'+esc(p.author_name||"—")+(p.author_org?' · '+esc(p.author_org):'')+(p.source_handle?' · @'+esc(p.source_handle):'')+' · '+esc(bzAgo(p.created_at))+' · '+(p.reply_count||0)+' replies · '+(p.useful_count||0)+' useful</div>'+
+      (p.body?'<div style="font-size:.82rem;opacity:.85;margin-top:6px;white-space:pre-wrap">'+esc(String(p.body).slice(0,400))+(String(p.body).length>400?'…':'')+'</div>':'')+
+      (p.url?'<div style="font-size:.78rem;margin-top:4px"><a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.url)+'</a></div>':'')+
+      (reps.length?'<div style="font-size:.78rem;margin-top:6px;color:#E5625A">Reports: '+reps.map(function(r){ return esc(r.reason||"(no reason)")+(r.reply_id?' [reply]':''); }).join(" · ")+'</div>':'')+
+      '<div class="bz-replies"></div></div><div class="ndr-acts"></div>';
+    var a=w.querySelector(".ndr-acts");
+    var rb=bzBtn("Replies"); rb.onclick=function(){ bzReplies(p, w.querySelector(".bz-replies")); }; a.appendChild(rb);
+    var eb=bzBtn("Edit"); eb.onclick=edit; a.appendChild(eb);
+    var pb=bzBtn(p.pinned?"Unpin":"Pin"); pb.onclick=function(){ bzUpd(p,{pinned:!p.pinned},view); }; a.appendChild(pb);
+    var hb=bzBtn(p.hidden?(p.kind==="social"&&!p.seeded_at?"Approve":"Unhide"):"Hide"); hb.onclick=function(){ var f={hidden:!p.hidden}; if(p.hidden&&p.kind==="social"&&!p.seeded_at) f.seeded_at=null; bzUpd(p,f,view); }; a.appendChild(hb);
+    if(reps.length){ var cb=bzBtn("Dismiss reports"); cb.onclick=function(){ ASB.from("baraza_reports").delete().eq("post_id",p.id).then(function(r){ if(r.error){ toast("Failed: "+r.error.message); return; } reps.length=0; toast("Reports dismissed"); view(); }); }; a.appendChild(cb); }
+    var db=bzBtn("Delete"); db.onclick=function(){ if(!confirm("Delete this post and all its replies? This can't be undone — use Hide to pull it down reversibly.")) return;
+      ASB.from("baraza_posts").delete().eq("id",p.id).then(function(r){ if(r.error){ toast("Delete failed: "+r.error.message); return; } w.remove(); toast("Deleted"); }); }; a.appendChild(db);
+  }
+  function edit(){
+    w.innerHTML=""; var box=document.createElement("div"); box.className="grow";
+    var t=pInput("Title"); t.value=p.title||"";
+    var c=document.createElement("select"); c.style.cssText="width:100%;margin-top:2px;padding:8px 10px;border:1px solid var(--line,#2a3a33);border-radius:7px;background:transparent;color:inherit;font:inherit";
+    c.innerHTML='<option value="">—</option>'+BZ_CATS.map(function(x){ return '<option'+(x===p.category?' selected':'')+'>'+esc(x)+'</option>'; }).join("");
+    var b=document.createElement("textarea"); b.rows=5; b.value=p.body||""; b.style.cssText="width:100%;margin-top:2px;padding:8px 10px;border:1px solid var(--line,#2a3a33);border-radius:7px;background:transparent;color:inherit;font:inherit";
+    var u=pInput("https://…"); u.value=p.url||""; var sn=pInput("Whose post (wall)"); sn.value=p.source_name||"";
+    box.appendChild(pLab("Title",t)); if(p.kind==="discussion") box.appendChild(pLab("Category",c)); box.appendChild(pLab("Text",b)); box.appendChild(pLab("Link",u)); if(p.kind!=="discussion") box.appendChild(pLab("Whose post",sn));
+    w.appendChild(box);
+    var acts=document.createElement("div"); acts.className="ndr-acts";
+    var sv=bzBtn("Save","pub"); sv.onclick=function(){
+      var url=u.value.trim(); if(url && !/^https:\/\//i.test(url)){ toast("Links must start with https://"); return; }
+      var f={ title:t.value.trim()||null, body:b.value.trim()||null, url:url||null };
+      if(p.kind==="discussion") f.category=c.value||null; else f.source_name=sn.value.trim()||null;
+      bzUpd(p,f,view); };
+    var cn=bzBtn("Cancel"); cn.onclick=view; acts.appendChild(sv); acts.appendChild(cn); w.appendChild(acts);
+  }
+  view(); return w;
+}
+function bzUpd(p,f,after){
+  ASB.from("baraza_posts").update(f).eq("id",p.id).then(function(r){
+    if(r.error){ toast("Save failed: "+r.error.message); return; }
+    Object.keys(f).forEach(function(k){ p[k]=f[k]; }); toast("Saved"); after(); });
+}
+function bzReplies(p, host){
+  if(host.innerHTML){ host.innerHTML=""; return; }
+  host.innerHTML='<div class="mini">Loading replies…</div>';
+  ASB.from("baraza_replies").select("*").eq("post_id",p.id).order("created_at",{ascending:true}).then(function(r){
+    var rows=r.data||[]; host.innerHTML=rows.length?"":'<div class="mini">No replies.</div>';
+    rows.forEach(function(x){
+      var d=document.createElement("div"); d.style.cssText="margin-top:8px;padding:8px 10px;border:1px solid var(--line,#2a3a33);border-radius:8px;font-size:.82rem";
+      d.innerHTML='<b>'+esc(x.author_name||"—")+'</b>'+(x.author_org?' · '+esc(x.author_org):'')+' <span class="mini" style="display:inline">'+esc(bzAgo(x.created_at))+(x.hidden?' · hidden':'')+'</span><div style="white-space:pre-wrap;margin-top:3px">'+esc(x.body)+'</div>';
+      var hb=bzBtn(x.hidden?"Unhide":"Hide"); hb.style.marginTop="6px"; hb.onclick=function(){ ASB.from("baraza_replies").update({hidden:!x.hidden}).eq("id",x.id).then(function(q){ if(q.error){ toast("Failed: "+q.error.message); return; } host.innerHTML=""; bzReplies(p,host); }); };
+      var db=bzBtn("Delete"); db.style.cssText="margin:6px 0 0 6px"; db.onclick=function(){ if(!confirm("Delete this reply?")) return; ASB.from("baraza_replies").delete().eq("id",x.id).then(function(q){ if(q.error){ toast("Failed: "+q.error.message); return; } d.remove(); }); };
+      d.appendChild(hb); d.appendChild(db); host.appendChild(d);
+    });
+  });
 }
 
 /* ==================== INTEREST — partners who clicked "Register interest" ==================== */
