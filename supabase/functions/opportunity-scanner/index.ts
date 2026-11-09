@@ -1,149 +1,128 @@
-// Supabase Edge Function: opportunity-scanner  (MazingiraKenya)
+// Supabase Edge Function: opportunity-scanner  (MazingiraKenya)  v2 (2026-11-09)
 // Auto-discovers climate / environmental-justice OPPORTUNITIES (grants, calls,
 // fellowships, accreditations) for Kenya / East Africa / pan-African climate justice
 // and files them into `resources` (category='Opportunities', published=false) for admin
-// Accept/Reject.
+// Accept/Reject. Each candidate page is fetched and Claude extracts opp_type / deadline /
+// amount / eligibility and decides whether it is on-topic AND still open.
 //
-// Currency + relevance are enforced BEFORE insert: each candidate's source page is
-// fetched and Claude extracts opp_type / deadline / amount / eligibility and decides
-// whether it is on-topic AND still open (deadline today-or-later, or rolling). Only
-// then is it inserted, WITH those four fields populated so the admin preview and
-// partner-matching have what they need.
+// v2 changes:
+//  - Dead sources removed: OpportunitiesForAfricans (404), ReliefWeb v1 API (410, retired;
+//    v2 needs an appname approved by ReliefWeb, so it is opt-in via RELIEFWEB_APPNAME).
+//  - Google News now has Bing News twins, so a Google 503 no longer empties the scan.
+//  - Claude failures are reported (llm.errors / llm.sample_error) instead of being
+//    silently counted as "skipped" (every candidate was "skipped" Oct 17 and Nov 9).
 //
 // Deploy:  supabase functions deploy opportunity-scanner --project-ref uueemckdoozsuowcqkhl
-// Secrets: CRON_SECRET, ANTHROPIC_API_KEY
+// Secrets: CRON_SECRET, ANTHROPIC_API_KEY, optional RELIEFWEB_APPNAME, optional SCANNER_MODEL
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { askJson, LlmStats } from "../_shared/llm.ts";
+import { bingNews, fetchAll, googleNews, type Feed, type FeedItem } from "../_shared/rss.ts";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 const CRON_SECRET = Deno.env.get("CRON_SECRET") ?? "";
-const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY") ?? "";
-const APP = "mazingira-hub";
+const RELIEFWEB_APPNAME = Deno.env.get("RELIEFWEB_APPNAME") ?? "";
 const MAX_CANDIDATES = 40;   // bound per-run fetch + LLM cost
 
-const RSS_FEEDS = [
-  { url: "https://www.opportunitiesforafricans.com/feed/", org: "OpportunitiesForAfricans" },
-  { url: "https://www.opportunitiesforafricans.com/category/grants/feed/", org: "OpportunitiesForAfricans" },
-  { url: "https://www.opportunitiesforafricans.com/category/fellowship/feed/", org: "OpportunitiesForAfricans" },
-  { url: "https://opportunitydesk.org/feed/", org: "OpportunityDesk" },
-  { url: "https://opportunitydesk.org/category/fellowships/feed/", org: "OpportunityDesk" },
-  { url: "https://www2.fundsforngos.org/feed/", org: "FundsforNGOs" },
-  { url: "https://www2.fundsforngos.org/category/latest-funds-for-ngos/feed/", org: "FundsforNGOs" },
-  { url: "https://news.google.com/rss/search?q=Africa+(climate+OR+environment+OR+conservation+OR+%22just+transition%22)+(%22call+for+proposals%22+OR+grant+OR+fellowship+OR+scholarship)&hl=en&gl=KE&ceid=KE:en", org: "Google News" },
-  { url: "https://news.google.com/rss/search?q=(Kenya+OR+%22East+Africa%22)+(climate+OR+environment+OR+conservation+OR+biodiversity)+(grant+OR+%22call+for+proposals%22+OR+fund+OR+funding)&hl=en&gl=KE&ceid=KE:en", org: "Google News" },
-  { url: "https://news.google.com/rss/search?q=Africa+(climate+OR+environmental)+(fellowship+OR+scholarship+OR+accelerator+OR+%22grant+opportunity%22)&hl=en&gl=KE&ceid=KE:en", org: "Google News" },
+const Q1 = 'Africa (climate OR environment OR conservation OR "just transition") ("call for proposals" OR grant OR fellowship)';
+const Q2 = 'Kenya OR "East Africa" (climate OR environment OR biodiversity) (grant OR "call for applications" OR funding)';
+const FEEDS: Feed[] = [
+  { url: "https://opportunitydesk.org/feed/", label: "OpportunityDesk" },
+  { url: "https://opportunitydesk.org/category/fellowships/feed/", label: "OpportunityDesk" },
+  { url: "https://opportunitydesk.org/category/grants/feed/", label: "OpportunityDesk" },
+  { url: "https://www2.fundsforngos.org/feed/", label: "FundsforNGOs" },                // was 403 with a bot UA
+  { url: "https://www2.fundsforngos.org/category/environment-climate-change/feed/", label: "FundsforNGOs" },
+  { url: "https://www.afterschoolafrica.com/feed/", label: "AfterSchoolAfrica" },
+  { url: "https://opportunitiescorners.com/feed/", label: "OpportunitiesCorners" },
+  googleNews(Q1), googleNews(Q2),
+  bingNews(Q1), bingNews(Q2),
 ];
-const QUERY = "climate OR environment OR conservation OR biodiversity OR renewable OR drought OR " +
-  "adaptation OR resilience OR deforestation OR carbon OR 'just transition' OR land rights OR water OR " +
-  "grant OR fellowship OR scholarship";
 const REL = ["climate", "environment", "conservation", "biodiversity", "carbon", "renewable", "solar",
   "green", "drought", "adaptation", "resilience", "pollution", "deforestation", "forest", "land",
   "water", "wash", "energy", "just transition", "nature", "ecosystem", "wildlife", "waste", "sustainab",
   "restoration", "emissions", "reparations", "fellowship", "scholarship", "grant", "fund"];
 const relevant = (t: string) => { const s = (t || "").toLowerCase(); return REL.some((k) => s.includes(k)); };
 
-function pick(block: string, tag: string): string | null {
-  const m = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i"));
-  return m ? m[1].replace(/<!\[CDATA\[|\]\]>/g, "").replace(/&amp;/g, "&").replace(/<[^>]+>/g, "").trim() : null;
-}
-async function fetchRss(feed: { url: string; org: string }) {
+// ReliefWeb v2 (opt-in). Request an appname at https://apidoc.reliefweb.int/parameters#appname,
+// then: supabase secrets set RELIEFWEB_APPNAME=<approved name>
+async function reliefweb(): Promise<{ items: FeedItem[]; status: string }> {
+  if (!RELIEFWEB_APPNAME) return { items: [], status: "off (no RELIEFWEB_APPNAME)" };
+  const body = {
+    query: { value: "climate OR environment OR conservation OR resilience", operator: "OR" },
+    filter: { field: "country.name", value: ["Kenya", "World"] },
+    fields: { include: ["title", "url", "source.name", "date.created"] }, limit: 30, sort: ["date.created:desc"],
+  };
   try {
-    const r = await fetch(feed.url, { headers: { "User-Agent": "mazingira-opportunity-scanner" }, signal: AbortSignal.timeout(15000) });
-    if (!r.ok) return { items: [] as any[], status: r.status };
-    const xml = await r.text();
-    const blocks = xml.split(/<item[\s>]/i).slice(1);
-    const items = blocks.map((b) => {
-      const title = pick(b, "title"); const link = (pick(b, "link") || "").split("<")[0].trim();
-      const src = pick(b, "source") || feed.org;
-      return title && link ? { title, link, org: src } : null;
-    }).filter(Boolean);
-    return { items, status: r.status };
-  } catch (e) { return { items: [] as any[], status: "err:" + String(e).slice(0, 50) }; }
-}
-async function reliefweb() {
-  const body = { query: { value: QUERY, operator: "OR" }, fields: { include: ["title", "source", "date", "url"] }, limit: 40, sort: ["date.created:desc"] };
-  try {
-    const r = await fetch(`https://api.reliefweb.int/v1/opportunities?appname=${APP}`, {
+    const r = await fetch(`https://api.reliefweb.int/v2/training?appname=${encodeURIComponent(RELIEFWEB_APPNAME)}`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: AbortSignal.timeout(20000),
     });
-    if (!r.ok) return { items: [] as any[], status: r.status };
+    if (!r.ok) return { items: [], status: String(r.status) };
     const j = await r.json();
-    const items = (j.data || []).map((d: any) => {
-      const f = d.fields || {};
-      return { title: f.title, link: f.url ?? null, org: Array.isArray(f.source) ? (f.source[0]?.name ?? "ReliefWeb") : "ReliefWeb" };
-    });
-    return { items, status: r.status };
-  } catch (e) { return { items: [] as any[], status: "err:" + String(e).slice(0, 50) }; }
+    const items = (j.data || []).map((d: any) => ({
+      title: d.fields?.title, link: d.fields?.url, desc: "", pubDate: d.fields?.date?.created ?? null,
+      source: d.fields?.source?.[0]?.name ?? "ReliefWeb",
+    })).filter((x: FeedItem) => x.title && x.link);
+    return { items, status: String(r.status) };
+  } catch (e) { return { items: [], status: "err:" + String(e).slice(0, 50) }; }
 }
 
 async function pageText(url: string): Promise<string> {
-  if (!url) return "";
   try {
-    const r = await fetch(url, { headers: { "User-Agent": "mazingira-opportunity-scanner" }, signal: AbortSignal.timeout(12000) });
+    const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 MazingiraKenyaScanner/2.0" }, signal: AbortSignal.timeout(12000) });
     if (!r.ok) return "";
     const html = await r.text();
     return html.replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<style[\s\S]*?<\/style>/gi, " ")
       .replace(/<[^>]+>/g, " ").replace(/&[a-z]+;/gi, " ").replace(/\s+/g, " ").trim().slice(0, 4000);
   } catch { return ""; }
 }
-async function extract(today: string, title: string, url: string, body: string): Promise<any | null> {
-  if (!ANTHROPIC_KEY) return null;
-  try {
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001", max_tokens: 350,
-        system: `Today is ${today}. You curate climate / environmental-justice OPPORTUNITIES (grants, calls, fellowships, scholarships, accreditations, funds) for a Kenya / East Africa / pan-African hub. ` +
-          `Given an opportunity's title, URL and page text, reply ONLY with compact JSON: ` +
-          `{"keep":bool,"opp_type":"Grant|Fellowship|Scholarship|Accreditation|Fund|Call|Consultancy","deadline":"human e.g. 31 Aug 2026 or Rolling or null","deadline_iso":"YYYY-MM-DD or null","amount":"e.g. Up to USD 20,000 or null","eligibility":"one line: who can apply / geographic focus or null"}. ` +
-          `Set keep=true ONLY if ALL hold: (a) genuinely about climate/environment/conservation/climate-justice; (b) open to Kenyan / East African / African applicants; (c) STILL OPEN — deadline_iso is today (${today}) or later, OR clearly rolling/ongoing. ` +
-          `Set keep=false for ANYTHING that is not an open application people can apply to, including: a news article, press release, blog post, roundup/listicle, results or winners announcement, report about a programme, or general org promotion. keep=true requires a concrete, still-open call with an application route (deadline_iso today or later, or explicitly rolling). If the deadline has passed, it is off-topic, or you are not sure it is a real open opportunity, set keep=false.`,
-        messages: [{ role: "user", content: `TITLE: ${title}\nURL: ${url}\n\nPAGE:\n${body}`.slice(0, 5000) }],
-      }),
-      signal: AbortSignal.timeout(25000),
-    });
-    const j = await r.json();
-    const txt = (j?.content?.[0]?.text ?? "").trim().replace(/^```json\s*|\s*```$/g, "");
-    return JSON.parse(txt);
-  } catch { return null; }
-}
+
+const system = (today: string) =>
+  `Today is ${today}. You curate climate / environmental-justice OPPORTUNITIES (grants, calls, fellowships, scholarships, accreditations, funds) for a Kenya / East Africa / pan-African hub. ` +
+  `Given an opportunity's title, URL and page text, reply ONLY with compact JSON: ` +
+  `{"keep":bool,"opp_type":"Grant|Fellowship|Scholarship|Accreditation|Fund|Call|Consultancy","deadline":"human e.g. 31 Aug 2026 or Rolling or null","deadline_iso":"YYYY-MM-DD or null","amount":"e.g. Up to USD 20,000 or null","eligibility":"one line: who can apply / geographic focus or null"}. ` +
+  `Set keep=true ONLY if ALL hold: (a) genuinely about climate/environment/conservation/climate-justice; (b) open to Kenyan / East African / African applicants (global calls open to Africans count); (c) STILL OPEN: deadline_iso is today (${today}) or later, OR clearly rolling/ongoing. ` +
+  `Set keep=false for news articles, press releases, roundups/listicles, winners announcements, reports about a programme, or general promotion. If the deadline has passed or you are unsure it is a real open call, set keep=false.`;
 
 Deno.serve(async (req) => {
   if (CRON_SECRET && req.headers.get("x-cron-secret") !== CRON_SECRET) {
     return new Response(JSON.stringify({ error: "forbidden" }), { status: 403, headers: { "content-type": "application/json" } });
   }
   const today = new Date().toISOString().slice(0, 10);
+  const llm = new LlmStats();
   try {
-    const debug: Record<string, unknown> = {};
-    let all: any[] = [];
-    for (const f of RSS_FEEDS) { const res = await fetchRss(f); debug[f.org] = `${res.status}/${res.items.length}`; all = all.concat(res.items); }
-    const rw = await reliefweb(); debug["ReliefWeb"] = `${rw.status}/${rw.items.length}`; all = all.concat(rw.items);
+    const { all, debug } = await fetchAll(FEEDS);
+    const rw = await reliefweb(); debug["ReliefWeb v2"] = `${rw.status}/${rw.items.length}`; all.push(...rw.items);
 
-    // pre-filter by keyword, drop dupes vs existing, cap the LLM workload
-    const rough = all.filter((x) => x.title && x.link && relevant(x.title));
+    const rough = all.filter((x) => relevant(x.title));
     const { data: existing } = await sb.from("resources").select("url").in("url", rough.map((x) => x.link));
     const have = new Set((existing || []).map((e: any) => e.url));
-    const cands = rough.filter((x) => !have.has(x.link)).slice(0, MAX_CANDIDATES);
+    const fresh = rough.filter((x) => !have.has(x.link));
+    const cands = fresh.slice(0, MAX_CANDIDATES);
 
-    let inserted = 0, rejected = 0, skipped = 0;
+    let inserted = 0, rejected = 0, failed = 0, aborted = false;
     for (const c of cands) {
       const body = await pageText(c.link);
-      const x = await extract(today, c.title, c.link, body);
-      if (!x) { skipped++; continue; }
-      if (!x.keep) { rejected++; continue; }                 // stale / off-topic — never inserted
+      const res = await askJson(system(today), `TITLE: ${c.title}\nURL: ${c.link}\n\nPAGE:\n${body}`.slice(0, 5000), 350);
+      llm.record(res);
+      if (res.err) { failed++; if (res.fatal) { aborted = true; break; } continue; }
+      const x = res.data;
+      if (!x.keep) { rejected++; continue; }
       const deadline = (x.deadline && String(x.deadline).trim()) || "Rolling";
-      const meta = [x.opp_type, c.org, deadline !== "Rolling" ? `closes ${deadline}` : "Rolling"].filter(Boolean).join(" · ");
+      const meta = [x.opp_type, c.source, deadline !== "Rolling" ? `closes ${deadline}` : "Rolling"].filter(Boolean).join(" · ");
       const { error } = await sb.from("resources").insert({
         category: "Opportunities", title: String(c.title).slice(0, 300),
-        meta, url: c.link, kind: "LINK", by: c.org, published: false,
-        opp_type: x.opp_type ?? null, deadline, deadline_iso: x.deadline_iso ?? null, amount: x.amount ?? null, eligibility: x.eligibility ?? null,
+        meta, url: c.link, kind: "LINK", by: c.source, published: false,
+        opp_type: x.opp_type ?? null, deadline,
+        deadline_iso: /^\d{4}-\d{2}-\d{2}$/.test(String(x.deadline_iso)) ? x.deadline_iso : null,
+        amount: x.amount ?? null, eligibility: x.eligibility ?? null,
       });
       if (!error) { inserted++; have.add(c.link); }
     }
-    return new Response(JSON.stringify({ candidates: cands.length, inserted, rejected, skipped, before_relevance: all.length, today, debug }),
-      { headers: { "content-type": "application/json" } });
+    return new Response(JSON.stringify({
+      candidates: cands.length, already_seen: rough.length - fresh.length, inserted, rejected, failed, aborted,
+      before_relevance: all.length, today, llm, debug,
+    }), { headers: { "content-type": "application/json" } });
   } catch (e) {
-    return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers: { "content-type": "application/json" } });
+    return new Response(JSON.stringify({ error: String(e), llm }), { status: 500, headers: { "content-type": "application/json" } });
   }
 });

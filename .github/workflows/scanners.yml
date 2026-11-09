@@ -48,6 +48,16 @@ jobs:
           BODY=$(echo "$RESP" | head -n -1); CODE=$(echo "$RESP" | tail -n 1)
           echo "${{ matrix.fn }} -> HTTP $CODE"; echo "$BODY"
           [ "$CODE" = "200" ] || exit 1
+          # A 200 can still hide a broken scanner. Surface it on the run page:
+          # every Claude call failed (bad key, no credit, retired model) -> red X + email
+          if echo "$BODY" | grep -q '"all_failed":true'; then
+            ERR=$(echo "$BODY" | grep -o '"sample_error":"[^"]*"' | head -n1)
+            echo "::error title=${{ matrix.fn }}: Claude calls failing::$ERR"; exit 1
+          fi
+          # feeds that returned errors or nothing -> yellow warning (job stays green)
+          DEAD=$(echo "$BODY" | grep -o '"[^"]*":"\(4[0-9][0-9]\|5[0-9][0-9]\|err[^"]*\)/0"' | tr '\n' ' ')
+          [ -n "$DEAD" ] && echo "::warning title=${{ matrix.fn }}: dead feeds::$DEAD"
+          true
 
   cleanup:
     # Review + enrich the pending Opportunity drafts. Loops the opportunity-cleanup
