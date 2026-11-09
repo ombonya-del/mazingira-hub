@@ -15,6 +15,58 @@ Classification key: `vf` = false / bad-faith (red) · `vm` = misleading (amber) 
 
 ---
 
+## 2026-11-09 — 4 new drafts queued
+
+Queue script: `scripts/queue-disinfo-2026-11-09.sh`. All four written to Supabase as drafts via the
+connected Chrome (POST /rest/v1/disinfo_items, 201) — the Mac device-bridge shell could not reach
+supabase.co this run (proxy 403 / HTTP 000 on CONNECT), so Chrome was the writer. Status: **awaiting
+admin review**. Deduped against the currently-published `disinfo_items` (41 rows read via anon GET) and
+the 2026-09-19 / -22 / -29 / 10-03 / 10-09 / 10-19 logs. Theme this run: two fresh PesaCheck denialist
+talking points (28 Oct 2026) plus two items on the growing AI-manipulation vector — AI-written fake
+"studies" / chatbot screenshots, and AI-generated disaster imagery — a channel earlier runs had not covered.
+
+> Note: a `__PROBE__` test row (body `__diagnostic_probe__`) was inadvertently inserted as a draft while
+> verifying write access this run. The anon key can insert drafts but cannot read or delete them, so it
+> could not be removed from here — please **reject** that one row in the admin queue alongside the four below.
+
+1. **Climate denial / manipulated data (`vf`) — "A temperature graph shows no warming since 1900"**
+   - Narrative (X/Facebook): a 1900–2010 global-temperature graph is flat — no real warming, no CO2 link.
+   - Fuller picture: every major dataset contradicts it. NOAA (1900–2010) shows a clear land+ocean rise;
+     the Met Office HadCRUT record shows the same spike from the 1960s, with near-identical agreement
+     across datasets (WMO). Both hemispheres warm; WMO shows Africa heating fastest in its north, central
+     and east (incl. Kenya). A cherry-picked flat line is textbook data manipulation.
+   - Source: PesaCheck (28 Oct 2026) — https://pesacheck.org/false-this-global-temperature-graph-is-not-accurate/
+
+2. **Climate denial / misattributed cause (`vf`) — "Clouds and albedo, not humans, cause warming"**
+   - Narrative (social media / skeptic sites): warming comes from natural changes in cloud cover and the
+     Earth's reflectivity (albedo), and NASA's CERES data proves it.
+   - Fuller picture: CERES data does not support the claim. Temperatures keep rising (Copernicus: May 2026
+     the 2nd-hottest such month on record). Water vapour condenses out within days; clouds mostly cool,
+     and warming is reducing cloud cover in amplifying feedbacks — cause runs the other way. The driver is
+     greenhouse-gas build-up from fossil fuels.
+   - Source: PesaCheck (28 Oct 2026) — https://pesacheck.org/false-clouds-and-albedo-changes-do-not-account-for-all-modern-warming/
+
+3. **Climate denial / fabricated AI authority (`vf`) — "An AI-written study (Grok) proves warming is natural"**
+   - Narrative (skeptic sites, AI-generated): a peer-reviewed study with Grok AI as "lead author" proves
+     warming is natural; ask a chatbot and it confirms climate change is natural / a hoax.
+   - Fuller picture: the ScienceofClimateChange.org article recycles debunked arguments (oceans/forests
+     absorb all emissions; the Sun is the driver) with known-skeptic co-authors. Grok, asked neutrally,
+     affirms strong evidence for human-caused warming. NewsGuard audits: chatbots repeat false claims
+     ~40% of the time; Global Witness (2025) and Scientific American documented chatbots reciting denial
+     talking points. Fake "AI proof" is a new, dressed-up denial tactic. (Flags a new disinfo channel.)
+   - Source: NewsGuard Reality Check — https://www.newsguardrealitycheck.com/p/no-grok-ai-written-study-does-not
+
+4. **Fabricated / AI-generated image (`vf`) — "Photo shows Kampala underwater after recent rains"**
+   - Narrative (Facebook, East Africa floods): a photo shows widespread flooding in Kampala after heavy rains.
+   - Fuller picture: Africa Check found the image altered / AI-generated — a reverse search found a
+     non-flooded original; a building sign reads "Mapeera" in the real version but "Mapeeba" in the viral
+     one (typical AI text error); no debris, vehicles, people or emergency response. Kampala did flood
+     after 6 Mar 2026 rains, but this picture isn't from it. With Kenya Met warning of heavy Nov 2026
+     rains, miscaptioned / AI "flood" images spread fast — verify against official sources.
+   - Source: Africa Check via AllAfrica (31 Mar 2026) — https://allafrica.com/stories/202603310161.html
+
+---
+
 ## 2026-10-19 — 4 new drafts queued
 
 Queue script: `scripts/queue-disinfo-2026-10-19.sh`. All four written to Supabase as drafts via the
