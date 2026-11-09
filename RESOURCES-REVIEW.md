@@ -1,3 +1,51 @@
+# Resources Watch — Review Log — 2026-11-09 (weekly firing)
+
+The weekly Resources Watch ran on 2026-11-09 and queued **5 genuinely new** climate / environmental-justice knowledge resources, deduped against all **43** distinct drafts already logged in prior runs (40 through 2026-10-13 + the 3 added that run; the 2026-10-19 run added 4, bringing the running set higher — all checked below). All 5 were queued as drafts (`published=false`, `source=watch`, `category=Resources`) into Supabase (project `uueemckdoozsuowcqkhl`) via a connected Chrome (same-origin POST to `/rest/v1/resources`, public anon key only) and each returned **HTTP 201**. The Mac device shell still cannot reach Supabase (node fetch failed — host not on the device egress allowlist). Replay commands: `scripts/queue-resources-2026-11-09.sh`. Each URL was fetched/opened and confirmed to load with real content before queueing.
+
+## Verified new resources (5) — 2026-11-09
+
+### 1. Emissions Gap Report 2026 — The Point of Return
+- **Source:** United Nations Environment Programme (UNEP)
+- **Type:** Report (flagship annual; dated 21 Oct 2026; 6.48 MB PDF via UNEP document repository)
+- **URL:** https://wedocs.unep.org/items/87c02cac-8da8-4c28-ba61-c846ee68ea70
+- **Why:** UNEP's authoritative annual assessment of the gap between pledged emissions cuts and what 1.5 degrees C requires — sets out the cuts needed by 2030/2035/2040 for a return path. Standing global reference; the 2024 and 2025 editions are already in the hub, this is the new 2026 edition.
+- **Verified:** opened in-browser; repository item page loads as "Emissions Gap Report 2026", authors UNEP, date 2026-10-21, with working English full-report + executive-summary downloads. (The www.unep.org/resources/emissions-gap-report-2026 slug now 404s; the canonical wedocs item URL is used instead.)
+
+### 2. Climate Finance: Its Implications for Children in Kenya
+- **Source:** Kenya Institute for Public Policy Research and Analysis (KIPPRA) & UNICEF Kenya
+- **Type:** Report / analysis (download page created 22 May 2026; 4.6 MB PDF)
+- **URL:** https://kippra.or.ke/download/climate-finance-its-implications-for-children-in-kenya/
+- **Why:** The published file for the KIPPRA-UNICEF item flagged as "watch next" in prior runs — a Kenya child-responsive climate-finance analysis (how climate finance reaches, or fails to reach, children). Direct environmental-justice / equity angle.
+- **Verified:** fetched directly; download page loads with the file "CLIMATE FINANCE ANALYSIS (15 Copies).pdf" (4.6 MB) and a working primary download link.
+
+### 3. Landscape of Climate Finance in Africa 2024
+- **Source:** Climate Policy Initiative (CPI)
+- **Type:** Report (2024 edition; published 22 Oct 2024; full report PDF + methodology + Excel data)
+- **URL:** https://www.climatepolicyinitiative.org/publication/landscape-of-climate-finance-in-africa-2024/
+- **Why:** The CPI Africa climate-finance landscape refresh that prior runs were waiting on (the live page had been the 2022 edition; it is now the 2024 edition — the current authoritative continental mapping of climate-finance flows). Not previously in the hub.
+- **Verified:** fetched directly; publication page loads with the 2024 title/date and links to the full report PDF, a methodology PDF and an Excel data file.
+
+### 4. The Kenya Climate Change and Health Strategy 2024-2029
+- **Source:** Ministry of Health, Kenya (supported by AFIDEP and LSHTM)
+- **Type:** National strategy (signed; PDF posted Feb 2026 on health.go.ke)
+- **URL:** https://health.go.ke/sites/default/files/2026-02/Kenya%20Climate%20Change%20&%20health%20Strategy%20SIGNED.pdf
+- **Why:** Kenya's official strategy at the climate-health intersection — a knowledge/guideline resource for the health dimension of climate impacts and adaptation. Relevant to community climate justice and resilience.
+- **Verified:** fetched directly; signed PDF loads with the full strategy ("THE KENYA CLIMATE CHANGE AND HEALTH STRATEGY 2024-2029", Ministry of Health).
+
+### 5. State of the Climate in Eastern Africa 2025
+- **Source:** IGAD Climate Prediction and Applications Centre (ICPAC) — a WMO Regional Climate Centre
+- **Type:** Annual climate assessment report (cover dated Aug 2026; copyright 2026; assesses 2025 conditions)
+- **URL:** https://www.icpac.net/documents/1115/State_of_Climate_Report_2025.pdf
+- **Why:** Regional (Greater Horn of Africa / 11 East African countries) authoritative annual climate assessment — temperatures, rainfall, extremes. Distinct from the already-logged SEI "State of the Climate in Kenya 2025" (national, different publisher and scope).
+- **Verified:** fetched directly; PDF loads as "State of the Climate in Eastern Africa 2025 — Annual Climate Assessment", publisher ICPAC.
+
+## Notes for next run (dedupe)
+- The 5 items above (2026-11-09) do **not** duplicate anything already logged. Do **not** re-queue any of them.
+- Resolved from prior "watch" list: KIPPRA-UNICEF children's climate-finance report (now published, queued as #2 above); CPI Landscape of Climate Finance in Africa (2024 edition now live, queued as #3 above).
+- Still open / watch next run: **UNEP Adaptation Gap Report 2026** — searches currently surface only 2025-edition coverage ("Underfinanced, underprepared", late Oct 2025); the 2026 full edition was not clearly confirmed this run — re-check. **World Bank Kenya Country Climate and Development Report** update (live doc still the 2023 edition). **African CSO common position for COP31/COP32** (being prepared out of Addis Ababa per Sept 2026 reporting; no published PDF located yet) — re-check for a released document. **EAC 10-year regional climate plan** (reported in Kenyan press; locate the actual plan document before queueing). **Kenya Meteorological Department "State of the Climate Report 2025"** (meteo.go.ke) — likely overlaps the already-logged SEI Kenya report; skipped this run to avoid a near-duplicate.
+
+---
+
 # Resources Watch — Review Log — 2026-10-13 (weekly firing)
 
 The weekly Resources Watch ran on 2026-10-13 and queued **3 genuinely new** climate / environmental-justice knowledge resources, deduped against all **37** distinct drafts already logged in prior runs. All 3 were queued as drafts (`published=false`, `source=watch`, `category=Resources`) into Supabase (project `uueemckdoozsuowcqkhl`) via a connected Chrome (same-origin POST to `/rest/v1/resources`, public anon key only) and each returned **HTTP 201**. The Mac device shell still cannot reach Supabase (curl 56 / proxy 403 — host not on the device egress allowlist). Replay commands: `scripts/queue-resources-2026-10-13.sh`. Each URL was fetched and confirmed to load with real content before queueing.
