@@ -1,3 +1,48 @@
+# Opportunities Watch — Review Log — 2026-11-09
+
+MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya / East Africa / pan-African climate justice. All deadlines below are **on or after 2026-11-09**. New items are **written straight into Supabase as drafts (published=false)** via the connected-Chrome JS write path and now await admin Accept/Reject in **admin → Opportunities review**. Nothing here is public until an admin accepts.
+
+> ✅ **Queueing status:** 3/3 new drafts inserted successfully (HTTP 201) via the connected-Chrome write path (Browser 1). The Mac device shell and the cloud container remain proxy-blocked from `uueemckdoozsuowcqkhl.supabase.co` (curl/node → HTTP 000), so the browser JS `fetch` is again the reliable writer. Re-runnable commands: `scripts/queue-opportunities-2026-11-09.sh`.
+
+## New verified-open opportunities queued (3)
+
+### 1. Oilwatch International Small Grants Programme 2026 — Community-Led Action for Climate & Environmental Justice
+- **Funder / host:** Oilwatch International, with funds disbursed by the Global Greengrants Fund (GGF)
+- **Type:** Small grant — up to US$5,000 per grant; project duration 6–9 months
+- **Deadline:** 13 Nov 2026, 23:59 GMT  ⚠️ *tight — about 4 days from this run; admin to action quickly*
+- **Eligibility:** Grassroots, Indigenous Peoples', community-based, women's and youth-led organisations, environmental-justice groups, small CSOs, social movements and local advocacy networks. **Applicants must be active Oilwatch members or partners** and support its objectives; preference to groups working with frontline communities affected by oil, gas, **coal**, mining or other extractive industries. Africa regional hub: grants@oilwatch.africa. Thematic areas include keeping fossil fuels in the ground and energy justice; explicitly excludes fossil gas, carbon offsets/trading, large-scale geoengineering and industrial biofuels. ⚠️ Admin to confirm Kenyan group eligibility / Oilwatch membership with the Africa hub.
+- **URL:** https://www.oilwatch.org/2026/08/12/small-grants-programme-2026
+- **Verified:** directly on oilwatch.org — call OPEN, deadline 13 Nov 2026, up to US$5,000, framed around "Climate and Environmental Justice". Strong fit for deCOALonize / anti-coal frontline work.
+
+### 2. Officially Green Global Fellowship 2027
+- **Funder / host:** The Green Institute
+- **Type:** Sustainability leadership/advocacy fellowship (Feb 2027 cohort; volunteer-style with required MOOC, school "Officially Green Club" reaching ≥20 students, conferences and activity reports). One outstanding fellow may receive a US$1,000 post-fellowship award (competitive, not guaranteed) plus a certificate.
+- **Deadline:** 7 Jan 2027, 16:00 GMT
+- **Eligibility:** Open to applicants worldwide (Kenya/Africa eligible), aged 18–35 at the deadline, with an interest in sustainability, willingness to teach younger people, commitment to the conferences/learning, and reliable internet.
+- **URL:** https://greeninstitute.ng/greenfellow2026
+- **Verified:** via MSME Africa citing The Green Institute's official 2027 call — applications OPEN, deadline 7 Jan 2027. ⚠️ Official landing URL is the greenfellow page; admin to confirm the live 2027 form.
+
+### 3. Keeling Curve Prize 2027 (Global Warming Mitigation Project)
+- **Funder / host:** Global Warming Mitigation Project (Keeling Curve Prize)
+- **Type:** Prize / project funding for climate solutions (historically ~US$50,000 per winner across ~10 winners — admin to confirm current amount, not stated on the live apply page)
+- **Deadline:** 15 Jan 2027, 23:59 IDLW (UTC-12:00) — or earlier if the 500-application cap is reached first
+- **Eligibility:** Individuals or organisations worldwide (Kenya/Africa eligible) with active/ongoing projects that reduce, remove or replace greenhouse gases. Applications must clearly show climate-mitigation impact.
+- **URL:** https://kcp-conduit.org/apply/kcp/
+- **Verified:** directly on kcp-conduit.org/apply — application window listed as "Live", deadline 15 Jan 2027; amount/eligibility cross-checked via Terra Viva Grants (worldwide; up to ~10 winners sharing ~US$50,000).
+
+## Checked and DROPPED this run (closed, out of scope, unverifiable, or already logged)
+- **LEAP Fund 2026 — Strengthening Local Coalitions to Accelerate the E-Mobility Transition** (Drive Electric Campaign; Ethiopia/Kenya/Nigeria/South Africa, US$1.5m) — deadline **6 Nov 2026 → CLOSED** before this run.
+- **FBIS Africa Small Grants (Freshwater Biodiversity Data Mobilisation)** — US$5,000–10,000, Africa-wide, but deadline **9 Nov 2026 (today)** → effectively closed before admin review; also narrow data-digitisation scope. Not queued.
+- **Illegal Wildlife Trade (IWT) Challenge Fund** — aggregators list a 23 Nov 2026 deadline, but the official iwt.challengefund.org.uk pages return only stale Round 10/11 (2024–25) content and archived snapshots; **no current open round verifiable** → not queued (unverifiable open deadline).
+- **AECF REACT 2.0 — Digital Innovation Fund for Energy & Climate (DIFEC)** — Sub-Saharan Africa, but an **enterprise investment fund** (early/growth-stage businesses), no deadline confirmable on the official AECF page; out of grassroots env-justice scope + unverifiable deadline.
+- **Climate Intervention Environmental Impact Fund (CIEIF) 2026** (1 Dec) — US-based climate-intervention/geoengineering & CDR field-testing research; out of scope (also dropped in prior runs).
+- **GEF Small Grants Programme — Kenya (ICCA GSI Phase 2)** — Kenyan CSOs, up to US$50,000, but deadline **21 Jun 2026 → CLOSED** (already logged closed in a prior run).
+- **Conservation, Food & Health Foundation Fund** — relevant (environment, developing countries) but the listing page failed to load and no open deadline could be verified → not queued (unverifiable).
+- **UNESCO Research Continuity Grants for Africa** (15 Nov), **GBIF DNA-derived data** (30 Nov), **Water4All Joint Call** (10 Nov, European), **West Africa Clean Cooking Fund** (31 Dec, West Africa only), **Onewater Photostory Contest** (29 Nov), **Alice McCosh Trust** (30 Nov), **Oneness Revival Team NGO grant** (20 Dec, unverifiable boilerplate) — out of scope, out of region, or unverifiable.
+- **Global EbA Fund Medium-size Grants** (16 Nov), **IBCI Fellowship** (23 Nov), **IKI Medium Grants** (12 Jan 2027), **Rufford Small Grants** (rolling) — still open but **already queued/logged** in prior runs (2026-10-09 / 10-19); deduped, not re-queued.
+
+---
+
 # Opportunities Watch — Review Log — 2026-10-19
 
 MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya / East Africa / pan-African climate justice. All deadlines below are **on or after 2026-10-19**. New items are **written straight into Supabase as drafts (published=false)** via the connected-Chrome JS write path and now await admin Accept/Reject in **admin → Opportunities review**. Nothing here is public until an admin accepts.
