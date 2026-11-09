@@ -1,5 +1,37 @@
 # Events Watch — Admin Review Queue
 
+**Run date (TODAY): 2026-11-09**
+Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
+Scope: upcoming climate & environmental-justice events on or after 2026-11-09, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
+
+> ✅ **Queueing status:** 3 NEW verified events below were written **straight to Supabase as drafts (`published=false`, `source=watch`)** via the connected-Chrome write path — all three inserts returned **HTTP 201**. Review and Accept/Reject them in **admin → Events review**. Nothing is public until an admin Accepts. (The Mac device-bridge shell could not reach Supabase this run — `curl` returned HTTP 403 from the proxy after CONNECT — so the connected Chrome was used as the writer, as designed.)
+
+**Verification notes:** Each event was confirmed against a primary/organiser source and is future-dated (on/after 2026-11-09). UNESCO World Conference on Education for Sustainable Development 2027 (13–15 Jan 2027, Nairobi) confirmed via the official UNESCO conference page — hosted by UNESCO and the Government of Kenya (co-organised with Japan); it marks the ESD-for-2030 midpoint and explicitly positions greening education as a climate-action strategy. Intersolar Africa 2027 (16–17 Mar 2027, Sarit Expo Centre, Nairobi) confirmed via the AFSIA events calendar (returns to Nairobi); East Africa's largest solar/energy-storage exhibition and conference. What Works Climate Solutions Summit 2027 (13–16 Apr 2027, University of Cape Town GSB) confirmed via the organiser announcement — first African edition, hosted by ASCEND (African Synthesis Centre for Climate Change, Environment and Development). **Candidates reviewed and dropped this run:** SEforALL Forum 2027 (no firm future date/location published yet — unverifiable, skipped per verified-only rule); Mission 300 Africa Energy Summit (no 2027 edition confirmed); WEF Africa summit 2027 revival and Africa CEO Forum (Abidjan, 3–4 May 2027) — real but general business/economic, not sufficiently climate/environment-justice focused; IUCN World Protected and Conserved Areas Congress and the 3e Conférence des directeurs d'Aires Protégées d'Afrique (Libreville, 2027) — conservation-governance, no firm public-facing dates / out of core scope.
+
+---
+
+## Drafts queued this run (3) — all published=false, source=watch
+
+| # | Event | Date(s) | Location | Mode | Host | Status |
+|---|-------|---------|----------|------|------|--------|
+| 1 | UNESCO World Conference on Education for Sustainable Development 2027 | 13–15 Jan 2027 | Nairobi, Kenya | In person | UNESCO & Government of Kenya (w/ Japan) | INSERTED 201 |
+| 2 | Intersolar Africa 2027 | 16–17 Mar 2027 | Sarit Expo Centre, Nairobi, Kenya | In person | Intersolar (Solar Promotion) & AFSIA | INSERTED 201 |
+| 3 | What Works Climate Solutions Summit 2027 | 13–16 Apr 2027 | University of Cape Town (GSB), South Africa | In person | ASCEND | INSERTED 201 |
+
+**New this run (not previously logged):** all 3 above.
+
+**Dedupe:** Checked against the 2026-10-26 run (2nd Africa Clean Cooking Summit, AGES 2027, BACE 2027), the 2026-10-19 run (Global Youth Summit for Climate Change, 5th African Symposium on Climate Change Adaptation, Africa Energy Indaba 2027), the 2026-10-09 run (Solarexpo/Power & Energy 2026, IMPAC6 Dakar, 3rd Eastern Africa Agroecology Conference), the 2026-09-29 run (African Green Investment Forum, MOP38, COP32, UNEA-8), the 2026-09-22 run (Carbon Markets Africa Summit, 9th GLF Investment Case Symposium) and the 2026-09-19 run (Reparations Symposium, African Energy Week, Africa Climate Forum, CBD COP17, GreenShift Forum, Global Off-Grid Solar Forum, 5th EIK Conference, COP31, ESG & Climate Africa Summit) — **none re-queued**; still-upcoming items remain in the review queue from those runs. (Note: Intersolar Africa 2027 is distinct from the previously-queued Solarexpo/Power & Energy 2026 and Africa Energy Indaba 2027.)
+
+Reproducible record: `scripts/queue-events-2026-11-09.sh`.
+
+*Approved events go live only when a human admin clicks Accept in the admin Events review tab. This log is a draft queue, not a publication.*
+
+---
+
+<!-- ================= PREVIOUS RUNS BELOW ================= -->
+
+# Events Watch — Admin Review Queue
+
 **Run date (TODAY): 2026-10-26**
 Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
 Scope: upcoming climate & environmental-justice events on or after 2026-10-26, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
