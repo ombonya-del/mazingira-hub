@@ -46,3 +46,36 @@ export async function askJson(system: string, user: string, maxTokens = 300, tim
     return { data: null, err: "request failed: " + String(e).slice(0, 120), fatal: false };
   }
 }
+
+// Structured output via tool use: the API returns the tool input as an already-parsed object,
+// so long multilingual text with quotes, apostrophes or line breaks can never break the JSON.
+// Use for big outputs (e.g. the COP31 digest). stop_reason "max_tokens" is reported clearly.
+export async function askTool(system: string, user: string, toolName: string, inputSchema: Record<string, unknown>,
+  maxTokens = 4000, timeoutMs = 120000, model: string = MODEL): Promise<LlmResult> {
+  if (!KEY) return { data: null, err: "ANTHROPIC_API_KEY is not set on this function", fatal: true };
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": KEY, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({
+        model, max_tokens: maxTokens, system, messages: [{ role: "user", content: user }],
+        tools: [{ name: toolName, description: "Submit the finished result.", input_schema: inputSchema }],
+        tool_choice: { type: "tool", name: toolName },
+      }),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    const j = await r.json().catch(() => null);
+    if (!r.ok) {
+      const msg = `HTTP ${r.status} ${j?.error?.type ?? ""}: ${j?.error?.message ?? ""}`.trim().slice(0, 220);
+      const fatal = [401, 403, 404].includes(r.status) || /credit|billing|model/i.test(msg);
+      return { data: null, err: msg, fatal };
+    }
+    if (j?.stop_reason === "max_tokens") return { data: null, err: `reply cut off at max_tokens (${maxTokens}) — raise the limit or shorten the output`, fatal: false };
+    const block = (j?.content ?? []).find((b: any) => b.type === "tool_use" && b.name === toolName);
+    if (!block || typeof block.input !== "object") return { data: null, err: "no structured result in reply (stop_reason " + (j?.stop_reason ?? "?") + ")", fatal: false };
+    return { data: block.input, err: null, fatal: false };
+  } catch (e) {
+    return { data: null, err: "request failed: " + String(e).slice(0, 120), fatal: false };
+  }
+}
+

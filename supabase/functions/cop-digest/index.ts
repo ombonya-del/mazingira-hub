@@ -13,7 +13,7 @@
 // Secrets: CRON_SECRET, ANTHROPIC_API_KEY, optional COP_DIGEST_MODEL (default claude-sonnet-5-5)
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { askJson, LlmStats } from "../_shared/llm.ts";
+import { askTool, LlmStats } from "../_shared/llm.ts";
 import { bingNews, fetchAll, googleNews, type Feed, type FeedItem } from "../_shared/rss.ts";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -29,6 +29,8 @@ const FEEDS: Feed[] = [
   googleNews("COP31 Africa negotiators OR \"African Group\""),
   googleNews("COP31 declaration OR pledge OR initiative OR \"draft text\""),
   bingNews("COP31 Antalya"), bingNews("COP31 Kenya"), bingNews("COP31 Africa"),
+  bingNews("COP31 climate summit"), bingNews("COP31 negotiations OR \"draft text\""), bingNews("COP31 pledge OR declaration OR initiative"),
+  bingNews("Antalya climate talks"),
   { url: "https://news.un.org/feed/subscribe/en/news/topic/climate-change/feed/rss.xml", label: "UN News" },
   { url: "https://www.carbonbrief.org/feed/", label: "Carbon Brief" },
   { url: "https://www.climatechangenews.com/feed/", label: "Climate Home News" },
@@ -55,13 +57,14 @@ RULES
 - If there is nothing new on Kenya in the items, say so plainly instead of padding with the baseline.
 - Be factual and fair. The coalition cares about climate justice, so DO highlight finance-as-debt vs grants, adaptation, fossil fuel expansion and community impacts, but do not editorialise beyond what the coverage supports.
 - Compare with Belém using the baseline: is Antalya moving ahead of, level with, or behind what Belém agreed on each topic, or is it too early to tell ("unclear")?
+- vs_belem feeds the hub's commitment tracker, so tag each entry with the matching key: adaptation-finance (tripling adaptation finance), finance-1-3tn (USD 1.3tn roadmap / NCQG / climate finance work programme), gga-indicators (Global Goal on Adaptation, indicators, Adaptation Fund), just-transition (just transition mechanism / its finance), fossil-roadmap (transition away from fossil fuels, electrification goal, new fossil infrastructure), forests-tfff (Tropical Forests Forever Fund, forests), health (Belém Health Action Plan, health resilience), kenya-ndc (Kenya's own pledge, finance for it, Kenya's asks), other. Only include a key when today's items actually say something about it; one entry per key.
 
 RAIA (public, community version)
 - Plain everyday language for ordinary Kenyans, no jargon (explain any unavoidable term in a few words). Short sentences.
 - Three languages for every field: "en" English, "sw" standard Kiswahili, "sh" Nairobi Sheng (natural mixed Sheng/Swahili/English as young Nairobians speak it, e.g. "Hizo nchi tajiri zinasema...", "doo", "project", "ni fiti" — respectful, not slang-heavy, never mocking).
 - Connect to daily life in Kenya (drought, floods, food prices, power bills, jobs, debt) only where the story genuinely connects.
 
-OUTPUT: reply with ONLY one JSON object, no prose, no code fences:
+OUTPUT: call the submit_digest tool exactly once with this structure:
 {
  "headline": str,                          // hub headline, max 14 words
  "summary": str,                           // 2-3 sentences: the day in brief
@@ -70,7 +73,7 @@ OUTPUT: reply with ONLY one JSON object, no prose, no code fences:
  "negotiations": str,                      // where the formal talks stand today (2-4 sentences) or "" if no coverage
  "kenya": {"summary": str, "points": [str], "src": [int]},     // Kenya's statements/moves today; say plainly if none reported
  "africa": str,                            // African Group / AU positions today, or ""
- "vs_belem": [{"topic": str, "belem": str, "antalya": str, "direction": "ahead"|"level"|"behind"|"unclear"}],  // 3-5 topics
+ "vs_belem": [{"key": "adaptation-finance"|"finance-1-3tn"|"gga-indicators"|"just-transition"|"fossil-roadmap"|"forests-tfff"|"health"|"kenya-ndc"|"other", "topic": str, "belem": str, "antalya": str, "direction": "ahead"|"level"|"behind"|"unclear"}],  // 3-8 topics; "antalya" = what happened on it in TODAY's coverage
  "watch_next": [str],                      // 2-4 things to watch in the coming days
  "raia": {
    "headline": {"en": str, "sw": str, "sh": str},
@@ -81,6 +84,29 @@ OUTPUT: reply with ONLY one JSON object, no prose, no code fences:
    "why_care": {"en": str, "sw": str, "sh": str}             // why this matters for ordinary Kenyans
  }
 }`;
+
+const T3 = { type: "object", properties: { en: { type: "string" }, sw: { type: "string" }, sh: { type: "string" } }, required: ["en", "sw", "sh"] };
+const SRC = { type: "array", items: { type: "integer" } };
+const SCHEMA = {
+  type: "object",
+  properties: {
+    headline: { type: "string" }, summary: { type: "string" },
+    highlights: { type: "array", items: { type: "object", properties: { title: { type: "string" }, detail: { type: "string" }, src: SRC }, required: ["title", "detail"] } },
+    declarations: { type: "array", items: { type: "object", properties: { name: { type: "string" }, who: { type: "string" }, what: { type: "string" },
+      status: { type: "string", enum: ["speech", "announced", "launched", "endorsed", "draft text", "agreed"] }, src: SRC }, required: ["name", "who", "what", "status"] } },
+    negotiations: { type: "string" },
+    kenya: { type: "object", properties: { summary: { type: "string" }, points: { type: "array", items: { type: "string" } }, src: SRC }, required: ["summary"] },
+    africa: { type: "string" },
+    vs_belem: { type: "array", items: { type: "object", properties: {
+      key: { type: "string", enum: ["adaptation-finance", "finance-1-3tn", "gga-indicators", "just-transition", "fossil-roadmap", "forests-tfff", "health", "kenya-ndc", "other"] },
+      topic: { type: "string" }, belem: { type: "string" }, antalya: { type: "string" },
+      direction: { type: "string", enum: ["ahead", "level", "behind", "unclear"] } }, required: ["key", "topic", "belem", "antalya", "direction"] } },
+    watch_next: { type: "array", items: { type: "string" } },
+    raia: { type: "object", properties: { headline: T3, summary: T3, points: { type: "array", items: T3 }, kenya: T3, belem: T3, why_care: T3 },
+      required: ["headline", "summary", "points", "kenya", "belem", "why_care"] },
+  },
+  required: ["headline", "summary", "highlights", "kenya", "vs_belem", "raia"],
+};
 
 function eatNow() { return new Date(Date.now() + 3 * 3600_000); }           // Kenya/Türkiye are both UTC+3
 const ymd = (d: Date) => d.toISOString().slice(0, 10);
@@ -132,7 +158,7 @@ Deno.serve(async (req) => {
       `[${i + 1}] ${it.source} | ${it.pubDate ?? "date unknown"}\n${it.title}\n${(it.desc || "").replace(/\s+/g, " ").slice(0, 320)}`).join("\n\n");
     const user = `${BELEM_BASELINE}\n\nTODAY: ${today}, COP31 day ${copDay} of 12 (${edition === "am" ? "morning" : "evening"} edition).\n${prevNote}\n\nNEWS ITEMS:\n${list}`;
 
-    const res = await askJson(SYSTEM, user, 7000, 125_000, MODEL);
+    const res = await askTool(SYSTEM, user, "submit_digest", SCHEMA, 9000, 125_000, MODEL);
     llm.record(res);
     if (res.err) return reply({ inserted: 0, failed: 1, today, edition, items: items.length, llm, debug });
     const d = res.data ?? {};
