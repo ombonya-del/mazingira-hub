@@ -1,14 +1,27 @@
-// Supabase Edge Function: scan-sentiment  (Pipeline C — the "radar")
-// Fetches curated RSS feeds SERVER-SIDE (no CORS), de-dupes, stance-scores each headline with
-// Claude, and stores them in sentiment_items. Schedule it (see SUPABASE-SETUP.md, cron).
+// Supabase Edge Function: scan-sentiment  (Pipeline C — the "radar")  v2 (2026-11-11)
+// Fetches curated RSS feeds SERVER-SIDE, keeps environmental headlines, stance-scores the NEW
+// ones with Claude and stores them in sentiment_items (the hub's Media pulse + raia's radar).
 //
-// Place at:  supabase/functions/scan-sentiment/index.ts
-// Deploy:    supabase functions deploy scan-sentiment
-// Secret:    ANTHROPIC_API_KEY (SUPABASE_URL / SERVICE_ROLE injected automatically)
+// v2 changes (the radar had gone stale):
+//  - v1 fetched 10 feeds one after another and made one Claude call for EVERY headline, including
+//    ones already stored, so a run could hit Supabase's ~150s limit and be cut off before the later
+//    feeds were reached. v2 fetches all feeds in parallel, drops already-stored URLs BEFORE calling
+//    Claude, and scores new headlines in batches of 25 (one call per batch).
+//  - Dates are normalised: unparseable or future-dated pubDates become "now", so a bad feed date
+//    can no longer pin an item to the top of the radar.
+//  - Reports real numbers: new_items / already_seen / per-feed status / Claude errors, so the
+//    GitHub run shows when it is broken instead of a meaningless "added" count.
+//
+// Deploy:  supabase functions deploy scan-sentiment --project-ref uueemckdoozsuowcqkhl
+// Secrets: ANTHROPIC_API_KEY, optional CRON_SECRET, optional SCANNER_MODEL
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { askJson, LlmStats } from "../_shared/llm.ts";
+import { fetchAll, TIME_BUDGET_MS, type Feed } from "../_shared/rss.ts";
+
 const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
+const CRON_SECRET = Deno.env.get("CRON_SECRET") ?? "";
+const PER_FEED = 20, BATCH = 25;
 
 // curated source list — extend freely
 const FEEDS = [
@@ -25,54 +38,70 @@ const FEEDS = [
 ];
 const ENV = /(climate|carbon|emission|coal|fossil|refinery|petroleum|geotherm|solar|renewable|hydropower|nuclear|NuPEA|atomic|uranium|drought|flood|\brain|weather|Kenya Met|El Ni|famine|locust|forest|deforest|reforest|afforest|\btree|seedling|logging|mangrove|wetland|conservan|wildlife|elephant|rhino|poach|biodivers|ecosystem|mining|\bgold\b|quarry|sand harvest|charcoal|pollution|\bwaste\b|plastic|sewage|\bwater|river|\blake|\bdam\b|land rights|eviction|displac|Lamu|Turkana|Siaya|Dangote|environment|\boil\b|\bgas\b|green energy)/i;
 
-Deno.serve(async () => {
-  let added = 0;
-  for (const f of FEEDS) {
-    try {
-      const xml = await (await fetch(f.url)).text();
-      const items = parseRss(xml);
-      // Keep only genuinely environmental headlines. ENV is broad (forests, mining, weather,
-      // water, wildlife, energy, El Nino...) so on-topic Kenyan stories pass, but tangential
-      // outlet noise (accidents, disease outbreaks, celebrity/business items) is dropped.
-      const picked = items.filter((i) => ENV.test(i.title)).slice(0, 20);
-      for (const it of picked) {
-        const stance = await scoreStance(it.title);
-        const { error } = await supabase.from("sentiment_items").upsert(
-          { source: f.source, source_type: f.type, title: it.title, url: it.link, published_at: it.pubDate, stance },
-          { onConflict: "url", ignoreDuplicates: true },
-        );
-        if (!error) added++;
+function normDate(s: string | null): string {
+  const t = s ? Date.parse(s) : NaN;
+  const now = Date.now();
+  if (isNaN(t) || t > now + 3600_000) return new Date(now).toISOString();
+  return new Date(t).toISOString();
+}
+
+const SYSTEM = "You classify Kenyan climate/environmental-justice headlines by their stance toward the justice framing " +
+  "(communities, accountability, climate justice). supportive = advances or sympathises with it; critical = dismisses or works " +
+  "against it (e.g. uncritical promotion of fossil projects, attacks on activists); neutral = straight reporting. " +
+  'Reply ONLY with JSON: {"s":["supportive"|"neutral"|"critical", ...]} with exactly one entry per numbered headline, in order.';
+
+Deno.serve(async (req) => {
+  if (CRON_SECRET && req.headers.get("x-cron-secret") !== CRON_SECRET) {
+    return new Response(JSON.stringify({ error: "forbidden" }), { status: 403, headers: { "content-type": "application/json" } });
+  }
+  const started = Date.now();
+  const llm = new LlmStats();
+  try {
+    const feeds: (Feed & { type: string; source: string })[] = FEEDS.map((f) => ({ ...f, label: f.source }));
+    // fetch each feed separately (parallel) so we know which source each item came from
+    const per = await Promise.all(feeds.map(async (f) => ({ f, r: await fetchAll([f]) })));
+    const debug: Record<string, string> = {};
+    const seen = new Set<string>();
+    const cand: { source: string; type: string; title: string; url: string; published_at: string }[] = [];
+    for (const { f, r } of per) {
+      Object.assign(debug, r.debug);
+      for (const it of r.all.filter((i) => ENV.test(i.title)).slice(0, PER_FEED)) {
+        if (seen.has(it.link)) continue; seen.add(it.link);
+        cand.push({ source: f.source, type: f.type, title: it.title, url: it.link, published_at: normDate(it.pubDate) });
       }
-    } catch (_) { /* skip a bad feed, keep going */ }
+    }
+    // drop what is already stored BEFORE spending Claude calls
+    const have = new Set<string>();
+    for (let i = 0; i < cand.length; i += 100) {
+      const { data } = await supabase.from("sentiment_items").select("url").in("url", cand.slice(i, i + 100).map((c) => c.url));
+      (data || []).forEach((d: any) => have.add(d.url));
+    }
+    const fresh = cand.filter((c) => !have.has(c.url));
+
+    let inserted = 0, timed_out = false;
+    for (let i = 0; i < fresh.length; i += BATCH) {
+      if (Date.now() - started > TIME_BUDGET_MS) { timed_out = true; break; }
+      const batch = fresh.slice(i, i + BATCH);
+      const res = await askJson(SYSTEM, batch.map((b, n) => `${n + 1}. ${b.title}`).join("\n"), 400, 30000);
+      llm.record(res);
+      const st: string[] = Array.isArray(res.data?.s) ? res.data.s : [];
+      const rows = batch.map((b, n) => ({
+        source: b.source, source_type: b.type, title: b.title, url: b.url, published_at: b.published_at,
+        stance: ["supportive", "neutral", "critical"].includes(String(st[n]).toLowerCase()) ? String(st[n]).toLowerCase() : "neutral",
+      }));
+      // store even if scoring failed (stance falls back to neutral) — the radar must not go stale
+      const { error, count } = await supabase.from("sentiment_items")
+        .upsert(rows, { onConflict: "url", ignoreDuplicates: true, count: "exact" });
+      if (!error) inserted += count ?? rows.length;
+      if (res.fatal) { // key/credit/model problem: store the rest unscored and stop calling Claude
+        const rest = fresh.slice(i + BATCH).map((b) => ({ source: b.source, source_type: b.type, title: b.title, url: b.url, published_at: b.published_at, stance: "neutral" }));
+        if (rest.length) { const r2 = await supabase.from("sentiment_items").upsert(rest, { onConflict: "url", ignoreDuplicates: true, count: "exact" }); if (!r2.error) inserted += r2.count ?? rest.length; }
+        break;
+      }
+    }
+    return new Response(JSON.stringify({ new_items: inserted, already_seen: cand.length - fresh.length, candidates: cand.length, timed_out, llm, debug }),
+      { headers: { "content-type": "application/json" } });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: String(e), llm }), { status: 500, headers: { "content-type": "application/json" } });
   }
-  return new Response(JSON.stringify({ added }), { headers: { "content-type": "application/json" } });
 });
-
-function parseRss(xml: string) {
-  const out: { title: string; link: string; pubDate: string | null }[] = [];
-  for (const m of xml.matchAll(/<item[\s\S]*?<\/item>/g)) {
-    const b = m[0];
-    const grab = (re: RegExp) => (b.match(re)?.[1] ?? "").replace(/<!\[CDATA\[|\]\]>/g, "").trim();
-    out.push({
-      title: grab(/<title>([\s\S]*?)<\/title>/),
-      link: grab(/<link>([\s\S]*?)<\/link>/),
-      pubDate: grab(/<pubDate>([\s\S]*?)<\/pubDate>/) || null,
-    });
-  }
-  return out;
-}
-
-async function scoreStance(title: string): Promise<string> {
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001", max_tokens: 6,
-      system: "Classify this Kenyan climate/environmental-justice headline's stance toward the justice framing. Reply ONE word: supportive, neutral, or critical.",
-      messages: [{ role: "user", content: title }],
-    }),
-  });
-  const j = await r.json();
-  const w = (j?.content?.[0]?.text ?? "neutral").toLowerCase().trim();
-  return ["supportive", "neutral", "critical"].includes(w) ? w : "neutral";
-}

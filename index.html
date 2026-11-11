@@ -276,7 +276,12 @@ a.sf-item:hover{ border-color:var(--muted); text-decoration:none; }
   .sf-tag{ order:2; font-size:.54rem; padding:2px 8px; }
 }
 /* Community Pulse — MOTD-style embed cards of real, attributable posts (no rebuttal) */
-.pulse-feed{ display:grid; gap:11px; }
+/* tiled like the Baraza Socials Wall: CSS columns so each card keeps its own height */
+.pulse-feed{ column-gap:14px; column-count:1; }
+@media(min-width:760px){ .pulse-feed{ column-count:2; } }
+@media(min-width:1100px){ .pulse-feed{ column-count:3; } }
+.pulse-feed > .pulse-card{ display:block; width:100%; box-sizing:border-box; margin:0 0 14px; break-inside:avoid; -webkit-column-break-inside:avoid; page-break-inside:avoid; }
+.pc-earlier{ margin:-3px 0 9px; font-size:.64rem; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:#C99A2E; }
 .pulse-card{ display:block; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 15px; text-decoration:none; transition:border-color .15s; }
 .pulse-card:hover{ border-color:var(--muted); text-decoration:none; }
 .pc-head{ display:flex; align-items:center; gap:10px; margin:0 0 9px; }
@@ -949,6 +954,12 @@ table.matrix tbody th{
 .cop-body dd b{ color:var(--text); }
 .cop-body .kepos{ border-left:2px solid var(--green); padding-left:11px; }
 .cop-body .kegap{ border-left:2px solid var(--ember-hot); padding-left:11px; }
+.cop-body .keant{ border-left:2px solid #C99A2E; padding-left:11px; }
+.cop-body .kelive{ border-left:2px dashed var(--ember-hot); padding-left:11px; }
+.mv{ display:inline-block; font-size:.56rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; padding:2px 8px; border-radius:100px; border:1px solid currentColor; white-space:nowrap; }
+.mv.ahead{ color:var(--green); } .mv.level{ color:var(--muted); } .mv.behind{ color:#E5484D; } .mv.unclear{ color:#C99A2E; }
+.cop-btn .mvcol{ flex:none; min-width:118px; text-align:right; }
+@media (max-width:640px){ .cop-btn .mvcol{ min-width:0; } }
 
 @media (min-width:900px){
   .copdeck{ grid-template-columns:1fr 1fr; }
@@ -1499,10 +1510,10 @@ function cleanEmail(v){
 </nav>
 
 <!-- ============================ COP31 COUNTDOWN (persistent, pinned under header) ============================ -->
-<a class="copbar" href="#cop" aria-label="Countdown to COP31 — open the tracker">
+<a class="copbar" href="#cop" aria-label="COP31 — open the commitment tracker">
   <span class="cb-dot" aria-hidden="true"></span>
-  <span class="cb-lab">Road to COP31</span>
-  <span class="cb-where">Antalya, Türkiye · 9 Nov 2026</span>
+  <span class="cb-lab" id="cbLab">Road to COP31</span>
+  <span class="cb-where" id="cbWhere">Antalya, Türkiye · 9 Nov 2026</span>
   <span class="cb-time" id="copBar" aria-live="off">
     <span><b id="bD">0</b><i>d</i></span>
     <span><b id="bH">00</b><i>h</i></span>
@@ -1607,10 +1618,11 @@ function cleanEmail(v){
   <div class="wrap">
     <div class="sec-head">
       <div class="grow">
-        <p class="kicker">Road to Antalya</p>
-        <h2>COP31 countdown &amp; commitment tracker</h2>
-        <p class="lede">What was actually agreed at COP30 in Belém, what has moved since, where Kenya stands
-          on each, and how far short the delivery is falling as the next conference approaches.</p>
+        <p class="kicker" id="copKicker">Live from Antalya</p>
+        <h2>COP31 commitment tracker</h2>
+        <p class="lede">Every major commitment from COP30 in Belém, mapped against COP31 in Antalya: what Belém
+          agreed, what has moved since, what is on the table now, whether Antalya is moving it forward, and
+          where Kenya stands.</p>
       </div>
     </div>
 
@@ -1624,7 +1636,7 @@ function cleanEmail(v){
 
     <div class="copdeck">
       <div class="copclock">
-        <p class="kicker kicker--g" id="copClockLab">COP31 opens in</p>
+        <p class="kicker kicker--g" id="copClockLab">COP31 is open</p>
         <div class="clock" id="copClock" aria-live="off">
           <span><b id="cD">0</b><i>days</i></span>
           <span><b id="cH">0</b><i>hrs</i></span>
@@ -1648,15 +1660,18 @@ function cleanEmail(v){
 
     <div class="sec-head" style="margin-top:34px">
       <div class="grow"><p class="kicker">Belém → Antalya</p>
-      <h3 class="trackh">Commitment delivery tracker</h3></div>
-      <p class="trackkey"><i class="sw comm"></i>Committed at COP30 &nbsp;<i class="sw rad"></i>Delivered so far</p>
+      <h3 class="trackh">COP30 commitments, tracked at COP31</h3></div>
+      <p class="trackkey"><i class="sw comm"></i>Committed at COP30 &nbsp;<i class="sw rad"></i>Delivered so far &nbsp;·&nbsp; Antalya:
+        <span class="mv ahead">moving ahead</span> <span class="mv level">holding</span> <span class="mv behind">slipping</span> <span class="mv unclear">too early</span></p>
     </div>
     <div id="copList"></div>
 
-    <p class="copsrc">Sources: Carbon Brief and UN News on the Belém Package · UNFCCC COP31 · Climate Action
-      Tracker and Kenya's Second NDC (2031–2035) · Africa Adaptation Initiative and Daily Nation on the
-      Africa Group position. Progress percentages are the Hub's own assessment against what was agreed,
-      not an official UNFCCC metric.</p>
+    <p class="copsrc">Sources: Carbon Brief and UN News on the Belém Package · UNFCCC (Stiell and Bowen opening
+      remarks, COP31) · UN News, Reuters, AFP and Climate Home News from Antalya · Climate Action Network ECO ·
+      Climate Action Tracker and Kenya's Second NDC (2031–2035) · Daily Nation, The Standard and TV47 on Kenya's
+      COP31 asks · AU on the CAHOSCC common position. "Delivered" percentages and the Antalya ratings are the
+      Hub's own assessment against what Belém agreed, not an official UNFCCC metric; the "Latest from the COP31
+      desk" lines update from the reviewed daily digest.</p>
   </div>
 </section>
 
@@ -3189,7 +3204,7 @@ async function refreshLive(){
     var mi = await sb.from("sentiment_items").select("title,source,published_at").order("published_at",{ascending:false}).limit(6);
     if(mi && mi.data && mi.data.length){
       state.media.items = mi.data.map(function(r){
-        return { tx: escE(r.title) + (r.source ? ' <span class="src">- '+escE(r.source)+'</span>' : ''), t: Date.parse(r.published_at)||Date.now() };
+        return { tx: txtE(r.title) + (r.source ? ' <span class="src">- '+txtE(r.source)+'</span>' : ''), t: Date.parse(r.published_at)||Date.now() };
       });
       renderFeed("media");
     }
@@ -3200,7 +3215,7 @@ async function refreshLive(){
     var ci = await sb.from("pulse_items").select("name,handle,body,posted_at,created_at").eq("published",true).order("created_at",{ascending:false}).limit(6);
     if(ci && ci.data && ci.data.length){
       state.community.items = ci.data.map(function(r){
-        var txt = String(r.body||"").replace(/\s+/g," ").trim(); if(txt.length>92) txt = txt.slice(0,92)+"…";
+        var txt = decEnt(r.body||"").replace(/\s+/g," ").trim(); if(txt.length>92) txt = txt.slice(0,92)+"…";
         var who = r.handle || r.name || "";
         return { tx: (who ? '<b>'+escE(who)+'</b> ' : '') + escE(txt), t: Date.parse(r.created_at||r.posted_at)||Date.now() };
       });
@@ -4431,6 +4446,20 @@ window.renderDeskActive = function(){
 var evWrap = document.getElementById("eventList");
 var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 function escE(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+/* Feed titles often arrive with HTML entities (&#8220; &amp; &#039; …). Decode them to plain text
+   BEFORE escaping, so readers see “quotes” and apostrophes instead of raw codes. A <textarea> never
+   runs anything put in it, so this is safe. */
+var _decT = document.createElement("textarea");
+function decEnt(s){ s=String(s==null?"":s); if(s.indexOf("&")<0) return s; var prev; var n=0; do{ prev=s; _decT.innerHTML=s; s=_decT.value; n++; }while(s!==prev && s.indexOf("&")>=0 && n<3); return s; }
+function txtE(s){ return escE(decEnt(s)); }
+/* Dates arrive as ISO ("2026-07-17T15:24:34.000Z") or "16 Jul 2026". Return a timestamp or NaN. */
+var _MON={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+function parseAnyDate(v){
+  if(!v) return NaN; var t=Date.parse(v); if(!isNaN(t)) return t;
+  var m=String(v).match(/(\d{1,2})\s+([A-Za-z]{3})[a-z]*\.?,?\s+(\d{4})/); if(m && _MON[m[2].toLowerCase()]!=null) return new Date(+m[3],_MON[m[2].toLowerCase()],+m[1]).getTime();
+  return NaN;
+}
+function niceDate(v){ var t=typeof v==="number"?v:parseAnyDate(v); if(isNaN(t)) return String(v||""); return new Date(t).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}); }
 function evKey(e){ var mi=MONTHS.indexOf(e.m); return (mi<0?99:mi)*100 + (parseInt(e.d,10)||0); }
 function renderEvents(){
   evWrap.innerHTML = "";
@@ -4580,7 +4609,7 @@ function hubToast(m){ var t=document.getElementById("hubToast"); if(!t) return; 
       wrap.innerHTML=data.map(function(i){
         return '<a class="sf-item" href="'+escE(i.url||"#")+'" target="_blank" rel="noopener noreferrer"><span class="sf-src">'+escE(i.source||"")+'</span><span class="sf-h">'+escE(i.title||"")+'</span><span class="sf-tag '+(tag[i.stance]||"neu")+'">'+escE(i.stance||"")+'</span></a>';
       }).join("");
-      var note=document.querySelector("#sp-pulse .sc-meta"); if(note) note.textContent="● Live from Supabase — "+data.length+" items from the scanner. "+note.textContent;
+      /* (last-scanned line is now set by loadPulse) */
     }, function(){ /* offline / not set up yet → keep static */ });
 })();
 
@@ -5013,11 +5042,16 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
     var map={supportive:"pos",neutral:"neu",critical:"neg"};
     var html = rows.map(function(i){
       return '<a class="sf-item" href="'+escE(i.url)+'" target="_blank" rel="noopener noreferrer">'+
-        '<span class="sf-src">'+escE(i.source)+'</span><span class="sf-h">'+escE(i.title)+'</span>'+
+        '<span class="sf-src">'+txtE(i.source)+'</span><span class="sf-h">'+txtE(i.title)+'</span>'+
         '<span class="sf-tag '+(map[i.stance]||"neu")+'">'+escE(i.stance||"neutral")+'</span></a>';
     }).join("");
     var feed=document.querySelector("#sp-pulse .sent-feed"); if(feed) feed.innerHTML=html;
     var kick=document.querySelector('#sp-pulse .sec-head .kicker'); if(kick) kick.textContent="Latest scanned items · live from Supabase";
+    var li = await SB.from("sentiment_items").select("ingested_at").order("ingested_at",{ascending:false}).limit(1);
+    var meta=document.querySelector("#sp-pulse .sc-meta");
+    if(meta && li && li.data && li.data[0]){ var lt=new Date(li.data[0].ingested_at);
+      meta.textContent="Last scanned "+lt.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})+", "+lt.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})+
+        ". Drawn automatically from public Kenyan and international coverage several times a day, de-duplicated and stance-scored (supportive · neutral · critical). Click any item to read the source."; }
   }catch(e){ /* keep in-file fallback */ }
   }
   if(SB.auth&&SB.auth.getSession){ SB.auth.getSession().then(loadPulse,loadPulse); } else { loadPulse(); }
@@ -5032,26 +5066,51 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
   function tc(c){ return c ? (" "+String(c).replace(/[^a-z0-9_-]/gi,"")) : ""; }
   function vc(v){ return /^(vf|vm|vc|vp)$/.test(v)?v:"vf"; }
 
-  sb.from("pulse_items").select("*").eq("published",true).order("created_at",{ascending:false}).limit(6)
+  /* No fresh community posts (the daily X sweep hasn't filed any in 30 days)? Then replace the
+     old curated August cards with the newest stance-flagged headlines from the media radar, so the
+     panel is never weeks out of date. Real community posts take over again as soon as they exist. */
+  function pulseFallback(){
+    var feed=document.getElementById("communityPulse"); if(!feed) return;
+    sb.from("sentiment_items").select("source,title,url,stance,published_at").neq("stance","neutral")
+      .order("published_at",{ascending:false}).limit(6).then(function(r){
+        var rows=r&&r.data; if(!rows||!rows.length) return;
+        function fd(t){ var d=new Date(t); return isNaN(d)?"":d.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}); }
+        feed.innerHTML=rows.map(function(i){
+          var tag=i.stance==="critical"?'<span class="pc-tag oil">Pushback</span>':'<span class="pc-tag water">Justice framing</span>';
+          return '<div class="pulse-card">'
+            +'<div class="pc-head"><span class="pc-av news">📰</span><div class="pc-who"><b>'+txtE(i.source||"")+'</b><span>In the news · '+escE(fd(i.published_at))+'</span></div>'+tag+'</div>'
+            +'<p class="pc-text">'+txtE(i.title||"")+'</p>'
+            +(i.url?'<div class="pc-foot"><a class="xorig-toggle" href="'+escE(i.url)+'" target="_blank" rel="noopener noreferrer">Read the story →</a></div>':'')
+            +'</div>';
+        }).join("");
+        if(window.buildTicker) window.buildTicker();
+      }, function(){});
+  }
+  sb.from("pulse_items").select("*").eq("published",true).order("created_at",{ascending:false}).limit(30)
     .then(function(res){
-      var d=res&&res.data; if(!d||!d.length) return;
-      var pcut = Date.now() - 30*864e5;                 // ignore pulse rows older than 30 days
-      d = d.filter(function(i){ var t=Date.parse(i.created_at||i.posted_at||""); return isNaN(t)?true:t>=pcut; });
-      if(!d.length) return;                             // nothing fresh → keep curated in-file cards
+      var d=res&&res.data; if(!d||!d.length){ pulseFallback(); return; }
+      var pcut = Date.now() - 30*864e5;                 // only rows filed in the last 30 days
+      d = d.filter(function(i){ var t=parseAnyDate(i.created_at||i.posted_at); return isNaN(t)?true:t>=pcut; });
+      if(!d.length){ pulseFallback(); return; }         // nothing fresh → newest radar headlines instead of stale cards
       var feed=document.getElementById("communityPulse"); if(!feed) return;
-      feed.insertAdjacentHTML("afterbegin", d.map(function(i){
+      // order by when the post was WRITTEN (posted_at), not when the sweep filed it
+      d.forEach(function(i){ i._posted=parseAnyDate(i.posted_at); i._filed=parseAnyDate(i.created_at); if(isNaN(i._posted)) i._posted=i._filed; });
+      d.sort(function(x,y){ return (y._posted||0)-(x._posted||0); });
+      d = d.slice(0,9);
+      feed.innerHTML = d.map(function(i){
+        var earlier = !isNaN(i._filed) && (i._filed - i._posted) > 21*864e5;   // an older post bookmarked recently
         return '<div class="pulse-card">'
-          +'<div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>'+escE(i.name||i.handle||"")+'</b><span>'+escE(i.handle||"")+(i.posted_at?" · "+escE(i.posted_at):"")+'</span></div>'
-          +(i.tag?'<span class="pc-tag'+tc(i.tag_class)+'">'+escE(i.tag)+'</span>':'')+'</div>'
-          +'<p class="pc-text">'+escE(i.body||"")+'</p>'
+          +'<div class="pc-head"><span class="pc-av x">𝕏</span><div class="pc-who"><b>'+txtE(i.name||i.handle||"")+'</b><span>'+txtE(i.handle||"")+(i._posted?" · "+escE(niceDate(i._posted)):"")+'</span></div>'
+          +(i.tag?'<span class="pc-tag'+tc(i.tag_class)+'">'+txtE(i.tag)+'</span>':'')+'</div>'
+          +(earlier?'<p class="pc-earlier">Earlier post · picked up '+escE(niceDate(i._filed))+'</p>':'')
+          +'<p class="pc-text">'+txtE(i.body||"")+'</p>'
           +(i.media_url?'<a class="pc-shot" href="'+escE(i.tweet_url||i.media_url)+'" target="_blank" rel="noopener noreferrer"><img src="'+escE(i.media_url)+'" alt="" loading="lazy"></a>':'')
-          +'<div class="pc-foot"><span class="pc-eng">'+escE(i.eng||"")+'</span>'
+          +'<div class="pc-foot"><span class="pc-eng">'+txtE(i.eng||"")+'</span>'
           +(i.tweet_url?'<button class="xorig-toggle" type="button" data-tweet="'+escE(i.tweet_url)+'">View original →</button>':'')+'</div>'
           +'<div class="xorig-embed" hidden></div></div>';
-      }).join(""));
-      while(feed.children.length>6) feed.removeChild(feed.lastElementChild);
+      }).join("");
       if(window.buildTicker) window.buildTicker();   // refresh the header ticker with the live Pulse rows
-    }, function(){});
+    }, function(){ pulseFallback(); });
 
   sb.from("disinfo_items").select("*").eq("published",true).order("created_at",{ascending:false}).limit(6)
     .then(function(res){
@@ -5276,31 +5335,40 @@ renderVoices();
 var COP31 = new Date("2026-11-09T00:00:00+03:00");
 var BELEM_CLOSE = new Date("2025-11-21T00:00:00-03:00");
 
+var COP31_END = new Date("2026-11-20T23:59:59+03:00");
+function copPhase(){ var n=new Date(); return n<COP31?"before":(n<=COP31_END?"live":"after"); }
+function copDayNo(){ return Math.min(12, Math.floor((new Date()-COP31)/86400000)+1); }
+function setTxt(id,t){ var e=document.getElementById(id); if(e) e.textContent=t; }
 function tickCop(){
+  var phase=copPhase();
+  if(phase!=="before"){
+    var day=copDayNo(), left=Math.max(0, Math.floor((COP31_END-new Date())/86400000));
+    var clock=document.getElementById("copClock");
+    if(phase==="live"){
+      setTxt("copClockLab","COP31 is open · live in Antalya");
+      if(clock) clock.innerHTML='<span><b>'+day+'</b><i>day of 12</i></span>'+(left?'<span><b>'+left+'</b><i>'+(left===1?"day":"days")+' to close</i></span>':'<span><b>Final</b><i>day · closes tonight</i></span>');
+      setTxt("cbLab","COP31 · Live"); setTxt("cbWhere","Antalya, Türkiye · closes 20 Nov");
+      var bar=document.getElementById("copBar"); if(bar) bar.innerHTML='<span><b>Day '+day+'</b><i>of 12</i></span>';
+    } else {
+      setTxt("copClockLab","COP31 has closed"); setTxt("copKicker","Antalya outcomes");
+      if(clock) clock.innerHTML='<span><b>12</b><i>days · 9–20 Nov</i></span>';
+      setTxt("cbLab","COP31 · Closed"); setTxt("cbWhere","Antalya, Türkiye · 9–20 Nov 2026");
+      var bar2=document.getElementById("copBar"); if(bar2) bar2.innerHTML='<span><b>Outcomes</b></span>';
+    }
+    return;
+  }
   var ms = COP31 - new Date();
-  var neg = ms < 0; if(neg) ms = -ms;
   var d = Math.floor(ms/86400000),
       h = Math.floor(ms/3600000)%24,
       m = Math.floor(ms/60000)%60,
       s = Math.floor(ms/1000)%60;
-  document.getElementById("cD").textContent = d;
-  document.getElementById("cH").textContent = ("0"+h).slice(-2);
-  document.getElementById("cM").textContent = ("0"+m).slice(-2);
-  document.getElementById("cS").textContent = ("0"+s).slice(-2);
-  var bD = document.getElementById("bD");
-  if(bD){
-    if(neg){ bD.textContent = "Under way"; ["bH","bM","bS"].forEach(function(id){
-      var e=document.getElementById(id); if(e) e.parentNode.style.display="none"; }); }
-    else {
-      bD.textContent = d;
-      document.getElementById("bH").textContent = ("0"+h).slice(-2);
-      document.getElementById("bM").textContent = ("0"+m).slice(-2);
-      document.getElementById("bS").textContent = ("0"+s).slice(-2);
-    }
-  }
+  setTxt("copClockLab","COP31 opens in"); setTxt("copKicker","Road to Antalya");
+  setTxt("cD",d); setTxt("cH",("0"+h).slice(-2)); setTxt("cM",("0"+m).slice(-2)); setTxt("cS",("0"+s).slice(-2));
+  setTxt("bD",d); setTxt("bH",("0"+h).slice(-2)); setTxt("bM",("0"+m).slice(-2)); setTxt("bS",("0"+s).slice(-2));
 }
-tickCop(); setInterval(tickCop, 1000);
-(function(){ var lab=document.getElementById("copClockLab"); if(lab && new Date()>=COP31) lab.textContent="COP31 has been under way for"; })();
+tickCop(); setInterval(tickCop, copPhase()==="before" ? 1000 : 60000);
+document.getElementById("sinceBelem").textContent =
+  Math.floor((new Date() - BELEM_CLOSE)/86400000) + " days";
 
 /* ---------- COP31 Daily: published digests from cop_digests (members) ---------- */
 var COPD = { rows:[], i:0 };
@@ -5333,55 +5401,83 @@ function cdLoad(){
   if(!SB) return;
   SB.from("cop_digests").select("id,digest_date,edition,cop_day,hub,sources").eq("published",true)
     .order("digest_date",{ascending:false}).order("edition",{ascending:false}).limit(30)
-    .then(function(r){ if(r.error||!r.data||!r.data.length) return; COPD.rows=r.data; COPD.i=0; cdRender(); }, function(){});
+    .then(function(r){ if(r.error||!r.data||!r.data.length) return; COPD.rows=r.data; COPD.i=0; cdRender(); if(window.copTrackLive) copTrackLive(r.data); }, function(){});
 }
 (function(){ if(!SB) return; if(SB.auth&&SB.auth.getSession){ SB.auth.getSession().then(cdLoad,cdLoad); } else cdLoad();
   if(SB.auth&&SB.auth.onAuthStateChange){ SB.auth.onAuthStateChange(function(_e,s){ if(s) cdLoad(); }); } })();
-document.getElementById("sinceBelem").textContent =
-  Math.floor((new Date() - BELEM_CLOSE)/86400000) + " days";
 
+/* Each COP30 commitment carries:
+   antalya / mv  — what is on the table at COP31 and the Hub's reading of whether Antalya is
+                   moving it ahead, holding it level, letting it slip behind, or too early to tell.
+                   Baseline written 11 Nov 2026 (Day 3) from UNFCCC, UN News, Reuters/AFP,
+                   Climate Home News, CAN ECO and Kenyan press; revisit as the talks close.
+   id            — matches the "key" the cop-digest scanner tags its Belém comparisons with, so
+                   published daily digests add a "Latest from the COP31 desk" line automatically. */
+var MV_LABEL = { ahead:"Antalya: moving ahead", level:"Antalya: holding", behind:"Antalya: slipping", unclear:"Antalya: too early" };
 var COMMITMENTS = [
- { t:"Triple adaptation finance by 2035", m:"Belém Package · global mutirão decision", d:15, tone:"of the tripling in place",
+ { id:"adaptation-finance", t:"Triple adaptation finance by 2035", m:"Belém Package · global mutirão decision", d:15, tone:"of the tripling in place",
    agreed:"Parties reaffirmed the roughly <b>USD 40 billion a year</b> adaptation finance goal for 2025 and agreed to <b>at least triple it by 2035</b>, taking it toward USD 120 billion a year within the wider NCQG.",
-   progress:"A political commitment with <b>no burden-sharing formula and no interim milestone</b> between now and 2035. Nothing binds any single country to a share of it, and nothing lands before the next NDC cycle.",
-   kenya:"Environment CS Deborah Barasa told the plenary Africa is already “in the eye of the storm”, pressing for new, accessible, <b>grant-based</b> finance rather than loans into an already distressed debt position.",
-   gap:"Africa's adaptation funding need is put at <b>over USD 2.5 trillion by 2030</b>. A tripling that arrives in 2035 does not touch the decade in which the damage is happening." },
+   progress:"A political commitment with <b>no baseline, no burden-sharing formula and no interim milestone</b>. At the June Bonn talks, work on the adaptation goal stalled after several developed countries preferred to handle the tripling outside the negotiations.",
+   antalya:"The central fight of COP31. Türkiye's chief climate diplomat named a <b>concrete roadmap for the tripling</b> as an aim for the summit, and UN climate chief Simon Stiell listed following up on it among the core negotiating tasks. African negotiators have asked for adaptation finance to be added to the <b>formal agenda</b>, and civil society (CAN) wants the tripling locked into the adaptation-goal talks with interim milestones well before 2035.",
+   mv:"unclear",
+   kenya:"At Belém, Environment CS Deborah Barasa told the plenary Africa is already “in the eye of the storm”, pressing for new, accessible, <b>grant-based</b> finance. In Antalya, Kenyan advocates are repeating it: adaptation money must come as <b>grants, not loans</b> that deepen debt.",
+   gap:"Africa's adaptation funding need is put at <b>over USD 2.5 trillion by 2030</b>. A tripling that arrives in 2035 does not touch the decade in which the damage is happening — unless Antalya sets a delivery path." },
 
- { t:"Mobilise USD 1.3 trillion a year by 2035", m:"Baku to Belém roadmap", d:20, tone:"of the pathway defined",
-   agreed:"A headline goal to mobilise <b>USD 1.3 trillion annually by 2035</b> for climate action in developing countries, building on the USD 300 billion a year NCQG agreed at COP29.",
-   progress:"The Brazilian presidency is convening an <b>independent expert group through 2026</b> to define financing pathways. The composition — grant, loan, or leveraged private capital — remains unresolved.",
-   kenya:"Kenya negotiated with the G77 and China bloc, arguing that finance counted as loans deepens the debt trap it is meant to relieve.",
+ { id:"finance-1-3tn", t:"Mobilise USD 1.3 trillion a year by 2035", m:"Baku to Belém roadmap", d:20, tone:"of the pathway defined",
+   agreed:"A headline goal to mobilise <b>USD 1.3 trillion annually by 2035</b> for climate action in developing countries, building on the USD 300 billion a year NCQG agreed at COP29. Belém also set up a two-year <b>Work Programme on Climate Finance</b> (March 2026 – November 2027).",
+   progress:"An independent expert group has worked through 2026 on financing pathways. The composition — grant, loan, or leveraged private capital — remains unresolved.",
+   antalya:"COP31 is due the <b>first progress update on the Baku-to-Belém roadmap</b> and must decide how the Climate Finance Work Programme operates. Climate funding is widely reported as one of the summit's dominant issues; Guterres used the leaders' summit to call for <b>taxes on oil windfall profits</b>.",
+   mv:"unclear",
+   kenya:"Kenya negotiates with the G77 and China bloc, arguing that finance counted as loans deepens the debt trap it is meant to relieve. Ruto's message to Africa's leaders ahead of Antalya: the world lacks delivery, not pledges.",
    gap:"Without a grant floor, a headline trillion can be met largely with debt instruments. <b>The number is agreed; its quality is not.</b>" },
 
- { t:"Global Goal on Adaptation — Belém indicators", m:"Adopted at COP30", d:55, tone:"of the framework agreed",
+ { id:"gga-indicators", t:"Global Goal on Adaptation — Belém indicators", m:"Adopted at COP30", d:55, tone:"of the framework agreed",
    agreed:"A set of <b>59 voluntary, non-prescriptive indicators</b> to track adaptation progress across water, food, health, ecosystems, infrastructure and livelihoods.",
-   progress:"Adopted and now in refinement through 2026. This is the one instrument that genuinely landed at Belém.",
-   kenya:"The Africa Group, Kenyan negotiators among them, said the indicators are <b>not fit for purpose</b> and were politically driven — not aligned with the means-of-implementation principles of the Convention.",
+   progress:"Adopted and in refinement through 2026. This is the one instrument that genuinely landed at Belém.",
+   antalya:"Stiell's agenda for COP31 includes <b>establishing a technical taskforce</b> to take the adaptation goal forward, and finalising the transition of the Adaptation Fund. Progress on the indicators is expected to be procedural rather than headline.",
+   mv:"level",
+   kenya:"The Africa Group, Kenyan negotiators among them, said at Belém the indicators are <b>not fit for purpose</b> and were politically driven — not aligned with the means-of-implementation principles of the Convention.",
    gap:"The framework measures adaptation without financing it. <b>Indicators are not money</b>, and the means-of-implementation indicators were the ones weakened." },
 
- { t:"Just transition mechanism", m:"Belém Action Mechanism", d:30, tone:"of the mechanism operational",
+ { id:"just-transition", t:"Just transition mechanism", m:"Belém Action Mechanism", d:30, tone:"of the mechanism operational",
    agreed:"Parties approved a <b>just transition mechanism</b> placing people and equity at the centre of climate action — a long-standing demand of labour and civil society.",
-   progress:"Established in principle; modalities and governance are being worked through during 2026.",
+   progress:"Established in principle; modalities and governance were worked through during 2026.",
+   antalya:"Campaigners are pushing a <b>“Belém-Antalya Mechanism”</b> proposal to keep financing for just transitions on the agenda without creating yet another empty fund. Whether Parties give the mechanism money is the open question.",
+   mv:"unclear",
    kenya:"Directly material to the coalition's own legislative work — the Energy (Amendment) Bill 2026 is Kenya's attempt to put just transition obligations on a statutory footing domestically.",
    gap:"<b>No finance is attached to the mechanism.</b> A mechanism without a funding line is a meeting schedule." },
 
- { t:"Roadmap to transition away from fossil fuels", m:"Not adopted", d:5, tone:"of a roadmap in the text",
+ { id:"fossil-roadmap", t:"Roadmap to transition away from fossil fuels", m:"Not adopted at Belém", d:5, tone:"of a roadmap in the text",
    agreed:"Nothing. Despite <b>more than 80 countries</b> backing a roadmap, the final Belém text contains <b>no reference to fossil fuels at all</b>.",
-   progress:"Pushed outside the formal process into a voluntary presidency roadmap. Colombia and the Netherlands will co-host a first International Conference on the Just Transition Away from Fossil Fuels during 2026.",
-   kenya:"Kenya <b>broke from the Africa Group's official line</b> and joined the 80-plus countries backing the roadmap, alongside Sierra Leone — a notable piece of independent climate diplomacy.",
-   gap:"The single commitment most directly relevant to this coalition's mandate is the one that <b>does not exist in the agreed text</b>. Everything now depends on voluntary coalitions." },
+   progress:"Pushed outside the formal process into a voluntary presidency roadmap, with only a handful of country submissions. A separate conference on transitioning away from fossil fuels, co-hosted by Colombia and the Netherlands, drew roughly 60 countries.",
+   antalya:"<b>Fossil fuel phase-out is not a formal COP31 agenda item.</b> Türkiye is instead pushing an <b>electrification goal</b> — raising electricity's share of energy use — which critics say may do little to curb warming. At the leaders' summit Guterres called for <b>no new coal, oil or gas infrastructure</b> that puts 1.5°C further out of reach, and civil society wants an “Antalya call for roadmaps” in the final package.",
+   mv:"behind",
+   kenya:"At Belém, Kenya <b>broke from the Africa Group's official line</b> and joined the 80-plus countries backing the roadmap, alongside Sierra Leone. In Antalya Kenya is backing the <b>“35 by 35” electrification goal</b>, which Ruto endorsed at the UN General Assembly.",
+   gap:"The commitment most directly relevant to this coalition's mandate <b>still does not exist in any agreed text</b>, and electrification targets can grow alongside fossil supply — see Lamu." },
 
- { t:"Tropical Forests Forever Fund", m:"Voluntary pledge · 53 countries", d:5, tone:"of the fund capitalised",
+ { id:"forests-tfff", t:"Tropical Forests Forever Fund", m:"Voluntary pledge · 53 countries", d:5, tone:"of the fund capitalised",
    agreed:"A standing fund for tropical forest countries, capitalised at <b>USD 5.5 billion</b>, with at least <b>20% flowing directly to Indigenous Peoples and local communities</b>.",
    progress:"Capitalised at a small fraction of its design ambition. The direct-to-communities share is the genuinely novel feature and is worth watching closely.",
+   antalya:"No significant new pledges reported from Antalya so far. Watch for announcements during the leaders' summit and the nature days.",
+   mv:"unclear",
    kenya:"Relevant to Mau, the Mt Kenya and Aberdare water towers, and coastal mangroves — all live pressure points on the national map above.",
    gap:"Pledged capital sits an order of magnitude below what the fund was designed to hold, and <b>disbursement rules for the community share are not yet set</b>." },
 
- { t:"Kenya's own NDC 3.0", m:"Submitted 30 April 2025", d:20, tone:"of the pledge funded",
+ { id:"health", t:"Belém Health Action Plan", m:"Adopted at COP30", d:25, tone:"of the plan in practice",
+   agreed:"A global framework for <b>climate-resilient health systems</b>, with emphasis on the disproportionate impact on women and Indigenous communities and better surveillance of climate-sensitive diseases such as malaria and dengue.",
+   progress:"Largely a framework; countries were left to implement it nationally.",
+   antalya:"Health is one of the <b>10 priority areas</b> of COP31's Action Agenda. Countries are being urged to put the Belém plan into practice, and a new <b>Antalya Initiative for Health Resilience</b> is being launched.",
+   mv:"ahead",
+   kenya:"Kenya's flood and drought seasons already drive cholera, malaria and malnutrition spikes — the plan only matters if county health systems get the money to act on it.",
+   gap:"An initiative is not funding. The test is whether Antalya attaches <b>finance to health adaptation</b>, not just another framework." },
+
+ { id:"kenya-ndc", t:"Kenya's own NDC 3.0", m:"Submitted 30 April 2025", d:20, tone:"of the pledge funded",
    agreed:"Kenya committed to abate <b>35% of emissions below business-as-usual by 2035</b> — 75.25 MtCO₂e — up from 32% in the previous NDC, plus a push toward a <b>100% renewable grid by 2035</b> from roughly 90% today.",
    progress:"Only the <b>20% domestically funded share</b> is unconditional. The remaining 80% waits on international finance, technology transfer and capacity building.",
+   antalya:"President Ruto is <b>not attending</b>; the delegation is led by the Environment, Climate Change and Forestry Cabinet Secretary. Kenya's two headline asks are <b>electricity access (“35 by 35”) and clean cooking</b>, ahead of the Africa Clean Cooking Summit Nairobi hosts in January 2027. Ruto, who coordinates the AU's climate committee, convened it in September to set Africa's common position for Antalya: implementation, grant-based finance, adaptation, clean cooking and climate-positive growth.",
+   mv:"level",
    kenya:"This is Kenya's position. The pledge carries a stated price of <b>USD 56 billion</b>.",
-   gap:"Kenya's climate pledge is <b>80% conditional on money Belém did not secure</b>. That is the sharpest way to state the problem locally: the ambition is real, the financing is hypothetical." }
+   gap:"Kenya's climate pledge is <b>80% conditional on money Belém did not secure</b>. Unless Antalya moves the finance, the ambition stays hypothetical." }
 ];
 
 /* ---------- donut, drawn inside each commitment's expanded view ----------
@@ -5409,6 +5505,7 @@ COMMITMENTS.forEach(function(k,i){
       '<span class="prog"><span class="pt"><span class="pc"></span>'+
         '<span class="pd" style="width:'+k.d+'%"></span></span>'+
         '<span class="pl"><span>committed</span><span><b>'+k.d+'%</b> delivered</span></span></span>'+
+      '<span class="mvcol"><span class="mv '+k.mv+'">'+MV_LABEL[k.mv]+'</span></span>'+
       '<svg class="acc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'+
     '</button>'+
     '<div class="cop-body">'+
@@ -5416,7 +5513,9 @@ COMMITMENTS.forEach(function(k,i){
     '<dl>'+
       '<div><dt>What was agreed</dt><dd>'+k.agreed+'</dd></div>'+
       '<div><dt>Progress since Belém</dt><dd>'+k.progress+'</dd></div>'+
+      '<div><dt>On the table at Antalya</dt><dd class="keant">'+k.antalya+'</dd></div>'+
       '<div><dt>Where Kenya stands</dt><dd class="kepos">'+k.kenya+'</dd></div>'+
+      '<div class="cop-live" data-key="'+k.id+'" hidden><dt>Latest from the COP31 desk</dt><dd class="kelive"></dd></div>'+
     '</dl>'+
     '<dl style="margin-top:14px; grid-template-columns:1fr"><div><dt>The gap</dt>'+
       '<dd class="kegap">'+k.gap+'</dd></div></dl></div>';
@@ -5437,6 +5536,23 @@ COMMITMENTS.forEach(function(k,i){
   if(i===0) drawArc();
   copWrap.appendChild(row);
 });
+
+/* Fill each commitment's "Latest from the COP31 desk" from published digests (newest first).
+   The digest scanner tags each Belém comparison with one of the commitment ids above. */
+function copTrackLive(rows){
+  var seen={};
+  (rows||[]).forEach(function(r){
+    ((r.hub&&r.hub.vs_belem)||[]).forEach(function(x){
+      var key=x.key; if(!key||seen[key]) return; seen[key]=1;
+      var box=document.querySelector('.cop-live[data-key="'+key+'"]'); if(!box) return;
+      var mv=MV_LABEL[x.direction]?x.direction:"unclear";
+      box.querySelector("dd").innerHTML='<span class="mv '+mv+'">'+MV_LABEL[mv]+'</span> <span style="font-size:.7rem;color:var(--muted-dim)">Day '+cdEsc(r.cop_day)+'</span><br>'+cdEsc(x.antalya);
+      box.hidden=false;
+    });
+  });
+}
+window.copTrackLive = copTrackLive;
+if(window.COPD && COPD.rows && COPD.rows.length) copTrackLive(COPD.rows);
 
 
 /* =================================================================

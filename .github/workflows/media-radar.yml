@@ -35,3 +35,11 @@ jobs:
           BODY=$(echo "$RESP" | head -n -1); CODE=$(echo "$RESP" | tail -n 1)
           echo "scan-sentiment -> HTTP $CODE"; echo "$BODY"
           [ "$CODE" = "200" ] || exit 1
+          if echo "$BODY" | grep -q '"all_failed":true'; then
+            ERR=$(echo "$BODY" | grep -o '"sample_error":"[^"]*"' | head -n1)
+            echo "::warning title=scan-sentiment: stance scoring failing (items still stored)::$ERR"
+          fi
+          echo "$BODY" | grep -q '"timed_out":true' && echo "::warning title=scan-sentiment: ran out of time::some new headlines wait for the next run"
+          DEAD=$(echo "$BODY" | grep -o '"[^"]*":"\(4[0-9][0-9]\|5[0-9][0-9]\|err[^"]*\)/0"' | tr '\n' ' ')
+          [ -n "$DEAD" ] && echo "::warning title=scan-sentiment: dead feeds::$DEAD"
+          true

@@ -9,8 +9,18 @@ export type Feed = { url: string; label: string };
 
 const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36 MazingiraKenyaScanner/2.0";
 
-const decode = (s: string) => s.replace(/<!\[CDATA\[|\]\]>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<")
-  .replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/<[^>]+>/g, "").trim();
+const NAMED: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", hellip: "…", ndash: "–", mdash: "—",
+  lsquo: "‘", rsquo: "’", ldquo: "“", rdquo: "”", laquo: "«", raquo: "»", eacute: "é", egrave: "è", uuml: "ü", ouml: "ö", ccedil: "ç" };
+function entities(s: string): string {
+  // twice, because feeds often double-encode (&amp;#8220;)
+  for (let k = 0; k < 2; k++) {
+    s = s.replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(+n))
+      .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+      .replace(/&([a-z]+);/gi, (m, name) => NAMED[name.toLowerCase()] ?? m);
+  }
+  return s;
+}
+const decode = (s: string) => entities(s.replace(/<!\[CDATA\[|\]\]>/g, "").replace(/<[^>]+>/g, "")).replace(/\s+/g, " ").trim();
 
 function pick(block: string, tag: string): string | null {
   const m = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i"));
