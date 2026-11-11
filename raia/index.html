@@ -66,6 +66,26 @@ main{padding-top:22px}
 /* ---------- hero ---------- */
 .hero{position:relative;background:radial-gradient(120% 130% at 85% -10%, #223 0%, var(--ink) 55%);color:var(--cream);border-radius:22px;overflow:hidden;box-shadow:var(--shadow-lg)}
 .hero .pad{padding:26px 22px 28px}
+/* COP31 Leo — daily digest card (cop_digests, raia version) */
+.copcard{margin:18px 0 0;background:var(--card);border:1px solid rgba(0,0,0,.08);border-top:5px solid var(--gold);border-radius:18px;padding:18px 18px 16px;box-shadow:0 6px 22px rgba(0,0,0,.06)}
+.copcard .cc-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px}
+.copcard .cc-live{display:inline-flex;align-items:center;gap:7px;background:#3a2a00;color:var(--gold-2);font-weight:900;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:5px 11px}
+.copcard .cc-live i{width:7px;height:7px;border-radius:50%;background:#F0B93E;animation:ccblink 1.4s infinite}
+@keyframes ccblink{50%{opacity:.25}}
+.copcard .cc-date{font-size:.78rem;font-weight:800;color:var(--ink-soft)}
+.copcard h3{font-size:1.25rem;line-height:1.3;margin:0 0 8px}
+.copcard .cc-sum{margin:0 0 12px;font-size:.98rem}
+.copcard ul{margin:0 0 12px;padding-left:20px;display:grid;gap:6px;font-size:.95rem}
+.copcard .cc-box{background:var(--paper);border-radius:12px;padding:11px 13px;margin:0 0 9px;font-size:.93rem}
+.copcard .cc-box b{display:block;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--green-ink);margin-bottom:3px}
+.copcard .cc-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.copcard .cc-acts button{flex:1;min-width:130px;border-radius:11px;padding:11px 14px;font-weight:800;font-size:.88rem;cursor:pointer;border:1px solid rgba(0,0,0,.12);background:var(--paper);color:var(--ink)}
+.copcard .cc-acts .pri{background:var(--green);border-color:var(--green);color:#fff}
+.copcard .cc-src{font-size:.74rem;color:var(--ink-soft);margin:10px 0 0;line-height:1.5}
+.copcard .cc-src a{color:var(--ink-soft)}
+.copdays{display:flex;gap:6px;flex-wrap:wrap;padding:0 2px 4px}
+.copdays button{border:1px solid rgba(0,0,0,.14);background:var(--card);border-radius:999px;padding:7px 13px;font-weight:800;font-size:.8rem;cursor:pointer;color:var(--ink)}
+.copdays button[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#3a2a00}
 .hero-grid{display:grid;gap:22px}
 .hero .eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .hero .eyebrow .badge{font-weight:900;letter-spacing:.04em;background:var(--gold);color:#3a2a00;font-size:.72rem;padding:4px 9px;border-radius:6px}
@@ -876,11 +896,13 @@ function render(){
   else if(v==="flag") app.innerHTML=viewFlag();
   else if(v==="disinfo") app.innerHTML=viewDisinfo();
   else if(v==="petitions") app.innerHTML=viewPetitions();
+  else if(v==="cop") app.innerHTML=viewCop();
   updateChrome(); window.scrollTo(0,0); bind();
   if(v==="flag") loadTweetWidget();
   if(v==="disinfo") fetchDisinfo();
   if(v==="petitions") fetchPetitions();
-  if(v==="ninini"){ fetchRadar(); fetchOpps(); fetchEvents(); }
+  if(v==="ninini"){ fetchCop(); fetchRadar(); fetchOpps(); fetchEvents(); }
+  if(v==="cop") fetchCop();
   if(v==="news") fetchStream("news");
   if(v==="hearsay") fetchStream("hearsay");
   if(v==="truth") fetchStream("truth");
@@ -1056,6 +1078,72 @@ function loadTweetWidget(){
   var s=document.createElement("script"); s.id="twitter-wjs"; s.async=true; s.charset="utf-8"; s.src="https://platform.twitter.com/widgets.js"; s.onload=go; document.head.appendChild(s);
 }
 
+/* ---------- COP31 Leo: published raia digests (cop_digests.raia, EN/SW/SH) ---------- */
+var COPR = { rows:null, i:0 };
+var COPUI = {
+  live:{en:"COP31 today",sw:"COP31 leo",sh:"COP31 leo"},
+  day:{en:"Day",sw:"Siku ya",sh:"Day"},
+  kenya:{en:"What Kenya is saying",sw:"Kenya inasema nini",sh:"Kenya inasema aje"},
+  belem:{en:"Compared with last year’s COP",sw:"Ukilinganisha na COP ya mwaka jana",sh:"Ukicompare na COP ya last year"},
+  why:{en:"Why it matters to you",sw:"Kwa nini inakuhusu",sh:"Kwa nini inakuhusu"},
+  all:{en:"Earlier days",sw:"Siku zilizopita",sh:"Siku zingine"},
+  share:{en:"Share",sw:"Sambaza",sh:"Share"},
+  copied:{en:"Link copied ✓",sw:"Kiungo kimenakiliwa ✓",sh:"Link imecopiwa ✓"},
+  title:{en:"COP31, day by day",sw:"COP31, siku kwa siku",sh:"COP31, day by day"},
+  sub:{en:"The UN climate talks in Antalya, Türkiye (9–20 November) — what happened each day, in plain language.",sw:"Mazungumzo ya tabianchi ya UN huko Antalya, Uturuki (9–20 Novemba) — kilichotokea kila siku, kwa lugha rahisi.",sh:"Ile mazungumzo ya climate ya UN huko Antalya, Uturuki (9–20 November) — kilichotokea kila siku, kwa lugha ya kawaida."},
+  src:{en:"From the day’s news coverage, checked by the MazingiraKenya team before publishing.",sw:"Kutoka habari za siku hiyo, imekaguliwa na timu ya MazingiraKenya kabla ya kuchapishwa.",sh:"Kutoka kwa news za siku hiyo, imecheckiwa na team ya MazingiraKenya kabla ya kupostiwa."},
+  none:{en:"The first daily update is on its way.",sw:"Taarifa ya kwanza ya kila siku inakuja.",sh:"Update ya kwanza iko njiani."}
+};
+function copDateLabel(r){ try{ return new Date(r.digest_date+"T00:00:00").toLocaleDateString(LANG==="en"?"en-GB":"sw-KE",{weekday:"long",day:"numeric",month:"long"}); }catch(e){ return r.digest_date; } }
+function copCardHtml(r,full){
+  var d=r.raia||{}, pts=d.points||[];
+  var fb=(LANG!=="en"&&isFallback(d.summary))?'<p class="muted" style="font-size:.78rem;margin:0 0 8px">'+esc(L(UI.fallback))+'</p>':'';
+  return '<div class="copcard">'+
+    '<div class="cc-top"><span class="cc-live"><i></i>'+esc(L(COPUI.live))+'</span><span class="cc-date">'+esc(L(COPUI.day))+' '+esc(r.cop_day)+' · '+esc(copDateLabel(r))+'</span></div>'+fb+
+    '<h3>'+esc(L(d.headline))+'</h3><p class="cc-sum">'+esc(L(d.summary))+'</p>'+
+    (pts.length?'<ul>'+pts.map(function(p){ return '<li>'+esc(L(p))+'</li>'; }).join("")+'</ul>':'')+
+    (L(d.kenya)?'<div class="cc-box"><b>'+esc(L(COPUI.kenya))+'</b>'+esc(L(d.kenya))+'</div>':'')+
+    (L(d.belem)?'<div class="cc-box"><b>'+esc(L(COPUI.belem))+'</b>'+esc(L(d.belem))+'</div>':'')+
+    (L(d.why_care)?'<div class="cc-box"><b>'+esc(L(COPUI.why))+'</b>'+esc(L(d.why_care))+'</div>':'')+
+    (full&&r.sources&&r.sources.length?'<p class="cc-src">'+esc(L(COPUI.src))+' '+r.sources.map(function(x){ return '<a href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer">'+esc(x.source)+'</a>'; }).join(" · ")+'</p>':'')+
+    '<div class="cc-acts">'+(full?'':'<button class="pri" data-nav="cop">'+esc(L(COPUI.all))+' →</button>')+'<button class="copshare">'+esc(L(COPUI.share))+'</button></div>'+
+  '</div>';
+}
+function copBindShare(host){
+  host.querySelectorAll(".copshare").forEach(function(b){ b.addEventListener("click",function(){
+    var u=location.origin+location.pathname+"#cop31", r=COPR.rows&&COPR.rows[COPR.i]; var t=r?L((r.raia||{}).headline):"COP31";
+    if(navigator.share){ navigator.share({title:"COP31 · MazingiraKenya Raia",text:t,url:u}).catch(function(){}); }
+    else { try{ navigator.clipboard.writeText(u); b.textContent=L(COPUI.copied); }catch(e){} }
+  }); });
+  host.querySelectorAll("[data-nav]").forEach(function(el){ el.addEventListener("click",function(){ go(el.getAttribute("data-nav")); }); });
+  host.querySelectorAll("[data-copi]").forEach(function(el){ el.addEventListener("click",function(){ COPR.i=+el.getAttribute("data-copi"); paintCop(); }); });
+}
+function paintCop(){
+  var home=document.getElementById("copBody"), page=document.getElementById("copPage");
+  var rows=COPR.rows||[];
+  if(home){ home.innerHTML=rows.length?copCardHtml(rows[0],false):""; copBindShare(home); }
+  if(page){
+    if(!rows.length){ page.innerHTML='<p class="muted" style="padding:0 4px">'+esc(L(COPUI.none))+'</p>'; return; }
+    page.innerHTML='<div class="copdays" role="group">'+rows.map(function(r,i){ return '<button data-copi="'+i+'" aria-pressed="'+(i===COPR.i)+'">'+esc(L(COPUI.day))+' '+esc(r.cop_day)+(r.edition==="am"?" · am":"")+'</button>'; }).join("")+'</div>'+copCardHtml(rows[COPR.i],true);
+    copBindShare(page);
+  }
+}
+function fetchCop(){
+  if(COPR.rows){ paintCop(); return; }
+  if(!RSB) return;
+  RSB.from("cop_digests").select("id,digest_date,edition,cop_day,raia,sources").eq("raia_published",true)
+    .order("digest_date",{ascending:false}).order("edition",{ascending:false}).limit(30)
+    .then(function(r){ COPR.rows=(r.error||!r.data)?[]:r.data; COPR.i=0; paintCop(); }, function(){ COPR.rows=[]; paintCop(); });
+}
+function viewCop(){
+  return '<section class="view">'+
+    '<button data-back style="background:none;border:0;font-weight:800;color:var(--ink-soft);cursor:pointer;padding:6px 2px">← '+esc(L(UI.back))+'</button>'+
+    '<div class="shead"><h2>'+esc(L(COPUI.title))+'</h2><span class="rule"></span></div>'+
+    '<p class="muted" style="margin:-6px 2px 12px;font-size:.92rem">'+esc(L(COPUI.sub))+'</p>'+
+    '<div id="copPage"><p class="muted">'+esc(L({en:"Loading…",sw:"Inapakia…",sh:"Inaload…"}))+'</p></div>'+
+    footer()+
+  '</section>';
+}
 function viewNiNini(){
   var f=null; for(var i=0;i<ISSUES.length;i++) if(ISSUES[i].featured){f=ISSUES[i];break;}
   var snav=[["news","d-news"],["hearsay","d-hearsay"],["truth","d-truth"],["learn","d-learn"]].map(function(p){
@@ -1073,6 +1161,7 @@ function viewNiNini(){
           sh:"Maneno kama ‘carbon credits’, ‘just transition’ na ‘EIA’ yanashape future ya ardhi, maji na hewa yetu — lakini yamezama kwa jargon. Raia inaweka story kwa lugha ya kawaida: habari, jinsi inavyoongewa, na picha kamili — ili uifollow, na uone unapofit."}))+'</p></div>'+
       '<div><div class="snav">'+snav+'</div></div>'+
     '</div></div></div>'+
+    '<div id="copBody"></div>'+
     '<div class="shead"><h2>'+esc(L({en:"Media radar \u2014 live",sw:"Rada ya habari \u2014 moja kwa moja",sh:"Media radar \u2014 live"}))+'</h2><span class="rule"></span></div>'+
     '<p class="muted" style="padding:0 16px 8px;margin:-6px 0 0;font-size:.82rem">'+esc(L({en:"What Kenya\u2019s newsrooms are saying on climate, land, coal, the Lamu refinery and the Siaya nuclear plant \u2014 refreshed through the day.",sw:"Yale vyombo vya habari vya Kenya vinasema kuhusu tabianchi, ardhi, makaa, kiwanda cha Lamu na mtambo wa nyuklia Siaya \u2014 yanasasishwa mchana kutwa.",sh:"Vile newsrooms za Kenya zinasema kuhusu climate, ardhi, coal, refinery ya Lamu na nuclear plant ya Siaya \u2014 inarefreshiwa mchana mzima."}))+'</p>'+
     '<div id="radarBody"><p class="muted" style="padding:0 16px">'+esc(L({en:"Loading the latest\u2026",sw:"Inapakia mpya\u2026",sh:"Inaload latest\u2026"}))+'</p></div>'+
@@ -1427,6 +1516,7 @@ function applyHash(scroll){
     state.disinfoId=h.slice(8).replace(/[^0-9]/g,""); state.view="disinfo"; render(); return true;
   }
   if(h==="petitions"){ state.view="petitions"; state.petitionId=null; render(); return true; }
+  if(h==="cop31"||h==="cop"){ state.view="cop"; render(); return true; }
   if(h.indexOf("petition=")===0){ state.petitionId=decodeURIComponent(h.slice(9)); state.view="petitions"; render(); return true; }
   if(h.indexOf("flag/")===0){
     var parts=h.slice(5).split("/");

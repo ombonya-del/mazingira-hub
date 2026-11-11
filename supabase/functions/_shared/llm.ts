@@ -12,21 +12,22 @@ export type LlmResult = { data: any | null; err: string | null; fatal: boolean }
 
 export class LlmStats {
   ok = 0; errors = 0; sample_error = "";
+  constructor(public model: string = MODEL) {}
   record(r: LlmResult) {
     if (r.err) { this.errors++; if (!this.sample_error) this.sample_error = r.err; } else this.ok++;
   }
   toJSON() {
-    return { ok: this.ok, errors: this.errors, sample_error: this.sample_error, all_failed: this.ok === 0 && this.errors > 0, model: MODEL };
+    return { ok: this.ok, errors: this.errors, sample_error: this.sample_error, all_failed: this.ok === 0 && this.errors > 0, model: this.model };
   }
 }
 
-export async function askJson(system: string, user: string, maxTokens = 300, timeoutMs = 25000): Promise<LlmResult> {
+export async function askJson(system: string, user: string, maxTokens = 300, timeoutMs = 25000, model: string = MODEL): Promise<LlmResult> {
   if (!KEY) return { data: null, err: "ANTHROPIC_API_KEY is not set on this function", fatal: true };
   try {
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "content-type": "application/json", "x-api-key": KEY, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({ model: MODEL, max_tokens: maxTokens, system, messages: [{ role: "user", content: user }] }),
+      body: JSON.stringify({ model, max_tokens: maxTokens, system, messages: [{ role: "user", content: user }] }),
       signal: AbortSignal.timeout(timeoutMs),
     });
     const j = await r.json().catch(() => null);

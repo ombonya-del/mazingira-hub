@@ -903,6 +903,27 @@ table.matrix tbody th{
 .trackkey{ display:flex; align-items:center; gap:6px; font-size:.6rem; font-weight:800;
   letter-spacing:.1em; text-transform:uppercase; color:var(--muted-dim); margin:0; }
 .copsrc{ margin-top:18px; font-size:.7rem; color:var(--muted-dim); line-height:1.6; }
+/* COP31 Daily (live digest from cop_digests) */
+.copdaily{ border:1px solid var(--line); background:var(--panel); margin:0 0 26px; }
+.copdaily .cd-top{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:14px 16px; border-bottom:1px solid var(--line); }
+.copdaily .cd-live{ display:inline-flex; align-items:center; gap:7px; font-size:.62rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--ember); }
+.copdaily .cd-live i{ width:8px; height:8px; border-radius:50%; background:var(--ember-hot); box-shadow:0 0 0 0 rgba(242,118,47,.6); animation:cdpulse 1.8s infinite; }
+@keyframes cdpulse{ 70%{ box-shadow:0 0 0 8px rgba(242,118,47,0); } 100%{ box-shadow:0 0 0 0 rgba(242,118,47,0); } }
+.copdaily .cd-days{ display:flex; gap:6px; flex-wrap:wrap; margin-left:auto; }
+.copdaily .cd-body{ padding:16px; display:grid; gap:18px; }
+.copdaily h3{ font-family:Lora,serif; font-size:1.3rem; line-height:1.3; margin:0 0 6px; }
+.copdaily .cd-sum{ color:var(--muted); font-size:.92rem; margin:0; line-height:1.6; }
+.copdaily .cd-lab{ font-size:.58rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--green); margin:0 0 8px; }
+.copdaily ul{ margin:0; padding-left:18px; display:grid; gap:7px; font-size:.86rem; line-height:1.55; }
+.copdaily ul b{ color:var(--text); }
+.copdaily .cd-tag{ display:inline-block; font-size:.58rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; padding:2px 7px; border:1px solid var(--line-2); border-radius:100px; color:var(--muted); margin-left:4px; vertical-align:1px; }
+.copdaily .cd-cmp{ display:grid; gap:8px; }
+.copdaily .cd-cmp div{ border-left:3px solid var(--line-2); padding:4px 0 4px 12px; font-size:.84rem; line-height:1.5; }
+.copdaily .cd-cmp .ahead{ border-color:var(--green); } .copdaily .cd-cmp .behind{ border-color:#E5484D; } .copdaily .cd-cmp .unclear{ border-color:#C99A2E; }
+.copdaily .cd-cmp small{ display:block; color:var(--muted-dim); }
+.copdaily .cd-src{ font-size:.72rem; color:var(--muted-dim); line-height:1.6; }
+.copdaily .cd-src a{ color:var(--muted); }
+@media (min-width:900px){ .copdaily .cd-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; } }
 .cop-row{ border:1px solid var(--line); background:var(--panel); }
 .cop-row + .cop-row{ margin-top:8px; }
 .cop-btn{ width:100%; display:flex; align-items:center; gap:14px; text-align:left; background:none;
@@ -1593,9 +1614,17 @@ function cleanEmail(v){
       </div>
     </div>
 
+    <div class="copdaily" id="copDaily" hidden>
+      <div class="cd-top">
+        <span class="cd-live"><i></i><span id="cdLiveLab">COP31 Daily</span></span>
+        <div class="cd-days" id="cdDays" role="group" aria-label="Choose a day"></div>
+      </div>
+      <div class="cd-body" id="cdBody"></div>
+    </div>
+
     <div class="copdeck">
       <div class="copclock">
-        <p class="kicker kicker--g">COP31 opens in</p>
+        <p class="kicker kicker--g" id="copClockLab">COP31 opens in</p>
         <div class="clock" id="copClock" aria-live="off">
           <span><b id="cD">0</b><i>days</i></span>
           <span><b id="cH">0</b><i>hrs</i></span>
@@ -5271,6 +5300,43 @@ function tickCop(){
   }
 }
 tickCop(); setInterval(tickCop, 1000);
+(function(){ var lab=document.getElementById("copClockLab"); if(lab && new Date()>=COP31) lab.textContent="COP31 has been under way for"; })();
+
+/* ---------- COP31 Daily: published digests from cop_digests (members) ---------- */
+var COPD = { rows:[], i:0 };
+function cdEsc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function cdRender(){
+  var box=document.getElementById("copDaily"), body=document.getElementById("cdBody"), days=document.getElementById("cdDays");
+  if(!box||!COPD.rows.length) return;
+  box.hidden=false;
+  days.innerHTML=COPD.rows.map(function(r,i){
+    return '<button class="chip" data-cdi="'+i+'" aria-pressed="'+(i===COPD.i)+'">Day '+cdEsc(r.cop_day)+(r.edition==="am"?" · am":"")+'</button>'; }).join("");
+  days.querySelectorAll("[data-cdi]").forEach(function(b){ b.addEventListener("click",function(){ COPD.i=+b.getAttribute("data-cdi"); cdRender(); }); });
+  var r=COPD.rows[COPD.i], h=r.hub||{}, k=h.kenya||{}, e=cdEsc;
+  document.getElementById("cdLiveLab").textContent="COP31 Daily · Day "+r.cop_day+" · "+new Date(r.digest_date+"T00:00:00").toLocaleDateString([], {weekday:"short",day:"numeric",month:"short"});
+  function ul(a,fn){ return (a&&a.length)?'<ul>'+a.map(fn).join("")+'</ul>':''; }
+  var DIR={ahead:"ahead of Belém",level:"level with Belém",behind:"behind Belém",unclear:"too early to tell"};
+  body.innerHTML=
+    '<div><h3>'+e(h.headline)+'</h3><p class="cd-sum">'+e(h.summary)+'</p></div>'+
+    '<div class="cd-grid">'+
+      '<div><p class="cd-lab">What happened</p>'+ul(h.highlights,function(x){ return '<li><b>'+e(x.title)+'</b> — '+e(x.detail)+'</li>'; })+'</div>'+
+      '<div><p class="cd-lab">Kenya</p><p class="cd-sum" style="margin-bottom:8px">'+e(k.summary)+'</p>'+ul(k.points,function(x){ return '<li>'+e(x)+'</li>'; })+
+        (h.africa?'<p class="cd-lab" style="margin-top:14px">Africa Group</p><p class="cd-sum">'+e(h.africa)+'</p>':'')+'</div>'+
+    '</div>'+
+    ((h.declarations&&h.declarations.length)?'<div><p class="cd-lab">Declarations, initiatives &amp; positions</p>'+ul(h.declarations,function(x){ return '<li><b>'+e(x.name)+'</b><span class="cd-tag">'+e(x.status)+'</span> — '+e(x.who)+': '+e(x.what)+'</li>'; })+'</div>':'')+
+    (h.negotiations?'<div><p class="cd-lab">In the negotiating rooms</p><p class="cd-sum">'+e(h.negotiations)+'</p></div>':'')+
+    ((h.vs_belem&&h.vs_belem.length)?'<div><p class="cd-lab">Antalya vs Belém</p><div class="cd-cmp">'+h.vs_belem.map(function(x){ return '<div class="'+e(x.direction)+'"><b>'+e(x.topic)+'</b> · '+e(DIR[x.direction]||DIR.unclear)+'<small>Belém: '+e(x.belem)+'</small>Antalya: '+e(x.antalya)+'</div>'; }).join("")+'</div></div>':'')+
+    ((h.watch_next&&h.watch_next.length)?'<div><p class="cd-lab">Watch next</p>'+ul(h.watch_next,function(x){ return '<li>'+e(x)+'</li>'; })+'</div>':'')+
+    ((r.sources&&r.sources.length)?'<p class="cd-src">Sources: '+r.sources.map(function(x){ return '<a href="'+e(x.url)+'" target="_blank" rel="noopener">'+e(x.source)+'</a>'; }).join(" · ")+' · Compiled by the Hub\u2019s COP31 desk from the day\u2019s coverage and reviewed before publishing.</p>':'');
+}
+function cdLoad(){
+  if(!SB) return;
+  SB.from("cop_digests").select("id,digest_date,edition,cop_day,hub,sources").eq("published",true)
+    .order("digest_date",{ascending:false}).order("edition",{ascending:false}).limit(30)
+    .then(function(r){ if(r.error||!r.data||!r.data.length) return; COPD.rows=r.data; COPD.i=0; cdRender(); }, function(){});
+}
+(function(){ if(!SB) return; if(SB.auth&&SB.auth.getSession){ SB.auth.getSession().then(cdLoad,cdLoad); } else cdLoad();
+  if(SB.auth&&SB.auth.onAuthStateChange){ SB.auth.onAuthStateChange(function(_e,s){ if(s) cdLoad(); }); } })();
 document.getElementById("sinceBelem").textContent =
   Math.floor((new Date() - BELEM_CLOSE)/86400000) + " days";
 
