@@ -27,7 +27,7 @@ export async function fetchFeed(feed: Feed): Promise<{ items: FeedItem[]; status
     try {
       const r = await fetch(feed.url, {
         headers: { "User-Agent": UA, "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml, */*" },
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(10000),
       });
       if ((r.status === 429 || r.status >= 500) && attempt === 0) { await new Promise((ok) => setTimeout(ok, 2000)); continue; }
       if (!r.ok) return { items: [], status: String(r.status) };
@@ -47,24 +47,31 @@ export async function fetchFeed(feed: Feed): Promise<{ items: FeedItem[]; status
       }).filter(Boolean) as FeedItem[];
       return { items, status: String(r.status) };
     } catch (e) {
-      if (attempt === 0) continue;
+      // a timeout or network error is not retried: a hung feed must not eat the time budget
       return { items: [], status: "err:" + String(e).slice(0, 50) };
     }
   }
   return { items: [], status: "err:retries" };
 }
 
-// Fetch all feeds; debug is keyed by label (labels are made unique) so every dead feed is visible.
+// Fetch all feeds IN PARALLEL (Supabase kills a function after ~150s, so sequential
+// fetching of 10+ feeds with timeouts and retries could run out the clock on its own).
+// debug is keyed by label (made unique) so every dead feed is visible.
 export async function fetchAll(feeds: Feed[]) {
+  const results = await Promise.all(feeds.map((f) => fetchFeed(f)));
   const debug: Record<string, string> = {};
-  let all: FeedItem[] = [];
+  const all: FeedItem[] = [];
   const seen = new Set<string>();
-  for (const f of feeds) {
+  feeds.forEach((f, i) => {
     let key = f.label, n = 2;
     while (key in debug) key = `${f.label} #${n++}`;
-    const res = await fetchFeed(f);
+    const res = results[i];
     debug[key] = `${res.status}/${res.items.length}`;
     for (const it of res.items) if (!seen.has(it.link)) { seen.add(it.link); all.push(it); }
-  }
+  });
   return { all, debug };
 }
+
+// Stop starting new Claude calls once this much wall-clock time has passed, so the
+// function always returns its JSON report before Supabase's limit cuts it off.
+export const TIME_BUDGET_MS = 110_000;

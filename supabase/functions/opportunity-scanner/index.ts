@@ -17,7 +17,7 @@
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { askJson, LlmStats } from "../_shared/llm.ts";
-import { bingNews, fetchAll, googleNews, type Feed, type FeedItem } from "../_shared/rss.ts";
+import { bingNews, fetchAll, googleNews, TIME_BUDGET_MS, type Feed, type FeedItem } from "../_shared/rss.ts";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 const CRON_SECRET = Deno.env.get("CRON_SECRET") ?? "";
@@ -89,6 +89,7 @@ Deno.serve(async (req) => {
   }
   const today = new Date().toISOString().slice(0, 10);
   const llm = new LlmStats();
+  const started = Date.now();
   try {
     const { all, debug } = await fetchAll(FEEDS);
     const rw = await reliefweb(); debug["ReliefWeb v2"] = `${rw.status}/${rw.items.length}`; all.push(...rw.items);
@@ -99,8 +100,9 @@ Deno.serve(async (req) => {
     const fresh = rough.filter((x) => !have.has(x.link));
     const cands = fresh.slice(0, MAX_CANDIDATES);
 
-    let inserted = 0, rejected = 0, failed = 0, aborted = false;
+    let inserted = 0, rejected = 0, failed = 0, aborted = false, timed_out = false;
     for (const c of cands) {
+      if (Date.now() - started > TIME_BUDGET_MS) { timed_out = true; break; }
       const body = await pageText(c.link);
       const res = await askJson(system(today), `TITLE: ${c.title}\nURL: ${c.link}\n\nPAGE:\n${body}`.slice(0, 5000), 350);
       llm.record(res);
@@ -119,7 +121,7 @@ Deno.serve(async (req) => {
       if (!error) { inserted++; have.add(c.link); }
     }
     return new Response(JSON.stringify({
-      candidates: cands.length, already_seen: rough.length - fresh.length, inserted, rejected, failed, aborted,
+      candidates: cands.length, already_seen: rough.length - fresh.length, inserted, rejected, failed, aborted, timed_out,
       before_relevance: all.length, today, llm, debug,
     }), { headers: { "content-type": "application/json" } });
   } catch (e) {
