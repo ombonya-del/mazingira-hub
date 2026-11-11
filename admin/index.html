@@ -454,6 +454,7 @@ function viewOverview(){
   ];
   var maxv=Math.max.apply(null,LANG_STATS.map(function(x){return x.v;}));
   return '<section class="view"><div class="page-head"><div><h2>Overview</h2><p>Everything waiting on the coalition, at a glance.</p></div></div>'+
+    '<div class="panel" id="freshBoard"><div class="sec-title"><h3>Freshness monitor</h3><span class="rule"></span></div><p class="muted" style="font-size:.8rem">Loading…</p></div>'+
     '<div class="kpis">'+kpis.map(function(k){return '<div class="kpi"><div class="n mono">'+k.n+'</div><div class="l">'+esc(k.l)+'</div><div class="d '+k.dc+'">'+esc(k.d)+'</div></div>';}).join("")+'</div>'+
     '<div class="panel"><div class="sec-title"><h3>Submissions by language · last 30 days</h3><span class="rule"></span></div>'+
       '<div class="bars">'+LANG_STATS.map(function(s){return '<div class="bar"><span class="lab">'+esc(s.k)+'</span><span class="track"><span class="fill" style="width:'+Math.round(s.v/maxv*100)+'%;background:'+s.c+'"></span></span><span class="val mono">'+s.v+'%</span></div>';}).join("")+'</div>'+
@@ -690,6 +691,7 @@ function bindView(){
   if(state.view==="oppsreview") loadOppsReview();
   if(state.view==="eventsreview") loadEventsReview();
   if(state.view==="copreview") loadCopReview();
+  if(state.view==="overview") loadFreshness();
 }
 
 /* ==================== EXCHANGE RESOURCES — member uploads (edit / delete) ==================== */
@@ -985,6 +987,34 @@ function evReviewCard(row,host){
     acts.appendChild(sv); acts.appendChild(cn); wrap.appendChild(acts);
   }
   viewMode(); return wrap;
+}
+
+/* ==================== FRESHNESS MONITOR — reads health_state (written by the health-check
+   function every 3 hours). Red = a feed has gone quiet, amber = drafts waiting too long for review. */
+function loadFreshness(){
+  var host=document.getElementById("freshBoard"); if(!host||!ASB) return;
+  ASB.from("health_state").select("*").order("sort",{ascending:true}).then(function(r){
+    var head='<div class="sec-title"><h3>Freshness monitor</h3><span class="rule"></span><button type="button" class="btn ghost" id="freshRun" style="padding:4px 10px;font-size:.72rem">Check now</button></div>';
+    if(r.error){ host.innerHTML=head+'<p class="muted" style="font-size:.8rem">Not set up yet — run <b>supabase/freshness-monitor.sql</b> in the SQL Editor and deploy the health-check function. ('+esc(r.error.message)+')</p>'; bindRun(); return; }
+    var rows=r.data||[];
+    if(!rows.length){ host.innerHTML=head+'<p class="muted" style="font-size:.8rem">No results yet — the first check runs within 3 hours, or press <b>Check now</b>.</p>'; bindRun(); return; }
+    var bad=rows.filter(function(x){ return !x.ok; });
+    var last=rows.reduce(function(m,x){ return x.checked_at>m?x.checked_at:m; },"");
+    function age(t){ if(!t) return ""; var h=(Date.now()-Date.parse(t))/36e5; return h<1?Math.round(h*60)+" min ago":h<48?h.toFixed(1)+" h ago":(h/24).toFixed(1)+" days ago"; }
+    var col={ok:"var(--green)",stale:"var(--red)",error:"var(--red)",backlog:"var(--gold)"};
+    var groups=["Pipeline","Published","Review queue","Site","Setup"];
+    host.innerHTML=head+
+      '<p style="margin:0 0 10px;font-size:.84rem">'+(bad.length?'<b style="color:var(--red)">'+bad.length+' need attention</b> · ':'<b style="color:var(--green)">All feeds fresh</b> · ')+'last checked '+esc(age(last))+' · alerts go to the monitor email</p>'+
+      groups.map(function(g){ var gr=rows.filter(function(x){ return x.grp===g; }); if(!gr.length) return "";
+        return '<div style="font-size:.62rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:10px 0 4px">'+esc(g==="Pipeline"?"Scanners & sweeps (writing)":g==="Published"?"Live for partners & public":g)+'</div>'+
+          gr.map(function(x){ return '<div style="display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--line)">'+
+            '<span style="flex:0 0 10px;height:10px;margin-top:5px;border-radius:50%;background:'+(col[x.level]||col.error)+'"></span>'+
+            '<div style="flex:1;min-width:0"><div style="font-size:.84rem;font-weight:700">'+esc(x.name)+'</div><div style="font-size:.74rem;color:var(--muted)">'+esc(x.detail||"")+(x.ok?'':' · since '+esc(age(x.since)))+'</div>'+
+            (x.ok?'':'<div style="font-size:.74rem;margin-top:2px">→ '+esc(x.fix||"")+'</div>')+'</div></div>'; }).join(""); }).join("");
+    bindRun();
+  });
+  function bindRun(){ var b=document.getElementById("freshRun"); if(!b) return; b.onclick=function(){ b.disabled=true; b.textContent="Checking…";
+    ASB.functions.invoke("health-check",{body:{}}).then(function(){ toast("Check complete"); loadFreshness(); }, function(e){ b.disabled=false; b.textContent="Check now"; toast("Check failed: "+(e&&e.message||e)); }); }; }
 }
 
 /* ==================== COP31 DAILY — digests from the cop-digest scanner ====================
@@ -1596,8 +1626,8 @@ var ASB = (window.supabase && window.supabase.createClient)
   : null;
 var authUser=null;
 if(ASB){
-  ASB.auth.getSession().then(function(r){ authUser=(r&&r.data&&r.data.session)?r.data.session.user:null; fetchWatchCounts(); if(state.view==="upload") render(); });
-  ASB.auth.onAuthStateChange(function(_e,session){ authUser=session?session.user:null; fetchWatchCounts(); if(state.view==="upload"||state.view==="oppsreview"||state.view==="eventsreview") render(); });
+  ASB.auth.getSession().then(function(r){ authUser=(r&&r.data&&r.data.session)?r.data.session.user:null; fetchWatchCounts(); if(state.view==="upload") render(); if(state.view==="overview") loadFreshness(); });
+  ASB.auth.onAuthStateChange(function(_e,session){ authUser=session?session.user:null; fetchWatchCounts(); if(state.view==="upload"||state.view==="oppsreview"||state.view==="eventsreview") render(); if(state.view==="overview") loadFreshness(); });
 }
 
 /* sector tags for the Pulse — label → colour class matching the hub */
