@@ -102,10 +102,13 @@ const SCHEMA = {
       topic: { type: "string" }, belem: { type: "string" }, antalya: { type: "string" },
       direction: { type: "string", enum: ["ahead", "level", "behind", "unclear"] } }, required: ["key", "topic", "belem", "antalya", "direction"] } },
     watch_next: { type: "array", items: { type: "string" } },
-    raia: { type: "object", properties: { headline: T3, summary: T3, points: { type: "array", items: T3 }, kenya: T3, belem: T3, why_care: T3 },
-      required: ["headline", "summary", "points", "kenya", "belem", "why_care"] },
   },
-  required: ["headline", "summary", "highlights", "kenya", "vs_belem", "raia"],
+  required: ["headline", "summary", "highlights", "kenya", "vs_belem"],
+};
+const RAIA_SCHEMA = {
+  type: "object",
+  properties: { headline: T3, summary: T3, points: { type: "array", items: T3 }, kenya: T3, belem: T3, why_care: T3 },
+  required: ["headline", "summary", "points", "kenya", "belem", "why_care"],
 };
 
 function eatNow() { return new Date(Date.now() + 3 * 3600_000); }           // Kenya/Türkiye are both UTC+3
@@ -158,10 +161,16 @@ Deno.serve(async (req) => {
       `[${i + 1}] ${it.source} | ${it.pubDate ?? "date unknown"}\n${it.title}\n${(it.desc || "").replace(/\s+/g, " ").slice(0, 320)}`).join("\n\n");
     const user = `${BELEM_BASELINE}\n\nTODAY: ${today}, COP31 day ${copDay} of 12 (${edition === "am" ? "morning" : "evening"} edition).\n${prevNote}\n\nNEWS ITEMS:\n${list}`;
 
-    const res = await askTool(SYSTEM, user, "submit_digest", SCHEMA, 9000, 125_000, MODEL);
-    llm.record(res);
-    if (res.err) return reply({ inserted: 0, failed: 1, today, edition, items: items.length, llm, debug });
-    const d = res.data ?? {};
+    // Two calls in parallel: the members' analysis and the trilingual raia version.
+    const HUB_ONLY = "\n\nFor THIS call produce only the hub (members) fields; the raia version is written separately. Keep it tight: 3-5 highlights of 1-2 sentences each.";
+    const RAIA_ONLY = "\n\nFor THIS call produce ONLY the raia object fields (headline, summary, points, kenya, belem, why_care), each in en, sw and sh. Keep it short: summary 2-3 sentences, exactly 3 points of at most 30 words, other fields 1-2 sentences.";
+    const [hubRes, raiaRes] = await Promise.all([
+      askTool(SYSTEM + HUB_ONLY, user, "submit_digest", SCHEMA, 6000, 125_000, MODEL),
+      askTool(SYSTEM + RAIA_ONLY, user, "submit_raia", RAIA_SCHEMA, 6000, 125_000, MODEL),
+    ]);
+    llm.record(hubRes); llm.record(raiaRes);
+    if (hubRes.err) return reply({ inserted: 0, failed: 1, today, edition, items: items.length, llm, debug });
+    const d = { ...(hubRes.data ?? {}), raia: raiaRes.data ?? {} };
 
     // Map cited item numbers back to links.
     const cited = new Set<number>();
@@ -179,7 +188,7 @@ Deno.serve(async (req) => {
     if (error) return reply({ error: "db: " + error.message, llm }, 500);
 
     return reply({ inserted: existing ? 0 : 1, updated: existing ? 1 : 0, today, edition, cop_day: copDay,
-      items: items.length, sources: sources.length, headline: d.headline ?? null, llm, debug });
+      items: items.length, sources: sources.length, headline: d.headline ?? null, raia_error: raiaRes.err, llm, debug });
   } catch (e) {
     return reply({ error: String(e), llm }, 500);
   }

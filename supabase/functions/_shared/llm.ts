@@ -55,7 +55,10 @@ export async function askTool(system: string, user: string, toolName: string, in
   if (!KEY) return { data: null, err: "ANTHROPIC_API_KEY is not set on this function", fatal: true };
   // Some models reject a forced tool_choice; fall back to "any" (only one tool, so same effect),
   // then to "auto" with the instruction to call the tool.
-  const choices: any[] = [{ type: "tool", name: toolName }, { type: "any" }, { type: "auto" }];
+  // Newer models may think by default; thinking both eats max_tokens and rejects a forced
+  // tool_choice, so switch it off (and drop that flag if a model refuses it).
+  let noThinking = true;
+  const choices: any[] = [{ type: "tool", name: toolName }, { type: "tool", name: toolName }, { type: "any" }, { type: "auto" }];
   const deadline = Date.now() + timeoutMs;
   let lastErr = "";
   for (const choice of choices) {
@@ -69,6 +72,7 @@ export async function askTool(system: string, user: string, toolName: string, in
           model, max_tokens: maxTokens, system, messages: [{ role: "user", content: user }],
           tools: [{ name: toolName, description: "Submit the finished result. Always call this exactly once.", input_schema: inputSchema }],
           tool_choice: choice,
+          ...(noThinking ? { thinking: { type: "disabled" } } : {}),
         }),
         signal: AbortSignal.timeout(left),
       });
@@ -77,6 +81,7 @@ export async function askTool(system: string, user: string, toolName: string, in
         // single quotes only, so the GitHub step can show the whole message
         const msg = `HTTP ${r.status} ${j?.error?.type ?? ""}: ${j?.error?.message ?? ""}`.replace(/"/g, "'").trim().slice(0, 300);
         lastErr = msg;
+        if (r.status === 400 && /thinking/i.test(msg) && noThinking) { noThinking = false; continue; }
         if (r.status === 400 && /tool_choice|tool/i.test(msg)) continue;   // try the next tool_choice
         const fatal = [401, 403, 404].includes(r.status) || /credit|billing|model/i.test(msg);
         return { data: null, err: msg, fatal };
