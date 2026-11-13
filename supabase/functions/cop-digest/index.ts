@@ -8,6 +8,10 @@
 // version separately (admin → Review → COP31 digest). A row an admin has already published
 // is never overwritten; the next run creates/updates the other edition instead.
 //
+// Catch-up: POST {"date":"2026-11-09"} (optionally "edition":"am") writes the digest for an EARLIER
+// COP day from that day's coverage only (date-restricted Google News + date-filtered feeds).
+// Used to backfill Days 1-2, which ran before this function existed. Same review flow.
+//
 // Deploy:  supabase functions deploy cop-digest --project-ref uueemckdoozsuowcqkhl
 // SQL:     run supabase/cop-digest.sql once in the SQL Editor
 // Secrets: CRON_SECRET, ANTHROPIC_API_KEY, optional COP_DIGEST_MODEL (default claude-sonnet-5-5)
@@ -36,6 +40,28 @@ const FEEDS: Feed[] = [
   { url: "https://www.climatechangenews.com/feed/", label: "Climate Home News" },
   { url: "https://allafrica.com/tools/headlines/rdf/kenya/headlines.rdf", label: "AllAfrica Kenya" },
 ];
+/* Catch-up mode: Google News supports after:/before: date operators; Bing does not, so it is left out. */
+const addDays = (d: string, n: number) => new Date(Date.parse(d + "T00:00:00Z") + n * 86400_000).toISOString().slice(0, 10);
+function feedsFor(day: string): Feed[] {
+  const w = ` after:${addDays(day, -1)} before:${addDays(day, 1)}`;
+  return [
+    googleNews("COP31 Antalya" + w), googleNews("COP31 Kenya" + w),
+    googleNews("COP31 Africa negotiators OR \"African Group\"" + w),
+    googleNews("COP31 declaration OR pledge OR initiative OR \"draft text\"" + w),
+    googleNews("COP31 climate summit opening" + w), googleNews("Antalya climate talks" + w),
+    googleNews("COP31 Ruto OR Barasa OR \"Kenyan delegation\"" + w),
+    ...FEEDS.filter((f) => !/news\.google|bing\.com/.test(f.url)),
+  ];
+}
+/* that COP day as covered: from 18:00 EAT the evening before to 06:00 EAT the morning after */
+function onDay(it: FeedItem, day: string) {
+  if (!it.pubDate) return false;
+  const t = Date.parse(it.pubDate); if (isNaN(t)) return false;
+  const start = Date.parse(day + "T00:00:00Z") - 9 * 3600_000;   // 18:00 EAT previous day
+  const end = Date.parse(day + "T00:00:00Z") + 27 * 3600_000;    // 06:00 EAT next day
+  return t >= start && t < end;
+}
+
 const ON_TOPIC = /COP\s?-?31|Antalya|Belém|Belem|climate (summit|talks|conference)|UNFCCC/i;
 
 // Fixed baseline so the comparison is anchored, not improvised.
@@ -125,14 +151,19 @@ Deno.serve(async (req) => {
   }
   const llm = new LlmStats(MODEL);
   const now = eatNow();
-  const today = ymd(now);
   const reply = (o: unknown, status = 200) =>
     new Response(JSON.stringify(o), { status, headers: { "content-type": "application/json" } });
+
+  // optional catch-up for an earlier COP day
+  const body: any = await req.json().catch(() => ({}));
+  const back = typeof body?.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(body.date) ? body.date : null;
+  if (back && (back < COP_START || back >= ymd(now))) return reply({ error: "catch-up date must be an earlier COP31 day", date: back }, 400);
+  const today = back ?? ymd(now);
 
   if (today < COP_START || today > COP_LAST_RUN) return reply({ skipped: "outside COP31 window", today, llm });
 
   const copDay = Math.floor((Date.parse(today) - Date.parse(COP_START)) / 86400_000) + 1;
-  const edition = now.getUTCHours() < 13 ? "am" : "pm";   // EAT hour (now is shifted to EAT)
+  const edition = back ? (body.edition === "am" ? "am" : "pm") : (now.getUTCHours() < 13 ? "am" : "pm");   // EAT hour (now is shifted to EAT)
 
   try {
     // Never overwrite a version an admin already published.
@@ -142,9 +173,11 @@ Deno.serve(async (req) => {
       return reply({ skipped: "this edition is already published", today, edition, llm });
     }
 
-    const { all, debug } = await fetchAll(FEEDS);
+    const { all, debug } = await fetchAll(back ? feedsFor(today) : FEEDS);
+    const seen = new Set<string>();
     const items = all
-      .filter((x) => ON_TOPIC.test(x.title + " " + x.desc) && within(x, 30))
+      .filter((x) => ON_TOPIC.test(x.title + " " + x.desc) && (back ? onDay(x, today) : within(x, 30)))
+      .filter((x) => { const k = x.title.toLowerCase().replace(/\W+/g, " ").trim().slice(0, 80); if (seen.has(k)) return false; seen.add(k); return true; })
       .sort((a, b) => (Date.parse(b.pubDate ?? "") || 0) - (Date.parse(a.pubDate ?? "") || 0))
       .slice(0, MAX_ITEMS);
     if (items.length < 4) return reply({ skipped: "too little fresh COP31 coverage", found: items.length, today, edition, llm, debug });
@@ -159,7 +192,10 @@ Deno.serve(async (req) => {
 
     const list = items.map((it, i) =>
       `[${i + 1}] ${it.source} | ${it.pubDate ?? "date unknown"}\n${it.title}\n${(it.desc || "").replace(/\s+/g, " ").slice(0, 320)}`).join("\n\n");
-    const user = `${BELEM_BASELINE}\n\nTODAY: ${today}, COP31 day ${copDay} of 12 (${edition === "am" ? "morning" : "evening"} edition).\n${prevNote}\n\nNEWS ITEMS:\n${list}`;
+    const backNote = back
+      ? `\nCATCH-UP DIGEST: this digest is written after the fact for ${today}. Write it exactly as that day's digest — describe only what the items say happened up to that evening, and never mention later events. In watch_next, list what was coming up as seen from that day.`
+      : "";
+    const user = `${BELEM_BASELINE}\n\nTODAY: ${today}, COP31 day ${copDay} of 12 (${edition === "am" ? "morning" : "evening"} edition).${backNote}\n${prevNote}\n\nNEWS ITEMS:\n${list}`;
 
     // Two calls in parallel: the members' analysis and the trilingual raia version.
     const HUB_ONLY = "\n\nFor THIS call produce only the hub (members) fields; the raia version is written separately. Keep it tight: 3-5 highlights of 1-2 sentences each.";
@@ -187,7 +223,7 @@ Deno.serve(async (req) => {
       : await sb.from("cop_digests").insert(row);
     if (error) return reply({ error: "db: " + error.message, llm }, 500);
 
-    return reply({ inserted: existing ? 0 : 1, updated: existing ? 1 : 0, today, edition, cop_day: copDay,
+    return reply({ inserted: existing ? 0 : 1, updated: existing ? 1 : 0, today, edition, cop_day: copDay, catch_up: !!back,
       items: items.length, sources: sources.length, headline: d.headline ?? null, raia_error: raiaRes.err, llm, debug });
   } catch (e) {
     return reply({ error: String(e), llm }, 500);

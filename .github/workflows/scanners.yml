@@ -22,6 +22,11 @@ on:
         default: 'all'
         type: choice
         options: [all, opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner, scan-sentiment, scan-sectors, baraza-seed, cop-digest, cleanup]
+      cop_dates:
+        description: 'COP31 catch-up only (with target=cop-digest): earlier COP days to write, oldest first, e.g. 2026-11-09,2026-11-10'
+        required: false
+        default: ''
+        type: string
 
 env:
   SUPABASE_URL: https://uueemckdoozsuowcqkhl.supabase.co
@@ -39,8 +44,23 @@ jobs:
         if: github.event_name == 'schedule' || inputs.target == 'all' || inputs.target == matrix.fn
         env:
           CRON_SECRET: ${{ secrets.MAZINGIRA_CRON_SECRET }}
+          COP_DATES: ${{ inputs.cop_dates }}
         run: |
           set -e
+          # COP31 catch-up: one call per requested earlier day, oldest first (each digest builds on the last)
+          if [ "${{ matrix.fn }}" = "cop-digest" ] && [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "$COP_DATES" ]; then
+            for D in $(echo "$COP_DATES" | tr ',' ' '); do
+              echo "$D" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' || { echo "::error::bad date '$D' (use YYYY-MM-DD)"; exit 1; }
+              RESP=$(curl -sS -w '\n%{http_code}' -X POST "$SUPABASE_URL/functions/v1/cop-digest" \
+                -H "Authorization: Bearer $ANON_KEY" -H "apikey: $ANON_KEY" \
+                -H "x-cron-secret: $CRON_SECRET" -H "Content-Type: application/json" \
+                -d "{\"date\":\"$D\"}" --max-time 300)
+              BODY=$(echo "$RESP" | head -n -1); CODE=$(echo "$RESP" | tail -n 1)
+              echo "cop-digest catch-up $D -> HTTP $CODE"; echo "$BODY"
+              [ "$CODE" = "200" ] || exit 1
+            done
+            exit 0
+          fi
           RESP=$(curl -sS -w '\n%{http_code}' -X POST \
             "$SUPABASE_URL/functions/v1/${{ matrix.fn }}" \
             -H "Authorization: Bearer $ANON_KEY" -H "apikey: $ANON_KEY" \
