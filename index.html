@@ -4,6 +4,48 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0A1512">
+<script>
+/* ---- MazingiraKenya theme switch (shared by hub · admin · raia) ----
+   Preference is stored in localStorage AND a .mazingirakenya.org cookie,
+   so a choice made on one dashboard carries to the others. */
+(function(){
+  var D=document.documentElement, DEF="dark", META={dark:"#0A1512",light:"#E4EFE8"};
+  function read(){
+    var t=null; try{ t=localStorage.getItem("mk.theme"); }catch(e){}
+    if(t!=="light"&&t!=="dark"){ var m=document.cookie.match(/(?:^|; )mk_theme=(light|dark)/); t=m?m[1]:null; }
+    return t==="light"||t==="dark"?t:DEF;
+  }
+  function paint(t){
+    D.setAttribute("data-theme",t);
+    var m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",META[t]);
+    var b=document.querySelectorAll("[data-theme-toggle]");
+    for(var i=0;i<b.length;i++){
+      var lab=t==="dark"?"Switch to light theme":"Switch to dark theme";
+      b[i].setAttribute("aria-label",lab); b[i].setAttribute("title",lab);
+      b[i].setAttribute("aria-pressed",t==="light"?"true":"false");
+    }
+  }
+  window.mkTheme=function(){ return D.getAttribute("data-theme")||DEF; };
+  window.mkSetTheme=function(t){
+    if(t!=="light"&&t!=="dark") return;
+    try{ localStorage.setItem("mk.theme",t); }catch(e){}
+    var dom=/(^|\.)mazingirakenya\.org$/.test(location.hostname)?"; domain=.mazingirakenya.org":"";
+    document.cookie="mk_theme="+t+"; path=/; max-age=31536000; SameSite=Lax"+dom;
+    paint(t);
+    try{ window.dispatchEvent(new CustomEvent("mk-theme",{detail:t})); }catch(e){}
+  };
+  paint(read());
+  document.addEventListener("DOMContentLoaded",function(){
+    paint(window.mkTheme());
+    document.addEventListener("click",function(e){
+      var b=e.target.closest&&e.target.closest("[data-theme-toggle]");
+      if(b){ e.preventDefault(); window.mkSetTheme(window.mkTheme()==="dark"?"light":"dark"); }
+    });
+  });
+  /* keep tabs in sync if the choice changes in another tab */
+  window.addEventListener("storage",function(e){ if(e.key==="mk.theme"&&(e.newValue==="light"||e.newValue==="dark")) paint(e.newValue); });
+})();
+</script>
 <link rel="manifest" href="/manifest.webmanifest">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -1375,6 +1417,71 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 .gate .btn--ghost{ margin-top:8px; background:transparent; }
 .gate.shake .gate-card{ animation:shk .4s; }
 @keyframes shk{ 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+
+/* ---- theme switch button ---- */
+.mk-theme-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;flex:0 0 auto;padding:0;border-radius:999px;cursor:pointer;background:transparent;border:1px solid var(--line-2);color:var(--text);transition:background .15s,border-color .15s,color .15s}
+.mk-theme-btn:hover{background:var(--panel-2)}
+.mk-theme-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+html[data-theme="dark"] .mk-theme-btn .i-moon, html:not([data-theme="dark"]) .mk-theme-btn .i-sun{display:none}
+html[data-theme="dark"]{color-scheme:dark} html[data-theme="light"]{color-scheme:light}
+
+/* =================== LIGHT THEME (toggle in header) =================== */
+html[data-theme="light"]{
+  --bg:#F4F1E8; --panel:#FFFFFF; --panel-2:#EEEAE0; --chrome:#E4EFE8; --panel-3:#E4DFD2;
+  --line:#DDD6C6; --line-2:#C7BFAB;
+  --text:#16201B; --muted:#4A5A52; --muted-dim:#5F6E66;
+  --green:#157A52; --green-deep:#0F5E3F; --green-wash:rgba(21,122,82,.10);
+  --ember:#B4521A; --ember-hot:#E8691F; --ember-deep:#8A3A0E; --ember-wash:rgba(180,82,26,.10);
+}
+/* dark insets → light insets */
+html[data-theme="light"] .sc-split,
+html[data-theme="light"] .nd-claim,
+html[data-theme="light"] .nd-embed,
+html[data-theme="light"] .dsrc-card,
+html[data-theme="light"] .ev-form input,
+html[data-theme="light"] .ev-form select,
+html[data-theme="light"] .ev-form textarea,
+html[data-theme="light"] .lg.none{ background:var(--panel-2); }
+html[data-theme="light"] .modal-overlay{ background:rgba(22,32,27,.45); }
+html[data-theme="light"] .modal-overlay > *{ box-shadow:0 20px 60px -20px rgba(0,0,0,.35); }
+html[data-theme="light"] nav.tabs.tabs-mob{ box-shadow:0 -6px 20px rgba(0,0,0,.08); }
+/* white text on green fills (dark text on the darker light-mode green is too faint) */
+html[data-theme="light"] .btn--green,
+html[data-theme="light"] .nd-debunk .nd-lab{ color:#fff; }
+html[data-theme="light"] .btn--green:hover{ background:var(--green-deep); }
+/* pale accent text → deeper tones that read on paper */
+html[data-theme="light"] .pc-view,
+html[data-theme="light"] .xorig-toggle,
+html[data-theme="light"] .nd-viewpost,
+html[data-theme="light"] .vidcap a,
+html[data-theme="light"] .dsrc-meta>span,
+html[data-theme="light"] .lane.document .lane-num,
+html[data-theme="light"] .lane.document .lane-go,
+html[data-theme="light"] .stat.s-proposed,
+html[data-theme="light"] .reltag.r-litigation,
+html[data-theme="light"] .tag.document,
+html[data-theme="light"] .pc-tag.energy,
+html[data-theme="light"] .pc-tag.water,
+html[data-theme="light"] .pc-tag.carbon{ color:#235E8F; }
+html[data-theme="light"] .pc-tag.bondo,
+html[data-theme="light"] .pc-tag.nuclear,
+html[data-theme="light"] .reltag.r-contested,
+html[data-theme="light"] .mv.behind,
+html[data-theme="light"] .acc-pill.lip{ color:#B3261E; }
+html[data-theme="light"] .contested-banner{ color:#8E1D1D; }
+html[data-theme="light"] .contested-banner b{ color:#6B1111; }
+html[data-theme="light"] .pc-tag.waste,
+html[data-theme="light"] .pc-tag.wildlife,
+html[data-theme="light"] .pc-tag.minerals,
+html[data-theme="light"] .pc-earlier,
+html[data-theme="light"] .mv.unclear,
+html[data-theme="light"] .pet-kind{ color:#855A06; }
+html[data-theme="light"] .pc-tag.coal{ color:#3F4452; }
+html[data-theme="light"] .pc-tag.oil{ background:rgba(40,40,46,.10); color:#2E3038; }
+html[data-theme="light"] .pc-tag.land{ color:#2C6E2C; }
+html[data-theme="light"] .pc-tag.forest{ color:#17704A; }
+html[data-theme="light"] .pc-tag.plastics{ color:#5B3D9E; }
+html[data-theme="light"] .fundtag{ color:#7A5A00; border-color:rgba(160,120,0,.4); background:rgba(240,192,64,.12); }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1469,6 +1576,7 @@ function cleanEmail(v){
       <span class="brand-sub">Comms Hub</span>
     </div>
     <p class="convene">Convened by deCOALonize — a coalition opposing coal development and advancing a just energy transition across Kenya and the region.</p>
+    <button type="button" class="mk-theme-btn" data-theme-toggle aria-label="Switch theme" title="Switch theme"><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
     <span class="sysstat"><span class="dot" aria-hidden="true"></span><span id="sync">Synced</span></span>
     <a class="btn btn--public tm-only" href="https://raia.mazingirakenya.org" target="mzk_raia" rel="noopener" title="Open raia — the public platform">raia ↗</a>
     <a class="btn btn--ember tm-only" href="#contribute">Submit</a>
@@ -1580,7 +1688,7 @@ function cleanEmail(v){
         <span class="lab">National response gap index</span>
         <div class="gauge-row">
           <svg class="gauge" viewBox="0 0 40 40" aria-hidden="true">
-            <circle cx="20" cy="20" r="16" fill="none" stroke="#182E25" stroke-width="5"/>
+            <circle cx="20" cy="20" r="16" fill="none" style="stroke:var(--panel-3)" stroke-width="5"/>
             <circle id="gaugeArc" cx="20" cy="20" r="16" fill="none" stroke="#F2762F" stroke-width="5"
                     stroke-linecap="butt" stroke-dasharray="0 100" transform="rotate(-90 20 20)" pathLength="100"/>
           </svg>
@@ -5197,7 +5305,7 @@ function embedHTML(url){
   if(p==="youtube"){ var id=ytId(url);
     if(id) return '<div class="embed-yt"><iframe src="https://www.youtube-nocookie.com/embed/'+id+
       '" title="YouTube video" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>'; }
-  if(p==="x") return '<blockquote class="twitter-tweet" data-theme="dark"><a href="'+url+'">'+url+'</a></blockquote>';
+  if(p==="x") return '<blockquote class="twitter-tweet" data-theme="'+(window.mkTheme?mkTheme():"dark")+'"><a href="'+url+'">'+url+'</a></blockquote>';
   if(p==="tiktok") return '<blockquote class="tiktok-embed" cite="'+url+'" style="max-width:100%"><a href="'+url+'">'+url+'</a></blockquote>';
   if(p==="instagram") return '<blockquote class="instagram-media" data-instgrm-permalink="'+url+'" data-instgrm-version="14"><a href="'+url+'">'+url+'</a></blockquote>';
   return '<a href="'+url+'" class="embed-fallback" target="_blank" rel="noopener noreferrer">'+url+'</a>';
@@ -6692,7 +6800,7 @@ document.addEventListener("click", function(e){
     if(!host||!url) return;
     if(host.getAttribute("data-loaded")==="1"){ host.hidden=!host.hidden; btn.textContent=host.hidden?"View original →":"Hide original ▲"; return; }
     btn.textContent="Loading…"; btn.disabled=true;
-    var bq=document.createElement("blockquote"); bq.className="twitter-tweet"; bq.setAttribute("data-theme","dark"); bq.setAttribute("data-dnt","true");
+    var bq=document.createElement("blockquote"); bq.className="twitter-tweet"; bq.setAttribute("data-theme",window.mkTheme?mkTheme():"dark"); bq.setAttribute("data-dnt","true");
     var a=document.createElement("a"); a.href=url; bq.appendChild(a); host.innerHTML=""; host.appendChild(bq); host.hidden=false;
     widgets(function(failed){
       btn.disabled=false;

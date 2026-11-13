@@ -6,6 +6,48 @@
 <title>Admin · MazingiraKenya</title>
 <meta name="description" content="Moderation & operations console for the MazingiraKenya Communications Hub.">
 <meta name="theme-color" content="#080F0C">
+<script>
+/* ---- MazingiraKenya theme switch (shared by hub · admin · raia) ----
+   Preference is stored in localStorage AND a .mazingirakenya.org cookie,
+   so a choice made on one dashboard carries to the others. */
+(function(){
+  var D=document.documentElement, DEF="dark", META={dark:"#080F0C",light:"#F4F1E8"};
+  function read(){
+    var t=null; try{ t=localStorage.getItem("mk.theme"); }catch(e){}
+    if(t!=="light"&&t!=="dark"){ var m=document.cookie.match(/(?:^|; )mk_theme=(light|dark)/); t=m?m[1]:null; }
+    return t==="light"||t==="dark"?t:DEF;
+  }
+  function paint(t){
+    D.setAttribute("data-theme",t);
+    var m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",META[t]);
+    var b=document.querySelectorAll("[data-theme-toggle]");
+    for(var i=0;i<b.length;i++){
+      var lab=t==="dark"?"Switch to light theme":"Switch to dark theme";
+      b[i].setAttribute("aria-label",lab); b[i].setAttribute("title",lab);
+      b[i].setAttribute("aria-pressed",t==="light"?"true":"false");
+    }
+  }
+  window.mkTheme=function(){ return D.getAttribute("data-theme")||DEF; };
+  window.mkSetTheme=function(t){
+    if(t!=="light"&&t!=="dark") return;
+    try{ localStorage.setItem("mk.theme",t); }catch(e){}
+    var dom=/(^|\.)mazingirakenya\.org$/.test(location.hostname)?"; domain=.mazingirakenya.org":"";
+    document.cookie="mk_theme="+t+"; path=/; max-age=31536000; SameSite=Lax"+dom;
+    paint(t);
+    try{ window.dispatchEvent(new CustomEvent("mk-theme",{detail:t})); }catch(e){}
+  };
+  paint(read());
+  document.addEventListener("DOMContentLoaded",function(){
+    paint(window.mkTheme());
+    document.addEventListener("click",function(e){
+      var b=e.target.closest&&e.target.closest("[data-theme-toggle]");
+      if(b){ e.preventDefault(); window.mkSetTheme(window.mkTheme()==="dark"?"light":"dark"); }
+    });
+  });
+  /* keep tabs in sync if the choice changes in another tab */
+  window.addEventListener("storage",function(e){ if(e.key==="mk.theme"&&(e.newValue==="light"||e.newValue==="dark")) paint(e.newValue); });
+})();
+</script>
 <meta name="robots" content="noindex, nofollow">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -227,14 +269,69 @@ button{font-family:inherit;cursor:pointer}
 .ndshare-btn.x{background:#0b0b0b;color:#fff;border-color:#333} .ndshare-btn.wa{background:#128C7E;color:#fff;border-color:#128C7E}
 
 @media(min-width:900px){ .main{padding:22px 28px calc(88px + env(safe-area-inset-bottom))} .subtabs{padding:14px 28px 2px} }
+
+/* ---- theme switch button ---- */
+.mk-theme-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;flex:0 0 auto;padding:0;border-radius:999px;cursor:pointer;background:transparent;border:1px solid var(--line-2);color:var(--text);transition:background .15s,border-color .15s,color .15s}
+.mk-theme-btn:hover{background:var(--panel-2)}
+.mk-theme-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+html[data-theme="dark"] .mk-theme-btn .i-moon, html:not([data-theme="dark"]) .mk-theme-btn .i-sun{display:none}
+html[data-theme="dark"]{color-scheme:dark} html[data-theme="light"]{color-scheme:light}
+
+.gate .gate-theme{position:absolute;top:16px;right:16px;width:34px;height:34px;padding:0;border-radius:999px;background:transparent;color:var(--text);border:1px solid var(--line-2);font-size:inherit}
+/* =================== LIGHT THEME (toggle in top bar) =================== */
+html[data-theme="light"]{
+  --bg:#F4F1E8; --panel:#FFFFFF; --panel-2:#EEEAE0; --panel-3:#E4DFD2;
+  --line:#DDD6C6; --line-2:#C7BFAB;
+  --text:#16201B; --muted:#4A5A52; --muted-dim:#5F6E66;
+  --green:#157A52; --green-deep:#1F8A5E; --green-ink:#0C3B29;
+  --ember:#C85A1C; --ember-soft:#A84A12; --ember-wash:rgba(200,90,28,.10);
+  --red:#B3261E; --red-wash:rgba(179,38,30,.09);
+  --gold:#8A5E00; --amber-wash:rgba(200,150,40,.14);
+  --shadow:0 10px 30px rgba(40,30,10,.10); --inset:#EEEAE0;
+}
+html[data-theme="light"] .gate{ background:radial-gradient(120% 120% at 80% -10%,#DCEBE2,#F4F1E8 60%); }
+html[data-theme="light"] .topbar{ background:rgba(244,241,232,.92); }
+html[data-theme="light"] .gate input,
+html[data-theme="light"] .qcard .qmedia,
+html[data-theme="light"] .role-sel,
+html[data-theme="light"] .toggle,
+html[data-theme="light"] .bar .track,
+html[data-theme="light"] .modal input,
+html[data-theme="light"] .modal textarea,
+html[data-theme="light"] .modal select,
+html[data-theme="light"] .upl-form input,
+html[data-theme="light"] .upl-form textarea,
+html[data-theme="light"] .upl-form select,
+html[data-theme="light"] .nd-quote{ background:var(--panel-2); }
+html[data-theme="light"] .upl-form input,
+html[data-theme="light"] .upl-form textarea,
+html[data-theme="light"] .upl-form select{ color-scheme:light; }
+html[data-theme="light"] .upl-form input[type="date"]::-webkit-calendar-picker-indicator{ filter:none; }
+html[data-theme="light"] .toggle[aria-pressed="true"]{ background:var(--green); }
+html[data-theme="light"] .toggle[aria-pressed="true"]::after{ background:#fff; }
+html[data-theme="light"] .overlay{ background:rgba(22,32,27,.4); }
+/* white text on green / ember fills */
+html[data-theme="light"] .gate button,
+html[data-theme="light"] .btn.approve,
+html[data-theme="light"] .ndshare-h,
+html[data-theme="light"] .avatar{ color:#fff; }
+html[data-theme="light"] .btn.pub,
+html[data-theme="light"] .sidenav .badge,
+html[data-theme="light"] .mtabs .badge,
+html[data-theme="light"] .bottomnav .badge,
+html[data-theme="light"] .subtabs .badge{ color:#fff; }
+/* pale blue accents → deeper blue */
+html[data-theme="light"] .ndpipe .np.ai{ border-color:#235E8F; color:#235E8F; }
+html[data-theme="light"] .ndr-draft .ndr-lab{ color:#235E8F; }
 </style>
 </head>
 <body>
 
 <!-- ACCESS GATE (prototype) -->
 <div class="gate" id="gate">
+  <button type="button" class="mk-theme-btn gate-theme" data-theme-toggle aria-label="Switch theme" title="Switch theme"><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
   <div class="card">
-    <div class="lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#62C79B" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+    <div class="lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="stroke:var(--green)" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
     <h1>MazingiraKenya Admin</h1>
     <p>Moderation &amp; operations console. Authorised coalition staff only.</p>
     <div id="gstep1">
@@ -255,6 +352,7 @@ button{font-family:inherit;cursor:pointer}
   <header class="topbar">
     <div class="brand">Mazingira<span style="color:var(--green)">Kenya</span></div>
     <div class="who">
+      <button type="button" class="mk-theme-btn" data-theme-toggle aria-label="Switch theme" title="Switch theme"><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
       <button class="signout" id="toHub" title="Open the members' hub carrying your sign-in">Members' hub ↗</button>
       <button class="signout" id="signout">Sign out</button>
     </div>
@@ -481,7 +579,7 @@ function voiceEmbedHTML(url){
   if(!url) return "";
   var yt = String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{6,})/);
   if(yt) return '<div class="qembed"><iframe src="https://www.youtube-nocookie.com/embed/'+yt[1]+'" title="Voice video" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;aspect-ratio:16/9;border:0;border-radius:10px"></iframe></div>';
-  if(/(twitter\.com|x\.com)/i.test(url)) return '<div class="qembed"><blockquote class="twitter-tweet" data-theme="dark"><a href="'+esc(url)+'">'+esc(url)+'</a></blockquote></div>';
+  if(/(twitter\.com|x\.com)/i.test(url)) return '<div class="qembed"><blockquote class="twitter-tweet" data-theme="'+(window.mkTheme?mkTheme():"dark")+'"><a href="'+esc(url)+'">'+esc(url)+'</a></blockquote></div>';
   if(/tiktok\.com/i.test(url)) return '<div class="qembed"><blockquote class="tiktok-embed" cite="'+esc(url)+'" style="max-width:100%"><a href="'+esc(url)+'">'+esc(url)+'</a></blockquote></div>';
   if(/instagram\.com/i.test(url)) return '<div class="qembed"><blockquote class="instagram-media" data-instgrm-permalink="'+esc(url)+'" data-instgrm-version="14"><a href="'+esc(url)+'">'+esc(url)+'</a></blockquote></div>';
   return "";
@@ -603,7 +701,7 @@ function loadNarrative(){
 function ndCard(row,isPub){
   var wrap=document.createElement("div"); wrap.className="qcard"; wrap.style.padding="14px 15px";
   function mkbtn(t,cls){ var b=document.createElement("button"); b.type="button"; b.className="btn "+(cls||""); b.textContent=t; return b; }
-  function fld(label,node){ var l=document.createElement("label"); l.style.cssText="display:block;font-size:.7rem;color:var(--muted);margin:6px 0 0"; l.textContent=label; node.style.cssText="width:100%;margin-top:2px;background:#0a1712;border:1px solid var(--line-2);color:var(--text);border-radius:8px;padding:8px;font-family:inherit"; l.appendChild(node); return l; }
+  function fld(label,node){ var l=document.createElement("label"); l.style.cssText="display:block;font-size:.7rem;color:var(--muted);margin:6px 0 0"; l.textContent=label; node.style.cssText="width:100%;margin-top:2px;background:var(--inset,#0a1712);border:1px solid var(--line-2);color:var(--text);border-radius:8px;padding:8px;font-family:inherit"; l.appendChild(node); return l; }
   function viewMode(){
     var src=esc(row.name||row.handle||"Circulating on X");
     var meta=[(row.name&&row.handle)?esc(row.handle):"", row.posted_at?esc(row.posted_at):"", row.eng?esc(row.eng):""].filter(Boolean).join(" · ");
