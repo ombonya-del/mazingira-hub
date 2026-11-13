@@ -1481,6 +1481,9 @@ html[data-theme="light"] .pc-tag.oil{ background:rgba(40,40,46,.10); color:#2E30
 html[data-theme="light"] .pc-tag.land{ color:#2C6E2C; }
 html[data-theme="light"] .pc-tag.forest{ color:#17704A; }
 html[data-theme="light"] .pc-tag.plastics{ color:#5B3D9E; }
+html[data-theme="light"] .corr.pipeline,
+html[data-theme="light"] .res .m.s-proposed, html[data-theme="light"] .res .m.s-stalled{ stroke:#5A3A20; }
+html[data-theme="light"] .corr.corridor{ stroke:#6E7F76; }
 html[data-theme="light"] .fundtag{ color:#7A5A00; border-color:rgba(160,120,0,.4); background:rgba(240,192,64,.12); }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -3591,6 +3594,28 @@ var STEP_EDGES  = [0.20, 0.40, 0.60, 0.80];          // 5 bands
 var DIV_STEPS   = ["#62C79B","#2C7D5C","#1D2C24","#B05A21","#F2762F"];
 var DIV_EDGES   = [-0.30, -0.10, 0.10, 0.30];
 
+/* ---- theme-aware map palette: every county map reads its colours from here,
+   so the maps flip with the dark/light switch (ramps run pale→strong in light) ---- */
+var MAP_PAL = {
+  dark:{ ember:EMBER_STEPS.slice(), green:GREEN_STEPS.slice(), div:DIV_STEPS.slice(),
+         none:"#13241D", edge:"#080F0C", densLo:"#16241D", densHi:"#3E9E76", foot:"#2C7D5C", legalDot:"#0A1512" },
+  light:{ ember:["#E4DFD2","#F2C7A0","#E89A5E","#D9722C","#A84A14"],
+          green:["#E4DFD2","#B7DCC6","#7FC1A0","#3E9E76","#1F6B4C"],
+          div:["#1F6B4C","#7FC1A0","#E4DFD2","#E89A5E","#A84A14"],
+          none:"#E4DFD2", edge:"#F4F1E8", densLo:"#E4DFD2", densHi:"#2F8A63", foot:"#8FCCAE", legalDot:"#FFFFFF" }
+};
+var MAPC = MAP_PAL.dark;
+/* pale category colours (white, light grey, yellow) would vanish as footprint lines on a pale map */
+var LINE_ON_LIGHT = { "#FFFFFF":"#16201B", "#C6D2CB":"#4A5A52", "#F0C040":"#9A7300" };
+function applyMapTheme(){
+  MAPC = MAP_PAL[document.documentElement.getAttribute("data-theme")==="light" ? "light" : "dark"];
+  function put(arr, src){ for(var i=0;i<src.length;i++) arr[i]=src[i]; }
+  put(EMBER_STEPS, MAPC.ember); put(GREEN_STEPS, MAPC.green); put(DIV_STEPS, MAPC.div);
+  if(typeof LEGAL_FILL === "object" && LEGAL_FILL) LEGAL_FILL.none = MAPC.none;
+  if(typeof SEC_FILL === "object" && SEC_FILL) SEC_FILL.none = MAPC.none;
+}
+applyMapTheme();
+
 function bucket(v, edges){
   for(var i=0;i<edges.length;i++) if(v < edges[i]) return i;
   return edges.length;
@@ -3922,7 +3947,7 @@ accordion(document.getElementById("legalList"), LEGAL, function(m,i){
    ================================================================= */
 var LEGAL_BY_COUNTY = {};
 LEGAL.forEach(function(c){ (LEGAL_BY_COUNTY[c.county] = LEGAL_BY_COUNTY[c.county] || []).push(c); });
-var LEGAL_FILL = { won:"#3E9E76", active:"#DE742B", watch:"#C86A2A", none:"#13241D" };
+var LEGAL_FILL = { won:"#3E9E76", active:"#DE742B", watch:"#C86A2A", none:MAPC.none };
 function legalStatus(nm){
   var cs = LEGAL_BY_COUNTY[nm]; if(!cs) return "none";
   if(cs.some(function(c){ return c.s==="active"; })) return "active";
@@ -3944,7 +3969,7 @@ function renderLegalMap(){
     var st = legalStatus(nm);
     var c = document.createElementNS(NS,"circle");
     c.setAttribute("cx",g[1]); c.setAttribute("cy",g[2]); c.setAttribute("r",4.4);
-    c.setAttribute("fill","#0A1512"); c.setAttribute("stroke",LEGAL_FILL[st]); c.setAttribute("stroke-width","2");
+    c.setAttribute("fill",MAPC.legalDot); c.setAttribute("stroke",LEGAL_FILL[st]); c.setAttribute("stroke-width","2");
     layer.appendChild(c);
   });
   svg.appendChild(layer);
@@ -6035,7 +6060,7 @@ function drawCounties(svg, fillFn, tipEl, tipFn, clickFn){
     var path = document.createElementNS(NS,"path");
     path.setAttribute("d", g[0]);
     path.setAttribute("fill", fillFn(nm));
-    path.setAttribute("stroke", "#080F0C");
+    path.setAttribute("stroke", MAPC.edge);
     path.setAttribute("stroke-width", "1");
     path.setAttribute("class", "cty2");
     path.dataset.n = nm;
@@ -6151,7 +6176,7 @@ function secCoverState(nm){
   var nat = ORGS.some(function(o){ return o.reg==="national" && (secMapSec==="all" || o.sec.indexOf(secMapSec)>=0); });
   return nat ? "thin" : "gap";
 }
-var SEC_FILL = { cov:"#3E9E76", thin:"#C86A2A", gap:"#B02310", none:"#13241D" };
+var SEC_FILL = { cov:"#3E9E76", thin:"#C86A2A", gap:"#B02310", none:MAPC.none };
 function renderSectorMap(){
   var svg = document.getElementById("sectorMap"); if(!svg) return;
   drawCounties(svg, function(nm){ return SEC_FILL[secCoverState(nm)]; },
@@ -6417,10 +6442,10 @@ var DENS_MAX = Math.max.apply(null, Object.keys(DENS).map(function(k){ return DE
 var netMode = "density";   // "density" (all orgs) or a single org name (footprint)
 function netFill(nm){
   if(netMode !== "density"){
-    return orgCounties(netMode).indexOf(nm) >= 0 ? "#2C7D5C" : "#13241D";
+    return orgCounties(netMode).indexOf(nm) >= 0 ? MAPC.foot : MAPC.none;
   }
   var v = DENS[nm] / DENS_MAX;
-  return v <= 0 ? "#13241D" : mix("#16241D","#3E9E76", Math.pow(v, .7));
+  return v <= 0 ? MAPC.none : mix(MAPC.densLo, MAPC.densHi, Math.pow(v, .7));
 }
 
 function renderNetMap(){
@@ -6433,6 +6458,7 @@ function renderNetMap(){
   // connector lines from an org's HQ to each programme county (footprint mode)
   if(netMode !== "density" && ORG_LOC[netMode]){
     var hq = GEO[ORG_LOC[netMode][0]], col = CAT_COLOR[ORG_LOC[netMode][1]] || "#fff";
+    if(MAPC === MAP_PAL.light) col = LINE_ON_LIGHT[String(col).toUpperCase()] || col;
     var lines = document.createElementNS(NS,"g");
     orgCounties(netMode).forEach(function(cty){
       if(cty === ORG_LOC[netMode][0] || !GEO[cty]) return;
@@ -6633,6 +6659,12 @@ function applyExploreSub(){
   if(exploreSub === "directory"){ renderSectorMap(); renderCoverStrip(); renderNetMap(); }
   if(exploreSub === "legal" && typeof renderLegalMap === "function") renderLegalMap();
 }
+/* redraw the county maps in the new palette when the theme switch is used */
+window.addEventListener("mk-theme", function(){
+  applyMapTheme();
+  try{ paint(); }catch(e){}
+  try{ applyExploreSub(); }catch(e){}
+});
 
 function showView(view, hash){
   if(VIEWS.indexOf(view) < 0) view = "live";
