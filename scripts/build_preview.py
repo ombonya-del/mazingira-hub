@@ -14,7 +14,7 @@ def rep(a, b, n=1):
     s = s.replace(a, b)
 
 NAME = "Climate &amp; Environmental Justice Hub"
-TAG = "Intelligence · Coordination · Comms · Resources"
+TAG = "Intelligence · Coordination · Communications · Resources"
 
 # ---------------------------------------------------------------- name / head
 rep('<span class="brand-sub">Comms Hub</span>', f'<span class="brand-sub">{NAME}</span>')
@@ -41,7 +41,7 @@ s = s.replace(desk_old, '''<nav class="tabs tabs-desk" id="tabbarDesk" aria-labe
     <a href="#home"      data-pillar="home" class="on">Home</a>
     <a href="#map"       data-pillar="intel">Intelligence</a>
     <a href="#directory" data-pillar="coord">Coordination</a>
-    <a href="#disinfo"   data-pillar="comms">Comms</a>
+    <a href="#disinfo"   data-pillar="comms">Communications</a>
     <a href="#projects"  data-pillar="res">Resources</a>
     <span class="nav-actions">
       <a class="btn btn--public" href="https://raia.mazingirakenya.org" target="mzk_raia" rel="noopener" title="Open raia — the public platform">raia ↗</a>
@@ -58,7 +58,7 @@ s = s.replace(mob_old, '''<nav class="tabs tabs-mob" id="tabbarMob" aria-label="
     <a href="#home" data-pillar="home" class="on"><svg class="ico" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a>
     <a href="#map" data-pillar="intel"><svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/><path d="M8.5 11h5M11 8.5v5"/></svg><span>Intel</span></a>
     <a href="#directory" data-pillar="coord"><svg class="ico" viewBox="0 0 24 24"><circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="12" cy="17" r="2.5"/><path d="M8 8.5 10.5 15M16 8.5 13.5 15M8.5 7h7"/></svg><span>Coordinate</span></a>
-    <a href="#disinfo" data-pillar="comms"><svg class="ico" viewBox="0 0 24 24"><path d="M4 10v4h3l6 4V6L7 10z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/></svg><span>Comms</span></a>
+    <a href="#disinfo" data-pillar="comms"><svg class="ico" viewBox="0 0 24 24"><path d="M4 10v4h3l6 4V6L7 10z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/></svg><span>Communicate</span></a>
     <a href="#projects" data-pillar="res"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M16.5 7.5c0-1.7-2-3-4.5-3s-4.5 1.3-4.5 3 2 2.6 4.5 3 4.5 1.3 4.5 3-2 3-4.5 3-4.5-1.3-4.5-3"/></svg><span>Resources</span></a>
   </div>
 </nav>''', 1)
@@ -81,7 +81,7 @@ rep('<!-- ============================ LIVE STREAMS ============================
     <div class="sec-head"><div class="grow"><p class="kicker">How the hub is organised</p>
       <h2>Four pillars</h2>
       <p class="lede">Intelligence tells us what is happening. Coordination decides who responds.
-        Comms shapes how the public understands it. Resources pay for the response.</p></div></div>
+        Communications shapes how the public understands it. Resources pay for the response.</p></div></div>
     <div class="pillar-grid">
       <a class="pillar-card pc-intel" href="#map">
         <span class="pc-k">Intelligence</span><b>What is happening, and where?</b>
@@ -90,7 +90,7 @@ rep('<!-- ============================ LIVE STREAMS ============================
         <span class="pc-k">Coordination</span><b>Who is doing what, and where are the gaps?</b>
         <span class="pc-d">Directory &amp; gaps · Baraza forum · Convenings &amp; coalition room</span></a>
       <a class="pillar-card pc-comms" href="#disinfo">
-        <span class="pc-k">Comms</span><b>What story do we tell, and how do we answer theirs?</b>
+        <span class="pc-k">Communications</span><b>What story do we tell, and how do we answer theirs?</b>
         <span class="pc-d">Disinformation &amp; rebuttals · Voices · Petitions · Socials wall · raia</span></a>
       <a class="pillar-card pc-res" href="#projects">
         <span class="pc-k">Resources</span><b>Who funds this, and what should they fund next?</b>
@@ -116,7 +116,7 @@ end = s.index(end_marker) + len(end_marker)
 old_router = s[start:end]
 assert 'window.addEventListener("mk-theme"' in old_router
 s = s[:start] + r'''/* =================================================================
-   FOUR-PILLAR ROUTER (preview) — Home + Intelligence · Coordination · Comms · Resources.
+   FOUR-PILLAR ROUTER (preview) — Home + Intelligence · Coordination · Communications · Resources.
    Each route shows a set of existing sections (and, for split sections, one part).
    ================================================================= */
 var PILLARS = [
@@ -125,7 +125,7 @@ var PILLARS = [
     subs:["map","legal","pulse","pledges","cop","brief","report"] },
   { id:"coord", name:"Coordination", q:"Who is doing what, and where are the gaps?",
     subs:["directory","forum","convene"] },
-  { id:"comms", name:"Comms", q:"What story do we tell, and how do we answer theirs?",
+  { id:"comms", name:"Communications", q:"What story do we tell, and how do we answer theirs?",
     subs:["disinfo","voices","petitions","wall","raia"] },
   { id:"res",   name:"Resources", q:"Who funds this, and what should they fund next?",
     subs:["projects","opps","funders"] }
