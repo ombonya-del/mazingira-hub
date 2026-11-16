@@ -1,3 +1,41 @@
+# Opportunities Watch — Review Log — 2026-11-16
+
+MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya / East Africa / pan-African climate justice. All deadlines below are **on or after 2026-11-16**. New items are **written straight into Supabase as drafts (published=false)** via the connected-Chrome JS write path and now await admin Accept/Reject in **admin → Opportunities review**. Nothing here is public until an admin accepts.
+
+> ✅ **Queueing status:** 2/2 new drafts inserted successfully (HTTP 201) via the connected-Chrome write path (Browser 1), POSTed from the `hub.mazingirakenya.org` origin. The Mac device shell and the cloud container remain proxy-blocked from `uueemckdoozsuowcqkhl.supabase.co` (curl/node → HTTP 000), so the browser JS `fetch` is again the reliable writer. Re-runnable commands: `scripts/queue-opportunities-2026-11-16.sh`.
+
+## New verified-open opportunities queued (2)
+
+### 1. Africa Youth Climate Fund (AYCF) 2026/2027 — Youth-Led Climate Action Grants (up to US$20,000)
+- **Funder / host:** Africa Youth Climate Fund (AYCF), a youth-led climate fund hosted by the Green Africa Youth Organization (GAYO)
+- **Type:** Grant — three tiers: US$5,000 (focused community initiative / new idea), US$10,000 (strengthening or expanding an initiative), US$20,000 (larger multi-activity/multi-community initiative). Participatory grantmaking (youth-for-youth review panel); funds released in tranches.
+- **Deadline:** 15 Jan 2027 (first Call for Proposals; opened at COP31 in Antalya, Türkiye on 10 Nov 2026)
+- **Eligibility:** Youth-led climate organisations and groups **based in Africa** (Kenya / East Africa eligible). Registered orgs, orgs whose registration is in progress, and informal/unregistered youth groups applying through a fiscal sponsor. Groups led by young women and those working with often-excluded communities strongly encouraged. Choose one of three thematic pillars: (I) Entrepreneurship, Innovation & Green Transition; (II) Youth Leadership, Solidarity & Movement-Building; (III) Research, Evidence & Learning.
+- **URL:** https://aycf.org/funding/6cf80744-a907-406f-92e3-5e94ba46d008
+- **Verified:** directly on aycf.org (official funding page) — call OPEN, deadline 15 Jan 2027, tiers US$5k/10k/20k, Africa-based youth-led groups; corroborated across MSME Africa, Opportunities for Youth, careersandopportunities.com, fundsforNGOs and yeshub. **Strong fit** — pan-African youth climate justice, direct funding to grassroots youth groups, low paperwork, Kenya eligible.
+
+### 2. Nature Culture Fellowship 2027 (NCF) — Storytelling & Artivism for Environmental Justice
+- **Funder / host:** Kinship
+- **Type:** Fellowship — global cohort; a two-phase programme (online 10-session Learning Journey Feb–Apr 2027 + Project Implementation Apr–Aug 2027). Selected Fellows receive **micro-grants of US$1,000–US$2,000** plus professional mentorship.
+- **Deadline:** 1 Dec 2026, 23:59 UTC (applications opened 26 Oct 2026; selection notified mid-Jan 2027)
+- **Eligibility:** International / worldwide; a diverse global community of change-makers. No country, age or education restriction stated (admin to confirm via official FAQs). Africa eligible — past cohorts include Fellows from Malawi, Ghana and beyond. Applications available in English, Spanish, Portuguese and French.
+- **URL:** https://www.kinship.earth/nature-culture-fellowship
+- **Verified:** directly on kinship.earth (official NCF page) — applications OPEN, deadline 1 Dec 2026, US$1,000–2,000 micro-grants + mentorship. ⚠️ **Borderline scope note:** focus is culture/narrative change — storytelling, artivism and culture "in the service of justice and collective liberation" — rather than a traditional climate grant. Queued for admin judgment (prior runs have queued comparable storytelling/narrative climate-justice fellowships, e.g. Voices for Climate Justice).
+
+## Checked and DROPPED this run (closed, out of scope, unverifiable, or already logged)
+- **Oilwatch International Small Grants Programme 2026** — deadline **13 Nov 2026 → CLOSED** before this run (queued in the 2026-11-09 run).
+- **Mountains ADAPT Small Grants for the East African Community (EAC)** (UNEP; up to US$30,000, Kenya + EAC eligible) — relevant and East-Africa-specific, but deadline **15 Sep 2026 → CLOSED** (first call already lapsed; re-check for a second EAC call in a later run).
+- **Global EbA Fund — Medium-size Grants** (16 Nov 2026) — deadline today / effectively closed before admin review; already queued in the 2026-10-09 run.
+- **Illegal Wildlife Trade (IWT) Challenge Fund** (aggregators list 23 Nov 2026) — official iwt.challengefund.org.uk still shows no verifiable current open round → not queued (unverifiable; also dropped in prior runs).
+- **AECF REACT 2.0 — Digital Innovation Fund for Energy & Climate (DIFEC)** (25 Nov 2026, Sub-Saharan Africa) — an **enterprise investment fund** (early/growth-stage businesses), out of grassroots env-justice scope (dropped in prior runs).
+- **Climate Intervention Environmental Impact Fund (CIEIF)** (1 Dec 2026) — US-based climate-intervention / geoengineering & CDR field-testing research; out of scope (dropped in prior runs).
+- **GCBC Research Grant Competition 4 (RGC4) concept-note window** (30 Nov 2026) — focal geographies are Amazon / Congo Basin / Coral Triangle only; a Kenyan/East-African lead would need a Congo-Basin partner and must be a not-for-profit research org → out of core region/scope.
+- **Urgent Action Fund–Africa (UAF-Africa)** — no dated, verifiable open climate/env-justice call for proposals could be confirmed (2026 call framed around women's-rights organisations; rapid-response grants are rolling) → nothing dated to queue.
+- **Alice McCosh Trust** (30 Nov, £1,000), **Onewater Walk of Water Photostory Contest** (29 Nov), **Ocean Culture Life Storytelling Grants** (1 Dec, worldwide ocean), **Planet Health Film Fund** (16 Nov, registered production company), **IIE/OceanX Ocean Futures Fellowship** (17 Nov), **IFAD rapid crisis response** (20 Nov, Kenya not on the priority list), **IREX Community Solutions** (24 Nov) — out of scope, out of region, or too narrow.
+- **IKI Medium Grants 2026** (12 Jan 2027), **Keeling Curve Prize 2027** (15 Jan 2027), **Officially Green Global Fellowship 2027** (7 Jan 2027), **IBCI Fellowship 2026** (23 Nov 2026), **Rufford Small Grants** (rolling) — still open but **already queued/logged** in prior runs (2026-10-09 / 10-19 / 11-09); deduped, not re-queued.
+
+---
+
 # Opportunities Watch — Review Log — 2026-11-09
 
 MazingiraKenya coalition · weekly scan of **currently-open** climate & environmental-justice opportunities relevant to Kenya / East Africa / pan-African climate justice. All deadlines below are **on or after 2026-11-09**. New items are **written straight into Supabase as drafts (published=false)** via the connected-Chrome JS write path and now await admin Accept/Reject in **admin → Opportunities review**. Nothing here is public until an admin accepts.
