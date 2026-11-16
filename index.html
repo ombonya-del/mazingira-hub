@@ -1370,6 +1370,10 @@ a.copbar:hover{ text-decoration:none; background:linear-gradient(90deg, rgba(238
 /* ---------- social embeds in Voices ---------- */
 .voice-embed{ width:100%; margin-top:10px; }
 .voice-embed:empty{ display:none; }
+.voice-media{ display:grid; gap:8px; margin-top:10px; }
+.voice-media:empty{ display:none; }
+.voice-media img,.voice-media video{ width:100%; max-height:420px; object-fit:contain; border-radius:10px; background:#111; display:block; }
+.voice-media audio{ width:100%; }
 .embed-yt{ position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border:1px solid var(--line); }
 .embed-yt iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
 .embed-fallback{ display:inline-block; color:var(--green); word-break:break-all; font-size:.82rem; padding:8px 0; }
@@ -5358,6 +5362,22 @@ function mountEmbed(container, url){
 
 var ICON_EMBED = { youtube:"video", x:"video", tiktok:"video", instagram:"photo" };
 var vWrap = document.getElementById("voiceList");
+/* uploaded files live in the private "voices" bucket: fetch short-lived signed links
+   (Supabase only grants them once the voice is approved — or to reviewers) */
+function fillVoiceMedia(box, paths){
+  var cl = window.HAUTH || window.MZ_SB || (typeof SB!=="undefined" ? SB : null);
+  if(!box || !paths || !paths.length || !cl || !cl.storage) return;
+  cl.storage.from("voices").createSignedUrls(paths, 6*3600).then(function(r){
+    if(!r || r.error || !r.data) return;
+    box.innerHTML = r.data.map(function(x){
+      if(!x || !x.signedUrl) return "";
+      var u = escE(x.signedUrl), n = String(x.path||"").toLowerCase();
+      if(/\.(mp4|mov|m4v|webm|3gp|mkv)$/.test(n)) return '<video src="'+u+'" controls playsinline preload="metadata"></video>';
+      if(/\.(mp3|m4a|aac|wav|ogg|oga|opus|amr|weba)$/.test(n)) return '<audio src="'+u+'" controls preload="none"></audio>';
+      return '<a href="'+u+'" target="_blank" rel="noopener noreferrer"><img src="'+u+'" alt="" loading="lazy"></a>';
+    }).join("");
+  }, function(){});
+}
 function renderVoices(){
   vWrap.innerHTML = "";
   if(!VOICES.length){ vWrap.innerHTML = '<div class="pet-empty">No community voices yet. Members share photos, video, audio or reports using the form above — they appear here after moderation.</div>'; return; }
@@ -5366,10 +5386,12 @@ function renderVoices(){
     var icon = ICONS[v.i] || ICONS.doc;
     c.innerHTML = '<div class="voice"><div class="voice-badge" aria-hidden="true">'+icon+'</div>'+
       '<div style="flex:1; min-width:0"><h3>'+escE(v.t)+'</h3><span class="meta">'+escE(v.m)+'</span></div></div><p>'+escE(v.p)+'</p>'+
+      (v.files && v.files.length ? '<div class="voice-media"></div>' : '')+
       (v.embed ? '<div class="voice-embed" data-embed="'+String(v.embed).replace(/"/g,'')+'"></div>' : '')+
       (v.src ? '<a class="voice-src" href="'+escE(v.src)+'" target="_blank" rel="noopener noreferrer">View source ↗</a>' : '');
     vWrap.appendChild(c);
     if(v.embed){ mountEmbed(c.querySelector(".voice-embed"), v.embed); }
+    if(v.files && v.files.length){ fillVoiceMedia(c.querySelector(".voice-media"), v.files); }
   });
 }
 renderVoices();
@@ -5378,7 +5400,8 @@ renderVoices();
 (function(){
   var C3 = window.HAUTH || window.MZ_SB || (typeof SB!=="undefined" ? SB : null);
   if(!C3 || !C3.from) return;
-  C3.from("voices_public").select("*").order("created_at",{ascending:false}).limit(12)
+  function viaView(){ return C3.from("voices_public").select("*").order("created_at",{ascending:false}).limit(12); }
+  (C3.rpc ? C3.rpc("voices_feed",{lim:12}).then(function(r){ return (r && !r.error) ? r : viaView(); }, viaView) : viaView())
     .then(function(r){
       if(!r || r.error || !r.data || !r.data.length) return;
       VOICES = r.data.map(function(row){
@@ -5394,7 +5417,8 @@ renderVoices();
           m: [row.county, kindLabel, dt].filter(Boolean).join(" · "),
           p: row.body || "",
           embed: isEmbed ? row.source_url : null,
-          src: (!isEmbed && row.source_url) ? row.source_url : null
+          src: (!isEmbed && row.source_url) ? row.source_url : null,
+          files: row.media_files || []
         };
       });
       renderVoices();
@@ -5444,8 +5468,32 @@ renderVoices();
     var submit=vf.querySelector('[type="submit"]'); if(submit) submit.disabled=true;
     var finish=function(){ vf.style.display="none"; document.getElementById("voiceOk").classList.add("show"); if(submit) submit.disabled=false; };
     var C2 = window.HAUTH || window.MZ_SB || (typeof SB!=="undefined" ? SB : null);
-    if(C2 && C2.from){ C2.from("submissions").insert(rec).then(finish, finish); }
-    else finish();
+    /* Files go to the PRIVATE "voices" bucket; they only become viewable once the
+       submission is approved (see supabase/voices-media.sql). */
+    var fl = (type==="embed" || !files) ? [] : Array.prototype.slice.call(files);
+    var big = fl.filter(function(f){ return f.size > 50*1024*1024; });
+    if(big.length){ hubToast("\u201c"+big[0].name+"\u201d is over 50 MB \u2014 please trim it, or post it on YouTube and share the link"); if(submit) submit.disabled=false; return; }
+    function save(){
+      if(!(C2 && C2.from)){ finish(); return; }
+      C2.from("submissions").insert(rec).then(function(r){
+        if(r && r.error && rec.media_files && /media_files/i.test(r.error.message||"")){ delete rec.media_files; return C2.from("submissions").insert(rec).then(finish, finish); }
+        finish();
+      }, finish);
+    }
+    if(!fl.length){ save(); return; }
+    if(!C2 || !C2.storage){ hubToast("Uploading needs a connection \u2014 please try again online"); if(submit) submit.disabled=false; return; }
+    var folder = "pending/" + ((window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now()+"-"+Math.random().toString(36).slice(2)));
+    hubToast("Uploading "+fl.length+" file"+(fl.length>1?"s":"")+"\u2026 please keep this page open");
+    var paths=[];
+    fl.reduce(function(p,f,ix){ return p.then(function(){
+      var path = folder+"/"+ix+"_"+f.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+      return C2.storage.from("voices").upload(path,f,{cacheControl:"3600",upsert:false,contentType:f.type||undefined}).then(function(up){
+        if(up.error) throw up.error; paths.push(path); });
+    }); }, Promise.resolve()).then(function(){ rec.media_files = paths; save(); }, function(err){
+      if(submit) submit.disabled=false;
+      var m=(err&&err.message)||"";
+      hubToast("Upload failed"+(m?": "+m:"")+" \u2014 check you're signed in and try again");
+    });
   });
   document.getElementById("vAgain").addEventListener("click", function(){
     vf.reset(); syncType(); document.getElementById("v-embedPreview").innerHTML="";

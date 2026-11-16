@@ -354,6 +354,8 @@ main{padding-top:22px}
 .voice .media{margin:0 15px;border-radius:12px;height:132px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;letter-spacing:.03em;font-size:.82rem;background:#26262b}
 .voice .media.video{background:linear-gradient(130deg,#2a2a30,#5a1a20)}.voice .media.photo{background:linear-gradient(130deg,#0f3a2a,#26262b)}.voice .media.audio{background:linear-gradient(130deg,#4a3608,#26262b)}
 .voice .msg{padding:12px 15px 6px;font-size:1rem}
+.voice .vmedia{margin:0 15px;display:grid;gap:8px}.voice .vmedia:empty{display:none}
+.voice .vmedia img,.voice .vmedia video{width:100%;max-height:440px;object-fit:contain;border-radius:12px;background:#111;display:block}.voice .vmedia audio{width:100%}
 .voice .msg.new{background:#FFFBEE}
 .reacts{display:flex;gap:9px;padding:4px 15px 14px}
 .reacts button{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 13px;font-weight:800;font-size:.85rem;transition:transform .1s,border-color .15s}
@@ -1075,13 +1077,34 @@ function liveVoiceCard(row){
   return '<div class="voice"><div class="vtop"><span class="avatar" style="background:'+color+'">'+esc(initial)+'</span>'+
     '<span class="who"><span class="nm">'+esc(name)+'</span><span class="pl">'+esc(meta)+'</span></span>'+
     '<span class="vtype">'+kindLabel+'</span></div>'+
+    (row.media_files&&row.media_files.length?'<div class="vmedia" data-vfiles="'+esc(row.id)+'"></div>':'')+
     '<p class="msg">'+esc(dec(row.body||""))+'</p>'+(srcLink?'<div class="reacts">'+srcLink+'</div>':'')+'</div>';
+}
+/* approved uploads live in the private "voices" bucket — Supabase only signs links for approved voices */
+function fillLiveVoiceMedia(host, rows){
+  if(!RSB||!RSB.storage) return;
+  rows.forEach(function(row){
+    if(!row.media_files||!row.media_files.length) return;
+    var box=host.querySelector('[data-vfiles="'+row.id+'"]'); if(!box) return;
+    RSB.storage.from("voices").createSignedUrls(row.media_files, 6*3600).then(function(r){
+      if(!r||r.error||!r.data) return;
+      box.innerHTML=r.data.map(function(x){
+        if(!x||!x.signedUrl) return "";
+        var u=esc(x.signedUrl), n=String(x.path||"").toLowerCase();
+        if(/\.(mp4|mov|m4v|webm|3gp|mkv)$/.test(n)) return '<video src="'+u+'" controls playsinline preload="metadata"></video>';
+        if(/\.(mp3|m4a|aac|wav|ogg|oga|opus|amr|weba)$/.test(n)) return '<audio src="'+u+'" controls preload="none"></audio>';
+        return '<img src="'+u+'" alt="" loading="lazy">';
+      }).join("");
+    }, function(){});
+  });
 }
 function fetchVoices(){
   var host=document.getElementById("wall"); if(!host||!RSB) return;
-  RSB.from("voices_public").select("*").order("created_at",{ascending:false}).limit(12).then(function(r){
+  function viaView(){ return RSB.from("voices_public").select("*").order("created_at",{ascending:false}).limit(12); }
+  (RSB.rpc ? RSB.rpc("voices_feed",{lim:12}).then(function(r){ return (r&&!r.error)?r:viaView(); }, viaView) : viaView()).then(function(r){
     if(r.error||!r.data||!r.data.length) return;
     host.innerHTML=r.data.map(liveVoiceCard).join("");
+    fillLiveVoiceMedia(host, r.data);
   }, function(){});
 }
 function radarItem(i){

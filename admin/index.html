@@ -168,6 +168,10 @@ button{font-family:inherit;cursor:pointer}
 .qcard .qnm{font-weight:900;font-size:.92rem}
 .qcard .qmeta{font-size:.72rem;color:var(--muted);font-weight:700}
 .qcard .qbody{padding:0 15px 10px;font-size:.94rem}
+.qcard .qmedia-live{margin:0 15px 10px;display:grid;gap:8px}
+.qcard .qmedia-live:empty{display:none}
+.qcard .qmedia-live img,.qcard .qmedia-live video{width:100%;max-height:360px;object-fit:contain;border-radius:10px;background:#000;display:block}
+.qcard .qmedia-live audio{width:100%}
 .qcard .qmedia{margin:0 15px 10px;height:96px;border-radius:10px;background:#0a1712;border:1px dashed var(--line-2);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.76rem;font-weight:800;letter-spacing:.04em}
 .qcard .qembed{margin:0 15px 10px}
 .qcard .qembed iframe{display:block;max-width:100%}
@@ -604,7 +608,10 @@ function modCard(r){
   if(r.has_minor) flags+='<span class="flag warn">⚠ Possible minor — guardian consent</span>';
   if(r.lang) flags+='<span class="flag ok" style="color:var(--muted);border-color:var(--line-2);background:none">'+esc(r.lang)+'</span>';
   var emb = voiceEmbedHTML(r.source_url);
-  var media = emb ? emb : ((type==="text"||type==="embed") ? "" : '<div class="qmedia">'+esc(String(type).toUpperCase())+(r.media_path?' · '+esc(r.media_path):' attachment')+'</div>');
+  var hasFiles = r.media_files && r.media_files.length;
+  var media = (hasFiles ? '<div class="qmedia-live" data-qfiles="'+esc(r.id)+'"><div class="qmedia">Loading '+r.media_files.length+' file'+(r.media_files.length>1?'s':'')+'…</div></div>' : '')+
+    (emb ? emb : (hasFiles||type==="text"||type==="embed") ? "" :
+      '<div class="qmedia">'+esc(String(type).toUpperCase())+(r.media_path?' · '+esc(r.media_path)+' — file never received (sent before uploads were fixed; ask them to resend)':' — no file attached')+'</div>');
   var srcLink = r.source_url ? '<a class="btn ghost" href="'+esc(r.source_url)+'" target="_blank" rel="noopener noreferrer">View source ↗</a>' : '';
   var acts;
   if(r.status==="pending"){
@@ -630,7 +637,7 @@ function loadModeration(){
     var rows=res.data||[];
     host.innerHTML = rows.length ? rows.map(modCard).join("") : '<div class="panel muted">Nothing in this queue.</div>';
     host.querySelectorAll("[data-modact]").forEach(function(el){ el.addEventListener("click",function(){ modAct(el.getAttribute("data-modact")); }); });
-    rows.forEach(function(r){ if(r.source_url) modReparseEmbeds(r.source_url); });
+    rows.forEach(function(r){ if(r.source_url) modReparseEmbeds(r.source_url); if(r.media_files && r.media_files.length) modFillMedia(r); });
   }, function(){ host.innerHTML='<div class="panel muted">Couldn\'t reach the database.</div>'; });
   ["pending","approved","rejected"].forEach(function(st){
     ASB.from("submissions").select("id",{count:"exact",head:true}).eq("status",st).then(function(r){
@@ -1943,6 +1950,20 @@ function publishUpload(btn){
     });
   } else { doInsert(); }
 }
+/* preview files from the PRIVATE "voices" bucket via short-lived signed links (reviewers only) */
+function modFillMedia(r){
+  var box=document.querySelector('[data-qfiles="'+r.id+'"]'); if(!box||!ASB||!ASB.storage) return;
+  ASB.storage.from("voices").createSignedUrls(r.media_files, 3600).then(function(res){
+    if(!res||res.error||!res.data){ box.innerHTML='<div class="qmedia">Couldn\'t load files'+(res&&res.error?': '+esc(res.error.message):'')+'</div>'; return; }
+    box.innerHTML=res.data.map(function(x){
+      if(!x||!x.signedUrl) return '<div class="qmedia">File missing'+(x&&x.path?' · '+esc(x.path.split("/").pop()):'')+'</div>';
+      var u=esc(x.signedUrl), n=String(x.path||"").toLowerCase();
+      if(/\.(mp4|mov|m4v|webm|3gp|mkv)$/.test(n)) return '<video src="'+u+'" controls playsinline preload="metadata"></video>';
+      if(/\.(mp3|m4a|aac|wav|ogg|oga|opus|amr|weba)$/.test(n)) return '<audio src="'+u+'" controls preload="none"></audio>';
+      return '<a href="'+u+'" target="_blank" rel="noopener noreferrer"><img src="'+u+'" alt=""></a>';
+    }).join("");
+  }, function(){ box.innerHTML='<div class="qmedia">Couldn\'t load files — network error</div>'; });
+}
 function modAct(a){
   if(!ASB){ toast("Not connected."); return; }
   var p=a.split(":"), op=p[0], id=p.slice(1).join(":");
@@ -1950,7 +1971,7 @@ function modAct(a){
   if(!newStatus) return;
   ASB.from("submissions").update({status:newStatus}).eq("id",id).then(function(r){
     if(r.error){ toast(op+" failed: "+r.error.message); return; }
-    toast(op==="approve"?"Approved → live on the hub" : op==="reject"?"Rejected" : "Reopened for review");
+    toast(op==="approve"?"Approved → live on the hub + raia (incl. photos/videos)" : op==="reject"?"Rejected" : "Reopened for review");
     loadModeration();
   }, function(){ toast(op+" failed — network error"); });
 }
