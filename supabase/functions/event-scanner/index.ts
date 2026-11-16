@@ -10,6 +10,12 @@
 //  - Considers title AND description, and up to 30 candidates (was 15, title-only).
 //  - Claude failures are reported (llm.errors / llm.sample_error) instead of hidden.
 //
+// v3 (2026-11-13): only events with REAL details are filed. Many drafts had no date or venue
+// because headlines rarely carry them and v2 accepted "announced as upcoming without an exact
+// date". Now each candidate's article page is read (in parallel) so Claude can find the date
+// and venue, and a draft is filed only with an exact start date that is today or later AND a
+// venue/city or a clearly virtual format. Everything else is counted as missing_details.
+//
 // Deploy:  supabase functions deploy event-scanner --project-ref uueemckdoozsuowcqkhl
 // Secrets: CRON_SECRET, ANTHROPIC_API_KEY, optional SCANNER_MODEL
 
@@ -44,11 +50,23 @@ const candidate = (t: string) => {
   return REL.some((k) => s.includes(k)) && EVENTWORD.some((k) => s.includes(k));
 };
 
+async function pageText(url: string): Promise<string> {
+  try {
+    const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 MazingiraKenyaScanner/3.0" }, signal: AbortSignal.timeout(9000) });
+    if (!r.ok) return "";
+    const html = await r.text();
+    return html.replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<style[\s\S]*?<\/style>/gi, " ")
+      .replace(/<[^>]+>/g, " ").replace(/&[a-z#0-9]+;/gi, " ").replace(/\s+/g, " ").trim().slice(0, 3500);
+  } catch { return ""; }
+}
+
 const SYSTEM = (today: string) =>
   `Today is ${today}. You extract a single upcoming climate/environment EVENT relevant to Kenya, East Africa or African climate justice from a news or feed snippet. ` +
-  `Reply ONLY with compact JSON: {"is_event":bool,"title":str|null,"start_date":"YYYY-MM-DD"|null,"location":str|null,"mode":"In person"|"Virtual"|"Hybrid"|null,"org":str|null,"description":str|null}. ` +
-  `is_event=true when the snippet names a specific conference/summit/forum/workshop/COP that has NOT yet happened (start date ${today} or later, or announced as upcoming without an exact date). ` +
-  `Coverage published before an upcoming event counts. is_event=false if the event is already over or the item is only general news. ` +
+  `Reply ONLY with compact JSON: {"is_event":bool,"title":str|null,"start_date":"YYYY-MM-DD"|null,"time":str|null,"location":str|null,"mode":"In person"|"Virtual"|"Hybrid"|null,"org":str|null,"description":str|null}. ` +
+  `Use the headline AND the article text. is_event=true ONLY when ALL of these are stated in the text: (1) a specific named conference/summit/forum/workshop/webinar/COP session that has NOT yet happened; ` +
+  `(2) its exact start date (day, month and year, on or after ${today}); (3) where it happens: a venue or city (location), or that it is online (mode "Virtual"). ` +
+  `If the date or the place is missing, vague ("later this year", "next month") or only guessed, set is_event=false. Never invent or estimate a date or venue. ` +
+  `Coverage published before an upcoming event counts. is_event=false if the event is already over or the item is only general news. time: start time if stated, else null. ` +
   `title: the event's own name (not the headline). description: one sentence on what it is and who it is for.`;
 
 Deno.serve(async (req) => {
@@ -67,26 +85,35 @@ Deno.serve(async (req) => {
     const fresh = rough.filter((x) => !have.has(x.link));
     const cands = fresh.slice(0, MAX_CANDIDATES);
 
-    let inserted = 0, not_event = 0, failed = 0, aborted = false, timed_out = false;
-    for (const c of cands) {
+    // read the candidates' article pages in parallel (dates and venues are rarely in headlines)
+    const pages: string[] = [];
+    for (let i = 0; i < cands.length; i += 8) {
+      if (Date.now() - started > 45_000) break;
+      pages.push(...await Promise.all(cands.slice(i, i + 8).map((c) => pageText(c.link))));
+    }
+    let inserted = 0, not_event = 0, missing_details = 0, failed = 0, aborted = false, timed_out = false;
+    for (const [idx, c] of cands.entries()) {
       if (Date.now() - started > TIME_BUDGET_MS) { timed_out = true; break; }
-      const res = await askJson(SYSTEM(today), `HEADLINE: ${c.title}\nSOURCE: ${c.source}\nPUBLISHED: ${c.pubDate ?? "unknown"}\n\n${c.desc}`.slice(0, 1500), 260);
+      const res = await askJson(SYSTEM(today), `HEADLINE: ${c.title}\nSOURCE: ${c.source}\nPUBLISHED: ${c.pubDate ?? "unknown"}\n\nSUMMARY: ${c.desc}\n\nARTICLE: ${pages[idx] ?? ""}`.slice(0, 5000), 300);
       llm.record(res);
       if (res.err) { failed++; if (res.fatal) { aborted = true; break; } continue; }
       const ev = res.data;
       if (!ev.is_event) { not_event++; continue; }
       const start = ev.start_date && /^\d{4}-\d{2}-\d{2}$/.test(ev.start_date) ? ev.start_date : null;
       if (start && start < today) { not_event++; continue; }   // belt-and-braces: never file past events
+      const place = String(ev.location ?? "").trim();
+      const online = ev.mode === "Virtual" || ev.mode === "Hybrid";
+      if (!start || (!place && !online)) { missing_details++; continue; }   // date AND venue/online required
       const { error } = await sb.from("calendar_events").insert({
         title: String(ev.title || c.title).slice(0, 300), start_date: start,
-        time: null, location: ev.location ?? null, mode: ev.mode ?? null,
+        time: ev.time ?? null, location: place || (ev.mode === "Virtual" ? "Online" : null), mode: ev.mode ?? null,
         description: ev.description ?? null, org: ev.org ?? null, link: c.link,
         source: "watch", published: false,
       });
       if (!error) { inserted++; have.add(c.link); }
     }
     return new Response(JSON.stringify({
-      candidates: cands.length, already_seen: rough.length - fresh.length, inserted, not_event, failed, aborted, timed_out,
+      candidates: cands.length, already_seen: rough.length - fresh.length, inserted, not_event, missing_details, failed, aborted, timed_out,
       before_filter: all.length, today, llm, debug,
     }), { headers: { "content-type": "application/json" } });
   } catch (e) {
