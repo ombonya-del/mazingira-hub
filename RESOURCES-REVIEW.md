@@ -1,3 +1,51 @@
+# Resources Watch — Review Log — 2026-11-16 (weekly firing)
+
+The weekly Resources Watch ran on 2026-11-16 and queued **5 genuinely new** climate / environmental-justice knowledge resources, deduped against all **48** distinct drafts already logged in prior runs (through 2026-11-09). All 5 were queued as drafts (`published=false`, `source=watch`, `category=Resources`) into Supabase (project `uueemckdoozsuowcqkhl`) via a connected Chrome (same-origin POST to `/rest/v1/resources`, public anon key only) and each returned **HTTP 201**. The Mac device shell still cannot reach Supabase (host not on the device egress allowlist). Replay commands: `scripts/queue-resources-2026-11-16.sh`. Each URL was fetched/opened and confirmed to load with real content before queueing.
+
+## Verified new resources (5) — 2026-11-16
+
+### 1. Adaptation Gap Report 2026
+- **Source:** United Nations Environment Programme (UNEP)
+- **Type:** Report (flagship annual; 2026 edition — subtitle "Ready? Not…"; released ahead of COP30)
+- **URL:** https://www.unep.org/en/publications/report/adaptation-gap-report-2026
+- **Why:** UNEP's authoritative annual assessment of the gap between adaptation needs and action/finance — finds adaptation finance continues to fall short and implementation remains constrained. The explicit "watch next" item from the 2026-11-09 run (then only 2025-edition coverage was confirmed); the 2026 edition is now live. Standing global reference; 2024 and 2025 editions already in the hub, this is the new 2026 edition.
+- **Verified:** opened in-browser. The `/resources/adaptation-gap-report-2026` slug 404s (same pattern as the Emissions Gap 2026 slug); the canonical publication page `www.unep.org/en/publications/report/adaptation-gap-report-2026` loads as "Adaptation Gap Report 2026" (author UNEP). (Repository item: `wedocs.unep.org/items/93231698-f219-414f-bcb6-f57e9c9b704e`.)
+
+### 2. Loss and Damage from Climate Change in the IGAD Region Assessment Report
+- **Source:** Intergovernmental Authority on Development (IGAD) — prepared by IGAD Centre of Excellence for Climate Adaptation & Environmental Protection (CAEP), hosted at ICPAC
+- **Type:** Regional assessment report (2026)
+- **URL:** https://caep.igad.int/wp-content/uploads/2020/07/IGAD-LD-from-Climate-Change-Assessment-Report_2026.pdf
+- **Why:** First regional assessment of economic and non-economic loss & damage across IGAD member states (country profiles incl. Kenya, Ethiopia, Somalia, South Sudan, Uganda, Djibouti), covering slow- and rapid-onset hazards, the Fund for Responding to Loss and Damage, barriers and recommendations. Direct climate-justice / loss-and-damage resource for the East Africa region. Distinct from the already-logged ICPAC "State of the Climate in Eastern Africa 2025" (annual climate assessment, different scope).
+- **Verified:** fetched directly; PDF loads with full content — title, IGAD/ICPAC authorship, 2026 copyright and recommended citation, authors Abdimajid Nunow Abdi & Alphonce Agola Mollo.
+
+### 3. Towards Anticipatory Disaster Risk Financing and Index Insurance Mechanisms for Resilience Building in Eastern Africa
+- **Source:** IGAD Climate Prediction and Applications Centre (ICPAC) — a WMO Regional Climate Centre
+- **Type:** Report / technical article (April 2026; DOI 10.5281/zenodo.19914210)
+- **URL:** https://www.icpac.net/documents/1069/Towards_Anticipatory_Disaster_Risk_Financing.pdf
+- **Why:** Makes the case for combining anticipatory action, climate/disaster risk financing & insurance, and stronger institutions across Eastern Africa — covering recurring droughts, floods and heat extremes and their effects on pastoral communities and food security, with policy priorities for fragile/conflict-affected settings. Practical climate-resilience / finance knowledge resource for the region.
+- **Verified:** fetched directly; PDF loads with full content — ICPAC publisher, April 2026, authors Sabiiti G. et al., DOI confirmed.
+
+### 4. Unlocking a Just Transition in Kenya: Policy Gaps, Opportunities and Global Support
+- **Source:** Climate Strategies / CECG (authors Elly Musembi, Kenneth Kigundu, Richard Mulwa)
+- **Type:** Policy brief (2026)
+- **URL:** https://www.efdinitiative.org/publications/unlocking-just-transition-kenya-policy-gaps-opportunities-and-global-support
+- **Why:** Kenya-specific just-transition analysis — policy gaps, opportunities and the international support needed for an equitable low-carbon transition. Direct environmental-justice / equity framing for Kenya.
+- **Verified:** landing page loads with title, named authors, document type (policy brief) and 2026 date. (On-page citation points to a placeholder link; the EfD landing page is used as the canonical resource URL.)
+
+### 5. I-CAN Policy Brief: Unlocking Kenya's Potential for Health, Resilience, and Inclusive Growth
+- **Source:** Global Alliance for Improved Nutrition (GAIN)
+- **Type:** Policy brief (2026; I-CAN — Initiative on Climate Action and Nutrition)
+- **URL:** https://www.gainhealth.org/resources/reports-and-publications/i-can-policy-brief-unlocking-kenyas-potential-health-resilience
+- **Why:** Kenya policy brief at the climate–nutrition–resilience intersection — how integrated climate and nutrition action can build resilience and inclusive growth. A knowledge/guideline resource on the community-resilience dimension of climate impacts.
+- **Verified:** page loads with title and GAIN publisher; 7 MB PDF linked (`i-can-kenya-policy-brief-2025.pdf`).
+
+## Notes for next run (dedupe)
+- The 5 items above (2026-11-16) do **not** duplicate anything already logged. Do **not** re-queue any of them.
+- Resolved from prior "watch" list: **UNEP Adaptation Gap Report 2026** (now live, queued as #1 above).
+- Still open / watch next run: **World Bank Kenya Country Climate and Development Report** update (live doc still the 2023 edition). **UNECA "Synthesis of COP30 Outcomes from an African Lens"** — referenced on `uneca.org/eca-events/cop30` as a "Conference Outcomes" caption; no canonical UNECA-hosted PDF located this run (only a news-site mirror) — re-check for an official document URL. **COP30 post-Belém African civil-society / UNECA outcome syntheses** generally — watch for released PDFs. **EAC 10-year regional climate plan** — locate the actual plan document before queueing. **Kenya Meteorological Department "State of the Climate Report 2025"** (meteo.go.ke) — likely overlaps the already-logged SEI Kenya report; still skipped to avoid a near-duplicate.
+
+---
+
 # Resources Watch — Review Log — 2026-11-09 (weekly firing)
 
 The weekly Resources Watch ran on 2026-11-09 and queued **5 genuinely new** climate / environmental-justice knowledge resources, deduped against all **43** distinct drafts already logged in prior runs (40 through 2026-10-13 + the 3 added that run; the 2026-10-19 run added 4, bringing the running set higher — all checked below). All 5 were queued as drafts (`published=false`, `source=watch`, `category=Resources`) into Supabase (project `uueemckdoozsuowcqkhl`) via a connected Chrome (same-origin POST to `/rest/v1/resources`, public anon key only) and each returned **HTTP 201**. The Mac device shell still cannot reach Supabase (node fetch failed — host not on the device egress allowlist). Replay commands: `scripts/queue-resources-2026-11-09.sh`. Each URL was fetched/opened and confirmed to load with real content before queueing.
