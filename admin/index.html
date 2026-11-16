@@ -187,6 +187,12 @@ button{font-family:inherit;cursor:pointer}
 .btn.approve{background:var(--green);color:#04140d;border-color:var(--green)}
 .btn.reject{background:transparent;color:var(--red);border-color:var(--red)}
 .btn.ghost{background:transparent;color:var(--muted)}
+.btn.danger{background:var(--red);color:#fff;border-color:var(--red)}
+.qedit{padding:4px 15px 12px;display:grid;gap:9px}
+.qedit label{display:grid;gap:4px;font-size:.72rem;font-weight:800;color:var(--muted);letter-spacing:.03em}
+.qedit input[type=text],.qedit select,.qedit textarea{width:100%;background:var(--panel-2);color:var(--text);border:1px solid var(--line-2);border-radius:8px;padding:8px 10px;font:inherit;font-size:.86rem;font-weight:500}
+.qedit .chk{display:flex;gap:8px;align-items:center;font-weight:700;color:var(--text)}
+.qedit .chk input{width:auto}
 .btn.pub{background:var(--ember);color:#1a0d03;border-color:var(--ember)}
 .btn:disabled{opacity:.5;cursor:default}
 .type-tag{font-size:.62rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line-2);color:var(--muted)}
@@ -572,10 +578,10 @@ function viewOverview(){
 function viewModeration(){
   state.modFilter = state.modFilter||"pending";
   var mc = state.modCounts||{};
-  var pills=[["pending","Pending"],["approved","Approved"],["rejected","Rejected"]].map(function(p){
+  var pills=[["pending","Pending"],["approved","Approved"],["rejected","Rejected"],["nomedia","Missing media"]].map(function(p){
     return '<button class="pill" data-mod="'+p[0]+'" aria-pressed="'+(state.modFilter===p[0])+'">'+p[1]+'<span class="c mono">'+(mc[p[0]]!=null?mc[p[0]]:"·")+'</span></button>';
   }).join("");
-  return '<section class="view"><div class="page-head"><div><h2>Moderation</h2><p>Review citizen Voices before anything is published. Check consent and privacy (Kenya DPA 2019).</p></div></div>'+
+  return '<section class="view"><div class="page-head"><div><h2>Moderation</h2><p>Review citizen Voices before anything is published. Check consent and privacy (Kenya DPA 2019). Use <b>Edit</b> to fix text or remove files, <b>Delete</b> to remove a post entirely. <b>Missing media</b> lists posts whose photo/video never arrived.</p></div></div>'+
     '<div class="pills">'+pills+'</div><div id="modList"><div class="panel muted">Loading…</div></div></section>';
 }
 /* Live Moderation — reads the real `submissions` table (status pending/approved/rejected).
@@ -622,7 +628,9 @@ function modCard(r){
     acts='<span class="status-tag st-'+esc(r.status)+'">'+esc(r.status)+'</span>'+srcLink+
       '<button class="btn ghost" data-modact="reopen:'+r.id+'" style="margin-left:auto">Reopen</button>';
   }
-  return '<div class="qcard"><div class="qtop"><span class="qav" style="background:'+(AVCOLORS[type]||"#62C79B")+'">'+esc(String(name).charAt(0))+'</span>'+
+  acts+='<button class="btn ghost" data-modact="edit:'+r.id+'">Edit</button>'+
+        '<button class="btn reject" data-modact="del:'+r.id+'">Delete</button>';
+  return '<div class="qcard" data-qid="'+esc(r.id)+'"><div class="qtop"><span class="qav" style="background:'+(AVCOLORS[type]||"#62C79B")+'">'+esc(String(name).charAt(0))+'</span>'+
     '<span class="qwho"><span class="qnm">'+esc(name)+'</span><span class="qmeta">'+esc(r.county||"—")+' · '+esc(when)+'</span></span>'+
     '<span class="type-tag">'+esc(type)+'</span></div>'+
     media+'<div class="qbody">'+esc(r.body||"")+'</div><div class="flags">'+flags+'</div>'+
@@ -632,11 +640,14 @@ function loadModeration(){
   if(!ASB) return;
   var host=document.getElementById("modList"); if(!host) return;
   var want=state.modFilter||"pending";
-  ASB.from("submissions").select("*").eq("status",want).order("created_at",{ascending:false}).then(function(res){
+  var q=ASB.from("submissions").select("*");
+  q = (want==="nomedia") ? q.not("media_path","is",null).is("media_files",null) : q.eq("status",want);
+  q.order("created_at",{ascending:false}).then(function(res){
     if(res.error){ host.innerHTML='<div class="panel muted">Couldn\'t load submissions: '+esc(res.error.message)+'</div>'; return; }
     var rows=res.data||[];
+    state.modRows={}; rows.forEach(function(r){ state.modRows[r.id]=r; });
     host.innerHTML = rows.length ? rows.map(modCard).join("") : '<div class="panel muted">Nothing in this queue.</div>';
-    host.querySelectorAll("[data-modact]").forEach(function(el){ el.addEventListener("click",function(){ modAct(el.getAttribute("data-modact")); }); });
+    host.querySelectorAll("[data-modact]").forEach(function(el){ el.addEventListener("click",function(){ modAct(el.getAttribute("data-modact"), el); }); });
     rows.forEach(function(r){ if(r.source_url) modReparseEmbeds(r.source_url); if(r.media_files && r.media_files.length) modFillMedia(r); });
   }, function(){ host.innerHTML='<div class="panel muted">Couldn\'t reach the database.</div>'; });
   ["pending","approved","rejected"].forEach(function(st){
@@ -645,6 +656,10 @@ function loadModeration(){
       if(st==="pending"){ state.modPending=r.count||0; renderNav(); }
       var pill=document.querySelector('.pills [data-mod="'+st+'"] .c'); if(pill) pill.textContent=r.count||0;
     });
+  });
+  ASB.from("submissions").select("id",{count:"exact",head:true}).not("media_path","is",null).is("media_files",null).then(function(r){
+    if(r.error) return; state.modCounts=state.modCounts||{}; state.modCounts.nomedia=r.count||0;
+    var pill=document.querySelector('.pills [data-mod="nomedia"] .c'); if(pill) pill.textContent=r.count||0;
   });
 }
 function subCard(s){
@@ -1964,9 +1979,58 @@ function modFillMedia(r){
     }).join("");
   }, function(){ box.innerHTML='<div class="qmedia">Couldn\'t load files — network error</div>'; });
 }
-function modAct(a){
+function modEdit(id){
+  var r=(state.modRows||{})[id], card=document.querySelector('[data-qid="'+id+'"]'); if(!r||!card||card.querySelector(".qedit")) return;
+  var q=function(v){ return esc(v||"").replace(/"/g,"&quot;"); };
+  var kinds=[["video","Video"],["audio","Audio"],["photo","Photo"],["doc","Written / report"],["embed","Social post"],["text","Text"]];
+  var files=(r.media_files||[]).map(function(f,i){ return '<label class="chk"><input type="checkbox" data-rmfile="'+i+'"> Remove file: '+esc(String(f).split("/").pop())+'</label>'; }).join("");
+  var orphan=(r.media_path && !(r.media_files&&r.media_files.length))
+    ? '<label class="chk"><input type="checkbox" data-orphan checked> Clear the \u201cfile never received\u201d note ('+esc(r.media_path)+')</label>' : '';
+  var f=document.createElement("div"); f.className="qedit";
+  f.innerHTML='<label>Name / alias<input type="text" data-f="submitter_name" value="'+q(r.submitter_name)+'"></label>'+
+    '<label>County / area<input type="text" data-f="county" value="'+q(r.county)+'"></label>'+
+    '<label>Type<select data-f="kind">'+kinds.map(function(k){ return '<option value="'+k[0]+'"'+(r.kind===k[0]?' selected':'')+'>'+k[1]+'</option>'; }).join("")+'</select></label>'+
+    '<label>Text<textarea rows="5" data-f="body">'+esc(r.body||"")+'</textarea></label>'+
+    '<label>Source / social link<input type="text" data-f="source_url" value="'+q(r.source_url)+'"></label>'+
+    files+orphan+
+    '<div class="qact"><button class="btn approve" data-qsave>Save changes</button><button class="btn ghost" data-qcancel>Cancel</button></div>';
+  card.querySelectorAll(".qbody,.qact,.qmedia-live,.qmedia,.flags").forEach(function(n){ n.style.display="none"; });
+  card.appendChild(f);
+  f.querySelector("[data-qcancel]").addEventListener("click", function(){ loadModeration(); });
+  f.querySelector("[data-qsave]").addEventListener("click", function(){
+    var upd={};
+    f.querySelectorAll("[data-f]").forEach(function(el){ var k=el.getAttribute("data-f"), v=(el.value||"").trim(); upd[k] = v || (k==="kind" ? r.kind : null); });
+    var rm=[]; f.querySelectorAll("[data-rmfile]").forEach(function(c){ if(c.checked) rm.push(r.media_files[+c.getAttribute("data-rmfile")]); });
+    if(rm.length){ var keep=(r.media_files||[]).filter(function(x){ return rm.indexOf(x)<0; });
+      upd.media_files = keep.length?keep:null; if(!keep.length) upd.media_path=null; }
+    var oc=f.querySelector("[data-orphan]"); if(oc && oc.checked) upd.media_path=null;
+    var btn=this; btn.disabled=true;
+    ASB.from("submissions").update(upd).eq("id",id).select("id").then(function(res){
+      if(res.error || !res.data || !res.data.length){ btn.disabled=false; toast("Save failed: "+(res.error?res.error.message:"not permitted \u2014 run supabase/voices-admin-edit.sql")); return; }
+      if(rm.length && ASB.storage) ASB.storage.from("voices").remove(rm).then(function(){},function(){});
+      toast("Saved"); loadModeration();
+    }, function(){ btn.disabled=false; toast("Save failed \u2014 network error"); });
+  });
+}
+function modDelete(id, btn){
+  if(!btn) return;
+  if(btn.getAttribute("data-armed")!=="1"){
+    btn.setAttribute("data-armed","1"); btn.textContent="Tap again to delete"; btn.classList.add("danger");
+    setTimeout(function(){ if(btn.isConnected && !btn.disabled){ btn.removeAttribute("data-armed"); btn.textContent="Delete"; btn.classList.remove("danger"); } }, 4000);
+    return;
+  }
+  var r=(state.modRows||{})[id]||{}; btn.disabled=true;
+  ASB.from("submissions").delete().eq("id",id).select("id").then(function(res){
+    if(res.error || !res.data || !res.data.length){ btn.disabled=false; toast("Delete failed: "+(res.error?res.error.message:"not permitted \u2014 run supabase/voices-admin-edit.sql")); return; }
+    if(r.media_files && r.media_files.length && ASB.storage) ASB.storage.from("voices").remove(r.media_files).then(function(){},function(){});
+    toast("Deleted"); loadModeration();
+  }, function(){ btn.disabled=false; toast("Delete failed \u2014 network error"); });
+}
+function modAct(a, btn){
   if(!ASB){ toast("Not connected."); return; }
   var p=a.split(":"), op=p[0], id=p.slice(1).join(":");
+  if(op==="edit"){ modEdit(id); return; }
+  if(op==="del"){ modDelete(id, btn); return; }
   var newStatus = op==="approve"?"approved" : op==="reject"?"rejected" : op==="reopen"?"pending" : null;
   if(!newStatus) return;
   ASB.from("submissions").update({status:newStatus}).eq("id",id).then(function(r){
