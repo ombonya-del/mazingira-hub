@@ -15,6 +15,65 @@ Classification key: `vf` = false / bad-faith (red) · `vm` = misleading (amber) 
 
 ---
 
+## 2026-11-16 — 4 new drafts queued
+
+Queue script: `scripts/queue-disinfo-2026-11-16.sh`. All four written to Supabase as drafts via the
+connected Chrome (POST /rest/v1/disinfo_items, 201) — the Mac device-bridge shell could not reach
+supabase.co this run (curl HTTP 000 on CONNECT), so Chrome was the writer. Status: **awaiting admin
+review**. Deduped against the currently-published `disinfo_items` (46 rows read via anon GET — none of
+the four source URLs or narratives present) and the 2026-09-19 / -22 / -29 / 10-03 / 10-09 / 10-19 /
+11-09 logs. Spread this run across four distinct disinfo mechanisms: a misused peer-reviewed study
+(paleoclimate denial), a fabricated government "announcement" riding the current El Niño floods,
+climate "doomism"/demobilisation (a narrative type the scan had not previously flagged), and
+gas-as-"transition-fuel" greenwashing sharpened around COP30.
+
+1. **Climate denial / manipulated study (`vf`) — "Earth is in its coldest period in 485 million years, so warming is trivial"**
+   - Narrative (X/Facebook, climate-skeptic sites): a 485-million-year temperature record in *Science*
+     proves Earth is unusually cold today, so modern warming is insignificant and natural.
+   - Fuller picture: the graph is read backwards. Judd et al. (2024, *Science*) plot temperature with
+     CO2 across the Phanerozoic — they move together, and the authors call CO2 "the dominant driver."
+     What the talking point hides: rate matters (humans raised CO2 ~50% in ~150 yrs; 2024 ~1.55°C above
+     pre-industrial) and past rapid warming drove mass extinctions (~60% marine species, Late Ordovician;
+     ~90% of all species, end-Permian). Our civilisation evolved for today's cooler climate. For East
+     Africa: vanishing Mt Kenya/Kilimanjaro ice, heatwaves, drought↔flood swings.
+   - Source: The Climate Brink (Hausfather/Dessler) / Judd et al. 2024 Science — https://www.theclimatebrink.com/p/climate-skeptics-have-new-favorite
+
+2. **Fabricated announcement / impersonation (`vf`) — "Kenya has postponed school reopening because of floods"**
+   - Narrative (TikTok/Facebook, 600k+ views): a "breaking news" post says the Ministry of Education
+     postponed school reopening nationwide due to heavy rains/flooding.
+   - Fuller picture: no such postponement. Africa Check found a fake graphic styled as Citizen Digital
+     (absent from Citizen TV's real channels) plus a genuine Ruto clip actually from a May 2024 flood
+     address, recycled to look current; schools reopened on schedule. Posts carried unrelated
+     "money-hack" captions (engagement-bait tell). Flagged now because Kenya Met warns of heavy
+     El Niño-enhanced rains across dozens of counties through Dec 2026 — verify closure/evacuation
+     notices against official Ministry and Kenya Met channels.
+   - Source: Africa Check — https://africacheck.org/fact-checks/meta-programme-fact-checks/no-kenya-has-not-postponed-reopening-schools-due-floods
+
+3. **Climate doomism / demobilisation (`vc`) — "Climate change is irreversible, so there's no point acting"**
+   - Narrative (social media, youth climate commentary in East Africa): warming is already irreversible
+     and extinction is coming, so cutting emissions or acting is pointless — just accept it.
+   - Fuller picture: doomism is the mirror image of denial and equally demobilising. The IPCC is explicit
+     that every fraction of a degree avoided reduces harm, and UN scientists stress rapid, deep, immediate
+     CO2 cuts can still prevent the worst; warming largely halts at net-zero emissions, so near-term cuts
+     change the trajectory. Much is locked in and adaptation matters, but "locked in" ≠ "hopeless." For
+     East Africa, how much drought/flood/crop-loss/glacier-melt occurs depends on this decade's choices.
+     (New narrative type for the scan — catches demobilisation, not only denial/greenwashing.)
+   - Source: The Observer (Uganda), on climate "doomism" / UN·IPCC — https://observer.ug/news/ugandas-climate-change-knowledge-and-accountability-gap-is-fuelling-disinformation/
+
+4. **Greenwashing / misleading framing (`vm`) — "Natural gas is a clean 'transition fuel' / bridge for Africa"**
+   - Narrative (energy-policy & oil-and-gas promotion, amplified around COP30): gas is clean and the
+     sensible bridge for Africa, so East African LNG and gas-power expansion is good for climate and access.
+   - Fuller picture: "clean bridge fuel" is branding. Gas is mostly methane (far more potent than CO2
+     near-term); leakage across the chain can erase its edge over coal, and the COP30 methane status
+     report shows action far short of the pledged 30% cut by 2030. Economics flipped: IRENA found 91% of
+     new renewables already cheaper than any new fossil option (2024); solar-plus-storage rivals/beats new
+     gas; IEA says clean energy draws ~two-thirds of energy investment. For Africa the "bridge" risks
+     stranded-asset lock-in and debt when distributed solar+storage expands access faster and cheaper.
+     "Gas or no power" is a false choice.
+   - Source: NRDC "Transition Fuel Illusion" / re-course "bridge fuel myth" / Cambridge CISL — https://www.nrdc.org/bio/shruti-shukla/transition-fuel-illusion-how-2025-exposed-limits-global-natural-gas-expansion
+
+---
+
 ## 2026-11-09 — 4 new drafts queued
 
 Queue script: `scripts/queue-disinfo-2026-11-09.sh`. All four written to Supabase as drafts via the
