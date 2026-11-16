@@ -2863,7 +2863,7 @@ var C = [
 
  {n:"Bungoma",cx:0,ry:3,s:{o:0,c:0,m:2,w:2,l:3,e:0},r:1,note:"Limestone quarrying; sugar processing effluent."},
  {n:"Uasin Gishu",cx:1,ry:3,s:{o:0,c:0,m:1,w:2,l:2,e:0},r:1,note:"Kaptagat forest pressure."},
- {n:"Laikipia",cx:2,ry:3,s:{o:0,c:0,m:1,w:4,l:5,e:0},r:4,orgs:["MKNF — Mount Kenya Network of Farmers"],note:"Land conflict, water abstraction, and climate impact on farming and pastoralist communities."},
+ {n:"Laikipia",cx:2,ry:3,s:{o:0,c:0,m:1,w:4,l:5,e:0},r:4,orgs:["MKNF — Mount Kenya Network Forum"],note:"Land conflict, water abstraction, and climate impact on farming and pastoralist communities."},
  {n:"Meru",cx:3,ry:3,s:{o:0,c:0,m:2,w:3,l:4,e:1},r:2,orgs:["JustAct Kenya"],note:"Nyambene forest loss; Mt Kenya water tower."},
  {n:"Tana River",cx:4,ry:3,s:{o:1,c:0,m:1,w:5,l:4,e:2},r:2,note:"Dam cascade, irrigation schemes, and delta degradation."},
 
@@ -3137,7 +3137,7 @@ var MEMBERS = [
  {n:"deCOALonize",c:"Coalition",loc:"Nairobi",d:"Convening secretariat coordinating legal advocacy, campaigns, and communications across the network.",e:true},
  {n:"Save Lamu",c:"Community",loc:"Lamu",d:"Community umbrella body that led the challenge against the Lamu coal plant from its inception."},
  {n:"LAWA — Lamu Women Alliance",c:"Community",loc:"Mkomani Ward, Lamu West",d:"Women-led organisation running a youth citizen journalism programme (funded by AJWS through deCOALonize) with Aweer/Boni, Sanye, Bajuni, Orma and Swahili coastal communities."},
- {n:"MKNF — Mount Kenya Network of Farmers",c:"Community",loc:"Laikipia",d:"Farmer and pastoralist network documenting climate impact, land pressure, and local advocacy."},
+ {n:"MKNF — Mount Kenya Network Forum",c:"Community",loc:"Laikipia",d:"Community network forum documenting climate impact, land pressure, and local advocacy."},
  {n:"Katiba Institute",c:"Legal",loc:"Nairobi",d:"Constitutional litigation and public interest law, including strategic environmental cases."},
  {n:"Friends of Lake Turkana",c:"Community",loc:"Turkana",d:"Indigenous-led advocacy on water rights, extractive industry, and the ecology of Lake Turkana."},
  {n:"Green Belt Movement",c:"Research",loc:"Nairobi",d:"Reforestation, water tower protection, and community environmental education."},
@@ -5862,7 +5862,7 @@ var ORGS = [
   { n:"Fossil Fuel Non-Proliferation Treaty",sec:["o","c"],         reg:"national" },
   { n:"Save Lamu",                           sec:["c","e","l","w","p"], reg:["Coast"] },
   { n:"LAWA — Lamu Women Alliance",          sec:["c","l","w"],     reg:["Coast"] },
-  { n:"MKNF — Mount Kenya Network of Farmers",sec:["w","l"],        reg:["Rift Valley"] },
+  { n:"MKNF — Mount Kenya Network Forum",sec:["w","l"],        reg:["Rift Valley"] },
   { n:"Friends of Lake Turkana",             sec:["o","w","e"],     reg:["Rift Valley"] },
   { n:"CHRCE — Center for Human Rights & Civic Education", sec:["c","l"], reg:["Eastern"] },
   { n:"Natural Justice",                     sec:["o","c","m","w","l","e"], reg:"national" },
@@ -6061,7 +6061,7 @@ var ORG_LOC = {
   "Fossil Fuel Non-Proliferation Treaty": ["Nairobi","International",true],
   "Save Lamu":                            ["Lamu","Community",false],
   "LAWA — Lamu Women Alliance":           ["Lamu","Community",false],
-  "MKNF — Mount Kenya Network of Farmers":["Laikipia","Community",false],
+  "MKNF — Mount Kenya Network Forum":["Laikipia","Community",false],
   "Friends of Lake Turkana":              ["Turkana","Community",false],
   "CHRCE — Center for Human Rights & Civic Education": ["Kitui","Community",false],
   "Natural Justice":                      ["Nairobi","Legal",true],
@@ -6442,7 +6442,7 @@ var PROGRAMS = {
     ["Nairobi","p","Clean-ups, recycling stations, invasive-weed removal and game counts with KWS","program"],
     ["Kajiado","l","Keeping the Athi-Kapiti migration routes and dispersal areas open — Kitengela, Isinya, Kipeto","program"],
     ["Kajiado","l","Solar predator-deterrent lights at livestock bomas on the southern boundary; community scouts for human-wildlife conflict","program"]],
-  "Save Lamu":[], "LAWA — Lamu Women Alliance":[], "MKNF — Mount Kenya Network of Farmers":[],
+  "Save Lamu":[], "LAWA — Lamu Women Alliance":[], "MKNF — Mount Kenya Network Forum":[],
   "KeNRA — Kenya National Rivers Association":[]
 };
 var REL_LABEL = { hq:"headquarters", program:"runs programmes", grantee:"funds a local partner",
@@ -6450,7 +6450,7 @@ var REL_LABEL = { hq:"headquarters", program:"runs programmes", grantee:"funds a
 
 /* funder / lead → grantee funding chains: [funder, grantee, county, sectors, activity] */
 var FUNDING = [
-  ["deCOALonize","MKNF — Mount Kenya Network of Farmers","Laikipia","w,l","Community documentation sub-grant · KES 380,000 (Jun–Nov 2026)"],
+  ["deCOALonize","MKNF — Mount Kenya Network Forum","Laikipia","w,l","Community documentation sub-grant · KES 380,000 (Jun–Nov 2026)"],
   ["deCOALonize","LAWA — Lamu Women Alliance","Lamu","c,l","Youth citizen-journalism sub-grant"],
   ["deCOALonize","CHRCE — Center for Human Rights & Civic Education","Kitui","c","Mui Basin coal opposition"],
   ["AJWS — American Jewish World Service","deCOALonize","Nairobi","c,o,e","Coalition core support"],
@@ -6459,7 +6459,7 @@ var FUNDING = [
   ["AJWS — American Jewish World Service","Natural Justice","Nairobi","c,l","Environmental law"],
   ["AJWS — American Jewish World Service","KeNRA — Kenya National Rivers Association","Nairobi","w","Water-rights network"],
   ["FIMI Ayni Fund","LAWA — Lamu Women Alliance","Lamu","l","Indigenous women-led content"],
-  ["Africa Climate Fund","MKNF — Mount Kenya Network of Farmers","Laikipia","w,l","Community adaptation grant *"],
+  ["Africa Climate Fund","MKNF — Mount Kenya Network Forum","Laikipia","w,l","Community adaptation grant *"],
   ["HIVOS","PACIDA — Pastoralist Community Initiative & Development Assistance","Marsabit","w,l","Drought resilience partnership"],
   ["FEMNET — African Women's Dev. & Communication Network","Samburu Women's Trust","Samburu","l","Women's climate justice grant"],
   ["UAF-Africa — Urgent Action Fund–Africa","Samburu Women's Trust","Samburu","l","Rapid-response resilience grant"],

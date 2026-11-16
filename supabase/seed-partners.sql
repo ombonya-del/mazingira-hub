@@ -13,7 +13,7 @@ insert into partners (name, category, focus, region, x_handle, youtube, website,
   select 'LAWA — Lamu Women Alliance', 'Community', 'coal, land, forest, water, community, youth, women, journalism', 'Coast, Lamu', 'lamuwomenallia1', 'https://www.youtube.com/Lamuwomenalliance', null, true
   where not exists (select 1 from partners where lower(name) like '%lawa%');
 insert into partners (name, category, focus, region, x_handle, youtube, website, active)
-  select 'MKNF — Mount Kenya Network of Farmers', 'Community', 'water, land, forest, community, pastoralist, climate', 'Rift Valley, Laikipia', null, null, null, true
+  select 'MKNF — Mount Kenya Network Forum', 'Community', 'water, land, forest, community, pastoralist, climate', 'Rift Valley, Laikipia', null, null, null, true
   where not exists (select 1 from partners where lower(name) like '%mknf%');
 insert into partners (name, category, focus, region, x_handle, youtube, website, active)
   select 'Katiba Institute', 'Legal', 'oil, gas, coal, mining, minerals, water, land, forest, energy, legal, litigation', 'National', 'katibainstitute', 'https://www.youtube.com/@Katiba_Institute', 'https://katibainstitute.org', true
