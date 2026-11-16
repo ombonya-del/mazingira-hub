@@ -30,7 +30,7 @@ const CFG = {
   copWindow: ["2026-11-09", "2026-11-21"],               // COP31 digest checks only run in this window
 }
 
-type Filter = [string, "eq" | "neq" | "gte" | "lte", unknown]
+type Filter = [string, "eq" | "neq" | "gte" | "lte" | "is", unknown]
 type Fresh = { key: string; name: string; group: "Pipeline" | "Published"; table: string; col: string; staleHours: number;
   filters?: Filter[]; fix: string; copOnly?: boolean }
 type Backlog = { key: string; name: string; table: string; col: string; olderThanHours: number; filters: Filter[]; fix: string; copOnly?: boolean }
@@ -60,7 +60,12 @@ const FRESH: Fresh[] = [
   { key: "cop-digest", name: "COP31 Daily — digest drafts", group: "Pipeline", table: "cop_digests", col: "updated_at", staleHours: 14, copOnly: true,
     fix: "Check the cop-digest job in GitHub Actions → MazingiraKenya Scanners." },
 
+  { key: "story-draft", name: "raia Story of the week — weekly draft", group: "Pipeline", table: "weekly_stories", col: "created_at", staleHours: 24 * 8,
+    filters: [["issue_id", "is", null]], fix: "Check GitHub → Actions → MazingiraKenya Story of the Week (runs Mondays 07:00)." },
+
   // PUBLISHED: what partners and the public actually see
+  { key: "story-live", name: "raia Story of the week — live", group: "Published", table: "weekly_stories", col: "updated_at", staleHours: 24 * 8,
+    filters: [["published", "eq", true]], fix: "Publish this week's story: Admin → Review → Story of the week (or feature a standing issue under Content)." },
   { key: "pulse-live", name: "Community pulse — published on the hub", group: "Published", table: "pulse_items", col: "created_at", staleHours: 48,
     filters: [["published", "eq", true]], fix: "Publish new community pulse items in the admin console." },
   { key: "cop-hub-live", name: "COP31 Daily — live on the hub", group: "Published", table: "cop_digests", col: "updated_at", staleHours: 24, copOnly: true,
@@ -71,6 +76,8 @@ const FRESH: Fresh[] = [
 
 // ---- review backlogs: drafts waiting too long keep the public view stale -------------------------
 const BACKLOG: Backlog[] = [
+  { key: "story-backlog", name: "Story of the week draft awaiting review", table: "weekly_stories", col: "created_at", olderThanHours: 48,
+    filters: [["published", "eq", false], ["issue_id", "is", null]], fix: "Admin → Review → Story of the week." },
   { key: "cop-backlog", name: "COP31 digest drafts awaiting review", table: "cop_digests", col: "updated_at", olderThanHours: 10, copOnly: true,
     filters: [["published", "eq", false], ["raia_published", "eq", false]], fix: "Admin → Review → COP31 digest." },
   { key: "disinfo-backlog", name: "Narrative disinfo drafts awaiting review", table: "disinfo_items", col: "created_at", olderThanHours: 72,

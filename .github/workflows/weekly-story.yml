@@ -1,0 +1,46 @@
+name: MazingiraKenya Story of the Week
+# Every Monday 07:00 EAT: draft raia's Story of the week from the past 7 days of hub intelligence
+# (English), then add Kiswahili + Sheng. The draft waits in Admin → Review → Story of the week.
+on:
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+jobs:
+  story:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: https://uueemckdoozsuowcqkhl.supabase.co
+      ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA
+      CRON_SECRET: ${{ secrets.MAZINGIRA_CRON_SECRET }}
+    steps:
+      - name: Write (English)
+        run: |
+          set -e
+          call() {
+            RESP=$(curl -sS -w '\n%{http_code}' -X POST "$SUPABASE_URL/functions/v1/weekly-story" \
+              -H "Authorization: Bearer $ANON_KEY" -H "apikey: $ANON_KEY" \
+              -H "x-cron-secret: $CRON_SECRET" -H "Content-Type: application/json" \
+              -d "{\"mode\":\"$1\"}" --max-time 300)
+            BODY=$(echo "$RESP" | head -n -1); CODE=$(echo "$RESP" | tail -n 1)
+            echo "weekly-story $1 -> HTTP $CODE"; echo "$BODY"
+            [ "$CODE" = "200" ] || exit 1
+            if echo "$BODY" | grep -q '"all_failed":true'; then
+              ERR=$(echo "$BODY" | grep -o '"sample_error":"[^"]*"' | head -n1)
+              echo "::error title=weekly-story $1: Claude calls failing::$ERR"; exit 1
+            fi
+          }
+          call write
+      - name: Translate (Kiswahili + Sheng)
+        run: |
+          set -e
+          RESP=$(curl -sS -w '\n%{http_code}' -X POST "$SUPABASE_URL/functions/v1/weekly-story" \
+            -H "Authorization: Bearer $ANON_KEY" -H "apikey: $ANON_KEY" \
+            -H "x-cron-secret: $CRON_SECRET" -H "Content-Type: application/json" \
+            -d '{"mode":"translate"}' --max-time 300)
+          BODY=$(echo "$RESP" | head -n -1); CODE=$(echo "$RESP" | tail -n 1)
+          echo "weekly-story translate -> HTTP $CODE"; echo "$BODY"
+          [ "$CODE" = "200" ] || exit 1
+          if echo "$BODY" | grep -q '"all_failed":true'; then
+            ERR=$(echo "$BODY" | grep -o '"sample_error":"[^"]*"' | head -n1)
+            echo "::error title=weekly-story translate: Claude calls failing::$ERR"; exit 1
+          fi

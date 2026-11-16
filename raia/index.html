@@ -1225,6 +1225,42 @@ function paintCop(){
     copBindShare(page);
   }
 }
+/* ---------- Story of the week: newest published row in weekly_stories ----------
+   Either an AI-drafted, admin-approved story for the week (shown in raia's issue format), or an
+   admin's pick of an existing issue (issue_id). Falls back to the issue marked featured in code. */
+var WEEKLY = { done:false };
+function applyWeekly(row){
+  if(!row) return false;
+  ISSUES = ISSUES.filter(function(x){ return !x.weekly; });
+  if(row.issue_id){
+    if(!issueById(row.issue_id)) return false;
+    ISSUES.forEach(function(x){ x.featured = (x.id===row.issue_id); });
+    return true;
+  }
+  var st=row.story||{};
+  if(!st.title||!st.title.en) return false;
+  var wk={ id:"week-"+row.week_of, weekly:true, week_of:row.week_of, featured:true,
+    status: STATUS[st.status]?st.status:"new",
+    place: st.place||{en:""}, title: st.title, summary: st.summary||{en:""},
+    happening: st.happening||{en:[]}, narrative: st.narrative||{en:[]}, gap: st.gap||{en:[]},
+    action: st.action||{en:""}, sources: row.sources||[],
+    related: [] };
+  ISSUES.forEach(function(x){ x.featured=false; });
+  ISSUES.unshift(wk);
+  return true;
+}
+function fetchWeekly(){
+  if(!RSB||WEEKLY.done) return;
+  WEEKLY.done=true;
+  RSB.from("weekly_stories").select("week_of,issue_id,story,sources").eq("published",true)
+    .order("week_of",{ascending:false}).order("updated_at",{ascending:false}).limit(1)
+    .then(function(r){
+      var row=r&&r.data&&r.data[0];
+      if(applyWeekly(row) && (state.view==="ninini"||state.view==="issue")) render();
+    }, function(){});
+}
+function weekLabel(d){ try{ return new Date(d+"T00:00:00").toLocaleDateString(LANG==="en"?"en-GB":"sw-KE",{day:"numeric",month:"short"}); }catch(e){ return d; } }
+
 function fetchCop(){
   if(COPR.rows){ paintCop(); return; }
   if(!RSB) return;
@@ -1277,7 +1313,7 @@ function viewNiNini(){
   '</section>';
 }
 function featuredCard(f){
-  return '<button class="featured" data-open="'+f.id+'"><div class="ribbon">★ '+esc(L(UI.featured))+'</div><div class="fg">'+
+  return '<button class="featured" data-open="'+f.id+'"><div class="ribbon">★ '+esc(L(UI.featured))+(f.weekly?' · '+esc(L({en:"week of",sw:"wiki ya",sh:"week ya"}))+' '+esc(weekLabel(f.week_of)):'')+'</div><div class="fg">'+
     '<div class="pad"><div class="meta" style="display:flex;gap:8px;align-items:center;margin-bottom:9px">'+statusChip(f.status)+'<span class="place">'+esc(L(f.place))+'</span></div>'+
       '<h2>'+esc(L(f.title))+'</h2><p class="sum">'+esc(L(f.summary))+'</p></div>'+
     '<div class="aside"><div class="lab">'+esc(L(UI.lensLabel))+'</div><div class="lensrow">'+
@@ -1311,6 +1347,7 @@ function viewIssue(){
     '<div class="issue-head"><div class="issue-meta">'+statusChip(is.status)+'<span class="place">'+esc(L(is.place))+'</span></div>'+
     '<h1>'+esc(L(is.title))+'</h1></div>'+tabs+panel+
     '<div class="actionbox"><span class="k gold">'+esc(L(UI.whatNow))+'</span><p>'+esc(L(is.action))+'</p></div>'+rel+
+    (is.weekly&&is.sources&&is.sources.length?'<p class="muted" style="font-size:.76rem;margin:14px 2px 0;line-height:1.5">'+esc(L({en:"Sources:",sw:"Vyanzo:",sh:"Sources:"}))+' '+is.sources.filter(function(x){return x.url;}).map(function(x){ return '<a href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer" style="color:inherit">'+esc(x.source)+'</a>'; }).join(" · ")+'</p>':'')+
   '</section>';
 }
 function bigqLabel(id){ for(var i=0;i<BIGQ.length;i++) if(BIGQ[i].id===id) return L(BIGQ[i].q); return id; }
@@ -1626,6 +1663,7 @@ function applyHash(scroll){
 window.addEventListener("hashchange",function(){ applyHash(true); });
 
 if(!applyHash(false)) render();
+fetchWeekly();
 if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
   window.addEventListener("load",function(){
     navigator.serviceWorker.register("sw.js").catch(function(){});
