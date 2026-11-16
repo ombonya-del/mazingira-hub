@@ -1,5 +1,37 @@
 # Events Watch — Admin Review Queue
 
+**Run date (TODAY): 2026-11-16**
+Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
+Scope: upcoming climate & environmental-justice events on or after 2026-11-16, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
+
+> ✅ **Queueing status:** 3 NEW verified events below were written **straight to Supabase as drafts (`published=false`, `source=watch`)** via the connected-Chrome write path — all three inserts returned **HTTP 201**. Review and Accept/Reject them in **admin → Events review**. Nothing is public until an admin Accepts. (The Mac device-bridge shell could not reach Supabase this run — `curl` returned HTTP 000, host blocked by the proxy — so the connected Chrome was used as the writer, as designed.)
+
+**Verification notes:** Each event was confirmed against a primary/organiser source and is future-dated (on/after 2026-11-16). Solar Africa Kenya 2027 (12th edition, 16–18 Jun 2027, Carnivore Exhibition Grounds, Nairobi) confirmed via the Expogroup organiser site (expogr.com/solarafrica) — East Africa's mega solar/clean-energy & energy-storage exhibition and conference; distinct from the already-queued Intersolar Africa 2027 (16–17 Mar 2027, Sarit Expo) and Solarexpo/Power & Energy 2026. Lagos Climate Week 2027 (22–26 Feb 2027, Eko Convention Centre, Lagos) confirmed via the official site (lagosclimateweek.com) — pan-African climate week themed "Unified Action for Climate Resilience", convened under the Lagos State Government / Ministry of the Environment & Water Resources. SETAC Africa 13th Biennial Conference 2027 (26–30 Sep 2027, Dar es Salaam) confirmed via the SETAC organiser site — "From Science to Solutions: Advancing Environmental Stewardship, Chemical Safety and Public Health in Africa", with tracks on climate change, ecosystems and pollution prevention. **Candidates reviewed and dropped this run:** 2nd Annual ESG & Climate Africa Summit (Leadvent Group, Nairobi) — organiser site now shows 24–25 Nov **2027**, but this is the same event already queued in the 2026-09-19 run (then dated 24–25 Nov 2026); the date merely slipped a year, so **not re-queued** (already in the review queue). AFMASS Africa Future Food Summit — Eastern Africa Edition (27 Apr 2027, Nairobi) — food-industry summit, climate only one of eight themes, venue TBC — out of core scope. Agritec Africa 2027 (9–11 Jun 2027, KICC Nairobi) and 12th East African Petroleum Conference (EAPCE'27) — agri-machinery trade show and an oil & gas conference respectively — out of scope. Sankalp Africa Summit 2027 (22–26 Feb 2027, Nairobi) and WEF Africa 2027 — impact-investing / general business, not sufficiently climate/environment-justice focused. WINDaba 2027 (Cape Town) — dates still TBD (unverifiable per firm-date rule). IUFRO 27th World Congress (Nairobi, 2029) — real and Africa-first but no dates published and too far out. ACT7 / 7th Africa Climate Talks and Africa Climate Week 2027 — no firm dates published yet (skipped per verified-only rule). UNCCD COP17 (Mongolia, Aug 2026) — past. Water Convention MOP11 (Dakar, 26–29 Oct 2027) — UN convention meeting, not sufficiently African climate-justice-focused for the hub.
+
+---
+
+## Drafts queued this run (3) — all published=false, source=watch
+
+| # | Event | Date(s) | Location | Mode | Host | Status |
+|---|-------|---------|----------|------|------|--------|
+| 1 | Solar Africa Kenya 2027 (12th East Africa Solar & Renewable Energy Exhibition) | 16–18 Jun 2027 | Carnivore Exhibition Grounds, Nairobi, Kenya | In person | Expogroup | INSERTED 201 |
+| 2 | Lagos Climate Week 2027 | 22–26 Feb 2027 | Eko Convention Centre, Lagos, Nigeria | In person | Lagos State Govt (Ministry of Environment & Water Resources) | INSERTED 201 |
+| 3 | SETAC Africa 13th Biennial Conference 2027 | 26–30 Sep 2027 | Dar es Salaam, Tanzania | In person | Society of Environmental Toxicology and Chemistry (SETAC) | INSERTED 201 |
+
+**New this run (not previously logged):** all 3 above.
+
+**Dedupe:** Checked against the 2026-11-09 run (UNESCO World Conference on ESD 2027, Intersolar Africa 2027, What Works Climate Solutions Summit 2027), the 2026-10-26 run (2nd Africa Clean Cooking Summit, AGES 2027, BACE 2027), the 2026-10-19 run (Global Youth Summit for Climate Change, 5th African Symposium on Climate Change Adaptation, Africa Energy Indaba 2027), the 2026-10-09 run (Solarexpo/Power & Energy 2026, IMPAC6 Dakar, 3rd Eastern Africa Agroecology Conference), the 2026-09-29 run (African Green Investment Forum, MOP38, COP32, UNEA-8), the 2026-09-22 run (Carbon Markets Africa Summit, 9th GLF Investment Case Symposium) and the 2026-09-19 run (Reparations Symposium, African Energy Week, Africa Climate Forum, CBD COP17, GreenShift Forum, Global Off-Grid Solar Forum, 5th EIK Conference, COP31, 2nd Annual ESG & Climate Africa Summit) — **none re-queued**. Note: Solar Africa Kenya 2027 (Expogroup, June, Carnivore) is distinct from Intersolar Africa 2027 (March, Sarit Expo) and Solarexpo/Power & Energy 2026; the ESG & Climate Africa Summit surfaced again this run only because its date slipped from Nov 2026 to Nov 2027 — it is the same already-queued event and was **not** re-inserted.
+
+Reproducible record: `scripts/queue-events-2026-11-16.sh`.
+
+*Approved events go live only when a human admin clicks Accept in the admin Events review tab. This log is a draft queue, not a publication.*
+
+---
+
+<!-- ================= PREVIOUS RUNS BELOW ================= -->
+
+# Events Watch — Admin Review Queue
+
 **Run date (TODAY): 2026-11-09**
 Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
 Scope: upcoming climate & environmental-justice events on or after 2026-11-09, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
