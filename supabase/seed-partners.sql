@@ -133,10 +133,10 @@ insert into partners (name, category, focus, region, x_handle, youtube, website,
   select 'Friends of Siaya Anti-Nuclear Plant (FSANP)', 'Community', 'energy, water, land, forest, community, nuclear', 'Nyanza, Siaya', null, null, null, true
   where not exists (select 1 from partners where lower(name) like '%friends of siaya anti-nuclear plant%');
 insert into partners (name, category, focus, region, x_handle, youtube, website, active)
-  select 'Kenya Anti-Nuclear Alliance (KANA)', 'Coalition', 'energy, advocacy, campaign', 'Nyanza, Siaya', null, null, null, true
+  select 'Kenya Anti-Nuclear Alliance (KANA)', 'Coalition', 'energy, nuclear, advocacy, campaign', 'National · Kilifi, Siaya', null, null, null, true
   where not exists (select 1 from partners where lower(name) like '%kenya anti-nuclear alliance%');
 insert into partners (name, category, focus, region, x_handle, youtube, website, active)
-  select 'ILEG — Institute for Law & Environmental Governance', 'Legal', 'mining, minerals, land, forest, water, energy, legal, litigation, land rights', 'Nyanza, Siaya Township', null, null, null, true
+  select 'ILEG — Institute for Law & Environmental Governance', 'Legal', 'mining, minerals, land, forest, water, energy, legal, litigation, land rights', 'National · Siaya Resource Centre', null, null, null, true
   where not exists (select 1 from partners where lower(name) like '%ileg%');
 insert into partners (name, category, focus, region, x_handle, youtube, website, active)
   select 'CIAGK — Community Initiative Action Group Kenya', 'Community', 'mining, minerals, land, forest, community, accountability', 'Nyanza, Siaya', 'CommunityCiag', null, null, true
@@ -197,5 +197,15 @@ update partners set x_handle = coalesce(x_handle, 'SiayaNetwork'), youtube = coa
 update partners set x_handle = coalesce(x_handle, 'RonaFoundation'), youtube = coalesce(youtube, 'https://www.youtube.com/channel/UCkizX5eSl4q8ty7g37MBBKA') where lower(name) like '%rona foundation%';
 update partners set x_handle = coalesce(x_handle, 'justact_kenya'), youtube = coalesce(youtube, null) where lower(name) like '%justact kenya%';
 update partners set x_handle = coalesce(x_handle, 'FoNNaPKenya'), youtube = coalesce(youtube, null) where lower(name) like '%fonnap%';
+
+insert into partners (name, category, focus, region, x_handle, youtube, website, email, active)
+  select 'SCODA — Solidarity and Capacity for Opportunity, Defenders in Action', 'Community', 'energy, nuclear, land, forest, water, fisheries, community, legal, paralegal, human rights, defenders, women, youth', 'Nyanza, Siaya (Usenge, Bondo) · Kisumu · Homa Bay · Busia', 'ScodaRights', null, 'https://scodarights.org', 'info@scodarights.org', true
+  where not exists (select 1 from partners where lower(name) like '%scoda%');
+
+-- refresh regions/websites for Siaya partners already in the table
+update partners set region = 'National · Siaya Resource Centre' where lower(name) like '%ileg%';
+update partners set region = 'National · Kilifi, Siaya', focus = 'energy, nuclear, advocacy, campaign' where lower(name) like '%kenya anti-nuclear alliance%';
+update partners set focus = 'mining, minerals, land, energy, nuclear, community, accountability', region = 'Nyanza, Siaya · Vihiga' where lower(name) like '%ciagk%';
+update partners set website = coalesce(website, 'https://ronafoundation.co.ke'), focus = 'land, forest, water, community, women, widows, climate' where lower(name) like '%rona foundation%';
 
 select name, category, region, x_handle, youtube, email from partners order by name;

@@ -375,6 +375,7 @@ var KITS = {
   partners:[
     ["Katiba Institute","Lead legal partner: constitutional and participation litigation"],
     ["Kenya Anti-Nuclear Alliance (KANA)","Community alliance from the Kilifi campaign"],
+    ["SCODA — Solidarity and Capacity for Opportunity, Defenders in Action","Siaya rights group on the frontline of the resistance; members harassed and arrested, backed by Defenders Coalition & Katiba Institute"],
     ["Greenpeace Africa","Campaign support and communication"],
     ["SAFCEI","Regional anti-nuclear and just-energy-transition ally"]],
   legal:[
@@ -523,6 +524,7 @@ var KITS = {
   partners:[
     ["Centre for Justice Governance and Environmental Action (CJGEA)","Lead litigant in Owino Uhuru; toxic-pollution litigation"],
     ["Nature Kenya","Yala Swamp conservation partner"],
+    ["SCODA — Solidarity and Capacity for Opportunity, Defenders in Action","Bondo-based; Yala Swamp community land registration, FPIC, paralegals and Alternative Justice Systems"],
     ["Katiba Institute","Constitutional public-interest litigation"],
     ["Kituo cha Sheria","Legal aid and paralegal support"]],
   legal:[
@@ -716,6 +718,7 @@ var KITS = {
   partners:[
     ["Ecofinder Kenya / Kenya Lake Victoria Waterkeeper","Pollution patrols and investigations"],
     ["Greenpeace Africa","Campaigning on the Siaya nuclear proposal"],
+    ["SCODA — Solidarity and Capacity for Opportunity, Defenders in Action","Siaya community resistance to the nuclear plant and Yala Swamp land grabs"],
     ["CEJAD","Mercury and ASGM investigations in Migori"],
     ["InfoNile","Water-focused journalism network"],
     ["Lake Victoria Basin Commission (EAC)","Regional transboundary engagement"]],
