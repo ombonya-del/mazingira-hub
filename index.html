@@ -1156,8 +1156,9 @@ a.lane:focus-visible{ outline:2px solid var(--green); outline-offset:-2px; }
 .tag.document{ color:#7FB0FF; background:rgba(127,176,255,.12); border:1px solid rgba(127,176,255,.35); }
 .tag.challenge{ color:var(--ember); background:var(--ember-wash); border:1px solid rgba(238,148,85,.35); }
 .tag.build{ color:var(--green); background:var(--green-wash); border:1px solid rgba(98,199,155,.35); }
-.projects{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line); }
-.project{ background:var(--panel); padding:17px 16px; }
+.projects{ display:grid; gap:12px; }
+.project{ background:var(--panel); padding:17px 16px; border:1px solid var(--line); border-radius:var(--radius-l); }
+.project[hidden], .lane-block[hidden]{ display:none !important; }
 .project .p-top{ display:flex; align-items:flex-start; gap:10px; flex-wrap:wrap; }
 .project h4{ font-family:Lora,serif; font-size:1.02rem; font-weight:600; flex:1; min-width:180px; }
 .project .status{ font-size:.56rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
@@ -1588,6 +1589,22 @@ html[data-theme="light"] .pj-badge{ color:#8A5E00; }
 .pj-dotk{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
 .pj-tfoot{ display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:10px; font-size:.78rem; color:var(--muted); }
 @media (max-width:600px){ .pj-views{ margin-left:0; } .pj-sum{ gap:8px 18px; } .pj-sum > div:not(.pj-views) b{ font-size:1.25rem; } }
+
+/* ---- Je, Hatua? table print (A4 landscape) ---- */
+.pj-printsheet{ display:none; }
+@media print{
+  html.pj-printing body > *:not(.pj-printsheet){ display:none !important; }
+  html.pj-printing, html.pj-printing body{ background:#fff !important; color:#111 !important; padding:0 !important; margin:0 !important; }
+  html.pj-printing .pj-printsheet{ display:block; font-family:"Nunito Sans",Arial,sans-serif; color:#111; }
+  .pj-printsheet h1{ font-family:Lora,Georgia,serif; font-size:16pt; margin:0 0 3pt; color:#0F5E3F; }
+  .pj-printsheet .pj-pmeta{ font-size:8pt; color:#555; margin:0 0 8pt; }
+  .pj-printsheet table{ width:100%; border-collapse:collapse; font-size:8pt; line-height:1.3; }
+  .pj-printsheet th{ text-align:left; font-size:7pt; text-transform:uppercase; letter-spacing:.06em; color:#333; border-bottom:1.2pt solid #0F5E3F; padding:4pt 5pt; }
+  .pj-printsheet td{ border-bottom:.5pt solid #ccc; padding:4pt 5pt; vertical-align:top; }
+  .pj-printsheet td.num{ text-align:right; white-space:nowrap; }
+  .pj-printsheet tr{ page-break-inside:avoid; }
+  .pj-printsheet thead{ display:table-header-group; }
+}
 /* ---- theme switch button ---- */
 .mk-theme-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;flex:0 0 auto;padding:0;border-radius:999px;cursor:pointer;background:transparent;border:1px solid var(--line-2);color:var(--text);transition:background .15s,border-color .15s,color .15s}
 .mk-theme-btn:hover{background:var(--panel-2)}
@@ -4478,7 +4495,8 @@ var PJV = (function(){
         return '<th><button type="button" data-pjsort="'+c[0]+'">'+c[1]+(V.sk===c[0]?(V.sd<0?' ↓':' ↑'):'')+'</button></th>'; }).join("")+'</tr></thead><tbody>'+
       list.map(function(p){ return '<tr data-pjopen="'+h(p.title)+'" tabindex="0"><td><b>'+h(p.title)+'</b></td><td><span class="pj-dotk" style="background:'+LANE_COL[p.lane]+'"></span>'+h(LANE_N[p.lane])+'</td><td>'+h(p.sector)+
         '</td><td>'+h(p.county)+'</td><td class="num">'+fmtKES(kes(p))+'</td><td class="num">'+(months(p)||"")+'</td><td>'+(p.status==="dev"?"In development":"Idea")+'</td><td>'+h(p.funder)+'</td></tr>'; }).join("")+
-      '</tbody></table></div><div class="pj-tfoot"><button type="button" class="btn btn--ghost" data-pjcsv>Download as CSV</button><span>Click a row for the description, sources and proposal templates.</span></div>';
+      '</tbody></table></div><div class="pj-tfoot"><button type="button" class="btn btn--ghost" data-pjcsv>Download as CSV</button>'+
+      '<button type="button" class="btn btn--ghost" data-pjprint>Print / save as PDF (A4)</button><span>Click a row for the description, sources and proposal templates.</span></div>';
   }
   function csv(){
     var rows=[["Project","Lane","Sector","Counties","Budget (KES)","Months","Status","Funder fit","Pitch","Gap it closes"]].concat(ALL.filter(match).map(function(p){
@@ -4486,6 +4504,25 @@ var PJV = (function(){
     var txt="﻿"+rows.map(function(r){ return r.map(function(x){ x=String(x==null?"":x).replace(/<[^>]+>/g,""); return /[",\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x; }).join(","); }).join("\r\n");
     var a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([txt],{type:"text/csv;charset=utf-8"})); a.download="MazingiraKenya-fundable-projects.csv";
     document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  /* A4 landscape print of the current (filtered) table: title, date, filters, totals — browser "Save as PDF" works too */
+  function printTable(){
+    var list=ALL.filter(match), tot=0; list.forEach(function(p){ tot+=kes(p); });
+    var f=[V.lane!=="all"?LANE_N[V.lane]+" lane":"", V.sector!=="all"?V.sector:"", V.q?'"'+V.q+'"':""].filter(Boolean).join(" · ")||"All projects";
+    var sheet=document.createElement("div"); sheet.className="pj-printsheet";
+    sheet.innerHTML='<h1>MazingiraKenya · Fundable projects</h1><p class="pj-pmeta">Climate &amp; Environmental Justice Hub · <i lang="sw">Je, Hatua?</i> · '+h(f)+' · '+list.length+' projects · '+fmtKES(tot)+' total ask · printed '+
+      new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})+'</p>'+
+      '<table><thead><tr>'+COLS.map(function(c){ return '<th>'+c[1]+'</th>'; }).join("")+'</tr></thead><tbody>'+
+      list.sort(function(a,b){ var x=val(a,V.sk), y=val(b,V.sk); return (typeof x==="number"?x-y:String(x).localeCompare(String(y)))*V.sd; }).map(function(p){
+        return '<tr><td><b>'+h(p.title)+'</b></td><td>'+h(LANE_N[p.lane])+'</td><td>'+h(p.sector)+'</td><td>'+h(p.county)+'</td><td class="num">'+fmtKES(kes(p))+'</td><td class="num">'+(months(p)||"")+
+          '</td><td>'+(p.status==="dev"?"In development":"Idea")+'</td><td>'+h(p.funder)+'</td></tr>'; }).join("")+'</tbody></table>'+
+      '<p class="pj-pmeta">Budgets are indicative planning figures. Details, sources and proposal templates: hub.mazingirakenya.org/#projects · admin@mazingirakenya.org</p>';
+    document.body.appendChild(sheet);
+    var pg=document.createElement("style"); pg.textContent="@page{ size:A4 landscape; margin:12mm; }"; document.head.appendChild(pg);
+    document.documentElement.classList.add("pj-printing");
+    function done(){ document.documentElement.classList.remove("pj-printing"); sheet.remove(); pg.remove(); window.removeEventListener("afterprint",done); }
+    window.addEventListener("afterprint",done);
+    setTimeout(function(){ window.print(); setTimeout(function(){ if(document.documentElement.classList.contains("pj-printing") && !window.matchMedia("print").matches) done(); }, 1500); }, 50);
   }
   function drawView(){
     host.hidden = V.view!=="portfolio"; mapBox.hidden = V.view!=="map"; tabBox.hidden = V.view!=="table";
@@ -4495,12 +4532,13 @@ var PJV = (function(){
   function render(){ drawTop(); drawView(); }
   var sec=document.getElementById("ajesasa");
   sec.addEventListener("click", function(e){
-    var t=e.target.closest("[data-pjview],[data-pjlane],[data-pjopen],[data-pjsort],[data-pjcsv],[data-pjclear]"); if(!t || !sec.contains(t)) return;
+    var t=e.target.closest("[data-pjview],[data-pjlane],[data-pjopen],[data-pjsort],[data-pjcsv],[data-pjprint],[data-pjclear]"); if(!t || !sec.contains(t)) return;
     if(t.hasAttribute("data-pjview")){ V.view=t.getAttribute("data-pjview"); try{ localStorage.setItem("mk.pjView",V.view); }catch(_){} render(); }
     else if(t.hasAttribute("data-pjlane")){ V.lane=t.getAttribute("data-pjlane"); V.pj=null; render(); }
     else if(t.hasAttribute("data-pjopen")){ var ti=t.getAttribute("data-pjopen"); ALL.forEach(function(p){ if(p.title===ti) open(p); }); }
     else if(t.hasAttribute("data-pjsort")){ var k=t.getAttribute("data-pjsort"); if(V.sk===k) V.sd=-V.sd; else { V.sk=k; V.sd=(k==="budget"||k==="months")?-1:1; } drawTable(); }
     else if(t.hasAttribute("data-pjcsv")) csv();
+    else if(t.hasAttribute("data-pjprint")) printTable();
     else if(t.hasAttribute("data-pjclear")){ V.cty=null; V.pj=null; drawMap(); }
   });
   sec.addEventListener("keydown", function(e){ var tr=e.target.closest && e.target.closest("tr[data-pjopen]"); if(tr && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); tr.click(); } });
