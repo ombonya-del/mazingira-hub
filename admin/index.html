@@ -453,14 +453,9 @@ var ISSUES = [
 ];
 var BIGQ_N = 4, MYTH_N = 8;
 
-var MEMBERS = [
-  {org:"Save Lamu", person:"Fatma Said", role:"Moderator", active:true, seen:"Today"},
-  {org:"LAWA (youth desk)", person:"Kevin Otieno", role:"Contributor", active:true, seen:"Today"},
-  {org:"Community Media Trust", person:"Coalition desk", role:"Admin", active:true, seen:"Now"},
-  {org:"Natural Justice", person:"Grace Wangui", role:"Editor", active:true, seen:"Yesterday"},
-  {org:"deCOALonize", person:"Omar Elmawi", role:"Editor", active:true, seen:"2d ago"},
-  {org:"Katiba Institute", person:"J. Kamau", role:"Contributor", active:false, seen:"3w ago"}
-];
+/* Real hub members, loaded from Supabase Auth via the members-admin function (admin only). */
+var MEMBERS = [];
+var MEMBERS_STATE = { loaded:0, loading:false, error:"", q:"" };
 
 var ROLES = ["Admin","Editor","Moderator","Contributor"];
 var LANG_STATS = [{k:"Swahili",v:48,c:"var(--green)"},{k:"English",v:34,c:"var(--ember)"},{k:"Sheng",v:18,c:"var(--gold)"}];
@@ -563,7 +558,8 @@ function viewOverview(){
   var kpis=[
     {n:count("pending"), l:"Awaiting moderation", d:"needs review", dc:"warn"},
     {n:pubCount("ready"), l:"Ready to publish", d:"queued for raia", dc:"up"},
-    {n:MEMBERS.filter(function(m){return m.active;}).length, l:"Active members", d:"across 6 orgs", dc:"up"},
+    {n:(MEMBERS_STATE.loaded?MEMBERS.filter(function(m){return !m.suspended;}).length:"…"), l:"Hub members",
+     d:(MEMBERS_STATE.loaded?"across "+memberOrgCount()+" orgs":"loading…"), dc:"up"},
     {n:"5.7k", l:"raia reach · 7d", d:"+14% vs last week", dc:"up"}
   ];
   var maxv=Math.max.apply(null,LANG_STATS.map(function(x){return x.v;}));
@@ -801,17 +797,69 @@ function viewContent(){
   '</section>';
 }
 
+function memberOrgCount(){ var o={}; MEMBERS.forEach(function(m){ if(m.org) o[m.org.toLowerCase()]=1; }); return Object.keys(o).length; }
+function fmtAgo(iso){
+  if(!iso) return "never";
+  var d=(Date.now()-new Date(iso).getTime())/86400000;
+  if(d<1) return "today"; if(d<2) return "yesterday"; if(d<30) return Math.floor(d)+"d ago";
+  if(d<365) return Math.floor(d/30)+"mo ago"; return Math.floor(d/365)+"y ago";
+}
+function membersCall(body){
+  if(!ASB) return Promise.reject(new Error("Not connected to Supabase"));
+  return ASB.functions.invoke("members-admin",{ body:body }).then(function(r){
+    var d=r&&r.data; if(r.error||!d||d.ok===false) throw new Error((d&&d.message)||(r.error&&r.error.message)||"failed (are you signed in as an admin?)");
+    return d;
+  });
+}
+function loadMembers(force){
+  if(MEMBERS_STATE.loading) return;
+  if(!force && MEMBERS_STATE.loaded && Date.now()-MEMBERS_STATE.loaded<60000) return;
+  MEMBERS_STATE.loading=true;
+  membersCall({action:"list"}).then(function(d){
+    MEMBERS=d.members||[]; MEMBERS_STATE.error=""; MEMBERS_STATE.loaded=Date.now();
+  }).catch(function(e){ MEMBERS_STATE.error=e.message; MEMBERS_STATE.loaded=Date.now(); })
+    .then(function(){ MEMBERS_STATE.loading=false; if(state.view==="members"||state.view==="overview") render(); });
+}
 function viewMembers(){
-  var rows=MEMBERS.map(function(m,i){
-    return '<tr><td class="org">'+esc(m.org)+'</td><td>'+esc(m.person)+'</td>'+
-      '<td><select class="role-sel" data-role="'+i+'">'+ROLES.map(function(r){return '<option'+(r===m.role?' selected':'')+'>'+r+'</option>';}).join("")+'</select></td>'+
-      '<td class="muted">'+esc(m.seen)+'</td>'+
-      '<td><button class="toggle" role="switch" aria-pressed="'+m.active+'" data-active="'+i+'" aria-label="Active"></button></td></tr>';
+  var q=MEMBERS_STATE.q.toLowerCase();
+  var list=MEMBERS.filter(function(m){ return !q || (m.person+" "+m.org+" "+m.email).toLowerCase().indexOf(q)>=0; });
+  var noName=MEMBERS.filter(function(m){ return !m.person||!m.org; }).length;
+  var never=MEMBERS.filter(function(m){ return !m.last_sign_in_at; }).length;
+  var rows=list.map(function(m){
+    var i=MEMBERS.indexOf(m);
+    return '<tr'+(m.suspended?' style="opacity:.55"':'')+'><td class="org">'+(m.org?esc(m.org):'<span class="muted">— add —</span>')+'</td>'+
+      '<td>'+(m.person?esc(m.person):'<span class="muted">— add —</span>')+(m.is_admin?' <span class="muted" style="font-size:.72rem">· hub admin</span>':'')+
+        '<div class="muted" style="font-size:.74rem">'+esc(m.email||"")+'</div></td>'+
+      '<td><select class="role-sel" data-role="'+i+'"><option value="">—</option>'+ROLES.map(function(r){return '<option'+(r===m.role?' selected':'')+'>'+r+'</option>';}).join("")+'</select></td>'+
+      '<td class="muted">'+esc(fmtAgo(m.last_sign_in_at))+(m.confirmed?'':'<div style="font-size:.72rem">invite not accepted</div>')+'</td>'+
+      '<td><button class="toggle" role="switch" aria-pressed="'+(!m.suspended)+'" data-active="'+i+'" aria-label="Can sign in"></button></td>'+
+      '<td style="white-space:nowrap"><button class="btn ghost" data-medit="'+i+'">Edit</button> <button class="btn ghost" data-mlink="'+i+'" title="Email a one-time sign-in link">Send link</button></td></tr>';
   }).join("");
-  return '<section class="view"><div class="page-head"><div><h2>Members &amp; access</h2><p>Who can submit, moderate and publish — across the coalition.</p></div>'+
+  var status = !MEMBERS_STATE.loaded ? '<p class="muted" style="padding:14px">Loading members from Supabase…</p>'
+    : MEMBERS_STATE.error ? '<p style="padding:14px;color:#E5625A">Couldn\'t load members: '+esc(MEMBERS_STATE.error)+'</p>' : '';
+  return '<section class="view"><div class="page-head"><div><h2>Members &amp; access</h2><p>Everyone with a hub account, live from Supabase. '+
+      (MEMBERS_STATE.loaded&&!MEMBERS_STATE.error? MEMBERS.length+' members · '+memberOrgCount()+' organisations · '+never+' never signed in · '+noName+' missing a name or organisation':'')+'</p></div>'+
     '<button class="btn approve" id="addMember" style="margin-left:auto">+ Add member</button></div>'+
-    '<div class="panel" style="padding:6px 10px"><table class="tbl"><thead><tr><th>Organisation</th><th>Person</th><th>Role</th><th>Last seen</th><th>Active</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
-    '<p class="muted" style="font-size:.76rem">Roles map to permissions: Contributors submit, Moderators review, Editors publish, Admins manage access. Enforced by row-level security once the backend is live.</p></section>';
+    '<div class="panel" style="padding:10px"><input id="memFind" type="search" placeholder="Search name, organisation or email…" value="'+esc(MEMBERS_STATE.q)+'" style="width:100%;margin-bottom:8px">'+
+    status+(rows?'<table class="tbl"><thead><tr><th>Organisation</th><th>Person</th><th>Role</th><th>Last sign-in</th><th>Can sign in</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>':'')+'</div>'+
+    '<p class="muted" style="font-size:.76rem">Names and organisations here are what members see in the call picker and on minutes. "Hub admin" comes from the admins list; the Role column is a label. Switching "Can sign in" off blocks that account until you switch it back on.</p></section>';
+}
+function openMemberEdit(i){
+  var m=MEMBERS[i]; if(!m) return;
+  openModal('<div class="mh"><h3>Edit member</h3><button class="mx">×</button></div><div class="mb">'+
+    '<p class="muted" style="font-size:.85rem">'+esc(m.email)+'</p>'+
+    '<label>Person</label><input id="meP" value="'+esc(m.person||"")+'" placeholder="Full name">'+
+    '<label>Organisation</label><input id="meO" value="'+esc(m.org||"")+'" placeholder="e.g. Natural Justice">'+
+    '<p class="muted" id="meMsg" style="font-size:.85rem;margin-top:8px"></p></div>'+
+    '<div class="mf"><button class="btn ghost mx">Cancel</button><button class="btn approve" id="meSave">Save</button></div>');
+  var btn=document.getElementById("meSave");
+  btn.addEventListener("click",function(){
+    var p=document.getElementById("meP").value.trim(), o=document.getElementById("meO").value.trim(), msg=document.getElementById("meMsg");
+    btn.disabled=true; msg.textContent="Saving…";
+    membersCall({action:"update", id:m.id, person:p, org:o}).then(function(){
+      m.person=p; m.org=o; closeModal(); toast("Saved"); render();
+    }).catch(function(e){ btn.disabled=false; msg.style.color="#E5625A"; msg.textContent=e.message; });
+  });
 }
 
 /* ============================ INTERACTIONS ============================ */
@@ -822,8 +870,25 @@ function bindView(){
   app.querySelectorAll("[data-pub]").forEach(function(el){ el.addEventListener("click",function(){ pubAct(el.getAttribute("data-pub")); }); });
   app.querySelectorAll("[data-feat]").forEach(function(el){ el.addEventListener("click",function(){ setFeatured(el.getAttribute("data-feat")); }); });
   app.querySelectorAll("[data-edit]").forEach(function(el){ el.addEventListener("click",function(){ openEdit(el.getAttribute("data-edit")); }); });
-  app.querySelectorAll("[data-role]").forEach(function(el){ el.addEventListener("change",function(){ MEMBERS[+el.getAttribute("data-role")].role=el.value; toast("Role updated"); }); });
-  app.querySelectorAll("[data-active]").forEach(function(el){ el.addEventListener("click",function(){ var i=+el.getAttribute("data-active"); MEMBERS[i].active=!MEMBERS[i].active; el.setAttribute("aria-pressed",MEMBERS[i].active); toast(MEMBERS[i].active?"Member activated":"Member suspended"); }); });
+  app.querySelectorAll("[data-role]").forEach(function(el){ el.addEventListener("change",function(){
+    var m=MEMBERS[+el.getAttribute("data-role")]; if(!m) return;
+    membersCall({action:"update", id:m.id, role:el.value}).then(function(){ m.role=el.value; toast("Role label saved"); }, function(e){ toast(e.message); }); }); });
+  app.querySelectorAll("[data-active]").forEach(function(el){ el.addEventListener("click",function(){
+    var m=MEMBERS[+el.getAttribute("data-active")]; if(!m) return;
+    var suspend=!m.suspended;
+    if(suspend && !confirm("Block "+(m.person||m.email)+" from signing in to the hub? You can switch it back on any time.")) return;
+    membersCall({action:"suspend", id:m.id, suspended:suspend}).then(function(){ m.suspended=suspend; toast(suspend?"Sign-in blocked":"Sign-in restored"); render(); }, function(e){ toast(e.message); }); }); });
+  app.querySelectorAll("[data-medit]").forEach(function(el){ el.addEventListener("click",function(){ openMemberEdit(+el.getAttribute("data-medit")); }); });
+  app.querySelectorAll("[data-mlink]").forEach(function(el){ el.addEventListener("click",function(){
+    var m=MEMBERS[+el.getAttribute("data-mlink")]; if(!m||!ASB) return; el.disabled=true;
+    ASB.functions.invoke("invite-member",{ body:{ email:m.email } }).then(function(r){
+      el.disabled=false; var d=r&&r.data;
+      if(r.error||(d&&d.ok===false)) toast("Couldn't send: "+((d&&d.message)||(r.error&&r.error.message)||"error"));
+      else toast((d&&d.status==="invited"?"Invite re-sent to ":"Sign-in link sent to ")+m.email);
+    }, function(){ el.disabled=false; toast("Couldn't send"); }); }); });
+  var mf=document.getElementById("memFind"); if(mf) mf.addEventListener("input",function(){
+    MEMBERS_STATE.q=mf.value; var pos=mf.selectionStart; render(); var n=document.getElementById("memFind"); if(n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(_){} } });
+  if(state.view==="members"||state.view==="overview") loadMembers();
   var add=document.getElementById("addMember"); if(add) add.addEventListener("click",openAddMember);
   bindUpload();
   if(state.view==="moderation") loadModeration();
