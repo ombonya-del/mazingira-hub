@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-# Usage (from the repo root): python3 scripts/build_preview.py index.html preview/index.html
+# Usage (from the repo root): python3 scripts/build_preview.py index.html preview/index.html [--live]
 """Build the 4-pillar restructure mock (preview/index.html) from the live hub index.html.
 The live hub is untouched; every section, feed and form is reused as-is — only the
 navigation layer, header name and a Home pillars strip change."""
 import re, sys
 src, dst = sys.argv[1], sys.argv[2]
+LIVE = "--live" in sys.argv[3:]     # --live: the real hub (no preview banner, indexable title)
 s = open(src, encoding="utf-8").read()
 
 def rep(a, b, n=1):
@@ -19,13 +20,15 @@ TAG = "Intelligence · Coordination · Communications · Resources"
 # ---------------------------------------------------------------- name / head
 rep('<span class="brand-sub">Comms Hub</span>', f'<span class="brand-sub">{NAME}</span>')
 rep('<title>hub.mazingirakenya.org · MazingiraKenya Communications Hub</title>',
+    f'<title>hub.mazingirakenya.org · MazingiraKenya {NAME}</title>' if LIVE else
     f'<title>PREVIEW · MazingiraKenya {NAME}</title>\n<meta name="robots" content="noindex, nofollow">')
+s = s.replace("   MazingiraKenya Communications Hub — sector dashboard", "   MazingiraKenya Climate & Environmental Justice Hub — sector dashboard")
 rep('content="MazingiraKenya Communications Hub — live intelligence',
     f'content="MazingiraKenya {NAME} — {TAG}. Live intelligence')
 
 # ---------------------------------------------------------------- preview banner
 m = re.search(r'<body[^>]*>', s)
-s = s[:m.end()] + '''
+if not LIVE: s = s[:m.end()] + '''
 <div class="pv-banner" role="note">
   <span class="pv-tag">Preview</span>
   <span class="pv-txt"><b>Proposed four-pillar structure.</b><span class="pv-long"> Same live data and features as the current hub, regrouped.
@@ -108,11 +111,9 @@ s = s.replace(m.group(1), m.group(1) + '''
 
 # ---------------------------------------------------------------- router (replaces the old tab/Explore router)
 start = s.index('var VIEWS = ["live","explore","cop","voices","baraza","act"];')
-end_marker = '''  showView(h in HASH2VIEW ? HASH2VIEW[h] : "live");
-  mzNarrativeMaybe(h);
-})();
-'''
-end = s.index(end_marker) + len(end_marker)
+m_end = re.search(r'/\* initial view from the URL, else Live \*/\n\(function\(\)\{[\s\S]*?\n\}\)\(\);\n', s[start:])
+assert m_end, "router end not found"
+end = start + m_end.end()
 old_router = s[start:end]
 assert 'window.addEventListener("mk-theme"' in old_router
 s = s[:start] + r'''/* =================================================================
@@ -194,8 +195,8 @@ function barazaTab(tab){
     if(++tries < 40) setTimeout(pick, 150);
   })();
 }
-function go(route, push){
-  route = resolve(route) || "home";
+function go(want, push){
+  var route = resolve(want) || "home";
   var r = ROUTES[route]; curRoute = route; lastSub[r.p] = route;
   // sections
   var want = {}; r.show.forEach(function(sel){ document.querySelectorAll("main > "+sel).forEach(function(el){ want[el.id||sel]=el; }); });
@@ -222,8 +223,11 @@ function go(route, push){
   if(route==="forum") barazaTab("forum");
   if(route==="wall") barazaTab("wall");
   try { window.scrollTo({ top:0, behavior: reduce ? "auto" : "smooth" }); } catch(_){ try { window.scrollTo(0,0); } catch(__){} }
-  if(push !== false) history.replaceState(null, "", "#"+route);
+  if(want === "virtual"){ var vEl = document.getElementById("virtual");
+    if(vEl) setTimeout(function(){ try{ vEl.scrollIntoView({ behavior: reduce?"auto":"smooth", block:"start" }); }catch(_){} }, 120); }
+  if(push !== false) history.replaceState(null, "", location.search + "#" + (resolve(want) ? want : route));
 }
+window.mzGo = go;
 /* every in-page anchor (pillar tabs, sub-tabs, hero buttons, callouts, Submit) goes through the router */
 document.addEventListener("click", function(e){
   var a = e.target.closest && e.target.closest('a[href^="#"]');
@@ -235,7 +239,14 @@ document.addEventListener("click", function(e){
 });
 window.addEventListener("hashchange", function(){ var h = location.hash.slice(1); if(resolve(h)) go(h, false); });
 (function(){ var h = location.hash.slice(1); go(resolve(h) ? h : "home", !!resolve(h)); })();
+/* old helpers other modules still call (coalition-room call links) */
+function showView(){ go(location.hash.slice(1) || "home", false); }
+function mzScrollToSection(h){ if(h === "virtual") go("virtual", false); }
 ''' + s[end:]
+
+# call-link handler: use the new router
+s = s.replace('else if(typeof showView==="function"){ exploreSub="exchange"; showView("explore"); mzScrollToSection("virtual"); }',
+              'else if(typeof window.mzGo==="function"){ window.mzGo("virtual"); }')
 
 # ---------------------------------------------------------------- CSS for the preview layer
 css = '''
