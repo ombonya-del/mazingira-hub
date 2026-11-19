@@ -354,8 +354,31 @@ main{padding-top:22px}
 .voice .media{margin:0 15px;border-radius:12px;height:132px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;letter-spacing:.03em;font-size:.82rem;background:#26262b}
 .voice .media.video{background:linear-gradient(130deg,#2a2a30,#5a1a20)}.voice .media.photo{background:linear-gradient(130deg,#0f3a2a,#26262b)}.voice .media.audio{background:linear-gradient(130deg,#4a3608,#26262b)}
 .voice .msg{padding:12px 15px 6px;font-size:1rem}
-.voice .vmedia{margin:0 15px;display:grid;gap:8px}.voice .vmedia:empty{display:none}
-.voice .vmedia img,.voice .vmedia video{width:100%;max-height:440px;object-fit:contain;border-radius:12px;background:#111;display:block}.voice .vmedia audio{width:100%}
+.voice .vmedia{margin:0 15px}.voice .vmedia:empty{display:none}
+/* Voices media: compact tiles + lightbox */
+.vgal{display:grid;gap:4px;margin-top:10px;border-radius:10px;overflow:hidden}
+.vgal:empty{display:none}
+.vgal.n1{grid-template-columns:1fr}
+.vgal.n2{grid-template-columns:1fr 1fr}
+.vgal.n3{grid-template-columns:repeat(3,1fr)}
+.vgal .vt{position:relative;display:block;padding:0;border:0;margin:0;cursor:zoom-in;background:#16161a;overflow:hidden;height:96px}
+.vgal.n1 .vt{height:190px}
+.vgal.n2 .vt{height:130px}
+.vgal .vt img,.vgal .vt video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s}
+.vgal .vt:hover img,.vgal .vt:hover video{transform:scale(1.04)}
+.vgal .vt .vplay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.vgal .vt .vplay:before{content:"";width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.55) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E") center/20px no-repeat}
+.vgal .vt .vmore{position:absolute;inset:0;background:rgba(0,0,0,.55);color:#fff;font-weight:800;font-size:1.2rem;display:flex;align-items:center;justify-content:center}
+.vaud{display:grid;gap:6px;margin-top:8px}.vaud:empty{display:none}.vaud audio{width:100%}
+.vlb{position:fixed;inset:0;z-index:9999;background:rgba(8,8,10,.92);display:flex;align-items:center;justify-content:center}
+.vlb[hidden]{display:none}
+.vlb .vlb-stage{max-width:94vw;max-height:86vh;display:flex;align-items:center;justify-content:center}
+.vlb .vlb-stage img,.vlb .vlb-stage video{max-width:94vw;max-height:86vh;border-radius:8px;display:block}
+.vlb button{position:absolute;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:50%;width:44px;height:44px;font-size:1.5rem;line-height:1;cursor:pointer}
+.vlb button:hover{background:rgba(255,255,255,.25)}
+.vlb .vlb-x{top:14px;right:14px}.vlb .vlb-p{left:12px;top:50%;margin-top:-22px}.vlb .vlb-n{right:12px;top:50%;margin-top:-22px}
+.vlb .vlb-c{position:absolute;bottom:16px;left:0;right:0;text-align:center;color:#ddd;font-size:.8rem;font-weight:700}
+
 .voice .msg.new{background:#FFFBEE}
 .reacts{display:flex;gap:9px;padding:4px 15px 14px}
 .reacts button{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 13px;font-weight:800;font-size:.85rem;transition:transform .1s,border-color .15s}
@@ -1081,6 +1104,58 @@ function liveVoiceCard(row){
     '<p class="msg">'+esc(dec(row.body||""))+'</p>'+(srcLink?'<div class="reacts">'+srcLink+'</div>':'')+'</div>';
 }
 /* approved uploads live in the private "voices" bucket — Supabase only signs links for approved voices */
+/* Voices media gallery: compact tiles, click to enlarge (lightbox with prev/next, Esc, arrows) */
+var VGAL = (function(){
+  var lb, items=[], idx=0;
+  function q(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function kindOf(path){ var n=String(path||"").toLowerCase();
+    if(/\.(mp4|mov|m4v|webm|3gp|mkv)$/.test(n)) return "video";
+    if(/\.(mp3|m4a|aac|wav|ogg|oga|opus|amr|weba)$/.test(n)) return "audio";
+    return "image"; }
+  function ensure(){
+    if(lb) return lb;
+    lb=document.createElement("div"); lb.className="vlb"; lb.hidden=true;
+    lb.setAttribute("role","dialog"); lb.setAttribute("aria-modal","true"); lb.setAttribute("aria-label","Media viewer");
+    lb.innerHTML='<div class="vlb-stage"></div><button class="vlb-x" aria-label="Close">×</button>'+
+      '<button class="vlb-p" aria-label="Previous">‹</button><button class="vlb-n" aria-label="Next">›</button><div class="vlb-c"></div>';
+    document.body.appendChild(lb);
+    lb.addEventListener("click", function(e){ if(e.target===lb || e.target.classList.contains("vlb-stage")) close(); });
+    lb.querySelector(".vlb-x").addEventListener("click", close);
+    lb.querySelector(".vlb-p").addEventListener("click", function(){ show(idx-1); });
+    lb.querySelector(".vlb-n").addEventListener("click", function(){ show(idx+1); });
+    document.addEventListener("keydown", function(e){ if(lb.hidden) return;
+      if(e.key==="Escape") close(); else if(e.key==="ArrowLeft") show(idx-1); else if(e.key==="ArrowRight") show(idx+1); });
+    return lb;
+  }
+  function show(i){
+    if(!items.length) return; idx=(i+items.length)%items.length; var it=items[idx];
+    var st=lb.querySelector(".vlb-stage");
+    st.innerHTML = it.k==="video" ? '<video src="'+q(it.u)+'" controls autoplay playsinline></video>' : '<img src="'+q(it.u)+'" alt="">';
+    var many=items.length>1;
+    lb.querySelector(".vlb-p").style.display = many?"":"none"; lb.querySelector(".vlb-n").style.display = many?"":"none";
+    lb.querySelector(".vlb-c").textContent = many ? (idx+1)+" / "+items.length : "";
+  }
+  function open(list,i){ ensure(); items=list; lb.hidden=false; document.documentElement.style.overflow="hidden"; show(i); lb.querySelector(".vlb-x").focus(); }
+  function close(){ if(!lb) return; lb.hidden=true; lb.querySelector(".vlb-stage").innerHTML=""; document.documentElement.style.overflow=""; }
+  /* box: container element; signed: [{path, signedUrl}] from createSignedUrls */
+  function render(box, signed){
+    var vis=[], aud=[];
+    (signed||[]).forEach(function(x){ if(!x||!x.signedUrl) return; var k=kindOf(x.path);
+      if(k==="audio") aud.push(x.signedUrl); else vis.push({u:x.signedUrl,k:k}); });
+    var MAX=6, shown=vis.slice(0,MAX), extra=vis.length-shown.length;
+    var n = shown.length>=3 ? 3 : shown.length;
+    var html = shown.length ? '<div class="vgal n'+n+'">'+shown.map(function(it,i){
+      var more = (extra>0 && i===shown.length-1) ? '<span class="vmore">+'+extra+'</span>' : '';
+      var inner = it.k==="video" ? '<video src="'+q(it.u)+'#t=0.5" preload="metadata" muted playsinline></video><span class="vplay"></span>'
+                                 : '<img src="'+q(it.u)+'" alt="" loading="lazy">';
+      return '<button type="button" class="vt" data-vi="'+i+'" aria-label="Enlarge '+(it.k==="video"?"video":"photo")+'">'+inner+more+'</button>';
+    }).join("")+'</div>' : '';
+    if(aud.length) html += '<div class="vaud">'+aud.map(function(u){ return '<audio src="'+q(u)+'" controls preload="none"></audio>'; }).join("")+'</div>';
+    box.innerHTML = html;
+    box.querySelectorAll(".vt").forEach(function(b){ b.addEventListener("click", function(){ open(vis, +b.getAttribute("data-vi")); }); });
+  }
+  return { render: render, open: open, close: close };
+})();
 function fillLiveVoiceMedia(host, rows){
   if(!RSB||!RSB.storage) return;
   rows.forEach(function(row){
@@ -1088,13 +1163,7 @@ function fillLiveVoiceMedia(host, rows){
     var box=host.querySelector('[data-vfiles="'+row.id+'"]'); if(!box) return;
     RSB.storage.from("voices").createSignedUrls(row.media_files, 6*3600).then(function(r){
       if(!r||r.error||!r.data) return;
-      box.innerHTML=r.data.map(function(x){
-        if(!x||!x.signedUrl) return "";
-        var u=esc(x.signedUrl), n=String(x.path||"").toLowerCase();
-        if(/\.(mp4|mov|m4v|webm|3gp|mkv)$/.test(n)) return '<video src="'+u+'" controls playsinline preload="metadata"></video>';
-        if(/\.(mp3|m4a|aac|wav|ogg|oga|opus|amr|weba)$/.test(n)) return '<audio src="'+u+'" controls preload="none"></audio>';
-        return '<img src="'+u+'" alt="" loading="lazy">';
-      }).join("");
+      VGAL.render(box, r.data);
     }, function(){});
   });
 }
