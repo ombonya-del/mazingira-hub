@@ -2328,7 +2328,7 @@ function cleanEmail(v){
 <div class="modal-overlay" id="callModal" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cmTitle">
     <div class="modal-head">
-      <div class="grow"><h3 id="cmTitle">Schedule a call</h3><p>Books a time in the coalition room (or a private room) and gives you a calendar invite (.ics) to share with members.</p></div>
+      <div class="grow"><h3 id="cmTitle">Schedule a call</h3><p>Any member can book a call — you'll be its host (mute, remove, Lobby). Gives you a calendar invite (.ics) and a link to share.</p></div>
       <button class="modal-x" id="cmClose" type="button" aria-label="Close">×</button>
     </div>
     <div class="modal-body">
@@ -2345,7 +2345,7 @@ function cleanEmail(v){
         <label>Note <span class="opt">(optional)</span><textarea name="note" rows="2" placeholder="Agenda, who should join…"></textarea></label>
         <label>Room<select name="roomType"><option value="coalition" selected>Coalition room (usual place)</option><option value="private">Private room — separate link, e.g. a working group</option></select></label>
         <fieldset class="cm-minutes" style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0">
-          <legend style="padding:0 6px">Send the minutes to <span class="opt">(everyone who joins gets them automatically)</span></legend>
+          <legend style="padding:0 6px">Send the minutes to these members <span class="opt">(everyone who joins gets them automatically)</span></legend>
           <div id="cmPartners" style="max-height:150px;overflow:auto;margin:6px 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:2px 10px"></div>
           <label>Other emails <span class="opt">(comma-separated)</span><input name="extraEmails" placeholder="name@org.org, other@org.org"></label>
         </fieldset>
@@ -5143,13 +5143,17 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
     var openBtn=document.getElementById("scheduleCall"); if(!overlay||!form) return;
     function loadPartners(){
       var box=document.getElementById("cmPartners"); if(!box || !SB || box.getAttribute("data-loaded")) return;
-      SB.from("partners").select("name,email").eq("active",true).order("name").then(function(r){
-        if(r.error || !r.data || !r.data.length){ box.innerHTML='<span class="meta">Partner list is visible to hub admins. Add emails below instead.</span>'; return; }
+      /* every hub member, straight from Supabase Auth (names only — emails stay on the server) */
+      SB.rpc("hub_members").then(function(r){
+        if(r.error || !r.data || !r.data.length){ box.innerHTML='<span class="meta">Couldn\'t load the members list. Add emails below instead.</span>'; return; }
         box.setAttribute("data-loaded","1");
-        box.innerHTML=r.data.filter(function(p){ return p.email; }).map(function(p){
-          var em=String(p.email).split(/[,;\s]+/)[0];
-          return '<label style="display:flex;gap:6px;align-items:center;font-size:.85rem;margin:0"><input type="checkbox" name="pEmail" value="'+esc(em.toLowerCase())+'" style="width:auto">'+esc(p.name)+'</label>';
-        }).join("");
+        box.innerHTML='<input type="search" id="cmFind" placeholder="Find a member…" style="grid-column:1/-1;margin-bottom:4px">'+
+          r.data.map(function(m){
+            return '<label class="cm-m" style="display:flex;gap:6px;align-items:center;font-size:.85rem;margin:0"><input type="checkbox" name="pEmail" value="uid:'+esc(m.id)+'" style="width:auto">'+esc(m.label)+'</label>';
+          }).join("");
+        var find=document.getElementById("cmFind");
+        if(find) find.addEventListener("input", function(){ var q=find.value.toLowerCase();
+          [].forEach.call(box.querySelectorAll(".cm-m"), function(l){ l.style.display = l.textContent.toLowerCase().indexOf(q)>=0 ? "flex" : "none"; }); });
       }, function(){});
     }
     function openM(){ loadPartners(); overlay.classList.add("on"); overlay.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden"; setTimeout(function(){ if(form.elements.title) form.elements.title.focus(); },30); }

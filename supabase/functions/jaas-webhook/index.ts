@@ -133,7 +133,13 @@ async function recipientsFor(sess: any): Promise<{ to: string[]; attendees: stri
   const to = new Set<string>(names.keys());
 
   const call = sess.call_id ? (await db.from("calls").select("minutes_to,kind").eq("id", sess.call_id).maybeSingle()).data : null;
-  for (const e of call?.minutes_to ?? []) to.add(String(e).toLowerCase());
+  for (const e of call?.minutes_to ?? []) {
+    const v = String(e);
+    if (v.startsWith("uid:")) {          // a hub member picked by name — look up their email here
+      const { data: u } = await db.auth.admin.getUserById(v.slice(4));
+      if (u?.user?.email) to.add(u.user.email.toLowerCase());
+    } else to.add(v.toLowerCase());
+  }
   if (call?.kind === "quick") {
     const { data: ads } = await db.from("admins").select("email");
     for (const a of ads ?? []) if (a.email) to.add(String(a.email).toLowerCase());

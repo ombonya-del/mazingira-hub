@@ -1,7 +1,9 @@
 // Supabase Edge Function: jaas-token
 // Signs a JaaS (8x8 Jitsi-as-a-Service) JWT so someone can enter a coalition video room.
 //   - Signed-in hub ADMINS  -> moderator (can mute, kick, run the Lobby, start transcription)
-//   - The member who STARTED a quick call -> moderator of that room (no admin needed)
+//   - The member who BOOKED a call (scheduled or quick) -> moderator of it (no admin needed).
+//     For the shared coalition room that means: you booked a call there starting within the next
+//     90 minutes or in the last 45.
 //   - Signed-in members (partners are hub members) -> participant
 // No guest access: you must be signed in to the hub.
 // Only rooms that exist (the standing coalition room or a row in public.calls) are allowed.
@@ -74,7 +76,14 @@ Deno.serve(async (req) => {
         if (!name) name = String(meta.person || meta.full_name || meta.name || email.split("@")[0]);
         const caller = createClient(SUPABASE_URL, ANON_KEY, { global: { headers: { Authorization: auth } } });
         const { data: isAdmin } = await caller.rpc("is_admin");
-        moderator = !!isAdmin || (quick && call?.created_by === userId);
+        moderator = !!isAdmin || (!!call && call.created_by === userId);
+        if (!moderator && room === COALITION_ROOM) {
+          const now = Date.now();
+          const { data: mine } = await admin.from("calls").select("id").ilike("room", room).eq("created_by", userId)
+            .gte("start_at", new Date(now - 45 * 60000).toISOString())
+            .lte("start_at", new Date(now + 90 * 60000).toISOString()).limit(1);
+          moderator = !!(mine && mine.length);
+        }
       }
     }
     if (!userId) return json({ ok: false, message: "Please sign in to the hub to join the call" }, 401);
