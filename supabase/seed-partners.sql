@@ -214,4 +214,7 @@ insert into partners (name, category, focus, region, x_handle, youtube, website,
   select 'KOGWG — Kenya Oil & Gas Working Group', 'Coalition', 'oil, gas, coal, mining, minerals, land, legal, advocacy, accountability, community', 'National', 'canco_kenya', null, 'https://cancokenya.net/our-programs/oil-gas-mining/', true
   where not exists (select 1 from partners where lower(name) like '%kogwg%' or lower(name) like 'kenya oil & gas%');
 
+-- KOGWG national convener (CANCO)
+update partners set email = 'teddy.muturi@cancokenya.net' where lower(name) like '%kogwg%';
+
 select name, category, region, x_handle, youtube, email from partners order by name;
