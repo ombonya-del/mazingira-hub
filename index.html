@@ -1491,6 +1491,42 @@ main[data-part="projects"] #ajesasa .sent-callout{ display:none; }
 main[data-part="forum"] #baraza .bz-seg, main[data-part="wall"] #baraza .bz-seg{ display:none; }
 main:not([data-part="funders"]) .only-funders{ display:none; }
 html[data-theme="light"] .pillar-card.pc-intel{ border-top-color:#235E8F; }
+
+/* ---- Convenings calendar (compact, grouped by month) ---- */
+.evx-wrap{ display:block; }
+.evx-bar{ display:flex; flex-wrap:wrap; gap:7px; margin:0 0 16px; }
+.evx-n{ opacity:.6; font-weight:700; margin-left:2px; }
+.evx-month{ font-family:"Nunito Sans",sans-serif; font-size:.66rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:18px 0 6px; }
+.evx-list > .evx-month:first-child{ margin-top:0; }
+.evx-ul{ list-style:none; margin:0; padding:0; border:1px solid var(--line); border-radius:var(--radius-l); background:var(--panel); overflow:hidden; }
+.evx{ display:flex; gap:14px; align-items:flex-start; padding:11px 14px; border-top:1px solid var(--line); }
+.evx:first-child{ border-top:0; }
+.evx.is-now{ background:linear-gradient(90deg, var(--ember-wash), transparent 70%); }
+.evx-date{ flex:none; width:42px; text-align:center; line-height:1.05; padding-top:2px; }
+.evx-date b{ display:block; font-family:Lora,serif; font-size:1.25rem; font-weight:700; color:var(--text); }
+.evx-date span{ display:block; font-size:.56rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ember); }
+.evx-body{ flex:1; min-width:0; }
+.evx-t{ display:block; width:100%; text-align:left; background:none; border:0; padding:0; margin:0; cursor:pointer; color:var(--text);
+  font:inherit; font-weight:700; font-size:.95rem; line-height:1.35; }
+.evx-t:disabled{ cursor:default; }
+.evx-t[aria-expanded]::after{ content:" ＋"; color:var(--muted-dim); font-weight:400; font-size:.8rem; }
+.evx-t[aria-expanded="true"]::after{ content:" −"; }
+.evx-t:hover:not(:disabled){ color:var(--green); }
+.evx-live{ display:inline-block; vertical-align:2px; margin-right:7px; font-size:.56rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase;
+  color:#160B03; background:var(--ember-hot); padding:2px 7px; border-radius:100px; }
+.evx-meta{ display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; margin-top:3px; font-size:.78rem; color:var(--muted); }
+.evx-reg{ font-size:.56rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; padding:1px 7px; border-radius:100px; border:1px solid var(--line-2); color:var(--muted); }
+.evx-reg.r-kenya{ color:var(--green); border-color:rgba(98,199,155,.45); }
+.evx-reg.r-online{ color:#7FB0D8; border-color:rgba(127,176,216,.45); }
+html[data-theme="light"] .evx-reg.r-online{ color:#235E8F; }
+.evx-more{ margin-top:8px; font-size:.84rem; line-height:1.55; color:var(--muted); }
+.evx-more b{ color:var(--text); }
+.evx-toggle{ margin-top:12px; }
+.evx-empty{ color:var(--muted); font-size:.9rem; }
+.evx-past{ margin-top:22px; }
+.evx-past summary{ cursor:pointer; font-size:.72rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+.evx-past .evx{ opacity:.7; }
+@media (max-width:600px){ .evx{ padding:10px 11px; gap:11px; } .evx-t{ font-size:.9rem; } }
 /* ---- theme switch button ---- */
 .mk-theme-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;flex:0 0 auto;padding:0;border-radius:999px;cursor:pointer;background:transparent;border:1px solid var(--line-2);color:var(--text);transition:background .15s,border-color .15s,color .15s}
 .mk-theme-btn:hover{background:var(--panel-2)}
@@ -4702,19 +4738,103 @@ function parseAnyDate(v){
 }
 function niceDate(v){ var t=typeof v==="number"?v:parseAnyDate(v); if(isNaN(t)) return String(v||""); return new Date(t).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}); }
 function evKey(e){ var mi=MONTHS.indexOf(e.m); return (mi<0?99:mi)*100 + (parseInt(e.d,10)||0); }
-function renderEvents(){
-  evWrap.innerHTML = "";
-  if(!EVENTS.length){ evWrap.innerHTML = '<div class="pet-empty">No convenings scheduled yet. Use <b>+ Create event</b> to add a baraza, training or convening to the coalition calendar.</div>'; return; }
-  EVENTS.slice().sort(function(a,b){ return evKey(a)-evKey(b); }).forEach(function(e){
-    var c = el("div","card");
-    var org = e.org ? '<b>'+escE(e.org)+'.</b> ' : '';
-    var link = e.link ? ' · <a href="'+escE(e.link)+'" target="_blank" rel="noopener noreferrer">More / register ↗</a>' : '';
-    c.innerHTML = '<div class="event"><div class="event-date" aria-hidden="true">'+
-      '<span class="m">'+escE(e.m)+'</span><span class="d">'+escE(e.d)+'</span></div>'+
-      '<div style="flex:1; min-width:0"><h3>'+escE(e.t)+'</h3><span class="meta">'+escE(e.w)+'</span></div></div>'+
-      '<p>'+org+escE(e.p)+link+'</p>';
-    evWrap.appendChild(c);
+/* ---------- Convenings calendar ----------
+   Shows only dated events that are on now or still to come, newest-relevant first, grouped by
+   month, one compact line each (details on tap). Undated ("TBC") rows, past events and duplicate
+   listings of the same event are kept out of the main list. Filter: Kenya · Africa · Global · Online. */
+var EV_UI = { f:"all", more:false, past:false, open:{} };
+var EV_KE = /kenya|nairobi|mombasa|kisumu|nakuru|eldoret|lamu|kilifi|kwale|machakos|kakamega|garissa|turkana|marsabit|naivasha|nyeri|meru|kitui|siaya|laikipia|samburu|isiolo|malindi|sarit|carnivore|kicc|gigiri|unep hq/i;
+var EV_AF = /africa|nigeria|abuja|lagos|ghana|accra|senegal|dakar|ethiopia|addis|rwanda|kigali|uganda|kampala|munyonyo|tanzania|dar es salaam|arusha|zambia|lusaka|zimbabwe|harare|malawi|mozambique|namibia|windhoek|botswana|cape town|johannesburg|durban|pretoria|egypt|cairo|morocco|marrakech|rabat|tunisia|algeria|cameroon|côte d|ivoire|abidjan|mali|niger|burkina|benin|togo|sierra leone|liberia|guinea|gabon|congo|kinshasa|angola|madagascar|mauritius|seychelles|somalia|mogadishu|djibouti|sudan|eritrea|burundi|lesotho|eswatini|gambia|chad/i;
+function evRegion(e){
+  var l=(e.loc||"")+" "+(e.t||"");
+  if(/virtual|online/i.test(e.mode+" "+e.loc)) return "online";
+  if(EV_KE.test(e.loc||"")) return "kenya";
+  if(EV_AF.test(e.loc||"")) return "africa";
+  if(!e.loc && EV_KE.test(l)) return "kenya";
+  return "global";
+}
+var EV_MON={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+function evTime(iso){ var t=Date.parse(iso+"T00:00:00"); return isNaN(t)?NaN:t; }
+/* end date: the last "12 Nov 2026" in the date text ("9–20 Nov 2026", "30 Sep – 1 Oct 2026"), else the start */
+function evEnd(e, st){
+  var w=e.when||"", m, last=null, re=/(\d{1,2})\s+([A-Za-z]{3})[a-z]*\.?\s+(\d{4})/g;
+  while((m=re.exec(w))) last=m;
+  if(last && EV_MON[last[2].toLowerCase()]!=null){ var t=new Date(+last[3],EV_MON[last[2].toLowerCase()],+last[1]).getTime(); if(t>=st && t-st<90*864e5) return t; }
+  return st;
+}
+function evKeyTitle(t){ return String(t||"").toLowerCase().replace(/^(the|unfccc|un)\s+/,"").split(/\s[—–-]\s|\(|:|,/)[0].replace(/\b20\d\d\b/g,"").replace(/[^a-z0-9]+/g," ").trim(); }
+function evScore(e){ return (e.when?3:0)+(e.p?1:0)+((e.loc||"").length>3?1:0)+(e.link?1:0)+(e.iso&&e.iso.slice(8)!=="01"?2:0)+(String(e.t).length>8?1:0); }
+function evPrepare(){
+  var now=new Date(); now.setHours(0,0,0,0); var today=now.getTime();
+  var byKey={}, out=[];
+  EVENTS.forEach(function(e){
+    var st=evTime(e.iso); if(isNaN(st)) return;                 // undated / TBC: not on the calendar
+    var x={ e:e, st:st, en:evEnd(e,st) }; x.region=evRegion(e);
+    var k=evKeyTitle(e.t); if(!k) k=e._id||e.t;
+    if(byKey[k]){ if(evScore(e)>evScore(byKey[k].e)) { out[out.indexOf(byKey[k])]=x; byKey[k]=x; } return; }
+    byKey[k]=x; out.push(x);
   });
+  var cur=[], past=[];
+  out.forEach(function(x){ x.now = x.st<=today && x.en>=today; (x.en<today ? past : cur).push(x); });
+  cur.sort(function(a,b){ return a.st-b.st; }); past.sort(function(a,b){ return b.st-a.st; });
+  return { cur:cur, past:past };
+}
+function evRow(x){
+  var e=x.e, dt=new Date(x.st), id=String(e._id||e.t);
+  var open=!!EV_UI.open[id];
+  var when=e.when || dt.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+  var place=e.loc||(x.region==="online"?"Online":"");
+  var meta=[when, place, e.mode && !/person/i.test(e.mode) ? String(e.mode).toLowerCase() : ""].filter(Boolean).map(escE).join(" · ");
+  var more = (e.p||e.org||e.link)
+    ? '<div class="evx-more"'+(open?'':' hidden')+'>'+(e.org?'<b>'+escE(e.org)+'.</b> ':'')+escE(e.p||"")+
+      (e.link?' <a href="'+escE(e.link)+'" target="_blank" rel="noopener noreferrer">More / register ↗</a>':'')+'</div>' : '';
+  return '<li class="evx'+(x.now?' is-now':'')+'" data-ev="'+escE(id)+'">'+
+    '<div class="evx-date" aria-hidden="true"><b>'+dt.getDate()+'</b><span>'+MONTHS[dt.getMonth()]+'</span></div>'+
+    '<div class="evx-body"><button type="button" class="evx-t"'+(more?' aria-expanded="'+open+'"':' disabled')+'>'+
+      (x.now?'<span class="evx-live">On now</span>':'')+escE(e.t)+'</button>'+
+      '<div class="evx-meta">'+meta+'<span class="evx-reg r-'+x.region+'">'+({kenya:"Kenya",africa:"Africa",global:"Global",online:"Online"})[x.region]+'</span></div>'+
+      more+'</div></li>';
+}
+function renderEvents(){
+  if(!evWrap) return;
+  var P=evPrepare(), cur=P.cur, past=P.past;
+  if(!cur.length && !past.length){ evWrap.innerHTML='<div class="pet-empty">No convenings scheduled yet. Use <b>+ Create event</b> to add a baraza, training or convening to the coalition calendar.</div>'; return; }
+  var counts={all:cur.length,kenya:0,africa:0,global:0,online:0}; cur.forEach(function(x){ counts[x.region]++; });
+  if(EV_UI.f!=="all" && !counts[EV_UI.f]) EV_UI.f="all";
+  var list=cur.filter(function(x){ return EV_UI.f==="all"||x.region===EV_UI.f; });
+  var LIMIT=8, shown=EV_UI.more?list:list.slice(0,LIMIT);
+  var chips=[["all","All"],["kenya","In Kenya"],["africa","Africa"],["global","Global"],["online","Online"]]
+    .filter(function(c){ return c[0]==="all"||counts[c[0]]; })
+    .map(function(c){ return '<button type="button" class="chip" data-evf="'+c[0]+'" aria-pressed="'+(EV_UI.f===c[0])+'">'+c[1]+' <span class="evx-n">'+counts[c[0]]+'</span></button>'; }).join("");
+  var h='<div class="evx-bar">'+chips+'</div>';
+  if(!list.length) h+='<p class="evx-empty">Nothing coming up here yet.</p>';
+  var lastM="";
+  h+='<div class="evx-list">';
+  shown.forEach(function(x){
+    var mk=x.now?"now":new Date(x.st).toLocaleDateString("en-GB",{month:"long",year:"numeric"});
+    if(mk!==lastM){ if(lastM) h+='</ul>'; h+='<h4 class="evx-month">'+(x.now?'Happening now':escE(mk))+'</h4><ul class="evx-ul">'; lastM=mk; }
+    h+=evRow(x);
+  });
+  if(lastM) h+='</ul>';
+  h+='</div>';
+  if(list.length>LIMIT) h+='<button type="button" class="btn btn--ghost evx-toggle" data-evmore>'+(EV_UI.more?'Show fewer':'Show all '+list.length+' upcoming')+'</button>';
+  if(past.length){
+    h+='<details class="evx-past"'+(EV_UI.past?' open':'')+'><summary>Past convenings <span class="evx-n">'+past.length+'</span></summary><ul class="evx-ul">'+
+      past.slice(0,30).map(evRow).join("")+'</ul></details>';
+  }
+  evWrap.innerHTML=h;
+}
+if(evWrap){
+  evWrap.classList.remove("cards"); evWrap.classList.add("evx-wrap");
+  evWrap.addEventListener("click", function(e){
+    var f=e.target.closest("[data-evf]"); if(f){ EV_UI.f=f.getAttribute("data-evf"); EV_UI.more=false; renderEvents(); return; }
+    if(e.target.closest("[data-evmore]")){ EV_UI.more=!EV_UI.more; renderEvents(); return; }
+    var t=e.target.closest(".evx-t"); if(t && !t.disabled){
+      var li=t.closest(".evx"), id=li.getAttribute("data-ev"), m=li.querySelector(".evx-more");
+      EV_UI.open[id]=!EV_UI.open[id]; if(m) m.hidden=!EV_UI.open[id]; t.setAttribute("aria-expanded", String(!!EV_UI.open[id]));
+    }
+  });
+  evWrap.addEventListener("toggle", function(e){ if(e.target.classList && e.target.classList.contains("evx-past")) EV_UI.past=e.target.open; }, true);
 }
 renderEvents();
 
@@ -5495,7 +5615,8 @@ function eventFromRow(row){
   var m="—", d="–";
   if(row.start_date){ var dt=new Date(String(row.start_date).slice(0,10)+"T00:00:00"); if(!isNaN(dt.getTime())){ m=MONTHS[dt.getMonth()]; d=String(dt.getDate()); if(d.length<2) d="0"+d; } }
   var w=(row.location||"TBC")+(row.mode?" · "+String(row.mode).toLowerCase():"")+(row.time?" · "+row.time:"");
-  return { m:m, d:d, t:row.title, w:w, p:(row.description||""), org:row.org||"", link:row.link||"", _id:row.id };
+  return { m:m, d:d, t:row.title, w:w, p:(row.description||""), org:row.org||"", link:row.link||"", _id:row.id,
+           iso:row.start_date?String(row.start_date).slice(0,10):"", when:row.time||"", loc:row.location||"", mode:row.mode||"" };
 }
 function mzFetchEvents(){
   if(!SB) return;
