@@ -2218,6 +2218,8 @@ function gateMsg(m){ var h=document.querySelector(".gate .hint"); if(h){ h.textC
 function showConsole(){
   document.getElementById("gate").classList.add("hidden");
   document.getElementById("shell").classList.add("on");
+  /* deep link: admin.mazingirakenya.org/#projects opens that view (e.g. the hub's "Match & notify partners" button) */
+  var hv=(location.hash||"").slice(1); if(hv && NAV.some(function(n){ return n.id===hv; })) state.view=hv;
   render();
 }
 function unlock(){
