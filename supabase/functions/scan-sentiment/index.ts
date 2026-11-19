@@ -38,6 +38,12 @@ const FEEDS = [
 ];
 const ENV = /(climate|carbon|emission|coal|fossil|refinery|petroleum|geotherm|solar|renewable|hydropower|nuclear|NuPEA|atomic|uranium|drought|flood|\brain|weather|Kenya Met|El Ni|famine|locust|forest|deforest|reforest|afforest|\btree|seedling|logging|mangrove|wetland|conservan|wildlife|elephant|rhino|poach|biodivers|ecosystem|mining|\bgold\b|quarry|sand harvest|charcoal|pollution|\bwaste\b|plastic|sewage|\bwater|river|\blake|\bdam\b|land rights|eviction|displac|Lamu|Turkana|Siaya|Dangote|environment|\boil\b|\bgas\b|green energy)/i;
 
+// feed description as plain text; null when it only repeats the headline (Google News does that)
+function clean(desc: string | undefined, title: string): string | null {
+  const t = String(desc ?? "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+  if (t.length < 40 || t.startsWith(title.slice(0, 40))) return null;
+  return t.slice(0, 400);
+}
 function normDate(s: string | null): string {
   const t = s ? Date.parse(s) : NaN;
   const now = Date.now();
@@ -62,12 +68,12 @@ Deno.serve(async (req) => {
     const per = await Promise.all(feeds.map(async (f) => ({ f, r: await fetchAll([f]) })));
     const debug: Record<string, string> = {};
     const seen = new Set<string>();
-    const cand: { source: string; type: string; title: string; url: string; published_at: string }[] = [];
+    const cand: { source: string; type: string; title: string; url: string; published_at: string; snippet: string | null }[] = [];
     for (const { f, r } of per) {
       Object.assign(debug, r.debug);
       for (const it of r.all.filter((i) => ENV.test(i.title)).slice(0, PER_FEED)) {
         if (seen.has(it.link)) continue; seen.add(it.link);
-        cand.push({ source: f.source, type: f.type, title: it.title, url: it.link, published_at: normDate(it.pubDate) });
+        cand.push({ source: f.source, type: f.type, title: it.title, url: it.link, published_at: normDate(it.pubDate), snippet: clean(it.desc, it.title) });
       }
     }
     // drop what is already stored BEFORE spending Claude calls
@@ -86,7 +92,7 @@ Deno.serve(async (req) => {
       llm.record(res);
       const st: string[] = Array.isArray(res.data?.s) ? res.data.s : [];
       const rows = batch.map((b, n) => ({
-        source: b.source, source_type: b.type, title: b.title, url: b.url, published_at: b.published_at,
+        source: b.source, source_type: b.type, title: b.title, url: b.url, published_at: b.published_at, snippet: b.snippet,
         stance: ["supportive", "neutral", "critical"].includes(String(st[n]).toLowerCase()) ? String(st[n]).toLowerCase() : "neutral",
       }));
       // store even if scoring failed (stance falls back to neutral) — the radar must not go stale
@@ -94,7 +100,7 @@ Deno.serve(async (req) => {
         .upsert(rows, { onConflict: "url", ignoreDuplicates: true, count: "exact" });
       if (!error) inserted += count ?? rows.length;
       if (res.fatal) { // key/credit/model problem: store the rest unscored and stop calling Claude
-        const rest = fresh.slice(i + BATCH).map((b) => ({ source: b.source, source_type: b.type, title: b.title, url: b.url, published_at: b.published_at, stance: "neutral" }));
+        const rest = fresh.slice(i + BATCH).map((b) => ({ source: b.source, source_type: b.type, title: b.title, url: b.url, published_at: b.published_at, snippet: b.snippet, stance: "neutral" }));
         if (rest.length) { const r2 = await supabase.from("sentiment_items").upsert(rest, { onConflict: "url", ignoreDuplicates: true, count: "exact" }); if (!r2.error) inserted += r2.count ?? rest.length; }
         break;
       }

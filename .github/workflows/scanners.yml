@@ -21,7 +21,7 @@ on:
         required: false
         default: 'all'
         type: choice
-        options: [all, opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner, scan-sentiment, scan-sectors, baraza-seed, cop-digest, cleanup]
+        options: [all, opportunity-scanner, resource-scanner, event-scanner, disinfo-scanner, scan-sentiment, scan-sectors, baraza-seed, cop-digest, cleanup, translate-raia, news-digest]
       cop_dates:
         description: 'COP31 catch-up only (with target=cop-digest): earlier COP days to write, oldest first, e.g. 2026-11-09,2026-11-10'
         required: false
@@ -106,3 +106,44 @@ jobs:
             [ "${REM:-0}" -eq 0 ] && { echo "Cleanup complete — nothing left to review."; break; }
             sleep 2
           done
+
+  raia-languages:
+    # raia in Kiswahili + Sheng. After the scanners: (1) translate-raia fills SW/SH for any
+    # Tetesi / Ukweli Halisi card and recent Kwenye Habari headline that lacks it (loops until
+    # the disinfo backlog is done, so the first run is the backfill); (2) news-digest drafts
+    # "Habari za leo" for today (only the first run of the day writes it; later runs skip).
+    needs: scan
+    if: always() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.target == 'all' || inputs.target == 'translate-raia' || inputs.target == 'news-digest')))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Translate raia streams (SW / Sheng)
+        if: github.event_name == 'schedule' || inputs.target != 'news-digest'
+        env:
+          CRON_SECRET: ${{ secrets.MAZINGIRA_CRON_SECRET }}
+        run: |
+          set -e
+          for i in $(seq 1 8); do
+            RESP=$(curl -sS -X POST "$SUPABASE_URL/functions/v1/translate-raia" \
+              -H "Authorization: Bearer $ANON_KEY" -H "apikey: $ANON_KEY" \
+              -H "x-cron-secret: $CRON_SECRET" -H "Content-Type: application/json" \
+              -d '{}' --max-time 300)
+            echo "batch $i: $RESP"
+            echo "$RESP" | grep -q '"error"' && { echo "::error title=translate-raia failed::$RESP"; exit 1; }
+            echo "$RESP" | grep -q '"aborted":true' && { echo "::error title=translate-raia: Claude calls failing::$RESP"; exit 1; }
+            REM=$(echo "$RESP" | grep -o '"remaining":[0-9]*' | grep -o '[0-9]*' | head -n1)
+            NEWS=$(echo "$RESP" | grep -o '"pending_before":[0-9]*' | tail -n1 | grep -o '[0-9]*')
+            [ "${REM:-0}" -eq 0 ] && [ "${NEWS:-0}" -lt 80 ] && { echo "All caught up."; break; }
+            sleep 2
+          done
+      - name: Draft today's Habari za leo
+        if: github.event_name == 'schedule' || inputs.target != 'translate-raia'
+        env:
+          CRON_SECRET: ${{ secrets.MAZINGIRA_CRON_SECRET }}
+        run: |
+          RESP=$(curl -sS -w '\n%{http_code}' -X POST "$SUPABASE_URL/functions/v1/news-digest" \
+            -H "Authorization: Bearer $ANON_KEY" -H "apikey: $ANON_KEY" \
+            -H "x-cron-secret: $CRON_SECRET" -H "Content-Type: application/json" \
+            -d '{}' --max-time 300)
+          BODY=$(echo "$RESP" | head -n -1); CODE=$(echo "$RESP" | tail -n 1)
+          echo "news-digest -> HTTP $CODE"; echo "$BODY"
+          [ "$CODE" = "200" ] || { echo "::error title=news-digest failed::$BODY"; exit 1; }

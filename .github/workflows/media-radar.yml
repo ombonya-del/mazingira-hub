@@ -43,3 +43,14 @@ jobs:
           DEAD=$(echo "$BODY" | grep -o '"[^"]*":"\(4[0-9][0-9]\|5[0-9][0-9]\|err[^"]*\)/0"' | tr '\n' ' ')
           [ -n "$DEAD" ] && echo "::warning title=scan-sentiment: dead feeds::$DEAD"
           true
+      - name: Kiswahili / Sheng gists for the new headlines
+        env:
+          CRON_SECRET: ${{ secrets.MAZINGIRA_CRON_SECRET }}
+        run: |
+          RESP=$(curl -sS -X POST "$SUPABASE_URL/functions/v1/translate-raia" \
+            -H "Authorization: Bearer $ANON_KEY" -H "apikey: $ANON_KEY" \
+            -H "x-cron-secret: $CRON_SECRET" -H "Content-Type: application/json" \
+            -d '{"only":"news","max_news":60}' --max-time 300)
+          echo "$RESP"
+          echo "$RESP" | grep -q '"error"' && echo "::warning title=translate-raia (news) failed::$RESP"
+          true
