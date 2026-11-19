@@ -3355,6 +3355,7 @@ var MEMBERS = [
  {n:"Busia CSO Network",c:"Coalition",loc:"Busia · Western",d:"Umbrella network monitoring environmental funding and resource governance; raised red flags over transparency gaps in World Bank-funded FLLoCA climate initiatives."},
  {n:"Tira Small Scale Mining Association",c:"Community",loc:"Busia · Samia/Teso South",d:"Artisanal cooperative helping miners register formally and move from toxic mercury and cyanide toward safer borax processing."},
  {n:"Dhamira Moja",c:"Community",loc:"Busia · Western",d:"CSO working via MOU with the county government; trains youth in climate mitigation and holds duty-bearers accountable for budgets and resource management."},
+ {n:"KOGWG — Kenya Oil &amp; Gas Working Group",c:"Coalition",loc:"Nairobi · national (convened by CANCO)",d:"National public-interest advocacy network for good governance, transparency and community rights in Kenya's oil, gas and mining sectors, convened by CANCO (Community Action for Nature Conservation), which has worked on extractives governance since 2009 — before the 2012 Turkana oil finds. It educates communities on oil-company impacts and land rights, pushes for environmental safeguards and accountability, and through a Business &amp; Human Rights programme (with Oxfam Kenya, the Danish Institute for Human Rights and the Global Greengrants Fund) helped shape Kenya's National Action Plan on Business and Human Rights.",profile:true,serves:"Communities in Kenya's oil, gas and mining frontiers — the Turkana oil basin, the Lamu and Anza basins, Mui Basin coal (Kitui), Taita Taveta iron ore and Kwale mineral sands"},
  {n:"JustAct Kenya",c:"Legal",loc:"Nairobi · national",d:"Helps Kenyans take civic and legal action to defend the environment. Its founders saw in 2016, when the SGR was routed through Nairobi and Tsavo National Parks despite the evidence, that technical studies alone don't stop politically driven destruction. JustAct gives grassroots groups the know-how, tools, money and networks to act themselves: analysing legal documents, preparing for public consultations, lobbying lawmakers, litigating, building coalitions and running campaigns. Current work includes the Nairobi National Park case with FoNNaP and the Green Belt Movement (interim order halting construction, 27 Oct 2026), the Oloolua Forest land-grab cases, and a legal challenge to Forest Act amendments that would allow roads and railways through protected forests.",profile:true,mission:"<b>Vision:</b> proactive citizens and strong institutions working towards a healthy environment in Kenya. <b>Mission:</b> to promote citizen-led stewardship and action for a healthy environment.",how:"Three mutually reinforcing pillars: <b>environmental civic education</b> (tools, guides and trainings so Kenyans know their rights and responsibilities), <b>legal action</b> (strategic and public-interest litigation for redress and enforcement) and <b>advocacy</b> (targeted public campaigns, and backing partners' campaigns so legal strategies are combined with people power).",serves:"Grassroots groups and local organisations defending forests, parks, coasts and green spaces, and Kenyans who want to back them. Partners include FoNNaP, the Green Belt Movement, Friends of Oloolua Forest, Ulinzi Africa Foundation, Blue Economy Network of Kenya and community groups in Kipini, Ozi and Chari"},
  {n:"EarthLungs Reforestation Foundation",c:"Research",loc:"Nairobi · Kenya, Tanzania, Mozambique",d:"Community-led restoration of degraded public forests (with the Kenya Forest Service and Community Forest Associations) and coastal mangroves, paying local workers fair wages; founded 2021. Mangrove sites include Tudor Creek (Mombasa) and Takaungu (Kilifi).",profile:true,serves:"Forest-adjacent and coastal communities — prioritising widows, single mothers and youth; former charcoal burners and illegal loggers hired as planters"},
  {n:"FoNNaP — Friends of Nairobi National Park",c:"Community",loc:"Nairobi · Kajiado (Athi-Kapiti)",d:"Membership society founded in 1995 to support KWS in conserving Nairobi National Park and its wider ecosystem — keeping the wet-season migration routes and dispersal areas south of the park open, public education, clean-ups and game counts, and advocacy against developments in the park. Co-petitioner (with JustAct Kenya and the Green Belt Movement) in the case that won an interim order on 27 Oct 2026 halting a car park, access road and orphanage relocation inside the park.",profile:true,serves:"Park users and the public, plus livestock-keeping communities on the park's southern boundary and migration routes — Kitengela, Isinya and Kipeto"}
@@ -4840,6 +4841,7 @@ var ORG_WEB = {
   "NAMATI":"https://namati.org",
   "GROOTS Kenya":"https://grootskenya.org",
   "Defenders Coalition":"https://defenderscoalition.org",
+  "KOGWG — Kenya Oil &amp; Gas Working Group":"https://cancokenya.net/our-programs/oil-gas-mining/",
   "Rona Foundation":"https://ronafoundation.co.ke",
   "SCODA — Solidarity and Capacity for Opportunity, Defenders in Action":"https://scodarights.org",
   "HIVOS":"https://hivos.org",
@@ -6536,6 +6538,7 @@ var ORGS = [
   { n:"Busia CSO Network",                   sec:["m","w","l"],     reg:["Western"] },
   { n:"Tira Small Scale Mining Association", sec:["m","w"],         reg:["Western"] },
   { n:"Dhamira Moja",                        sec:["l","e"],         reg:["Western"] },
+  { n:"KOGWG — Kenya Oil &amp; Gas Working Group", sec:["o","c","m","l"], reg:"national" },
   { n:"JustAct Kenya",                       sec:["l","w"],         reg:"national" },
   { n:"EarthLungs Reforestation Foundation", sec:["l"],          reg:["Coast"] },
   { n:"FoNNaP — Friends of Nairobi National Park", sec:["l","w","p"], reg:["Nairobi","Rift Valley"] }
@@ -6733,7 +6736,8 @@ var ORG_LOC = {
   "ILEG — Institute for Law &amp; Environmental Governance": ["Nairobi","Legal",true],
   "CIAGK — Community Initiative Action Group Kenya": ["Siaya","Community",false],
   "Siaya Muungano Network (SIMUN)": ["Siaya","Community",false],
-  "Rona Foundation": ["Siaya","Community",false]
+  "Rona Foundation": ["Siaya","Community",false],
+  "KOGWG — Kenya Oil &amp; Gas Working Group": ["Nairobi","Coalition",true]
 };
 /* sectors for orgs not in the coverage list (funders + KeNRA already there) */
 var ORG_SEC = {}; ORGS.forEach(function(o){ ORG_SEC[o.n] = o.sec; });
@@ -7100,6 +7104,12 @@ var PROGRAMS = {
     ["Siaya","w","Climate-smart farming & kitchen gardens for women's groups","program"]],
   "Rona Foundation":[
     ["Siaya","l","Widows in climate action; community forest associations","program"]],
+  "KOGWG — Kenya Oil &amp; Gas Working Group":[
+    ["Turkana","o","Oil governance, community land rights & benefit-sharing — Lokichar basin","campaign"],
+    ["Lamu","o","Lamu basin exploration — transparency & safeguards","campaign"],
+    ["Kitui","c","Mui Basin coal — extractives governance","campaign"],
+    ["Taita Taveta","m","Iron-ore mining — community rights & accountability","campaign"],
+    ["Kwale","m","Mineral sands & rare earths — community protections","campaign"]],
   "Save Lamu":[], "LAWA — Lamu Women Alliance":[], "MKNF — Mount Kenya Network Forum":[],
   "KeNRA — Kenya National Rivers Association":[]
 };

@@ -208,4 +208,10 @@ update partners set region = 'National · Kilifi, Siaya', focus = 'energy, nucle
 update partners set focus = 'mining, minerals, land, energy, nuclear, community, accountability', region = 'Nyanza, Siaya · Vihiga' where lower(name) like '%ciagk%';
 update partners set website = coalesce(website, 'https://ronafoundation.co.ke'), focus = 'land, forest, water, community, women, widows, climate' where lower(name) like '%rona foundation%';
 
+-- Kenya Oil & Gas Working Group (convened by CANCO): fix the bare 'Kenya Oil & Gas' row, keep its email
+update partners set name = 'KOGWG — Kenya Oil & Gas Working Group', category = 'Coalition', region = 'National', focus = 'oil, gas, coal, mining, minerals, land, legal, advocacy, accountability, community', website = coalesce(website, 'https://cancokenya.net/our-programs/oil-gas-mining/'), x_handle = coalesce(x_handle, 'canco_kenya') where name = 'Kenya Oil & Gas';
+insert into partners (name, category, focus, region, x_handle, youtube, website, active)
+  select 'KOGWG — Kenya Oil & Gas Working Group', 'Coalition', 'oil, gas, coal, mining, minerals, land, legal, advocacy, accountability, community', 'National', 'canco_kenya', null, 'https://cancokenya.net/our-programs/oil-gas-mining/', true
+  where not exists (select 1 from partners where lower(name) like '%kogwg%' or lower(name) like 'kenya oil & gas%');
+
 select name, category, region, x_handle, youtube, email from partners order by name;
