@@ -1564,7 +1564,13 @@ function cleanEmail(v){
     var em=cleanEmail(document.getElementById("gateEmail").value);
     if(!em){ err("Enter your email first, then request the link."); return; }
     ok("Sending your sign-in link…");
-    HAUTH.auth.signInWithOtp({ email:em, options:{ shouldCreateUser:false, emailRedirectTo:location.origin+location.pathname } }).then(function(r){
+    /* opened from a call link? remember it so the emailed sign-in lands back on the call */
+    var callRoom=(new URLSearchParams(location.search).get("room")||"").toLowerCase();
+    if(!/^[a-z0-9-]{6,80}$/.test(callRoom)) callRoom="";
+    var toCall = callRoom || location.hash==="#virtual";
+    try{ if(toCall) localStorage.setItem("mzPendingCall", JSON.stringify({ room:callRoom, t:Date.now() })); else localStorage.removeItem("mzPendingCall"); }catch(_){}
+    var back=location.origin+location.pathname+(callRoom?"?room="+encodeURIComponent(callRoom):"");
+    HAUTH.auth.signInWithOtp({ email:em, options:{ shouldCreateUser:false, emailRedirectTo:back } }).then(function(r){
       if(r.error){ var m=r.error.message||""; err(/not|exist|allow|signup|found/i.test(m)?"That email isn't on the members list — ask the coordinator to add you.":m); return; }
       ok("Check your email for the sign-in link.");
     });
@@ -4973,14 +4979,32 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
   }
   var b;
   /* opened from a private-room link? point the main button at that room */
-  var linkRoom=(new URLSearchParams(location.search).get("room")||"").toLowerCase();
-  if(!/^[a-z0-9-]{6,80}$/.test(linkRoom)) linkRoom="";
-  if(linkRoom && linkRoom!==COALITION_ROOM){
-    var tt=document.getElementById("vsCtaTitle"), tx=document.getElementById("vsCtaText");
-    if(tt) tt.textContent="Private call room"; if(tx) tx.textContent="You opened a link to a private call room. A host will let you in from the Lobby. Minutes are emailed to everyone who joins.";
-    setTimeout(function(){ section.scrollIntoView({behavior:"smooth", block:"start"}); }, 400);
+  var mainRoom=COALITION_ROOM;
+  function okRoom(r){ r=String(r||"").toLowerCase(); return /^[a-z0-9-]{6,80}$/.test(r) ? r : ""; }
+  /* point the main Join button at the room from a shared link, and bring Virtual space into view */
+  function applyCallLink(r){
+    r=okRoom(r);
+    if(r && r!==COALITION_ROOM){
+      mainRoom=r;
+      var tt=document.getElementById("vsCtaTitle"), tx=document.getElementById("vsCtaText");
+      if(tt) tt.textContent="You've been invited to a call";
+      if(tx) tx.textContent="Click Join to enter. If it's a booked call, a host will let you in from the Lobby. Minutes are emailed to everyone who joins.";
+      try{ if(location.search.indexOf("room=")<0) history.replaceState(null,"","?room="+encodeURIComponent(r)+"#virtual"); }catch(_){}
+    }
+    if(location.hash!=="#virtual"){ location.hash="virtual"; }
+    else if(typeof showView==="function"){ exploreSub="exchange"; showView("explore"); mzScrollToSection("virtual"); }
   }
-  var mainRoom=linkRoom||COALITION_ROOM;
+  var urlRoom=okRoom(new URLSearchParams(location.search).get("room"));
+  if(urlRoom) setTimeout(function(){ applyCallLink(urlRoom); }, 0);
+  /* came back from an emailed sign-in link: restore the call they were opening (valid 2 hours) */
+  function restorePending(){
+    var p=null; try{ p=JSON.parse(localStorage.getItem("mzPendingCall")||"null"); localStorage.removeItem("mzPendingCall"); }catch(_){}
+    if(p && Date.now()-(p.t||0) < 2*3600*1000) applyCallLink(p.room||urlRoom);
+  }
+  if(SB && SB.auth){
+    SB.auth.getSession().then(function(r){ if(r && r.data && r.data.session) restorePending(); }, function(){});
+    if(SB.auth.onAuthStateChange) SB.auth.onAuthStateChange(function(_e,sess){ if(sess) restorePending(); });
+  }
   if((b=document.getElementById("vsStart"))) b.addEventListener("click", function(){ startRoom(mainRoom); });
   if((b=document.getElementById("vsCopy"))) b.addEventListener("click", function(){ copy(roomUrl(mainRoom)); });
   if((b=document.getElementById("vsBarCopy"))) b.addEventListener("click", function(){ copy(roomUrl(curRoom)); });
@@ -6765,12 +6789,12 @@ var VIEWS = ["live","explore","cop","voices","baraza","act"];
 var HASH2VIEW = { live:"live", explore:"explore",
   map:"explore", directory:"explore", sectors:"explore", network:"explore",
   legal:"explore", disinfo:"explore", sentiment:"explore", narrative:"explore",
-  exchange:"explore", desk:"explore", events:"explore", accountability:"explore",
+  exchange:"explore", desk:"explore", events:"explore", accountability:"explore", virtual:"explore",
   cop:"cop", voices:"voices", baraza:"baraza", forum:"baraza", wall:"baraza",
   ajesasa:"act", contribute:"act" };
 var HASH2SUB = { map:"map", directory:"directory", sectors:"directory", network:"directory",
   legal:"legal", disinfo:"sentiment", sentiment:"sentiment", narrative:"sentiment",
-  exchange:"exchange", desk:"exchange", events:"exchange", accountability:"accountability" };
+  exchange:"exchange", desk:"exchange", events:"exchange", accountability:"accountability", virtual:"exchange" };
 var EXPLORE_SUBS = ["map","directory","legal","sentiment","exchange","accountability"];
 var exploreSub = "map";
 var tabLinks = document.querySelectorAll("nav.tabs a");
@@ -6822,11 +6846,17 @@ document.addEventListener("click", function(e){
   e.preventDefault();
   if(hash in HASH2SUB) exploreSub = HASH2SUB[hash];
   showView(HASH2VIEW[hash], hash);
+  mzScrollToSection(hash);
   if(hash === "contribute" || hash === "ajesasa"){
     var el = document.getElementById(hash);
     if(el) setTimeout(function(){ el.scrollIntoView({ behavior: reduce?"auto":"smooth", block:"start" }); }, 40);
   }
 });
+function mzScrollToSection(h){
+  if(h !== "virtual") return;
+  var el = document.getElementById("virtual");
+  if(el) setTimeout(function(){ try{ el.scrollIntoView({ behavior: reduce?"auto":"smooth", block:"start" }); }catch(_){} }, 120);
+}
 function mzNarrativeMaybe(h){
   if(h === "narrative" && window.MZ_showSent){
     window.MZ_showSent("narrative");
@@ -6838,7 +6868,7 @@ window.addEventListener("hashchange", function(){
   var h = location.hash.slice(1);
   if(h in HASH2SUB) exploreSub = HASH2SUB[h];
   if(h in HASH2VIEW) showView(HASH2VIEW[h]);
-  mzNarrativeMaybe(h);
+  mzNarrativeMaybe(h); mzScrollToSection(h);
 });
 
 /* initial view from the URL, else Live */
@@ -6846,7 +6876,7 @@ window.addEventListener("hashchange", function(){
   var h = location.hash.slice(1);
   if(h in HASH2SUB) exploreSub = HASH2SUB[h];
   showView(h in HASH2VIEW ? HASH2VIEW[h] : "live");
-  mzNarrativeMaybe(h);
+  mzNarrativeMaybe(h); mzScrollToSection(h);
 })();
 
 /* =================================================================
