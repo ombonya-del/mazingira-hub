@@ -1677,7 +1677,7 @@ function petsLoad(cb){
 }
 function petById(id){ var rs=PETS.rows||[]; for(var i=0;i<rs.length;i++) if(String(rs[i].id)===String(id)) return rs[i]; return null; }
 function petUrl(p){ return location.origin+location.pathname+"#petition="+encodeURIComponent(p.id); }
-function petSlug(p){ return String(p.title||"petition").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60)||"petition"; }
+function petSlug(p){ return String(p.title||"petition").toLowerCase().replace(/[^a-z0-9]+/g,"-").slice(0,60).replace(/^-+|-+$/g,"")||"petition"; }
 function petSigned(id){ try{ return localStorage.getItem("raia.signed."+id)==="1"; }catch(e){ return false; } }
 function petIsExt(p){ return !!p.action_url; }
 function petShareText(p){
@@ -1724,7 +1724,7 @@ function petShareRow(p, compact){
   '</div>';
 }
 function petCardHtml(p){
-  var full='<a href="#petition='+encodeURIComponent(p.id)+'" style="font-weight:800;color:var(--green-ink)">'+esc(L({en:"Read the full petition →",sw:"Soma ombi lote →",sh:"Soma petition yote →"}))+'</a>';
+  var full='<a href="#petition='+encodeURIComponent(p.id)+'" style="font-weight:800;color:var(--green-ink)">'+esc(p.brief?L({en:"Read the summary & full petition →",sw:"Soma muhtasari na ombi lote →",sh:"Soma summary na petition yote →"}):L({en:"Read the full petition →",sw:"Soma ombi lote →",sh:"Soma petition yote →"}))+'</a>';
   var doc=p.doc_url?'<a href="'+esc(p.doc_url)+'" target="_blank" rel="noopener noreferrer" style="font-weight:700">'+esc(L({en:"Original document ↗",sw:"Hati asili ↗",sh:"Document asili ↗"}))+'</a>':'';
   return '<div class="card" data-pid="'+esc(p.id)+'" style="padding:16px">'+petKicker(p)+
     '<h3 style="margin:0 0 8px;font-size:1.08rem;line-height:1.3"><a href="#petition='+encodeURIComponent(p.id)+'" style="color:inherit;text-decoration:none">'+esc(dec(p.title))+'</a></h3>'+
@@ -1828,6 +1828,13 @@ function petParas(t){
   t=dec(String(t||"")).replace(/\r/g,"").trim(); if(!t) return [];
   var parts=t.split(/\n\s*\n/);
   if(parts.length===1 && t.length>900) parts=t.split(/\n/);
+  /* a short all-caps line at the top of a block is its heading */
+  var split=[]; parts.forEach(function(par){
+    var ls=par.trim().split("\n");
+    while(ls.length>1){ var f=ls[0].trim().replace(/\*\*/g,""); if(f.length<110 && /[A-Z]/.test(f) && f===f.toUpperCase()){ split.push(f); ls.shift(); } else break; }
+    split.push(ls.join("\n"));
+  });
+  parts=split;
   return parts.map(function(par){
     par=par.trim(); if(!par) return null;
     var md=par.match(/^#{1,4}\s+([\s\S]*)$/);
@@ -1843,10 +1850,30 @@ function petBodyHtml(t){
     return '<p style="margin:0 0 12px;line-height:1.6">'+h+'</p>';
   }).join("");
 }
+function petTab(on){ return "flex:1;border:1.5px solid var(--green);border-radius:10px;padding:9px 10px;font-weight:800;font-size:.84rem;cursor:pointer;"+(on?"background:var(--green);color:#fff":"background:transparent;color:var(--green-ink)"); }
+function bindPetTabs(host){
+  host.querySelectorAll("[data-ptab]").forEach(function(b){ b.addEventListener("click",function(){
+    var w=b.getAttribute("data-ptab");
+    host.querySelectorAll("[data-ppanel]").forEach(function(pn){ pn.hidden=pn.getAttribute("data-ppanel")!==w; });
+    host.querySelectorAll(".pettabs [data-ptab]").forEach(function(t){ var on=t.getAttribute("data-ptab")===w; t.setAttribute("aria-selected",on); t.setAttribute("style",petTab(on)); });
+    if(!b.closest(".pettabs")){ var tb=host.querySelector(".pettabs"); if(tb) tb.scrollIntoView({behavior:"smooth",block:"start"}); }
+  }); });
+}
+/* ready-made PDFs (brief_pdf_url / full_pdf_url) are fetched ahead so "Share the document"
+   can hand the file to WhatsApp straight from the tap */
+PETS.files={};
+function petPrefetch(url){
+  if(!url||PETS.files[url]) return;
+  PETS.files[url]="loading";
+  fetch(url).then(function(r){ if(!r.ok) throw 0; return r.blob(); }).then(function(b){ PETS.files[url]=b; }, function(){ delete PETS.files[url]; });
+}
+function petFileBlob(url){ var b=PETS.files[url]; return (b && b!=="loading")?b:null; }
 function petDetailHtml(p){
   var hasBody=!!(p.body&&String(p.body).trim());
+  var hasBrief=!!(p.brief&&String(p.brief).trim());
   var tools='<div style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 4px">'+
-    '<button type="button" class="petpdf" style="'+petGhost()+'">⤓ PDF</button>'+
+    (hasBrief?'<button type="button" class="petpdf" data-which="short" style="'+petGhost()+'">⤓ '+esc(L({en:"Summary PDF (2 pages)",sw:"PDF ya muhtasari (kurasa 2)",sh:"Summary PDF (pages 2)"}))+'</button>':'')+
+    '<button type="button" class="petpdf" data-which="full" style="'+petGhost()+'">⤓ '+esc(hasBrief?L({en:"Full petition PDF",sw:"PDF ya ombi lote",sh:"Full petition PDF"}):"PDF")+'</button>'+
     '<button type="button" class="petword" style="'+petGhost()+'">⤓ Word</button>'+
     '<button type="button" class="petsharedoc" style="'+petGhost()+'">'+esc(L({en:"Share the document",sw:"Shiriki hati",sh:"Share document"}))+'</button>'+
     (p.doc_url?'<a href="'+esc(p.doc_url)+'" target="_blank" rel="noopener noreferrer" style="'+petGhost()+'">'+esc(L({en:"Original document ↗",sw:"Hati asili ↗",sh:"Document asili ↗"}))+'</a>':'')+
@@ -1862,8 +1889,14 @@ function petDetailHtml(p){
       petShareRow(p)+tools+
     '</article>'+
     '<div class="card" style="padding:18px;margin-top:14px">'+
-      '<div style="font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a6a06;margin-bottom:10px">'+esc(hasBody?L({en:"The full text",sw:"Maandishi kamili",sh:"Text yote"}):L({en:"About this petition",sw:"Kuhusu ombi hili",sh:"Kuhusu hii petition"}))+'</div>'+
-      (hasBody?petBodyHtml(p.body):'<p style="margin:0;line-height:1.6">'+esc(dec(p.summary))+'</p>')+
+      (hasBrief&&hasBody?'<div class="pettabs" role="tablist" style="display:flex;gap:6px;margin-bottom:14px">'+
+        '<button type="button" role="tab" data-ptab="short" aria-selected="true" style="'+petTab(true)+'">'+esc(L({en:"In brief · 2-minute read",sw:"Kwa ufupi · dakika 2",sh:"Kwa ufupi · dakika 2"}))+'</button>'+
+        '<button type="button" role="tab" data-ptab="full" aria-selected="false" style="'+petTab(false)+'">'+esc(L({en:"Full petition",sw:"Ombi lote",sh:"Petition yote"}))+'</button></div>':
+        '<div style="font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a6a06;margin-bottom:10px">'+esc(hasBody?L({en:"The full text",sw:"Maandishi kamili",sh:"Text yote"}):L({en:"About this petition",sw:"Kuhusu ombi hili",sh:"Kuhusu hii petition"}))+'</div>')+
+      (hasBrief&&hasBody?
+        '<div data-ppanel="short">'+petBodyHtml(p.brief)+'<p style="margin:14px 0 0"><button type="button" data-ptab="full" style="'+petGhost()+'">'+esc(L({en:"Read the full petition →",sw:"Soma ombi lote →",sh:"Soma petition yote →"}))+'</button></p></div>'+
+        '<div data-ppanel="full" hidden>'+petBodyHtml(p.body)+'</div>':
+        (hasBody?petBodyHtml(p.body):'<p style="margin:0;line-height:1.6">'+esc(dec(p.summary))+'</p>'))+
       (petIsExt(p)?'<p class="muted" style="margin:12px 0 0;font-size:.8rem">'+esc(L({en:"Posted by a partner organisation. Their page has the official version.",sw:"Imewekwa na shirika mshirika. Ukurasa wao una toleo rasmi.",sh:"Imepostiwa na partner. Page yao iko na version rasmi."}))+'</p>':'')+
     '</div>'+
     (others.length?'<div style="margin-top:22px"><div class="shead"><h2>'+esc(L({en:"More petitions you can support",sw:"Maombi mengine unayoweza kuunga mkono",sh:"Petitions zingine unaweza support"}))+'</h2><span class="rule"></span></div>'+
@@ -1881,7 +1914,7 @@ function fetchPetition(){
   petsLoad(function(){
     if(!document.getElementById("petdetail")) return;
     var p=petById(id);
-    function show(p){ host.innerHTML=petDetailHtml(p); var card=host.querySelector(".card[data-pid]"); bindSign(card,p); bindPetShare(host); bindPetDocs(host,p); try{ document.title=dec(p.title)+" · MazingiraKenya Raia"; }catch(e){} }
+    function show(p){ host.innerHTML=petDetailHtml(p); var card=host.querySelector(".card[data-pid]"); bindSign(card,p); bindPetShare(host); bindPetTabs(host); bindPetDocs(host,p); petPrefetch(p.brief_pdf_url); petPrefetch(p.full_pdf_url); try{ document.title=dec(p.title)+" · MazingiraKenya Raia"; }catch(e){} }
     if(p) return show(p);
     if(!RSB||!id){ host.innerHTML=missing; return; }
     RSB.from("petitions").select("*").eq("id",id).eq("published",true).maybeSingle().then(function(r){
@@ -1908,7 +1941,8 @@ function pdfSafe(s){
     .replace(/[\u2013\u2014\u2212]/g,"-").replace(/\u2026/g,"...").replace(/[\u2022\u25CF\u25AA]/g,"-").replace(/\u00A0/g," ")
     .replace(/[^\x09\x0A\x0D\x20-\x7E\u00A1-\u00FF]/g,"");
 }
-function petPdfBlob(p){
+function petPdfBlob(p,which){
+  var brief=which==="short"&&p.brief;
   var doc=new window.jspdf.jsPDF({unit:"pt",format:"a4"});
   var W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), m=56, lw=W-2*m, y=m;
   function ensure(h){ if(y+h>H-m-20){ doc.addPage(); y=m; } }
@@ -1917,14 +1951,14 @@ function petPdfBlob(p){
     var lines=doc.splitTextToSize(pdfSafe(text),lw), lh=size*1.4;
     lines.forEach(function(l){ ensure(lh); doc.text(l,m,y+size); y+=lh; }); y+=(gap||0);
   }
-  block("MAZINGIRAKENYA RAIA  -  PETITIONS & MEMORANDA",8,"bold",10,[154,106,6]);
+  block(brief?"MAZINGIRAKENYA RAIA  -  PETITION IN BRIEF":"MAZINGIRAKENYA RAIA  -  PETITIONS & MEMORANDA",8,"bold",10,[154,106,6]);
   block(p.title,18,"bold",8);
   block("To: "+(p.target||""),10.5,"normal",2,[88,85,73]);
   if(p.deadline) block("Deadline: "+p.deadline,10.5,"normal",2,[88,85,73]);
   if(p.source_name) block("Posted by: "+p.source_name,10.5,"normal",2,[88,85,73]);
   y+=8; block(p.summary,11.5,"bold",10);
   doc.setDrawColor(220,154,24); doc.setLineWidth(1.2); ensure(10); doc.line(m,y,W-m,y); y+=16;
-  var paras=petParas(p.body); if(!paras.length) paras=[{head:false,text:p.summary}];
+  var paras=petParas(brief?p.brief:p.body); if(!paras.length) paras=[{head:false,text:p.summary}];
   paras.forEach(function(x){ var t=x.text.replace(/\*\*/g,""); if(x.head){ y+=4; block(t,11.5,"bold",4); } else block(t,10.5,"normal",8); });
   y+=10;
   block(petIsExt(p)?"Take action: "+p.action_url:"Read and add your name: "+petUrl(p),10,"bold",2,[27,122,62]);
@@ -1949,24 +1983,35 @@ function petDownload(blob,name){
   document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(u); a.remove(); },4000);
 }
 function bindPetDocs(host,p){
-  var pdf=host.querySelector(".petpdf"), word=host.querySelector(".petword"), sh=host.querySelector(".petsharedoc");
+  var word=host.querySelector(".petword"), sh=host.querySelector(".petsharedoc");
   var base="Petition-"+petSlug(p);
-  function busy(b,on,txt){ b.disabled=on; if(txt) b.textContent=txt; }
-  if(pdf) pdf.addEventListener("click",function(){
-    var t=pdf.textContent; busy(pdf,true,L({en:"Preparing…",sw:"Inaandaa…",sh:"Inaprepare…"}));
-    petLoadPdfLib().then(function(){ petDownload(petPdfBlob(p),base+".pdf"); busy(pdf,false,t); },
-      function(){ busy(pdf,false,L({en:"PDF unavailable — try Word",sw:"PDF haipatikani — jaribu Word",sh:"PDF haipatikani — try Word"})); });
-  });
+  function name(which){ return base+(which==="short"?"-summary":"")+".pdf"; }
+  function urlFor(which){ return which==="short"?p.brief_pdf_url:p.full_pdf_url; }
+  /* a ready-made file when there is one, otherwise build it here */
+  function getPdf(which){
+    var u=urlFor(which), b=u&&petFileBlob(u);
+    if(b) return Promise.resolve(b);
+    if(u) return fetch(u).then(function(r){ if(!r.ok) throw 0; return r.blob(); }).catch(function(){ return petLoadPdfLib().then(function(){ return petPdfBlob(p,which); }); });
+    return petLoadPdfLib().then(function(){ return petPdfBlob(p,which); });
+  }
+  host.querySelectorAll(".petpdf").forEach(function(btn){ btn.addEventListener("click",function(){
+    var which=btn.getAttribute("data-which"), t=btn.textContent;
+    btn.disabled=true; btn.textContent=L({en:"Preparing…",sw:"Inaandaa…",sh:"Inaprepare…"});
+    getPdf(which).then(function(b){ petDownload(b,name(which)); btn.disabled=false; btn.textContent=t; },
+      function(){ btn.disabled=false; btn.textContent=L({en:"PDF unavailable — try Word",sw:"PDF haipatikani — jaribu Word",sh:"PDF haipatikani — try Word"}); });
+  }); });
   if(word) word.addEventListener("click",function(){ petDownload(petWordBlob(p),base+".doc"); });
   if(sh) sh.addEventListener("click",function(){
-    /* share the PDF file itself where the phone allows it (WhatsApp, Telegram, email…);
-       otherwise download it so it can be attached by hand */
-    if(window.jspdf && navigator.canShare && typeof File==="function"){
-      var f=new File([petPdfBlob(p)],base+".pdf",{type:"application/pdf"});
+    /* share the file itself where the phone allows it (WhatsApp, Telegram, email…) — the short
+       version when there is one; otherwise share the link, or download so it can be attached */
+    var which=p.brief?"short":"full", u=urlFor(which), blob=u&&petFileBlob(u);
+    if(!blob && window.jspdf) blob=petPdfBlob(p,which);
+    if(blob && navigator.canShare && typeof File==="function"){
+      var f=new File([blob],name(which),{type:"application/pdf"});
       if(navigator.canShare({files:[f]})){ navigator.share({files:[f],title:dec(p.title),text:petShareText(p)+" "+petUrl(p)}).catch(function(){}); return; }
     }
     if(navigator.share){ navigator.share({title:dec(p.title),text:petShareText(p),url:petUrl(p)}).catch(function(){}); return; }
-    petLoadPdfLib().then(function(){ petDownload(petPdfBlob(p),base+".pdf"); sh.textContent=L({en:"Downloaded — attach it to share",sw:"Imepakuliwa — iambatanishe kushiriki",sh:"Imedownload — iattach ushare"}); }, function(){});
+    getPdf(which).then(function(b){ petDownload(b,name(which)); sh.textContent=L({en:"Downloaded — attach it to share",sw:"Imepakuliwa — iambatanishe kushiriki",sh:"Imedownload — iattach ushare"}); }, function(){});
   });
 }
 
