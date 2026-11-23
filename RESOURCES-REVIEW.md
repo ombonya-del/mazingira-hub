@@ -1,3 +1,53 @@
+# Resources Watch — Review Log — 2026-11-23 (weekly firing)
+
+The weekly Resources Watch ran on 2026-11-23 and queued **6 genuinely new** climate / environmental-justice knowledge resources, deduped against all **66** distinct drafts logged in prior runs (through 2026-11-16). All 6 were queued as drafts (`published=false`, `source=watch`, `category=Resources`) into Supabase (project `uueemckdoozsuowcqkhl`) via a connected Chrome (same-origin POST to `/rest/v1/resources`, public anon key only) and each returned **HTTP 201**. The Mac device shell still cannot reach Supabase (host not on the device egress allowlist; `curl` -> HTTP 000). Replay commands: `scripts/queue-resources-2026-11-23.sh`. Each URL was fetched and confirmed to load with real, substantive content before queueing. Theme this week: post-COP30 (Belem) outcome synthesis for Africa, plus Kenya/East-Africa gender-health-disability climate-justice resources.
+
+## Verified new resources (6) — 2026-11-23
+
+### 1. Africa on the Road to COP30: From Addis Ababa to Belem
+- **Source:** Mo Ibrahim Foundation
+- **Type:** Research brief (Nov 2025)
+- **URL:** https://mo.ibrahim.foundation/sites/default/files/2025-11/africa-on-the-road-to-cop30.pdf
+- **Why:** Pan-African research brief tracing Africa's climate-negotiation priorities from the Addis Ababa / second Africa Climate Summit to Belem - facts, figures and the continent's positions going into COP30. Authoritative continent-wide framing resource.
+- **Verified:** fetched directly - HTTP 200, application/pdf (~45k chars), cover "Africa on the road to COP30: from Addis Ababa to Belem", label "RESEARCH BRIEF", November 2025.
+
+### 2. Policy Brief: Strengthening Gender-Responsive Health Integration within Kenya's Climate Commitments
+- **Source:** SHE Changes Climate
+- **Type:** Policy brief (2026; developed ahead of COP31)
+- **URL:** https://www.shechangesclimate.org/reports/policy-brief-strengthening-genderresponsive-health-integration-within-kenyas-climate-commitments
+- **Why:** Kenya-specific brief at the gender-health-climate intersection - how to embed gender-responsive health into Kenya's NDC/climate commitments. Direct environmental-justice / equity resource for Kenya.
+- **Verified:** page loads - HTTP 200, title confirmed, publisher SHE Changes Climate, references a March 2026 roundtable and COP31 framing.
+
+### 3. COP30 Executive Report
+- **Source:** COP30 Presidency (Brazil) & UNFCCC
+- **Type:** Executive report (March 2026)
+- **URL:** https://unfccc.int/sites/default/files/resource/COP_30_executive_report.pdf
+- **Why:** The headline official account of COP30 (Belem) outcomes, including the USD 1.3 trillion climate-finance roadmap, adaptation and the Global Mutirao. Standing global reference for what COP30 delivered.
+- **Verified:** fetched directly - HTTP 200, application/pdf (~106k chars), cover "COP30 Executive Report", footer cop30.br | unfccc.int, March 2026.
+
+### 4. Guidelines for Gender Mainstreaming into Climate Action
+- **Source:** Government of Kenya - Ministry of Environment, Climate Change & Forestry, with the State Department for Gender
+- **Type:** Guideline (2026)
+- **URL:** https://www.gender.go.ke/sites/default/files/publications/GUIDELINES%20FOR%20GENDER%20MAINSTREAMING%20INTO%20CLIMATE%20ACTION.pdf
+- **Why:** Official Kenyan government guideline for mainstreaming gender across climate action - a practical toolkit/guideline resource for county and sector practitioners. Core Kenya climate-justice reference.
+- **Verified:** fetched directly - HTTP 200 (~95k chars), cover "GUIDELINES FOR GENDER MAINSTREAMING INTO CLIMATE ACTION", Govt of Kenya authorship, 2026 copyright/citation.
+
+### 5. Inclusive Planetary Health: Centring Women with Disabilities in the Climate-Health Nexus
+- **Source:** Humanity & Inclusion (HI) - Global Inclusive Health and Protection division
+- **Type:** Study brief (March 2026; Kenya & Uganda study)
+- **URL:** https://www.hi.org/sn_uploads/document/HI_Climate_health_Women_with_disabilities_Kenya_Uganda_study_Brief.pdf
+- **Why:** East-Africa (Kenya & Uganda) study brief on how climate-health impacts fall on women with disabilities - a disability-inclusion, intersectional climate-justice resource rarely covered elsewhere in the hub.
+- **Verified:** fetched directly - HTTP 200, application/pdf (~12k chars), title "Inclusive Planetary Health: Centring Women with Disabilities in the Climate-Health Nexus", self-labelled "Study brief" RS n26, March 2026.
+
+### 6. Global Climate Action Agenda at COP30 — Outcomes Report
+- **Source:** UNFCCC High-Level Climate Champions (COP29 & COP30 Presidencies)
+- **Type:** Outcomes report (19 December 2025, final updated version)
+- **URL:** https://unfccc.int/sites/default/files/resource/COP30%20Action%20Agenda_Outcomes%20Report_December_2025.pdf
+- **Why:** The non-party-stakeholder (Marrakech Partnership) outcomes of COP30 - voluntary initiatives, coalitions and the Global Climate Action Agenda. Distinct from the COP30 Executive Report (formal negotiated outcome); useful for tracking the action-agenda / implementation side.
+- **Verified:** fetched directly - HTTP 200, application/pdf (~128k chars), cover "OUTCOMES REPORT / Global Climate Action Agenda at COP 30", Climate High-Level Champions, 19 December 2025.
+
+---
+
 # Resources Watch — Review Log — 2026-11-16 (weekly firing)
 
 The weekly Resources Watch ran on 2026-11-16 and queued **5 genuinely new** climate / environmental-justice knowledge resources, deduped against all **48** distinct drafts already logged in prior runs (through 2026-11-09). All 5 were queued as drafts (`published=false`, `source=watch`, `category=Resources`) into Supabase (project `uueemckdoozsuowcqkhl`) via a connected Chrome (same-origin POST to `/rest/v1/resources`, public anon key only) and each returned **HTTP 201**. The Mac device shell still cannot reach Supabase (host not on the device egress allowlist). Replay commands: `scripts/queue-resources-2026-11-16.sh`. Each URL was fetched/opened and confirmed to load with real content before queueing.
