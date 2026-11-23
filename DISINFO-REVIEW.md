@@ -15,6 +15,66 @@ Classification key: `vf` = false / bad-faith (red) · `vm` = misleading (amber) 
 
 ---
 
+## 2026-11-23 — 4 new drafts queued
+
+Queue script: `scripts/queue-disinfo-2026-11-23.sh`. All four written to Supabase as drafts via the
+connected Chrome (same-origin POST /rest/v1/disinfo_items, 201) — the Mac device-bridge shell could not
+reach supabase.co this run (curl 403 from the proxy on CONNECT), so Chrome was the writer. Status:
+**awaiting admin review**. Deduped against the currently-published `disinfo_items` (51 rows read via
+anon GET — none of the four source URLs or narratives present) and the full prior log (2026-09-19 →
+2026-11-16, ~33 narratives). Spread this run across four distinct mechanisms the scan had not yet filed:
+a public figure's mockery of forecasts eroding trust in science, the "temperature records are
+fraudulently adjusted" denial trope, the cloud-seeding/HAARP flood conspiracy riding the current El Niño,
+and the fossil-industry "energy apartheid / renewables can't power Africa" framing (distinct from last
+week's gas-"transition fuel" item and the Oct "green colonialism" item). Note on dates: the current UN
+summit is **COP31 (Antalya, Türkiye, Nov 2026)** — COP30 (Belém) was a year ago; the gas item last week
+said "COP30 period" in error.
+
+1. **Minimisation / eroding trust in science (`vm`) — "El Niño forecasts keep shifting, so forecasters are guessing and can't be trusted"**
+   - Narrative (after high-profile Kenyan remarks): weather experts moved the El Niño onset from Aug → Sep →
+     Oct, so the forecasts — and climate science generally — are guesswork to be ignored during flood season.
+   - Fuller picture: seasonal forecasts are probabilities, not a timetable. Ruto questioned the shifting onset
+     at an Oct 2026 summit ("waiting for these rains involves guesswork"), echoing his 2023 "God has decreed…
+     no El Niño, just heavy rainfall"; experts warned this erodes trust in science. Kenya Met says El Niño ≠
+     guaranteed uniform rain everywhere; onset uncertainty ≠ an invalid warning. WMO (Nov 2026): event
+     "firmly established," near-100% through Feb 2027. 2023 dismissals preceded floods that killed scores.
+   - Source: Nation.africa "Ruto versus experts" (Oct 2026); WMO; Kenya Met; Greenpeace Africa —
+     https://www.nation.africa/kenya/news/ruto-versus-experts-questions-as-president-mocks-science-on-el-ni%C3%B1o-threat-5626522
+
+2. **Climate denial / data-manipulation claim (`vf`) — "Scientists 'adjust'/homogenise the temperature record to fake warming"**
+   - Narrative (climate-skeptic posts, fact-checked for African audiences by PesaCheck): the warming trend is
+     an artefact of "homogenised" data; raw thermometers show little/no warming.
+   - Fuller picture: adjustments correct known artefacts (station moves, instrument/time-of-observation
+     changes, urban heat island). The NET global effect of adjustments REDUCES the long-term trend (older
+     ship SST readings ran warm). NASA/NOAA/Hadley/Berkeley Earth — plus raw data — all show ~1.1–1.5°C;
+     Berkeley Earth (sceptic-founded, Koch-funded) confirmed it. Corroborated by oceans, ice, sea level; for
+     East Africa, the vanishing Mt Kenya/Kilimanjaro ice.
+   - Source: Carbon Brief explainer on data adjustments; Berkeley Earth; NASA/NOAA; PesaCheck —
+     https://www.carbonbrief.org/explainer-how-data-adjustments-affect-global-temperature-records
+
+3. **Conspiracy / false attribution (`vf`) — "The El Niño floods are man-made (cloud seeding / HAARP / geoengineering)"**
+   - Narrative (social media during the floods): the heavy rains are deliberately engineered, not natural.
+   - Fuller picture: a conspiracy recycled onto every big flood (Dubai 2024, Spain, Pakistan, US). Cloud
+     seeding only nudges existing clouds to drop a little more rain locally; it cannot create storm systems or
+     a months-long season across countries; HAARP (a closed research facility) can't steer weather. Real
+     drivers: strong El Niño + positive Indian Ocean Dipole, forecast months ahead, intensified by climate
+     change. Blaming secret tech displaces preparedness; verify via Kenya Met / NDOC.
+   - Source: Earth.com; AFP "cloud-seeding claims overshadow record floods"; WMO/Kenya Met —
+     https://www.earth.com/news/climate-change-denial-historic-floods-are-not-caused-by-cloud-seeding/
+
+4. **Misleading framing / fossil-fuel talking point (`vm`) — "Renewables can't power Africa; blocking fossil fuels is 'energy apartheid'"**
+   - Narrative (energy-policy / fossil-promotion content, COP31 period): solar/wind are too unreliable and
+     costly, so Africa must expand oil/gas/coal; restricting fossils is "energy apartheid" keeping Africa poor.
+   - Fuller picture: energy poverty is real, but "fossil or nothing" is a false choice; "energy apartheid" is
+     pushed by fossil-funded groups (CO2 Coalition). IRENA: 91% of new 2024 renewables cheaper than the
+     cheapest new fossil; solar+storage rivals/beats new gas. IEA: clean energy ~2/3 of energy investment.
+     Distributed solar/mini-grids reach rural Africa faster/cheaper than grid-tied fossil plants; new
+     analyses find oil/gas wealth largely failed to deliver development in African producer states.
+   - Source: narrative via CO2 Coalition / "energy apartheid" pieces; context Mongabay (May 2026), IRENA, IEA —
+     https://news.mongabay.com/short-article/2026/05/new-report-questions-africas-oil-and-gas-promise/
+
+---
+
 ## 2026-11-16 — 4 new drafts queued
 
 Queue script: `scripts/queue-disinfo-2026-11-16.sh`. All four written to Supabase as drafts via the
