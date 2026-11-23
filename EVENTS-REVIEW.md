@@ -1,5 +1,35 @@
 # Events Watch — Admin Review Queue
 
+**Run date (TODAY): 2026-11-23**
+Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
+Scope: upcoming climate & environmental-justice events on or after 2026-11-23, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
+
+> ✅ **Queueing status:** 1 NEW verified event below was written **straight to Supabase as a draft (`published=false`, `source=watch`)** via the connected-Chrome write path — the insert returned **HTTP 201**. Review and Accept/Reject it in **admin → Events review**. Nothing is public until an admin Accepts. (The Mac device-bridge shell could not reach Supabase this run — `node` fetch returned "fetch failed", host blocked by the proxy — so the connected Chrome was used as the writer, as designed.)
+
+**Verification notes:** The queued item was confirmed against a primary/organiser-adjacent news source and is future-dated (on/after 2026-11-23). **6th African Conference of Science Journalists (ACSJ 2027)** — 26–28 Apr 2027, Nairobi, Kenya, convened by MESHA (Media for Environment, Science, Health and Agriculture) — confirmed via Capital FM Africa / allAfrica (both 9–10 Nov 2026), theme "Frontlines of Resilience: Science, AI, and the Future of African Reporting"; its first programme track is agriculture, environment, energy & algorithms, with climate change leading the billing. **Scope note for admin:** this is a science-journalism convening where climate/environment is the lead (but not sole) theme — queued as a draft so the admin can judge fit; reject if considered too tangential. **Candidates reviewed and dropped this run:** International Water & Development Congress 2027 (IWA, Kampala, Uganda) — real and East African, but organiser states "final dates and venue to be announced later" (no firm date → skipped per verified-firm-date rule; climate not a stated theme). Africa Climate Summit 2 / ACS-2 (Addis Ababa) — **past** (8–10 Sep 2025). 11th Our Ocean Conference (Mombasa, Kenya) — **past** (16–18 Jun 2026). CCDA-14 (Addis Ababa) — **past** (Sep 2026). ARFSD 12th session — pre-session events 25–29 Apr 2026 (past); forum's own dates not published. AMCEN-21 — no firm public dates found (page unreachable). ACT7 / 7th Africa Climate Talks — **past** (referenced in past tense "on the road to COP32"). Africa Energy Forum (aef) 2027 and Invest in African Energy 2027 (Paris) — dates TBD and/or general energy-investment business, out of core scope. GLF Africa 2027, AfA Forum 2027, Mission 300 (2027) — no firm 2027 dates published yet. Africa Energy Indaba 2027, ESG & Climate Africa Summit, 2nd Africa Clean Cooking Summit, UNEA-8, COP32 (now confirmed Addis Ababa), Solar Africa Kenya 2027, Intersolar Africa 2027 — already in the review queue (not re-queued). Sankalp Africa Summit 2027, Africa Tech Summit, AFMASS Future Food Summit — impact-investing / tech / food business, not sufficiently climate/environment-justice-focused.
+
+---
+
+## Drafts queued this run (1) — published=false, source=watch
+
+| # | Event | Date(s) | Location | Mode | Host | Status |
+|---|-------|---------|----------|------|------|--------|
+| 1 | 6th African Conference of Science Journalists (ACSJ 2027) | 26–28 Apr 2027 | Nairobi, Kenya | In person | MESHA (Media for Environment, Science, Health and Agriculture) | INSERTED 201 |
+
+**New this run (not previously logged):** the 1 item above.
+
+**Dedupe:** Checked against the 2026-11-16 run (Solar Africa Kenya 2027, Lagos Climate Week 2027, SETAC Africa 13th Biennial 2027), the 2026-11-09 run (UNESCO World Conference on ESD 2027, Intersolar Africa 2027, What Works Climate Solutions Summit 2027), the 2026-10-26 run (2nd Africa Clean Cooking Summit, AGES 2027, BACE 2027), the 2026-10-19 run (Global Youth Summit for Climate Change, 5th African Symposium on Climate Change Adaptation, Africa Energy Indaba 2027), the 2026-10-09, 2026-09-29, 2026-09-22 and 2026-09-19 runs — **none re-queued**. ACSJ 2027 has not appeared in any prior run.
+
+Reproducible record: `scripts/queue-events-2026-11-23.sh`.
+
+*Approved events go live only when a human admin clicks Accept in the admin Events review tab. This log is a draft queue, not a publication.*
+
+---
+
+<!-- ================= PREVIOUS RUNS BELOW ================= -->
+
+# Events Watch — Admin Review Queue
+
 **Run date (TODAY): 2026-11-16**
 Coalition: MazingiraKenya · Prepared by: Events Watch (automated, device-bound)
 Scope: upcoming climate & environmental-justice events on or after 2026-11-16, relevant to Kenya/East Africa, pan-Africa, or globally significant to African climate justice.
