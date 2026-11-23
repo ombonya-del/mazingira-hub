@@ -31,6 +31,8 @@ const TARGETED = [
   'Kenya (climate OR coal OR "carbon credits" OR oil OR environment) (claim OR misleading OR false OR hoax OR denial OR greenwash)',
   'Lamu OR Dangote refinery Kenya environment',
   'Siaya OR NuPEA nuclear plant Kenya',
+  'Turkana OR Lokichar oil (Gulf Energy OR compensation OR court OR petition)',
+  'Kipevu OR KPRL Gulf Energy crude storage',
   'Kenya "carbon credits" OR "carbon market" communities',
   'Africa (climate OR "fossil fuel" OR gas) (disinformation OR misleading OR greenwashing)',
 ];
@@ -43,7 +45,7 @@ const FEEDS: Feed[] = [
   { url: "https://www.climatechangenews.com/feed/", label: "Climate Home News" },
 ];
 
-const KW = /(climate|carbon|coal|oil|gas|fossil|refinery|geotherm|nuclear|uranium|drought|flood|conservanc|land|Lamu|Turkana|Siaya|environment|Dangote|greenwash|emission|deforest|mining|pipeline|EACOP)/i;
+const KW = /(climate|carbon|coal|oil|gas|fossil|refinery|geotherm|nuclear|uranium|drought|flood|conservanc|land|Lamu|Turkana|Siaya|environment|Dangote|greenwash|emission|deforest|mining|pipeline|EACOP|Lokichar|Kipevu|Tullow|Gulf Energy)/i;
 
 const SYSTEM =
   "You screen Kenyan/African climate & environment media for the hub's Narrative-disinfo queue. A human editor reviews every draft, so flag items worth a second look. " +

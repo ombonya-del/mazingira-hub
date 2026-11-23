@@ -1,0 +1,23 @@
+/* Voices media: compact tiles + lightbox */
+.vgal{display:grid;gap:4px;margin-top:10px;border-radius:10px;overflow:hidden}
+.vgal:empty{display:none}
+.vgal.n1{grid-template-columns:1fr}
+.vgal.n2{grid-template-columns:1fr 1fr}
+.vgal.n3{grid-template-columns:repeat(3,1fr)}
+.vgal .vt{position:relative;display:block;padding:0;border:0;margin:0;cursor:zoom-in;background:#16161a;overflow:hidden;height:96px}
+.vgal.n1 .vt{height:190px}
+.vgal.n2 .vt{height:130px}
+.vgal .vt img,.vgal .vt video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s}
+.vgal .vt:hover img,.vgal .vt:hover video{transform:scale(1.04)}
+.vgal .vt .vplay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.vgal .vt .vplay:before{content:"";width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.55) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E") center/20px no-repeat}
+.vgal .vt .vmore{position:absolute;inset:0;background:rgba(0,0,0,.55);color:#fff;font-weight:800;font-size:1.2rem;display:flex;align-items:center;justify-content:center}
+.vaud{display:grid;gap:6px;margin-top:8px}.vaud:empty{display:none}.vaud audio{width:100%}
+.vlb{position:fixed;inset:0;z-index:9999;background:rgba(8,8,10,.92);display:flex;align-items:center;justify-content:center}
+.vlb[hidden]{display:none}
+.vlb .vlb-stage{max-width:94vw;max-height:86vh;display:flex;align-items:center;justify-content:center}
+.vlb .vlb-stage img,.vlb .vlb-stage video{max-width:94vw;max-height:86vh;border-radius:8px;display:block}
+.vlb button{position:absolute;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:50%;width:44px;height:44px;font-size:1.5rem;line-height:1;cursor:pointer}
+.vlb button:hover{background:rgba(255,255,255,.25)}
+.vlb .vlb-x{top:14px;right:14px}.vlb .vlb-p{left:12px;top:50%;margin-top:-22px}.vlb .vlb-n{right:12px;top:50%;margin-top:-22px}
+.vlb .vlb-c{position:absolute;bottom:16px;left:0;right:0;text-align:center;color:#ddd;font-size:.8rem;font-weight:700}

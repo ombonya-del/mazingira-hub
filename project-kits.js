@@ -81,7 +81,23 @@ var PROJECTS = [
  { lane:"build", title:"Western Gold-Belt Mercury Watch", status:"idea",
    pitch:"Stand up a shared community-monitoring node across the Western gold belt — Kakamega, Migori and Vihiga — testing water and soil for mercury and cyanide, training citizen samplers, and feeding verified readings into the platform's water and minerals layers so the harm is documented as it happens.",
    gap:"Western gold belt: severe mercury and water pressure, monitoring scattered and un-pooled.",
-   county:"Kakamega · Migori · Vihiga", sector:"Minerals · Water", budget:"KES 7.5M / 24 mo", funder:"Pooled donor facility" }
+   county:"Kakamega · Migori · Vihiga", sector:"Minerals · Water", budget:"KES 7.5M / 24 mo", funder:"Pooled donor facility" },
+ { lane:"document", title:"South Lokichar Water & Health Watch", status:"idea",
+   pitch:"Put community monitors and an independent lab behind the restart of oil production at South Lokichar — testing water, soil and livestock around old and new well pads, logging illness and spills, and feeding verified readings into the platform's oil and water layers.",
+   gap:"Turkana oil: drilling resumed in November 2026 with no independent monitoring, on a field already linked to contaminated groundwater.",
+   county:"Turkana", sector:"Oil & gas · Water", budget:"KES 3.5M / 12 mo", funder:"Africa Climate Fund · HBS" },
+ { lane:"challenge", title:"South Lokichar Compensation & FPIC Clinic", status:"idea",
+   pitch:"Give families whose community land is being acquired for the oil fields free legal advice and representation — on valuation, the Community Land Act trust rules and consent — before payouts are fixed. Legal partners: Kituo Cha Sheria and KOGWG.",
+   gap:"Turkana oil: land is being acquired while compensation is unsettled, and affected families have no organised legal support.",
+   county:"Turkana", sector:"Oil & gas · Land", budget:"KES 5.0M / 18 mo", funder:"NAMATI · AJWS" },
+ { lane:"challenge", title:"Turkana Legacy Cases Support", status:"idea",
+   pitch:"Back the three community cases already in court over Tullow's legacy — the residents' 'environmental violence' petition, the children's petition and TIPD's lease-money case — with expert evidence, legal fees and protection for the people bringing them.",
+   gap:"Turkana oil: live cases short of evidence and funds, with a petitioner group reporting threats and a fee gap.",
+   county:"Turkana", sector:"Oil & gas · Land", budget:"KES 4.0M / 18 mo", funder:"Strategic litigation fund" },
+ { lane:"build", title:"Oil Corridor Transparency Campaign", status:"idea",
+   pitch:"Build a public campaign, led by KOGWG, on the undisclosed deals along Kenya's new oil chain — the production-sharing contract's 85% cost-oil clause, the 25-year Kipevu storage contract and the county and community revenue shares — using Access to Information requests and plain-language briefings.",
+   gap:"From wellhead to Kipevu: the key contracts are not public, and only a consumer petition is testing them.",
+   county:"Turkana · Mombasa", sector:"Oil & gas", budget:"KES 4.5M / 12 mo", funder:"HBS · HIVOS" }
 ];
 window.MZK_PROJECTS = PROJECTS;
 
@@ -773,6 +789,151 @@ var KITS = {
     {t:"Inventory and mapping of mercury use in ASGM sites in Migori",u:"https://www.planetgold.org/imeap-report-inventory-and-mapping-mercury-use-artisanal-small-scale-gold-mining-asgm-sites-migori",k:"case study",s:"CEJAD / IPEN via planetGOLD",w:"Kenyan CSO mapping at Mikei, Masara and Osiri."},
     {t:"Illegal gold mining harms Kakamega's ecosystem",u:"https://nation.africa/kenya/health/illegal-gold-mining-harms-kakamega-s-ecosystem-4549456",k:"article",s:"Nation",w:"Community testimony on contaminated rivers and slow NEMA response."},
     {t:"Reducing Mercury Use in ASGM: A Practical Guide",u:"https://www.unep.org/resources/report/reducing-mercury-use-artisanal-and-small-scale-gold-mining-practical-guide",k:"toolkit",s:"UNEP",w:"Training guide for miners and cooperatives."}]
+},
+"South Lokichar Water & Health Watch": {
+  id:"south-lokichar-water-health",
+  description:"Gulf Energy began drilling in the South Lokichar basin on 20 November 2026 and plans first oil on 1 December, at 20,000 barrels a day in phase one. The field was explored by Tullow from 2012, and residents link its drilling-waste pits to contaminated water, illness and livestock deaths; a 2022 study found heavy contamination in 8 of 11 groundwater samples near well pads. There is no independent, community-trusted monitoring as production restarts. This project puts trained community monitors and an independent laboratory on the ground to record water, soil and livestock health around old and new well pads, so harm is documented as it happens and can be used by communities, regulators and courts.",
+  objectives:[
+    "Establish a baseline of water, soil and livestock health around old and new South Lokichar well pads before production scales up",
+    "Train community monitors in Turkana South and Turkana East to sample, record and report safely",
+    "Publish verified readings on the platform's oil and water layers and share them with NEMA and the county",
+    "Build an evidence record usable in the pending legacy-pollution cases and any future challenge"],
+  activities:[
+    "Map water points, pans and boreholes used by herders near Amosing, Ngamia and other well pads",
+    "Train and equip 12–15 community monitors, with consent and data-protection protocols",
+    "Run quarterly sampling with an accredited laboratory for hydrocarbons, heavy metals and salinity",
+    "Keep an incident log of spills, waste dumping, livestock deaths and illness reports, with photos and GPS",
+    "Request NEMA licences, environmental audits and Gulf Energy's monitoring data through Access to Information requests",
+    "Hold community feedback forums and share findings with the county assembly and NEMA"],
+  outcomes:[
+    "A public, independent baseline exists before oil volumes rise",
+    "Spills and contamination are recorded with admissible evidence within days, not years",
+    "Regulators and the operator face documented questions they must answer"],
+  partners:[
+    ["Turkana Extractive Consortium","Local civil-society anchor and community mobilisation"],
+    ["Friends of Lake Turkana","Indigenous-led water-rights advocacy in the basin"],
+    ["KOGWG — Kenya Oil & Gas Working Group","National extractives-governance network; links findings to policy"],
+    ["Kituo Cha Sheria","Legal advice on evidence handling for the pending cases"],
+    ["deCOALonize","Coalition convenor; platform and communications"]],
+  legal:[
+    "Constitution of Kenya 2010, Arts. 35, 42, 69, 70",
+    "EMCA 1999, Water Quality Regulations 2006 and Waste Management Regulations 2006",
+    "Petroleum Act 2019: operator environmental obligations",
+    "Access to Information Act 2016",
+    "Data Protection Act 2019 (testimonies, photos, contacts)"],
+  resources:[
+    {t:"Kenya's renewed oil push faces a tainted legacy",u:"https://news.mongabay.com/2026/03/kenyas-renewed-oil-push-faces-a-tainted-legacy/",k:"article",s:"Mongabay (Mar 2026)",w:"Residents' water and health concerns; the 2022 groundwater study."},
+    {t:"Kenya begins crude oil drilling as Gulf targets December 1 first oil",u:"https://www.the-star.co.ke/business/kenya/2026-11-21-kenya-begins-crude-oil-drilling-as-gulf-targets-december-1-first-oil",k:"article",s:"The Star (Nov 2026)",w:"Blocks T6 and T7, the rig, volumes and road haulage to Mombasa."},
+    {t:"Tullow Oil sued for Sh284bn over 'environment violence'",u:"https://nation.africa/kenya/business/companies/tullow-oil-sued-for-sh284bn-over-environment-violence-4547696",k:"case study",s:"Nation",w:"Residents seek court-supervised monitoring of groundwater, air and soil."},
+    {t:"Video as Evidence field guide",u:"https://vae.witness.org/video-as-evidence-field-guide/",k:"toolkit",s:"WITNESS",w:"Capture footage so it stands up in court."}]
+},
+"South Lokichar Compensation & FPIC Clinic": {
+  id:"south-lokichar-compensation-fpic",
+  description:"As Gulf Energy moves South Lokichar into production, community land in Turkana South and Turkana East is being compulsorily acquired for oil activities. Residents say payouts must be settled first; the Treasury has set aside KES 200 million for phase one, which residents treat as a down payment rather than a settlement. Families face valuation, eligibility and documentation processes with no organised legal support, and earlier payouts — including KSh 258 million Tullow paid for leased land in 2024 — did not reach communities as the Community Land Act requires. This clinic gives affected families free legal advice and representation before amounts are fixed.",
+  objectives:[
+    "Ensure affected households understand their rights under the Community Land Act and Land Act before signing anything",
+    "Secure fair, transparent valuation and payment through registered community land management committees",
+    "Press for genuine free, prior and informed consent on further land acquisition",
+    "Create a legal record for challenges where acquisition or payment is unlawful"],
+  activities:[
+    "Run mobile legal clinics in Lokichar, Lokori, Nakukulas and Lokwamosing with paralegals who speak Ng'aturkana",
+    "Help households and community land committees assemble documentation and verify beneficiary lists",
+    "Request valuation reports, acquisition notices and beneficiary lists from the National Land Commission and the State Department for Petroleum",
+    "Represent families in NLC inquiries and file complaints or petitions where processes break the law",
+    "Train community land management committee members on trust duties and benefit-sharing",
+    "Publish plain-language guides in English, Kiswahili and Ng'aturkana"],
+  outcomes:[
+    "Affected households have advice before compensation is fixed",
+    "Payments flow through lawful community structures, with public beneficiary lists",
+    "Unlawful acquisitions are challenged on a solid record"],
+  partners:[
+    ["Kituo Cha Sheria","Lead legal-aid partner; existing Turkana oil litigation"],
+    ["KOGWG — Kenya Oil & Gas Working Group","Extractives-governance expertise; convened by CANCO"],
+    ["NAMATI","Legal-empowerment methods for land and environmental justice"],
+    ["TIPD — Turkana Indigenous People Action for Development","Indigenous community anchor; lease-money case"],
+    ["Turkana Extractive Consortium","Local civil-society network"]],
+  legal:[
+    "Constitution of Kenya 2010, Arts. 10, 40, 56, 63",
+    "Community Land Act 2016 and Community Land Regulations 2017",
+    "Land Act 2012, Part VIII (compulsory acquisition)",
+    "Petroleum Act 2019: benefit sharing with counties and communities",
+    "Fair Administrative Action Act 2015"],
+  resources:[
+    {t:"Turkana oil: new project, old compensation questions",u:"https://www.nation.africa/kenya/counties/turkana/turkana-oil-new-project-old-compensation-questions-5603336",k:"article",s:"Nation (2026)",w:"Residents and leaders on compensation and resettlement."},
+    {t:"New Turkana oil push meets old compensation questions",u:"https://mjengohub.co.ke/articles/counties/new-turkana-oil-push-meets-old-compensation-questions",k:"article",s:"Mjengo Hub (2026)",w:"KES 200m for phase one; county talks with Gulf Energy."},
+    {t:"Turkana residents renew calls for greater share and transparency",u:"https://www.standardmedia.co.ke/counties/article/2001553962/turkana-residents-renew-calls-for-greater-share-and-transparency-in-gulf-energy-oil-deal",k:"article",s:"The Standard (Jul 2026)",w:"Baraza demands on revenue sharing and the 85% cost-oil clause."},
+    {t:"Free, Prior and Informed Consent: manual for project practitioners",u:"https://www.fao.org/3/I6190E/i6190e.pdf",k:"toolkit",s:"FAO",w:"Consent process the clinic can hold the state and operator to."}]
+},
+"Turkana Legacy Cases Support": {
+  id:"turkana-legacy-cases",
+  description:"Three community cases over Tullow's time in South Lokichar are in court: residents' 'environmental violence' petition at the Lodwar Environment and Land Court against Tullow, the county and NEMA, seeking a KSh 284 billion environmental bond and long-term monitoring; Kituo Cha Sheria's petition with 13 Turkana children over drilling waste and livestock deaths; and TIPD's 2025 case over KSh 258 million in community land-lease money. Tullow kept liability for the residents' case when it sold to Gulf Energy, and the State has sided with Tullow. The petitioners face expert-evidence costs, unpaid legal fees and, in TIPD's case, reported threats. This project backs all three so they are argued on a strong record.",
+  objectives:[
+    "Strengthen the evidence in the three pending cases with independent expert testing and testimony",
+    "Close the petitioners' funding gaps for court fees, expert witnesses and travel to Lodwar",
+    "Protect petitioners and witnesses who report intimidation",
+    "Turn judgments into precedent and public understanding"],
+  activities:[
+    "Commission expert reviews of drilling-waste pits, groundwater data and veterinary records",
+    "Cover court costs, expert fees and witness travel; settle TIPD's reported KSh 520,000 fee balance",
+    "Set up a protection protocol with Defenders Coalition, including rapid response to threats",
+    "Hold watching briefs and court monitoring, with plain-language updates on the hub",
+    "Coordinate the three legal teams so evidence and arguments reinforce each other"],
+  outcomes:[
+    "The cases proceed with expert evidence on record",
+    "Petitioners and witnesses are safer and better supported",
+    "A clear precedent on legacy pollution and community lease money"],
+  partners:[
+    ["Kituo Cha Sheria","Counsel in the children's petition"],
+    ["TIPD — Turkana Indigenous People Action for Development","Petitioner in the lease-money case"],
+    ["Defenders Coalition","Protection of human-rights defenders"],
+    ["Katiba Institute","Constitutional litigation support"],
+    ["KOGWG — Kenya Oil & Gas Working Group","Policy and coordination"]],
+  legal:[
+    "Constitution of Kenya 2010, Arts. 42, 53, 69, 70",
+    "EMCA 1999: polluter pays and environmental restoration orders",
+    "Community Land Act 2016: county trusteeship of community funds",
+    "Environment and Land Court Act 2011"],
+  resources:[
+    {t:"Tullow Oil sued for Sh284bn over 'environment violence'",u:"https://nation.africa/kenya/business/companies/tullow-oil-sued-for-sh284bn-over-environment-violence-4547696",k:"case study",s:"Nation",w:"What the residents' petition seeks."},
+    {t:"Tullow Oil company sued by 13 children over environmental degradation in Turkana",u:"https://citizen.digital/article/tullow-oil-company-sued-by-13-children-over-environmental-degradation-in-turkana-n338029",k:"case study",s:"Citizen Digital",w:"Kituo Cha Sheria's petition and reliefs."},
+    {t:"Oil extraction in Turkana: community rights, broken promises and the fight for justice",u:"https://iprights.org/2025/09/19/oil-extraction-in-turkana-community-rights-broken-promises-and-the-fight-for-justice/",k:"case study",s:"IPRI (Sept 2025)",w:"TIPD's case, the KSh 258m and the threats faced."},
+    {t:"State backs Tullow in pay row with Turkana locals",u:"https://www.businessdailyafrica.com/bd/economy/state-backs-tullow-in-pay-row-with-turkana-locals-5135228",k:"article",s:"Business Daily",w:"Tullow keeps the liability after the sale to Gulf Energy."}]
+},
+"Oil Corridor Transparency Campaign": {
+  id:"oil-corridor-transparency",
+  description:"Kenya's oil chain now runs from South Lokichar by road to Mombasa, where KPRL will store and export the crude under a 25-year contract with Gulf Energy worth about KES 93.7 billion. The key terms are not public: the revised production-sharing contract reportedly lets Gulf recover up to 85% of yearly output as cost oil before profit is shared, and Cofek says the Kipevu storage contract was signed without a disclosed tender, selection criteria or terms. Turkana residents and leaders want revenue-sharing and accountability structures in place before production. This campaign, led by KOGWG, uses Access to Information requests, public briefings and parliamentary engagement to get the contracts and revenue figures published.",
+  objectives:[
+    "Get the South Lokichar production-sharing contract, field development plan and Kipevu storage contract published",
+    "Make the county's 20% and communities' 5% revenue shares under the Petroleum Act visible and tracked",
+    "Equip Turkana and Mombasa communities, media and MPs to scrutinise the deals",
+    "Support Cofek's case and any further legal action with public evidence"],
+  activities:[
+    "File Access to Information requests with the State Department for Petroleum, EPRA, KPC and KPRL",
+    "Publish plain-language briefings on cost oil, profit oil and revenue shares, in English and Kiswahili",
+    "Brief the National Assembly Energy Committee and the Public Investments Committee",
+    "Run media trainings in Lodwar and Mombasa",
+    "Track first-export revenue from early 2027 on the hub"],
+  outcomes:[
+    "Key contracts and revenue figures are in the public domain",
+    "Parliament and the county ask documented questions about the deals",
+    "Communities know what share is due to them and can follow it"],
+  partners:[
+    ["KOGWG — Kenya Oil & Gas Working Group","Lead campaign partner; convened by CANCO"],
+    ["Cofek — Consumers Federation of Kenya","Petitioner on the Kipevu storage deal"],
+    ["Turkana Extractive Consortium","Turkana community voice on revenue"],
+    ["deCOALonize","Coalition convenor; communications"],
+    ["350 Africa","Campaign ally on fossil-fuel finance"]],
+  legal:[
+    "Constitution of Kenya 2010, Arts. 10, 35, 71, 201, 227",
+    "Petroleum Act 2019: contract disclosure and revenue sharing",
+    "Access to Information Act 2016",
+    "Public Procurement and Asset Disposal Act 2015",
+    "Public Finance Management Act 2012"],
+  resources:[
+    {t:"Court fight breaks over Sh93bn Gulf Energy Kipevu oil storage deal",u:"https://www.nation.africa/kenya/business/court-fight-breaks-over-sh93bn-gulf-energy-kipevu-oil-storage-deal-5609884",k:"case study",s:"Nation (Sept 2026)",w:"Cofek's petition and the disclosure gaps it cites."},
+    {t:"State-backed Gulf Energy bags Sh93.68b oil storage deal",u:"https://www.standardmedia.co.ke/business/article/2001556452/state-backed-gulf-energy-bags-sh93-68b-oil-storage-deal",k:"article",s:"The Standard (Aug 2026)",w:"The 25-year KPRL contract."},
+    {t:"Gulf Energy's Sh94bn KPC deal raising serious concentration questions",u:"https://cofek.africa/news/exaggerated-asset-accumulation-and-gulf-energy-s-sh94bn-kpc-deal-raising-serious-concentration",k:"article",s:"Cofek",w:"Gulf's reach across import, storage and production."},
+    {t:"Turkana residents renew calls for greater share and transparency",u:"https://www.standardmedia.co.ke/counties/article/2001553962/turkana-residents-renew-calls-for-greater-share-and-transparency-in-gulf-energy-oil-deal",k:"article",s:"The Standard (Jul 2026)",w:"The 85% cost-oil clause and residents' demands."}]
 }
 };
 /* ---- Funders named in the portfolio (verified Oct 2026) ---- */

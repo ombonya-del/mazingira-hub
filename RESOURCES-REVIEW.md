@@ -536,3 +536,43 @@ returned HTTP 201. Deduped against all URLs previously logged. Awaiting admin Ac
 - IISD "Review of Current and Planned Adaptation Action in Kenya" — dated 2016, too old. Skipped.
 - ICPAC GHACOF 73 technical statement (JJAS 2026) — past-season seasonal outlook, ephemeral. Skipped.
 - Kenya green-jobs / "240,000 green jobs by 2030" FSD figure — only secondary news coverage found, no fetchable primary report. Revisit if the FSD Kenya report URL surfaces.
+
+---
+
+## Run 2026-11-19 (3×/day CoalHub sweep) — 6 Media-brief drafts queued
+
+POSTed to `resources` (category="Media briefs", published=false, source=watch) via connected
+Chrome. Each returned HTTP 201 — awaiting admin Accept/Reject. Note: anon cannot read draft
+rows, so dedupe for media briefs relies on this log; deduped against all previously logged URLs.
+
+1. **Kenya signs Sh90bn LNG power plant deal for Dongo Kundu, Mombasa** — @moneyacademyKE · 2026-11-17
+   https://x.com/moneyacademyKE/status/2122658013387309409
+2. **Dangote offers East African states 30% equity in regional refinery** — @MwangoCapital · 2026-08-21
+   https://x.com/MwangoCapital/status/2090686408919069182
+3. **Kenya caps carbon credit exports at 10M tonnes to 2030** — @moneyacademyKE · 2026-08-05
+   https://x.com/moneyacademyKE/status/2084889641950531635
+4. **CoG calls for a funded plan to transition from coal, oil and gas to renewables** — @princepapa1 · 2026-04-13
+   https://x.com/princepapa1/status/2043593330131402770
+5. **Roysambu residents demand NEMA action over toxic chemical waste dumping** — @NyakundiReport · 2026-07-30
+   https://x.com/NyakundiReport/status/2082923338985562222
+6. **Environmental groups warn Dangote's Sh2.2tn Lamu refinery threatens ecosystem** — @moneyacademyKE · 2026-07-13
+   https://x.com/moneyacademyKE/status/2076554719430934549
+
+---
+
+## Run 2026-11-20 (3×/day CoalHub sweep) — 5 Media-brief drafts queued
+
+POSTed to `resources` (category="Media briefs", published=false, source=watch) via connected
+Chrome. Each returned HTTP 201 — awaiting admin Accept/Reject. Note: anon cannot read draft
+rows, so dedupe for media briefs relies on this log; deduped against all previously logged URLs.
+
+1. **Mombasa agreement aims to curb illegal fishing and protect coastal communities** — @ADFmagazine · 2026-07-28
+   https://x.com/ADFmagazine/status/2082191761699434965
+2. **Kenya Guide for Strategic Engagement in Carbon Markets 2026** — @AfricaClimComms · 2026-08-03
+   https://x.com/AfricaClimComms/status/2084141013564641711
+3. **Nairobi's Upper Hill gains new pedestrian walkways near KNH** — @NationAfrica · 2026-07-27
+   https://x.com/NationAfrica/status/2081816957213626874
+4. **Lake Naivasha under pressure as stalled Microsoft-G42 data centre looms** — @AJEnglish · 2026-08-24
+   https://x.com/AJEnglish/status/2091733251283116179
+5. **Kenya's forest law battle: conservation gains or threat to protected lands?** — @katibainstitute · 2026-07-23
+   https://x.com/katibainstitute/status/2080201266194727036

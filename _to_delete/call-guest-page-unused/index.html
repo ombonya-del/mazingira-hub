@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Join the coalition call · MazingiraKenya</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icon-192.png">
+<style>
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#0E1A15;color:#EDEAE0;margin:0;min-height:100vh}
+  .card{max-width:440px;margin:8vh auto;padding:28px 24px;background:#13241C;border:1px solid #24392E;border-radius:14px}
+  h1{color:#62C79B;font-size:1.35rem;margin:0 0 6px;font-family:Georgia,serif}
+  p{line-height:1.5;margin:0 0 14px;color:#C9CFC6}
+  label{display:block;font-size:.85rem;color:#9FB0A6;margin:12px 0 4px}
+  input{width:100%;padding:11px 12px;border-radius:8px;border:1px solid #2E4A3C;background:#0E1A15;color:#EDEAE0;font-size:1rem}
+  button{margin-top:18px;width:100%;background:#62C79B;color:#062018;border:0;padding:12px 18px;border-radius:8px;font-weight:700;font-size:1rem;cursor:pointer}
+  button[disabled]{opacity:.6;cursor:wait}
+  .small{font-size:.8rem;color:#7A8D83;margin-top:14px}
+  .err{color:#F08A5D;font-size:.9rem;min-height:1.2em;margin-top:10px}
+  #stage{position:fixed;inset:0 0 34px 0;display:none;background:#000}
+  #bar{position:fixed;left:0;right:0;bottom:0;height:34px;display:none;align-items:center;padding:0 12px;font-size:.82rem;background:#13241C;color:#9FB0A6}
+  a{color:#62C79B}
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <h1>Join the coalition call</h1>
+  <p id="lead">MazingiraKenya · deCOALonize. Enter your name and email. The host will let you in, and the minutes will be emailed to you after the call.</p>
+  <form id="f">
+    <label for="n">Your name and organisation</label>
+    <input id="n" required maxlength="80" placeholder="e.g. Amina — LAWA" autocomplete="name">
+    <label for="e">Email (for the minutes)</label>
+    <input id="e" type="email" required maxlength="160" placeholder="you@example.org" autocomplete="email">
+    <button id="go" type="submit">Join call →</button>
+    <div class="err" id="err"></div>
+  </form>
+  <p class="small">Works in Chrome, Edge, Firefox or Safari — no app needed. The call is transcribed to produce minutes. Hub members: <a href="/#virtual">join from the hub</a> instead.</p>
+</div>
+<div id="stage"></div>
+<div id="bar"></div>
+<script src="/call/jaas-room.js"></script>
+<script>
+(function(){
+  var FN="https://uueemckdoozsuowcqkhl.supabase.co/functions/v1/jaas-token";
+  var ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZWVtY2tkb296c3Vvd2Nxa2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzcwMTUsImV4cCI6MjEwMDY1MzAxNX0.lRpyb6AdGft0eN21vOlH_dVtSMBrmqCPDbO77IHufyA";
+  var q=new URLSearchParams(location.search);
+  var room=(q.get("r")||"mazingirakenya-coalition-a7f3c9e2b18d4f6a").toLowerCase();
+  var f=document.getElementById("f"), go=document.getElementById("go"), err=document.getElementById("err");
+  var n=document.getElementById("n"), e=document.getElementById("e");
+  try{ n.value=q.get("n")||localStorage.getItem("mzName")||""; e.value=q.get("e")||localStorage.getItem("mzEmail")||""; }catch(_){}
+  f.addEventListener("submit", function(ev){
+    ev.preventDefault(); err.textContent=""; go.disabled=true; go.textContent="Connecting…";
+    try{ localStorage.setItem("mzName", n.value.trim()); localStorage.setItem("mzEmail", e.value.trim()); }catch(_){}
+    fetch(FN,{method:"POST",headers:{"Content-Type":"application/json","apikey":ANON,"Authorization":"Bearer "+ANON},
+      body:JSON.stringify({room:room,name:n.value.trim(),email:e.value.trim()})})
+    .then(function(r){ return r.json(); })
+    .then(function(t){
+      if(!t || !t.ok) throw new Error((t&&t.message)||"Couldn't join — please try again.");
+      document.getElementById("card").style.display="none";
+      var stage=document.getElementById("stage"), bar=document.getElementById("bar");
+      stage.style.display="block"; bar.style.display="flex"; bar.textContent="Connecting…";
+      return MZRoom.start({ stage:stage, token:t, onStatus:function(s){ bar.textContent=s; },
+        onLeave:function(){ stage.style.display="none"; bar.style.display="none"; document.getElementById("card").style.display="";
+          document.getElementById("lead").textContent="You've left the call. Thanks for joining — the minutes will arrive by email."; go.disabled=false; go.textContent="Rejoin →"; } });
+    })
+    .catch(function(x){ err.textContent=x.message||String(x); go.disabled=false; go.textContent="Join call →"; });
+  });
+})();
+</script>
+</body>
+</html>

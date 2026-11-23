@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hub members — names &amp; organisations</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#0E1A15;color:#EDEAE0}
+header{position:sticky;top:0;z-index:5;background:#13241C;border-bottom:1px solid #24392E;padding:14px 18px}
+h1{margin:0 0 4px;font:600 1.15rem Georgia,serif;color:#62C79B}
+.sub{font-size:.85rem;color:#9FB0A6;margin:0}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px}
+.bar input[type=search]{flex:1 1 220px;padding:8px 10px;border-radius:8px;border:1px solid #2E4A3C;background:#0E1A15;color:#EDEAE0}
+.bar label{font-size:.85rem;color:#C9CFC6;display:flex;gap:6px;align-items:center}
+.prog{font-size:.85rem;color:#62C79B;font-weight:600}
+button{background:#62C79B;color:#062018;border:0;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:.9rem}
+button.ghost{background:transparent;color:#62C79B;border:1px solid #2E4A3C}
+main{padding:10px 18px 120px;max-width:1100px;margin:0 auto}
+.row{display:grid;grid-template-columns:minmax(180px,1.1fr) 1fr 1.3fr;gap:8px;align-items:start;padding:9px 0;border-bottom:1px solid #1E3127}
+.em{font-size:.84rem;word-break:break-all;padding-top:8px}
+.note{font-size:.72rem;color:#E0A458;margin-top:3px}
+.row input{width:100%;padding:8px 9px;border-radius:7px;border:1px solid #2E4A3C;background:#0E1A15;color:#EDEAE0;font-size:.92rem}
+.row input.empty{border-color:#8A5A2B;background:#1A1710}
+.row.done .em{color:#9FB0A6}
+.head{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:#7A8D83;border-bottom:1px solid #24392E}
+#out{position:fixed;inset:auto 0 0 0;background:#13241C;border-top:1px solid #24392E;padding:12px 18px;display:none}
+#out textarea{width:100%;height:170px;background:#0E1A15;color:#CFE9DC;border:1px solid #2E4A3C;border-radius:8px;font:12px ui-monospace,Menlo,monospace;padding:8px}
+#out .bar{margin:0 0 8px}
+@media(max-width:700px){.row{grid-template-columns:1fr}.head{display:none}}
+</style></head><body>
+<header>
+  <h1>Hub members — names &amp; organisations</h1>
+  <p class="sub">Type over the boxes. Orange boxes are empty; guesses are marked in orange text under the email. The Organisation box suggests all 73 organisations from the hub Directory — start typing (e.g. "SCO", "Siaya", "KOG") and pick. Leave a box empty if you don't know. Then press <b>Generate SQL</b> and paste it into Supabase → SQL Editor → Run. (Edits aren't saved if you close this, so generate before you leave.)</p>
+  <div class="bar">
+    <input type="search" id="find" placeholder="Find a member…">
+    <label><input type="checkbox" id="onlyTodo"> Show only rows that need attention</label>
+    <span class="prog" id="prog"></span>
+    <button id="gen" type="button">Generate SQL →</button>
+  </div>
+</header>
+<main>
+  <div class="row head"><div>Email</div><div>Name</div><div>Organisation</div></div>
+  <div id="list"></div>
+  <datalist id="orgs"></datalist>
+</main>
+<div id="out">
+  <div class="bar"><b style="color:#62C79B">SQL ready</b><span class="sub" id="outInfo"></span>
+    <button id="copy" type="button" style="margin-left:auto">Copy SQL</button><button class="ghost" id="closeOut" type="button">Keep editing</button></div>
+  <textarea id="sql" readonly></textarea>
+</div>
+<script>
+var ROWS=[{"email": "ablaize@irck.or.ke", "name": "", "organisation": "Inter-Religious Council of Kenya (IRCK)", "note": "name: please fill in"}, {"email": "akshay@justactkenya.org", "name": "Akshay", "organisation": "JustAct Kenya", "note": "add surname?"}, {"email": "akshayv@pilae.org", "name": "Akshay", "organisation": "PILAE", "note": "same person as akshay@justactkenya? org name: guess – please check"}, {"email": "aletting@tikenya.org", "name": "", "organisation": "Transparency International Kenya", "note": "name: please fill in"}, {"email": "alexandermajanja@gmail.com", "name": "Alexander Majanja", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "amwomo@chemichemi.org", "name": "", "organisation": "Chemichemi", "note": "name: please fill in; org name: guess – please check"}, {"email": "ashley@laudatosimovement.org", "name": "Ashley", "organisation": "Laudato Si' Movement", "note": "add surname?"}, {"email": "chrcemgi@gmail.com", "name": "", "organisation": "CHRCE — Center for Human Rights & Civic Education", "note": "org guess from email (CHRCE) – please check; name: please fill in"}, {"email": "chrispine.m@laudatosimovement.org", "name": "Chrispine M.", "organisation": "Laudato Si' Movement", "note": "add surname?"}, {"email": "ckerkeri@gmail.com", "name": "", "organisation": "", "note": "name + org: please fill in"}, {"email": "ckerkering@katibainstitute.org", "name": "", "organisation": "Katiba Institute", "note": "name: please fill in"}, {"email": "danmajanja@gmail.com", "name": "Dan Majanja", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "dimajanjaadvocates@gmail.com", "name": "", "organisation": "Majanja Advocates", "note": "name: please fill in; org name: guess – please check"}, {"email": "doreen.adh@gmail.com", "name": "Doreen", "organisation": "", "note": "same Doreen as below? please fill in"}, {"email": "doreen.onyango@decoalonize.net", "name": "Doreen Onyango", "organisation": "deCOALonize", "note": ""}, {"email": "eddiekiama@gmail.com", "name": "Eddie Kiama", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "eliudkibii91@gmail.com", "name": "Eliud Kibii", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "eunicemwongera@gmail.com", "name": "Eunice Mwongera", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "fnjehu@greenpeace.org", "name": "", "organisation": "Greenpeace Africa", "note": "name: please fill in"}, {"email": "fredrick.njau@ke.boell.org", "name": "Fredrick Njau", "organisation": "Heinrich Böll Stiftung", "note": ""}, {"email": "ggithuku@ajws.org", "name": "", "organisation": "AJWS — American Jewish World Service", "note": "name: please fill in"}, {"email": "hannahevansva@gmail.com", "name": "Hannah Evans", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "hassansaid087@gmail.com", "name": "Hassan Said", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "heditrust2010@gmail.com", "name": "", "organisation": "HEDI Trust", "note": "name: please fill in; org name: guess – please check"}, {"email": "ishakbakar2030@gmail.com", "name": "Ishak Bakar", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "johnlucas750@gmail.com", "name": "John Lucas", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "josintaom@gmail.com", "name": "Josinta", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "khadijashekuwe@gmail.com", "name": "Khadija Shekuwe", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "lacenamanda@gmail.com", "name": "", "organisation": "", "note": "name + org: please fill in"}, {"email": "lwasson@rightsandresources.org", "name": "", "organisation": "Rights and Resources Initiative", "note": "name: please fill in"}, {"email": "mark.odaga@gmail.com", "name": "Mark Odaga", "organisation": "", "note": "org: please fill in"}, {"email": "marystone13@gmail.com", "name": "Mary Stone", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "mazingirakhub@gmail.com", "name": "MazingiraKenya Hub", "organisation": "deCOALonize", "note": "hub admin account"}, {"email": "mohamedathman64@gmail.com", "name": "Mohamed Athman", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "muotidaniel@yahoo.com", "name": "Daniel Muoti", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "muturikamau89@gmail.com", "name": "Muturi Kamau", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "nitabhalla@gmail.com", "name": "Nita Bhalla", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "odhisoyoko@gmail.com", "name": "", "organisation": "", "note": "name + org: please fill in"}, {"email": "omar.elmawi@gmail.com", "name": "Omar Elmawi", "organisation": "", "note": "org: please fill in"}, {"email": "ombokitotieno@gmail.com", "name": "", "organisation": "", "note": "name + org: please fill in"}, {"email": "ombonya@gmail.com", "name": "", "organisation": "", "note": "you? name + org: please fill in"}, {"email": "omuomboatieno@gmail.com", "name": "", "organisation": "", "note": "name + org: please fill in"}, {"email": "prince@fossilfueltreaty.org", "name": "Prince", "organisation": "Fossil Fuel Non-Proliferation Treaty Initiative", "note": "add surname?"}, {"email": "rayaafamau@gmail.com", "name": "Raya Famau", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "rogersochieng23@gmail.com", "name": "Rogers Ochieng", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "rose@naturaljustice.org", "name": "Rose", "organisation": "Natural Justice", "note": "add surname?"}, {"email": "rosemuthoni14@gmail.com", "name": "Rose Muthoni", "organisation": "", "note": "name guess – please check; org: please fill in"}, {"email": "rukiya.khamis@350.org", "name": "Rukiya Khamis", "organisation": "350.org", "note": ""}, {"email": "savelamucommunication@gmail.com", "name": "", "organisation": "Save Lamu", "note": "name: please fill in (or 'Save Lamu Communications')"}, {"email": "sgakii@greenpeace.org", "name": "", "organisation": "Greenpeace Africa", "note": "name: please fill in"}, {"email": "sham@justactkenya.org", "name": "Sham", "organisation": "JustAct Kenya", "note": "add surname?"}, {"email": "shamitp@gmail.com", "name": "", "organisation": "", "note": "same Sham as JustAct? please fill in"}, {"email": "skkariz@gmail.com", "name": "", "organisation": "", "note": "name + org: please fill in"}, {"email": "steeven@laudatosimovement.org", "name": "Steeven", "organisation": "Laudato Si' Movement", "note": "add surname?"}, {"email": "stephen.kiboi@mtkenyanetworkforum.org", "name": "Stephen Kiboi", "organisation": "MKNF — Mount Kenya Network Forum", "note": ""}, {"email": "transform2055@gmail.com", "name": "", "organisation": "Nairobi2055", "note": "name: please fill in; org guess – please check"}, {"email": "victor@earthlungs.org", "name": "Victor", "organisation": "EarthLungs Reforestation Foundation", "note": "add surname?"}, {"email": "vombonya@cometkenya.org", "name": "", "organisation": "CoMeT (Community Media Trust)", "note": "you? name: please fill in"}, {"email": "vombonya@gmail.com", "name": "", "organisation": "", "note": "you? name + org: please fill in"}];
+var list=document.getElementById("list");
+var DIR_ORGS=["350 Africa", "350.org", "Africa Climate Fund", "AJWS — American Jewish World Service", "ALDEF Kenya — Arid Lands Development Focus", "Barwaaqo Development Organization (BDO)", "Bunge la Wananchi (Wajir Chapter)", "Busia CSO Network", "CANCO", "CHRCE — Center for Human Rights & Civic Education", "CIAGK — Community Initiative Action Group Kenya", "CivFund", "CoMeT (Community Media Trust)", "Cross-Border Community Resilience (CBCR) Networks", "deCOALonize", "Defenders Coalition", "Dhamira Moja", "EACOP — East African Crude Oil Pipeline", "EarthLungs Reforestation Foundation", "Executive Rangeland Management Committees (ERMC)", "FEMNET — African Women's Dev. & Communication Network", "FIMI Ayni Fund", "FoNNaP — Friends of Nairobi National Park", "Fossil Fuel Non-Proliferation Treaty Initiative", "Friends of Lake Turkana", "Friends of Siaya Anti-Nuclear Plant (FSANP)", "Green Africa Foundation", "Green Belt Movement", "Green Globe Realization & Youth Activists", "Greenpeace Africa", "GROOTS Kenya", "Heinrich Böll Stiftung", "HIVOS", "ILEG — Institute for Law & Environmental Governance", "Inter-Religious Council of Kenya (IRCK)", "JustAct Kenya", "Katiba Institute", "KeNRA — Kenya National Rivers Association", "Kenya Anti-Nuclear Alliance (KANA)", "KHRC — Kenya Human Rights Commission", "Kisumu Environmental Champions (KEC)", "KOGWG — Kenya Oil & Gas Working Group (convened by CANCO)", "Laudato Si' Movement", "LAWA — Lamu Women Alliance", "MACSON — Marsabit Civil Society Network", "Mandera Conservation Consortium (MaCoCo)", "Marsabit Indigenous Organization Network", "Mazingira Trust", "MKNF — Mount Kenya Network Forum", "Mzalendo Halisi Foundation", "NAMATI", "Natural Justice", "Northern Rangelands Trust (NRT)", "OSIENALA (Friends of Lake Victoria)", "PACIDA — Pastoralist Community Initiative & Development Assistance", "PACJA — Pan African Climate Justice Alliance", "Pastoralist Community Initiatives (PCI)", "Rights and Resources Initiative", "Rona Foundation", "Saku Accountability Forum (SAF)", "Samburu Women's Trust", "Save Lamu", "SCODA — Solidarity and Capacity for Opportunity, Defenders in Action", "Siaya Muungano Network (SIMUN)", "StopEACOP (Kenya hub)", "SUSWATCH Kenya", "Tira Small Scale Mining Association", "Transparency International Kenya", "UAF-Africa — Urgent Action Fund–Africa", "Voices for Just Climate Action (VJCA)", "Wa-PAYDO — Pastoralist Youth Development Organization", "Wajir Peace & Development Agency (WPDA)", "Wajir Women for Environmental & Climate Change (WWECC)"];
+function orgList(){ var s={}; DIR_ORGS.forEach(function(o){ s[o]=1; }); ROWS.forEach(function(r){ if(r.organisation) s[r.organisation]=1; });
+  document.getElementById("orgs").innerHTML=Object.keys(s).sort().map(function(o){ return '<option value="'+o.replace(/"/g,"&quot;")+'">'; }).join(""); }
+function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
+function needs(r){ return !r.name.trim() || !r.organisation.trim() || (r.note && /guess|\?/.test(r.note) && !r._touched); }
+function draw(){
+  list.innerHTML=ROWS.map(function(r,i){
+    return '<div class="row" data-i="'+i+'"><div><div class="em">'+esc(r.email)+'</div>'+(r.note?'<div class="note">'+esc(r.note)+'</div>':'')+'</div>'+
+      '<div><input data-f="name" value="'+esc(r.name)+'" placeholder="Full name"></div>'+
+      '<div><input data-f="organisation" list="orgs" value="'+esc(r.organisation)+'" placeholder="Organisation"></div></div>';
+  }).join("");
+  [].forEach.call(list.querySelectorAll("input"), function(inp){
+    inp.addEventListener("input", function(){ var r=ROWS[+inp.closest(".row").getAttribute("data-i")]; r[inp.getAttribute("data-f")]=inp.value; r._touched=true; mark(); });
+    inp.addEventListener("change", orgList);
+  });
+  mark();
+}
+function mark(){
+  var q=document.getElementById("find").value.toLowerCase(), only=document.getElementById("onlyTodo").checked, done=0;
+  [].forEach.call(list.querySelectorAll(".row"), function(el){
+    var r=ROWS[+el.getAttribute("data-i")], complete=r.name.trim()&&r.organisation.trim();
+    if(complete) done++;
+    el.classList.toggle("done", !!complete);
+    [].forEach.call(el.querySelectorAll("input"), function(inp){ inp.classList.toggle("empty", !inp.value.trim()); });
+    var hit=!q || (r.email+" "+r.name+" "+r.organisation).toLowerCase().indexOf(q)>=0;
+    el.style.display = hit && (!only || needs(r)) ? "" : "none";
+  });
+  document.getElementById("prog").textContent=done+" of "+ROWS.length+" complete";
+}
+function sqlStr(s){ return "'"+String(s).trim().replace(/'/g,"''")+"'"; }
+document.getElementById("gen").addEventListener("click", function(){
+  var lines=["-- MazingiraKenya: save member names & organisations (generated "+new Date().toLocaleString()+")",
+             "-- Paste into Supabase -> SQL Editor -> Run. Only fills what you typed; blanks are left as they are.",""], n=0;
+  ROWS.forEach(function(r){
+    var parts=[];
+    if(r.name.trim()) parts.push("'person', "+sqlStr(r.name));
+    if(r.organisation.trim()) parts.push("'org', "+sqlStr(r.organisation));
+    if(!parts.length) return; n++;
+    lines.push("update auth.users set raw_user_meta_data = coalesce(raw_user_meta_data, '{}'::jsonb) || jsonb_build_object("+parts.join(", ")+") where lower(email) = "+sqlStr(r.email.toLowerCase())+";");
+  });
+  lines.push("","-- check:","select email, raw_user_meta_data->>'person' as name, raw_user_meta_data->>'org' as organisation from auth.users order by 3, 2;");
+  document.getElementById("sql").value=lines.join("\n");
+  document.getElementById("outInfo").textContent=" · "+n+" members will be updated";
+  document.getElementById("out").style.display="block";
+});
+document.getElementById("copy").addEventListener("click", function(){
+  var t=document.getElementById("sql"); t.focus(); t.select();
+  var ok=false; try{ ok=document.execCommand("copy"); }catch(e){}
+  if(navigator.clipboard){ navigator.clipboard.writeText(t.value).then(function(){ ok=true; }, function(){}); }
+  this.textContent="Copied ✓ (or press Cmd+C)"; var b=this; setTimeout(function(){ b.textContent="Copy SQL"; },2500);
+});
+document.getElementById("closeOut").addEventListener("click", function(){ document.getElementById("out").style.display="none"; });
+document.getElementById("find").addEventListener("input", mark);
+document.getElementById("onlyTodo").addEventListener("change", mark);
+orgList(); draw();
+</script></body></html>

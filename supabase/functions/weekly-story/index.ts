@@ -22,7 +22,7 @@ const MODEL = Deno.env.get("STORY_MODEL") ?? "claude-sonnet-5-5";
 // raia's standing issues (so the draft can link to one, and so we don't just repeat them)
 const ISSUES = [
   ["lamu-refinery", "A $17bn oil refinery is coming to Lamu"], ["lamu-coal", "The Lamu coal plant that Kenya defeated"],
-  ["western-gold", "Gold, guns and eviction in Western Kenya"], ["turkana-wind", "Lake Turkana wind: green power, contested land"],
+  ["western-gold", "Gold, guns and eviction in Western Kenya"], ["turkana-wind", "Lake Turkana wind: green power, contested land"], ["turkana-oil", "Turkana oil is flowing. Who gets paid, and who cleans up?"],
   ["siaya-nuclear", "A nuclear plant proposed for the lakeshore"], ["coast-plastics", "Drowning in plastic: Dandora, Gioto & the coast"],
 ];
 
