@@ -459,6 +459,21 @@ html[data-theme="dark"] .dlab.bad{ background:rgba(192,32,42,.22); color:#F49A9F
 html[data-theme="dark"] .dlab.good{ background:rgba(12,122,77,.24); color:#7FD6A9; }
 /* JS-built cards use inline rgba(0,0,0,.08) borders — lift them on dark */
 html[data-theme="dark"] #app [style*="rgba(0,0,0,.08)"]{ border-color:var(--line) !important; }
+/* live ticker under the top bar */
+.rtick{display:flex;align-items:center;height:32px;background:rgba(255,255,255,.05);border-top:1px solid rgba(255,255,255,.07);overflow:hidden}
+.rtick[hidden]{display:none}
+.rtick-tag{flex:none;height:100%;display:flex;align-items:center;gap:6px;padding:0 12px;background:var(--gold);color:#15161A;font-size:.6rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;user-select:none}
+.rtick-tag i{width:7px;height:7px;border-radius:50%;background:#C0202A;animation:rtpulse 1.6s ease-in-out infinite}
+.rtick.paused .rtick-tag i{animation:none;opacity:.5}
+.rtick-view{flex:1;overflow:hidden;position:relative}
+.rtick-track{display:flex;width:max-content;animation:rtslide var(--rdur,90s) linear infinite}
+.rtick-view:hover .rtick-track,.rtick.paused .rtick-track{animation-play-state:paused}
+@keyframes rtslide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes rtpulse{0%,100%{opacity:1}50%{opacity:.35}}
+.rtick-item{display:inline-flex;align-items:center;gap:8px;padding:0 18px;white-space:nowrap;font-size:.76rem;color:#E6E2D6;border-right:1px solid rgba(255,255,255,.1);text-decoration:none}
+.rtick-item:hover{color:#fff;text-decoration:underline}
+.rtick-cat{font-size:.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+@media (prefers-reduced-motion:reduce){.rtick-track{animation:none}.rtick-view{overflow-x:auto}}
 </style>
 </head>
 <body>
@@ -481,6 +496,10 @@ html[data-theme="dark"] #app [style*="rgba(0,0,0,.08)"]{ border-color:var(--line
       <button data-lang="sh" aria-pressed="false">SHENG</button>
     </div>
     <button type="button" class="mk-theme-btn" data-theme-toggle aria-label="Switch theme" title="Switch theme"><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+  </div>
+  <div class="rtick" id="rtick" hidden aria-label="Live on raia">
+    <div class="rtick-tag" title="Tap to pause / play"><i aria-hidden="true"></i><span id="rtickLabel">Live</span></div>
+    <div class="rtick-view"><div class="rtick-track" id="rtickTrack"></div></div>
   </div>
 </header>
 <div class="flagbar"></div>
@@ -1045,11 +1064,13 @@ function render(){
   else if(v==="flag") app.innerHTML=viewFlag();
   else if(v==="disinfo") app.innerHTML=viewDisinfo();
   else if(v==="petitions") app.innerHTML=viewPetitions();
+  else if(v==="petition") app.innerHTML=viewPetition();
   else if(v==="cop") app.innerHTML=viewCop();
   updateChrome(); window.scrollTo(0,0); bind();
   if(v==="flag") loadTweetWidget();
   if(v==="disinfo") fetchDisinfo();
   if(v==="petitions") fetchPetitions();
+  if(v==="petition") fetchPetition();
   if(v==="ninini"){ fetchCop(); fetchRadar(); fetchOpps(); fetchEvents(); }
   if(v==="cop") fetchCop();
   if(v==="news") fetchStream("news");
@@ -1640,39 +1661,79 @@ function voiceCard(v){
 }
 
 /* ---------- petitions & memoranda (public support) ---------- */
+/* Each petition: a card in the list, a full-text page (#petition=<id>) with sign / share /
+   download (PDF + Word), and links to the other petitions people can support. */
+var PETS = { rows:null, at:0 };
+var JSPDF_SRC = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
 function petBtn(){ return "display:inline-block;background:var(--green);color:#fff;border:0;border-radius:10px;padding:11px 16px;font-weight:800;font-size:.9rem;cursor:pointer"; }
-function viewPetitions(){
-  return '<section class="view reading">'+
-    '<div class="shead"><h2>'+esc(L({en:"Petitions & memoranda",sw:"Malalamiko na memoranda",sh:"Petitions na memoranda"}))+'</h2><span class="rule"></span></div>'+
-    '<p class="sum" style="margin:0 0 18px">'+esc(L({en:"Coalition demands to those in power. Add your name — every signature counts.",sw:"Madai ya muungano kwa walio madarakani. Ongeza jina lako — kila sahihi inahesabika.",sh:"Madai ya coalition kwa walio na power. Ongeza jina lako — kila signature inacount."}))+'</p>'+
-    '<div id="petpub" style="display:grid;gap:14px"></div>'+footer()+'</section>';
+function petGhost(){ return "display:inline-block;background:transparent;color:var(--green-ink);border:1.5px solid var(--green);border-radius:10px;padding:9px 14px;font-weight:800;font-size:.86rem;cursor:pointer;text-decoration:none"; }
+function petsLoad(cb){
+  if(PETS.rows && Date.now()-PETS.at<60000) return cb(PETS.rows);
+  if(!RSB) return cb(null);
+  RSB.from("petitions").select("*").eq("published",true).order("created_at",{ascending:false}).limit(50).then(function(r){
+    if(r.error||!r.data) return cb(null);
+    PETS.rows=r.data; PETS.at=Date.now(); cb(r.data);
+  }, function(){ cb(null); });
 }
-function petExtHtml(p){
-  var isAct=p.kind==="action";
-  var dl=p.deadline?' · '+esc(L({en:"Deadline",sw:"Mwisho",sh:"Deadline"}))+' '+esc(new Date(p.deadline+"T00:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})):'';
-  var lab=isAct?L({en:"Take action ↗",sw:"Chukua hatua ↗",sh:"Chukua action ↗"}):L({en:"Sign on the partner’s page ↗",sw:"Tia sahihi kwenye ukurasa wa mshirika ↗",sh:"Sign kwa page ya partner ↗"});
-  return '<div class="card" data-pid="'+esc(p.id)+'" style="padding:16px">'+
-    '<div style="font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a6a06;margin-bottom:6px">'+esc(isAct?L({en:"Call to action",sw:"Wito wa hatua",sh:"Call to action"}):L({en:"Partner petition",sw:"Ombi la mshirika",sh:"Petition ya partner"}))+(p.source_name?' · '+esc(p.source_name):'')+dl+'</div>'+
-    '<h3 style="margin:0 0 8px;font-size:1.08rem;line-height:1.3">'+esc(p.title)+'</h3>'+
-    '<p style="font-size:.82rem;color:var(--ink-soft);margin:0 0 6px">'+esc(L({en:"To",sw:"Kwa",sh:"Kwa"}))+': '+esc(p.target)+'</p>'+
-    '<p class="sum" style="margin:0 0 12px">'+esc(p.summary)+'</p>'+
-    '<a href="'+esc(p.action_url)+'" target="_blank" rel="noopener noreferrer" style="'+petBtn()+';text-decoration:none">'+esc(lab)+'</a>'+
-  '</div>';
+function petById(id){ var rs=PETS.rows||[]; for(var i=0;i<rs.length;i++) if(String(rs[i].id)===String(id)) return rs[i]; return null; }
+function petUrl(p){ return location.origin+location.pathname+"#petition="+encodeURIComponent(p.id); }
+function petSlug(p){ return String(p.title||"petition").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60)||"petition"; }
+function petSigned(id){ try{ return localStorage.getItem("raia.signed."+id)==="1"; }catch(e){ return false; } }
+function petIsExt(p){ return !!p.action_url; }
+function petShareText(p){
+  return dec(p.title)+(p.target?" — "+L({en:"to",sw:"kwa",sh:"kwa"})+" "+dec(p.target):"")+". "+
+    (petIsExt(p)?L({en:"Read it and take action:",sw:"Isome na uchukue hatua:",sh:"Isome na uchukue action:"}):L({en:"Read it and add your name:",sw:"Isome na uongeze jina lako:",sh:"Isome na uongeze jina lako:"}));
 }
-function petCardHtml(p){
-  if(p.action_url) return petExtHtml(p);
+function petDeadline(p){ return p.deadline?esc(new Date(p.deadline+"T00:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})):""; }
+function petKicker(p){
+  var isAct=p.kind==="action", bits=[];
+  if(petIsExt(p)) bits.push(esc(isAct?L({en:"Call to action",sw:"Wito wa hatua",sh:"Call to action"}):L({en:"Partner petition",sw:"Ombi la mshirika",sh:"Petition ya partner"}))+(p.source_name?' · '+esc(dec(p.source_name)):''));
+  else bits.push(esc(L({en:"Coalition petition",sw:"Ombi la muungano",sh:"Petition ya coalition"})));
+  if(p.deadline) bits.push(esc(L({en:"Deadline",sw:"Mwisho",sh:"Deadline"}))+' '+petDeadline(p));
+  return '<div style="font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a6a06;margin-bottom:6px">'+bits.join(' · ')+'</div>';
+}
+function petProgress(p){
   var count=p.sign_count||0, goal=p.goal||0;
   var pct=goal>0?Math.min(100,Math.round(count/goal*100)):(count>0?100:0);
   var goalTxt=goal>0?(' '+L({en:"of",sw:"kati ya",sh:"kati ya"})+' '+goal.toLocaleString()):'';
-  var doc=p.doc_url?'<a href="'+esc(p.doc_url)+'" target="_blank" rel="noopener noreferrer" style="font-weight:700">'+esc(L({en:"Read memorandum ↗",sw:"Soma memoranda ↗",sh:"Soma memo ↗"}))+'</a>':'';
-  return '<div class="card" data-pid="'+esc(p.id)+'" style="padding:16px">'+
-    '<div style="font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a6a06;margin-bottom:6px">'+esc(L({en:"To",sw:"Kwa",sh:"Kwa"}))+': '+esc(p.target)+'</div>'+
-    '<h3 style="margin:0 0 8px;font-size:1.08rem;line-height:1.3">'+esc(p.title)+'</h3>'+
-    '<p class="sum" style="margin:0 0 12px">'+esc(p.summary)+'</p>'+
-    '<div style="height:7px;border-radius:6px;background:var(--line);overflow:hidden;margin-bottom:6px"><i style="display:block;height:100%;width:'+pct+'%;background:var(--green);border-radius:6px"></i></div>'+
-    '<p style="font-size:.82rem;color:var(--ink-soft);margin:0 0 12px"><b style="color:var(--ink)">'+count.toLocaleString()+'</b> '+esc(L({en:"signatures",sw:"sahihi",sh:"signatures"}))+goalTxt+'</p>'+
+  return '<div style="height:7px;border-radius:6px;background:var(--line);overflow:hidden;margin-bottom:6px"><i style="display:block;height:100%;width:'+pct+'%;background:var(--green);border-radius:6px"></i></div>'+
+    '<p class="petcount" style="font-size:.82rem;color:var(--ink-soft);margin:0 0 12px"><b style="color:var(--ink)">'+count.toLocaleString()+'</b> '+esc(L({en:"signatures",sw:"sahihi",sh:"signatures"}))+goalTxt+'</p>';
+}
+/* the action button: sign here (coalition petitions) or act on the partner's page */
+function petActHtml(p){
+  if(petIsExt(p)){
+    var lab=p.kind==="action"?L({en:"Take action ↗",sw:"Chukua hatua ↗",sh:"Chukua action ↗"}):L({en:"Sign on the partner’s page ↗",sw:"Tia sahihi kwenye ukurasa wa mshirika ↗",sh:"Sign kwa page ya partner ↗"});
+    return '<a href="'+esc(p.action_url)+'" target="_blank" rel="noopener noreferrer" style="'+petBtn()+';text-decoration:none">'+esc(lab)+'</a>';
+  }
+  if(petSigned(p.id)) return '<span style="display:inline-block;color:var(--green-ink);font-weight:800;padding:10px 0">✓ '+esc(L({en:"You’ve signed this",sw:"Umetia sahihi",sh:"Ume-sign hii"}))+'</span>';
+  return '<button class="petsign" type="button" style="'+petBtn()+'">'+esc(L({en:"Add your name",sw:"Ongeza jina lako",sh:"Ongeza jina lako"}))+'</button>';
+}
+/* share links: WhatsApp first (where most people will pass it on) */
+function petShareRow(p, compact){
+  var url=petUrl(p), u=encodeURIComponent(url), t=encodeURIComponent(petShareText(p)), tu=encodeURIComponent(petShareText(p)+" "+url);
+  var nets=[["WhatsApp","https://wa.me/?text="+tu,"#1EAA52"],["X","https://twitter.com/intent/tweet?text="+t+"&url="+u,"#15161A"],
+    ["Facebook","https://www.facebook.com/sharer/sharer.php?u="+u,"#1877F2"],["Telegram","https://t.me/share/url?url="+u+"&text="+t,"#229ED9"],
+    ["LinkedIn","https://www.linkedin.com/sharing/share-offsite/?url="+u,"#0A66C2"]];
+  if(compact) nets=nets.slice(0,3);
+  var pill="display:inline-block;color:#fff;border:0;border-radius:999px;padding:7px 12px;font-weight:800;font-size:.76rem;text-decoration:none;cursor:pointer";
+  return '<div class="petshare" style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:12px">'+
+    '<span style="font-size:.74rem;font-weight:800;color:var(--ink-soft);margin-right:2px">'+esc(L({en:"Share:",sw:"Shiriki:",sh:"Share:"}))+'</span>'+
+    nets.map(function(n){ return '<a href="'+esc(n[1])+'" target="_blank" rel="noopener noreferrer" style="'+pill+';background:'+n[2]+'">'+n[0]+'</a>'; }).join("")+
+    '<button type="button" class="petcopy" data-url="'+esc(url)+'" style="'+pill+';background:var(--ink-soft)">'+esc(L({en:"Copy link",sw:"Nakili kiungo",sh:"Copy link"}))+'</button>'+
+    (navigator.share?'<button type="button" class="petnative" data-pid="'+esc(p.id)+'" style="'+pill+';background:var(--ink-soft)">'+esc(L({en:"More…",sw:"Zaidi…",sh:"Zaidi…"}))+'</button>':'')+
+  '</div>';
+}
+function petCardHtml(p){
+  var full='<a href="#petition='+encodeURIComponent(p.id)+'" style="font-weight:800;color:var(--green-ink)">'+esc(L({en:"Read the full petition →",sw:"Soma ombi lote →",sh:"Soma petition yote →"}))+'</a>';
+  var doc=p.doc_url?'<a href="'+esc(p.doc_url)+'" target="_blank" rel="noopener noreferrer" style="font-weight:700">'+esc(L({en:"Original document ↗",sw:"Hati asili ↗",sh:"Document asili ↗"}))+'</a>':'';
+  return '<div class="card" data-pid="'+esc(p.id)+'" style="padding:16px">'+petKicker(p)+
+    '<h3 style="margin:0 0 8px;font-size:1.08rem;line-height:1.3"><a href="#petition='+encodeURIComponent(p.id)+'" style="color:inherit;text-decoration:none">'+esc(dec(p.title))+'</a></h3>'+
+    '<p style="font-size:.82rem;color:var(--ink-soft);margin:0 0 6px">'+esc(L({en:"To",sw:"Kwa",sh:"Kwa"}))+': '+esc(dec(p.target))+'</p>'+
+    '<p class="sum" style="margin:0 0 12px">'+esc(dec(p.summary))+'</p>'+
+    (petIsExt(p)?'':petProgress(p))+
     '<div class="petsignwrap"></div>'+
-    '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><button class="petsign" type="button" style="'+petBtn()+'">'+esc(L({en:"Add your name",sw:"Ongeza jina lako",sh:"Ongeza jina lako"}))+'</button>'+doc+'</div>'+
+    '<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">'+petActHtml(p)+full+doc+'</div>'+
+    petShareRow(p,true)+
   '</div>';
 }
 function petSignForm(){
@@ -1682,42 +1743,290 @@ function petSignForm(){
     '<label style="display:flex;gap:8px;align-items:flex-start;font-size:.86rem"><input type="checkbox" class="ps-consent"><span>'+esc(L({en:"I add my name and consent to it being counted publicly.",sw:"Ninaongeza jina langu na kukubali lihesabiwe hadharani.",sh:"Naongeza jina langu na kukubali licountiwe publicly."}))+'</span></label>'+
     '<button class="ps-submit" type="button" style="'+petBtn()+'">'+esc(L({en:"Sign",sw:"Tia sahihi",sh:"Sign"}))+'</button></div>';
 }
+/* after signing: thank, ask to share, offer the next petitions */
+function petAfterSign(p){
+  var others=(PETS.rows||[]).filter(function(x){ return String(x.id)!==String(p.id) && !(!petIsExt(x)&&petSigned(x.id)); });
+  others.sort(function(a,b){ return (petIsExt(a)?1:0)-(petIsExt(b)?1:0); });
+  others=others.slice(0,3);
+  return '<div style="background:var(--paper2);border-radius:12px;padding:14px;margin:6px 0 14px">'+
+    '<p style="color:var(--green-ink);font-weight:800;margin:0 0 4px">✓ '+esc(L({en:"Thank you — your name is added.",sw:"Asante — jina lako limeongezwa.",sh:"Asante — jina lako limeaddiwa."}))+'</p>'+
+    '<p style="margin:0;font-size:.88rem">'+esc(L({en:"One signature becomes ten when you pass it on.",sw:"Sahihi moja inakuwa kumi ukiipitisha.",sh:"Signature moja inakuwa kumi ukiipass."}))+'</p>'+
+    petShareRow(p)+
+    (others.length?'<p style="margin:14px 0 6px;font-weight:800;font-size:.84rem">'+esc(L({en:"Sign more petitions",sw:"Tia sahihi maombi mengine",sh:"Sign petitions zingine"}))+'</p>'+
+      others.map(function(o){ return '<a href="#petition='+encodeURIComponent(o.id)+'" style="display:block;padding:8px 0;border-top:1px solid var(--line);color:var(--ink);text-decoration:none;font-weight:700;font-size:.9rem">'+esc(dec(o.title))+' <span style="color:var(--green-ink)">→</span></a>'; }).join(""):'')+
+  '</div>';
+}
+function bindPetShare(host){
+  host.querySelectorAll(".petcopy").forEach(function(b){ b.addEventListener("click",function(){
+    var u=b.getAttribute("data-url");
+    function ok(){ b.textContent=L({en:"Link copied ✓",sw:"Imenakiliwa ✓",sh:"Imecopiwa ✓"}); }
+    try{ navigator.clipboard.writeText(u).then(ok,function(){ window.prompt("",u); }); }catch(e){ window.prompt("",u); }
+  }); });
+  host.querySelectorAll(".petnative").forEach(function(b){ b.addEventListener("click",function(){
+    var p=petById(b.getAttribute("data-pid")); if(!p||!navigator.share) return;
+    navigator.share({title:dec(p.title),text:petShareText(p),url:petUrl(p)}).catch(function(){});
+  }); });
+}
+function bindSign(card, p){
+  var openBtn=card.querySelector(".petsign"), wrap=card.querySelector(".petsignwrap");
+  if(!openBtn||!wrap) return;
+  openBtn.addEventListener("click",function(){
+    if(wrap.innerHTML){ wrap.innerHTML=""; return; }
+    wrap.innerHTML=petSignForm();
+    var sub=wrap.querySelector(".ps-submit");
+    var nm=wrap.querySelector(".ps-name"); if(nm) nm.focus();
+    sub.addEventListener("click",function(){
+      var name=(wrap.querySelector(".ps-name").value||"").trim();
+      var org=(wrap.querySelector(".ps-org").value||"").trim();
+      var consent=wrap.querySelector(".ps-consent").checked;
+      if(!name||!consent){ sub.textContent=L({en:"Name + consent needed",sw:"Jina + ridhaa",sh:"Jina + consent"}); setTimeout(function(){ sub.textContent=L({en:"Sign",sw:"Tia sahihi",sh:"Sign"}); },1600); return; }
+      sub.disabled=true;
+      function done(){
+        try{ localStorage.setItem("raia.signed."+p.id,"1"); }catch(e){}
+        p.sign_count=(p.sign_count||0)+1;
+        var c=card.querySelector(".petcount b"); if(c) c.textContent=p.sign_count.toLocaleString();
+        openBtn.outerHTML='<span style="display:inline-block;color:var(--green-ink);font-weight:800;padding:10px 0">✓ '+esc(L({en:"You’ve signed this",sw:"Umetia sahihi",sh:"Ume-sign hii"}))+'</span>';
+        wrap.innerHTML=petAfterSign(p); bindPetShare(wrap);
+      }
+      if(RSB){ RSB.from("petition_signatures").insert({petition_id:p.id,name:name,org:org}).then(function(rr){ if(rr.error){ sub.disabled=false; sub.textContent=L({en:"Try again",sw:"Jaribu tena",sh:"Try again"}); } else done(); }, function(){ sub.disabled=false; sub.textContent=L({en:"Try again",sw:"Jaribu tena",sh:"Try again"}); }); }
+    });
+  });
+}
+
+/* --- list view --- */
+function viewPetitions(){
+  return '<section class="view reading">'+
+    '<div class="shead"><h2>'+esc(L({en:"Petitions & memoranda",sw:"Malalamiko na memoranda",sh:"Petitions na memoranda"}))+'</h2><span class="rule"></span></div>'+
+    '<p class="sum" style="margin:0 0 18px">'+esc(L({en:"Coalition demands to those in power. Read them in full, add your name and pass them on — every signature counts.",sw:"Madai ya muungano kwa walio madarakani. Yasome yote, ongeza jina lako na uyapitishe — kila sahihi inahesabika.",sh:"Madai ya coalition kwa walio na power. Zisome zote, ongeza jina lako na uzipass — kila signature inacount."}))+'</p>'+
+    '<div id="petpub" style="display:grid;gap:14px"></div>'+footer()+'</section>';
+}
 function fetchPetitions(){
   var box=document.getElementById("petpub"); if(!box) return;
   box.innerHTML='<p class="muted">'+esc(L({en:"Loading…",sw:"Inapakia…",sh:"Ina-load…"}))+'</p>';
   if(!RSB){ box.innerHTML='<div class="card" style="padding:20px;text-align:center"><span class="muted">'+esc(L({en:"Petitions are unavailable right now.",sw:"Malalamiko hayapatikani sasa.",sh:"Petitions hazipatikani sasa."}))+'</span></div>'; return; }
-  RSB.from("petitions").select("*").eq("published",true).order("created_at",{ascending:false}).limit(50).then(function(r){
-    var rows=r&&r.data;
-    if(r.error || !rows || !rows.length){ box.innerHTML='<div class="card" style="padding:20px;text-align:center"><span class="muted">'+esc(L({en:"No active petitions yet — check back soon.",sw:"Hakuna malalamiko hai bado — angalia tena hivi karibuni.",sh:"Hakuna petitions bado — rudi soon."}))+'</span></div>'; return; }
-    if(state.petitionId){ rows.sort(function(a,b){ return (b.id===state.petitionId?1:0)-(a.id===state.petitionId?1:0); }); }
+  petsLoad(function(rows){
+    if(!document.getElementById("petpub")) return;
+    if(!rows || !rows.length){ box.innerHTML='<div class="card" style="padding:20px;text-align:center"><span class="muted">'+esc(L({en:"No active petitions yet — check back soon.",sw:"Hakuna malalamiko hai bado — angalia tena hivi karibuni.",sh:"Hakuna petitions bado — rudi soon."}))+'</span></div>'; return; }
     box.innerHTML=rows.map(petCardHtml).join("");
     bindPetitions();
-    if(state.petitionId){ var c=box.querySelector('[data-pid="'+state.petitionId+'"]'); if(c){ c.scrollIntoView({block:"center"}); } }
-  }, function(){ box.innerHTML='<div class="card" style="padding:20px;text-align:center"><span class="muted">'+esc(L({en:"Couldn’t load petitions.",sw:"Imeshindwa kupakia.",sh:"Haiwezi load."}))+'</span></div>'; });
+  });
 }
 function bindPetitions(){
   var box=document.getElementById("petpub"); if(!box) return;
-  box.querySelectorAll(".card[data-pid]").forEach(function(card){
-    var pid=card.getAttribute("data-pid");
-    var openBtn=card.querySelector(".petsign"), wrap=card.querySelector(".petsignwrap");
-    if(!openBtn) return;
-    openBtn.addEventListener("click",function(){
-      if(wrap.innerHTML){ wrap.innerHTML=""; return; }
-      wrap.innerHTML=petSignForm();
-      var sub=wrap.querySelector(".ps-submit");
-      sub.addEventListener("click",function(){
-        var name=(wrap.querySelector(".ps-name").value||"").trim();
-        var org=(wrap.querySelector(".ps-org").value||"").trim();
-        var consent=wrap.querySelector(".ps-consent").checked;
-        if(!name||!consent){ sub.textContent=L({en:"Name + consent needed",sw:"Jina + ridhaa",sh:"Jina + consent"}); setTimeout(function(){ sub.textContent=L({en:"Sign",sw:"Tia sahihi",sh:"Sign"}); },1600); return; }
-        sub.disabled=true;
-        function done(){ wrap.innerHTML='<p style="color:var(--green-ink);font-weight:800;margin:4px 0 12px">✓ '+esc(L({en:"Thank you — your name is added.",sw:"Asante — jina lako limeongezwa.",sh:"Asante — jina lako limeaddiwa."}))+'</p>'; }
-        if(RSB){ RSB.from("petition_signatures").insert({petition_id:pid,name:name,org:org}).then(function(rr){ if(rr.error){ sub.disabled=false; sub.textContent=L({en:"Try again",sw:"Jaribu tena",sh:"Try again"}); } else done(); }, function(){ done(); }); }
-        else done();
-      });
-    });
+  box.querySelectorAll(".card[data-pid]").forEach(function(card){ var p=petById(card.getAttribute("data-pid")); if(p) bindSign(card,p); });
+  bindPetShare(box);
+}
+
+/* --- full petition page --- */
+function viewPetition(){
+  return '<section class="view reading">'+
+    '<a href="#petitions" style="display:inline-block;margin:4px 0 14px;font-weight:800;color:var(--green-ink);text-decoration:none">← '+esc(L({en:"All petitions",sw:"Maombi yote",sh:"Petitions zote"}))+'</a>'+
+    '<div id="petdetail"><p class="muted">'+esc(L({en:"Loading…",sw:"Inapakia…",sh:"Ina-load…"}))+'</p></div>'+footer()+'</section>';
+}
+/* plain or lightly-marked-up text → readable paragraphs and headings */
+function petParas(t){
+  t=dec(String(t||"")).replace(/\r/g,"").trim(); if(!t) return [];
+  var parts=t.split(/\n\s*\n/);
+  if(parts.length===1 && t.length>900) parts=t.split(/\n/);
+  return parts.map(function(par){
+    par=par.trim(); if(!par) return null;
+    var md=par.match(/^#{1,4}\s+([\s\S]*)$/);
+    var plain=par.replace(/\*\*/g,"");
+    var head=!!md || (plain.length<110 && plain.indexOf("\n")<0 && /[A-Z]/.test(plain) && plain===plain.toUpperCase());
+    return { head:head, text:md?md[1].replace(/\*\*/g,""):par };
+  }).filter(Boolean);
+}
+function petBodyHtml(t){
+  return petParas(t).map(function(x){
+    if(x.head) return '<h4 style="margin:18px 0 6px;font-size:.98rem;line-height:1.35">'+esc(x.text.replace(/\*\*/g,""))+'</h4>';
+    var h=esc(x.text).replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/\n/g,"<br>");
+    return '<p style="margin:0 0 12px;line-height:1.6">'+h+'</p>';
+  }).join("");
+}
+function petDetailHtml(p){
+  var hasBody=!!(p.body&&String(p.body).trim());
+  var tools='<div style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 4px">'+
+    '<button type="button" class="petpdf" style="'+petGhost()+'">⤓ PDF</button>'+
+    '<button type="button" class="petword" style="'+petGhost()+'">⤓ Word</button>'+
+    '<button type="button" class="petsharedoc" style="'+petGhost()+'">'+esc(L({en:"Share the document",sw:"Shiriki hati",sh:"Share document"}))+'</button>'+
+    (p.doc_url?'<a href="'+esc(p.doc_url)+'" target="_blank" rel="noopener noreferrer" style="'+petGhost()+'">'+esc(L({en:"Original document ↗",sw:"Hati asili ↗",sh:"Document asili ↗"}))+'</a>':'')+
+  '</div>';
+  var others=(PETS.rows||[]).filter(function(x){ return String(x.id)!==String(p.id); }).slice(0,6);
+  return '<article class="card" data-pid="'+esc(p.id)+'" style="padding:18px">'+petKicker(p)+
+      '<h2 style="margin:0 0 10px;font-size:1.35rem;line-height:1.25">'+esc(dec(p.title))+'</h2>'+
+      '<p style="font-size:.86rem;color:var(--ink-soft);margin:0 0 10px">'+esc(L({en:"To",sw:"Kwa",sh:"Kwa"}))+': <b style="color:var(--ink)">'+esc(dec(p.target))+'</b></p>'+
+      '<p class="sum" style="margin:0 0 14px;font-weight:600">'+esc(dec(p.summary))+'</p>'+
+      (petIsExt(p)?'':petProgress(p))+
+      '<div class="petsignwrap"></div>'+
+      '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">'+petActHtml(p)+'</div>'+
+      petShareRow(p)+tools+
+    '</article>'+
+    '<div class="card" style="padding:18px;margin-top:14px">'+
+      '<div style="font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a6a06;margin-bottom:10px">'+esc(hasBody?L({en:"The full text",sw:"Maandishi kamili",sh:"Text yote"}):L({en:"About this petition",sw:"Kuhusu ombi hili",sh:"Kuhusu hii petition"}))+'</div>'+
+      (hasBody?petBodyHtml(p.body):'<p style="margin:0;line-height:1.6">'+esc(dec(p.summary))+'</p>')+
+      (petIsExt(p)?'<p class="muted" style="margin:12px 0 0;font-size:.8rem">'+esc(L({en:"Posted by a partner organisation. Their page has the official version.",sw:"Imewekwa na shirika mshirika. Ukurasa wao una toleo rasmi.",sh:"Imepostiwa na partner. Page yao iko na version rasmi."}))+'</p>':'')+
+    '</div>'+
+    (others.length?'<div style="margin-top:22px"><div class="shead"><h2>'+esc(L({en:"More petitions you can support",sw:"Maombi mengine unayoweza kuunga mkono",sh:"Petitions zingine unaweza support"}))+'</h2><span class="rule"></span></div>'+
+      '<div style="display:grid;gap:10px">'+others.map(function(o){
+        return '<a href="#petition='+encodeURIComponent(o.id)+'" class="card" style="display:block;padding:13px 15px;text-decoration:none;color:var(--ink)">'+
+          '<span style="display:block;font-weight:800;line-height:1.3">'+esc(dec(o.title))+'</span>'+
+          '<span style="display:block;font-size:.8rem;color:var(--ink-soft);margin-top:3px">'+esc(L({en:"To",sw:"Kwa",sh:"Kwa"}))+': '+esc(dec(o.target))+(petIsExt(o)?'':' · '+(o.sign_count||0).toLocaleString()+' '+esc(L({en:"signatures",sw:"sahihi",sh:"signatures"})))+'</span>'+
+          '<span style="display:block;font-size:.82rem;font-weight:800;color:var(--green-ink);margin-top:6px">'+esc(petIsExt(o)?L({en:"Read & act →",sw:"Soma na uchukue hatua →",sh:"Soma na uchukue action →"}):L({en:"Read & sign →",sw:"Soma na utie sahihi →",sh:"Soma na usign →"}))+'</span></a>';
+      }).join("")+'</div></div>':'');
+}
+function fetchPetition(){
+  var host=document.getElementById("petdetail"), id=state.petitionId; if(!host) return;
+  var missing='<div class="card" style="padding:20px;text-align:center"><span class="muted">'+esc(L({en:"This petition isn’t available.",sw:"Ombi hili halipatikani.",sh:"Hii petition haipatikani."}))+'</span></div>';
+  petLoadPdfLib();
+  petsLoad(function(){
+    if(!document.getElementById("petdetail")) return;
+    var p=petById(id);
+    function show(p){ host.innerHTML=petDetailHtml(p); var card=host.querySelector(".card[data-pid]"); bindSign(card,p); bindPetShare(host); bindPetDocs(host,p); try{ document.title=dec(p.title)+" · MazingiraKenya Raia"; }catch(e){} }
+    if(p) return show(p);
+    if(!RSB||!id){ host.innerHTML=missing; return; }
+    RSB.from("petitions").select("*").eq("id",id).eq("published",true).maybeSingle().then(function(r){
+      if(r.error||!r.data){ host.innerHTML=missing; return; }
+      (PETS.rows=PETS.rows||[]).push(r.data); show(r.data);
+    }, function(){ host.innerHTML=missing; });
   });
 }
+
+/* --- downloads: PDF (jsPDF, loaded on demand) and Word --- */
+function petLoadPdfLib(){
+  if(window.jspdf) return Promise.resolve();
+  if(PETS.pdfLoading) return PETS.pdfLoading;
+  PETS.pdfLoading=new Promise(function(res,rej){
+    var s=document.createElement("script"); s.src=JSPDF_SRC; s.async=true;
+    s.onload=function(){ res(); }; s.onerror=function(){ PETS.pdfLoading=null; rej(); };
+    document.head.appendChild(s);
+  });
+  return PETS.pdfLoading;
+}
+/* the built-in PDF fonts cover Latin-1 only, so map typographic marks and drop the rest */
+function pdfSafe(s){
+  return dec(String(s||"")).replace(/[\u2018\u2019\u201A\u2032]/g,"'").replace(/[\u201C\u201D\u201E\u2033]/g,'"')
+    .replace(/[\u2013\u2014\u2212]/g,"-").replace(/\u2026/g,"...").replace(/[\u2022\u25CF\u25AA]/g,"-").replace(/\u00A0/g," ")
+    .replace(/[^\x09\x0A\x0D\x20-\x7E\u00A1-\u00FF]/g,"");
+}
+function petPdfBlob(p){
+  var doc=new window.jspdf.jsPDF({unit:"pt",format:"a4"});
+  var W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), m=56, lw=W-2*m, y=m;
+  function ensure(h){ if(y+h>H-m-20){ doc.addPage(); y=m; } }
+  function block(text,size,style,gap,rgb){
+    doc.setFont("helvetica",style||"normal"); doc.setFontSize(size); var c=rgb||[21,22,26]; doc.setTextColor(c[0],c[1],c[2]);
+    var lines=doc.splitTextToSize(pdfSafe(text),lw), lh=size*1.4;
+    lines.forEach(function(l){ ensure(lh); doc.text(l,m,y+size); y+=lh; }); y+=(gap||0);
+  }
+  block("MAZINGIRAKENYA RAIA  -  PETITIONS & MEMORANDA",8,"bold",10,[154,106,6]);
+  block(p.title,18,"bold",8);
+  block("To: "+(p.target||""),10.5,"normal",2,[88,85,73]);
+  if(p.deadline) block("Deadline: "+p.deadline,10.5,"normal",2,[88,85,73]);
+  if(p.source_name) block("Posted by: "+p.source_name,10.5,"normal",2,[88,85,73]);
+  y+=8; block(p.summary,11.5,"bold",10);
+  doc.setDrawColor(220,154,24); doc.setLineWidth(1.2); ensure(10); doc.line(m,y,W-m,y); y+=16;
+  var paras=petParas(p.body); if(!paras.length) paras=[{head:false,text:p.summary}];
+  paras.forEach(function(x){ var t=x.text.replace(/\*\*/g,""); if(x.head){ y+=4; block(t,11.5,"bold",4); } else block(t,10.5,"normal",8); });
+  y+=10;
+  block(petIsExt(p)?"Take action: "+p.action_url:"Read and add your name: "+petUrl(p),10,"bold",2,[27,122,62]);
+  var n=doc.internal.getNumberOfPages();
+  for(var i=1;i<=n;i++){ doc.setPage(i); doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(120,120,120);
+    doc.text("MazingiraKenya Raia - "+location.host,m,H-30); doc.text(i+" / "+n,W-m,H-30,{align:"right"}); }
+  return doc.output("blob");
+}
+function petWordBlob(p){
+  var body=(p.body&&String(p.body).trim())?petBodyHtml(p.body):'<p>'+esc(dec(p.summary))+'</p>';
+  var link=petIsExt(p)?p.action_url:petUrl(p);
+  var html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>'+esc(dec(p.title))+'</title>'+
+    '<style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.45;color:#15161A} h1{font-size:18pt;margin:0 0 8pt} h4{font-size:12pt;margin:14pt 0 4pt} .k{color:#9a6a06;font-size:8pt;font-weight:bold;letter-spacing:1pt} .m{color:#585549} .s{font-weight:bold;border-bottom:1.5pt solid #DC9A18;padding-bottom:8pt}</style></head><body>'+
+    '<p class="k">MAZINGIRAKENYA RAIA · PETITIONS &amp; MEMORANDA</p><h1>'+esc(dec(p.title))+'</h1>'+
+    '<p class="m">To: '+esc(dec(p.target))+(p.deadline?'<br>Deadline: '+esc(p.deadline):'')+(p.source_name?'<br>Posted by: '+esc(dec(p.source_name)):'')+'</p>'+
+    '<p class="s">'+esc(dec(p.summary))+'</p>'+body+
+    '<p><b>'+(petIsExt(p)?'Take action':'Read and add your name')+':</b> <a href="'+esc(link)+'">'+esc(link)+'</a></p></body></html>';
+  return new Blob(["\ufeff",html],{type:"application/msword"});
+}
+function petDownload(blob,name){
+  var a=document.createElement("a"), u=URL.createObjectURL(blob); a.href=u; a.download=name;
+  document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(u); a.remove(); },4000);
+}
+function bindPetDocs(host,p){
+  var pdf=host.querySelector(".petpdf"), word=host.querySelector(".petword"), sh=host.querySelector(".petsharedoc");
+  var base="Petition-"+petSlug(p);
+  function busy(b,on,txt){ b.disabled=on; if(txt) b.textContent=txt; }
+  if(pdf) pdf.addEventListener("click",function(){
+    var t=pdf.textContent; busy(pdf,true,L({en:"Preparing…",sw:"Inaandaa…",sh:"Inaprepare…"}));
+    petLoadPdfLib().then(function(){ petDownload(petPdfBlob(p),base+".pdf"); busy(pdf,false,t); },
+      function(){ busy(pdf,false,L({en:"PDF unavailable — try Word",sw:"PDF haipatikani — jaribu Word",sh:"PDF haipatikani — try Word"})); });
+  });
+  if(word) word.addEventListener("click",function(){ petDownload(petWordBlob(p),base+".doc"); });
+  if(sh) sh.addEventListener("click",function(){
+    /* share the PDF file itself where the phone allows it (WhatsApp, Telegram, email…);
+       otherwise download it so it can be attached by hand */
+    if(window.jspdf && navigator.canShare && typeof File==="function"){
+      var f=new File([petPdfBlob(p)],base+".pdf",{type:"application/pdf"});
+      if(navigator.canShare({files:[f]})){ navigator.share({files:[f],title:dec(p.title),text:petShareText(p)+" "+petUrl(p)}).catch(function(){}); return; }
+    }
+    if(navigator.share){ navigator.share({title:dec(p.title),text:petShareText(p),url:petUrl(p)}).catch(function(){}); return; }
+    petLoadPdfLib().then(function(){ petDownload(petPdfBlob(p),base+".pdf"); sh.textContent=L({en:"Downloaded — attach it to share",sw:"Imepakuliwa — iambatanishe kushiriki",sh:"Imedownload — iattach ushare"}); }, function(){});
+  });
+}
+
+/* ============================ LIVE TICKER ============================ */
+/* What's current on raia, running across the top: petitions to sign, fresh fact-checks,
+   headlines and what's coming up. Built from the same public tables the pages use. */
+var TK = { petitions:[], checks:[], news:[], events:[], lang:null, timer:null };
+function tkLoad(){
+  if(!RSB) return;
+  var today=new Date().toISOString().slice(0,10), pending=4;
+  function one(){ if(--pending===0) tkPaint(true); }
+  petsLoad(function(rows){ TK.petitions=(rows||[]).slice(0,6); one(); });
+  RSB.from("disinfo_items").select("*").eq("published",true).order("created_at",{ascending:false}).limit(8).then(function(r){ TK.checks=((r&&r.data)||[]).filter(function(x){ return x.rebuttal; }).slice(0,4); one(); }, one);
+  RSB.from("sentiment_items").select("title,url,source,published_at").order("published_at",{ascending:false}).limit(5).then(function(r){ TK.news=(r&&r.data)||[]; one(); }, one);
+  RSB.from("calendar_events").select("id,title,start_date,location,link").eq("published",true).gte("start_date",today).order("start_date",{ascending:true}).limit(3).then(function(r){ TK.events=(r&&r.data)||[]; one(); }, one);
+}
+function tkClip(s,n){ s=dec(String(s||"")).replace(/\s+/g," ").trim(); return s.length>n?s.slice(0,n-1)+"…":s; }
+function tkItem(cat,color,text,attrs){
+  return '<a class="rtick-item" '+attrs+'><span class="rtick-cat" style="color:'+color+'">'+esc(cat)+'</span>'+esc(text)+'</a>';
+}
+function tkPaint(force){
+  var tr_=document.getElementById("rtickTrack"), bar=document.getElementById("rtick"); if(!tr_||!bar) return;
+  if(!force && TK.lang===LANG) return;
+  TK.lang=LANG;
+  var items=[];
+  TK.petitions.forEach(function(p){
+    var n=p.sign_count||0, tail=petIsExt(p)?L({en:"take action",sw:"chukua hatua",sh:"chukua action"}):(n?n.toLocaleString()+" "+L({en:"signed",sw:"wametia sahihi",sh:"wame-sign"}):L({en:"be the first to sign",sw:"kuwa wa kwanza kutia sahihi",sh:"kuwa wa kwanza ku-sign"}));
+    items.push(tkItem(L({en:"Petition",sw:"Ombi",sh:"Petition"}),"#F0B93E",tkClip(p.title,80)+" — "+tail,'href="#petition='+encodeURIComponent(p.id)+'"'));
+  });
+  TK.checks.forEach(function(i){ items.push(tkItem(L({en:"Fact-check",sw:"Uhakiki",sh:"Fact-check"}),"#FF6B6B",(tr(i,"verdict")?tr(i,"verdict")+": ":"")+tkClip(tr(i,"body"),80),'href="#disinfo/'+esc(i.id)+'"')); });
+  TK.news.forEach(function(i){ if(i.title) items.push(tkItem(L({en:"In the news",sw:"Habarini",sh:"Kwa news"}),"#7FD1A0",tkClip(i.title,90)+(i.source?" · "+tkClip(i.source,24):""),'href="'+esc(i.url||"#")+'" target="_blank" rel="noopener noreferrer"')); });
+  TK.events.forEach(function(i){
+    var d=i.start_date?new Date(i.start_date+"T00:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"";
+    items.push(tkItem(L({en:"Coming up",sw:"Inakuja",sh:"Inakuja"}),"#9EC5FF",(d?d+" · ":"")+tkClip(i.title,70),i.link?'href="'+esc(i.link)+'" target="_blank" rel="noopener noreferrer"':''));
+  });
+  ISSUES.filter(function(x){ return x.status==="ongoing"||x.status==="threat"; }).slice(0,3).forEach(function(x){
+    items.push(tkItem(L({en:"Ni Nini?",sw:"Ni Nini?",sh:"Ni Nini?"}),"#F0B93E",tkClip(L(x.title),80),'href="#" data-tk-issue="'+esc(x.id)+'"'));
+  });
+  if(!items.length){ bar.hidden=true; return; }
+  /* mix the kinds so one source doesn't run in a block */
+  var mixed=[], buckets={}; items.forEach(function(h){ var k=h.match(/rtick-cat" style="color:([^"]+)"/)[1]; (buckets[k]=buckets[k]||[]).push(h); });
+  var keys=Object.keys(buckets), left=items.length; while(left>0){ keys.forEach(function(k){ if(buckets[k].length){ mixed.push(buckets[k].shift()); left--; } }); }
+  tr_.innerHTML=mixed.join("")+mixed.join("");
+  tr_.style.setProperty("--rdur",Math.max(60,mixed.length*7)+"s");
+  document.getElementById("rtickLabel").textContent=L({en:"Live",sw:"Sasa hivi",sh:"Live"});
+  bar.hidden=false;
+  tr_.querySelectorAll("[data-tk-issue]").forEach(function(a){ a.addEventListener("click",function(e){ e.preventDefault(); openIssue(a.getAttribute("data-tk-issue")); }); });
+}
+function tkStart(){
+  var bar=document.getElementById("rtick"); if(!bar) return;
+  bar.addEventListener("click",function(e){ if(e.target.closest(".rtick-tag")) bar.classList.toggle("paused"); });
+  /* a link to the hash you're already on doesn't fire hashchange — re-apply it */
+  document.addEventListener("click",function(e){
+    var a=e.target.closest&&e.target.closest('a[href^="#petition"],a[href^="#disinfo/"]'); if(!a) return;
+    if(location.hash===a.getAttribute("href")){ e.preventDefault(); applyHash(true); }
+  });
+  tkLoad();
+  TK.timer=setInterval(function(){ if(!document.hidden){ PETS.at=0; tkLoad(); } },300000);
+}
+
 
 function footer(){
   return '<div class="footer overflow-anywhere"><p>'+esc(L({
@@ -1735,6 +2044,7 @@ function updateChrome(){
   document.querySelectorAll(".desknav button").forEach(function(b){ b.textContent=L(TAB[b.getAttribute("data-nav")].name); });
   document.querySelectorAll(".langs button").forEach(function(b){ b.setAttribute("aria-pressed",b.getAttribute("data-lang")===LANG?"true":"false"); });
   document.documentElement.lang = LANG==="en"?"en":"sw";
+  if(typeof tkPaint==="function") tkPaint(false);
 }
 
 function bind(){
@@ -1805,7 +2115,7 @@ function applyHash(scroll){
   }
   if(h==="petitions"){ state.view="petitions"; state.petitionId=null; render(); return true; }
   if(h==="cop31"||h==="cop"){ state.view="cop"; render(); return true; }
-  if(h.indexOf("petition=")===0){ state.petitionId=decodeURIComponent(h.slice(9)); state.view="petitions"; render(); return true; }
+  if(h.indexOf("petition=")===0){ state.petitionId=decodeURIComponent(h.slice(9)); state.view="petition"; render(); return true; }
   if(h.indexOf("flag/")===0){
     var parts=h.slice(5).split("/");
     state.flagPost=(parts[0]||"").replace(/[^0-9]/g,"");
@@ -1818,6 +2128,7 @@ window.addEventListener("hashchange",function(){ applyHash(true); });
 
 if(!applyHash(false)) render();
 fetchWeekly();
+tkStart();
 if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
   window.addEventListener("load",function(){
     navigator.serviceWorker.register("sw.js").catch(function(){});
