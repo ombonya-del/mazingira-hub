@@ -5387,14 +5387,8 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
     PETS.forEach(function(p){ listEl.appendChild(card(p)); });
   }
   render();
-  function loadCounts(){
-    if(!SB) return;
-    PETS.forEach(function(p){
-      if((""+p.id).indexOf("local-")===0) return;
-      SB.from("petition_signatures").select("id",{count:"exact",head:true}).eq("petition_id",p.id)
-        .then(function(r){ if(typeof r.count==="number"){ p._count=r.count; render(); } }, function(){});
-    });
-  }
+  /* sign_count is kept accurate by the trg_bump_petition_count DB trigger;
+     petition_signatures is not readable (names/emails), so never recount from it. */
   function load(){
     if(!SB) return;
     SB.from("petitions").select("*").eq("published",true).order("created_at",{ascending:false}).limit(50)
@@ -5405,7 +5399,7 @@ var SB = window.HAUTH || ((window.supabase && window.supabase.createClient)
                    goal:row.goal||0, doc:row.doc_url||"", _count:row.sign_count||0,
                    kind:row.kind||"petition", ext:row.action_url||"", deadline:row.deadline||"", src:row.source_name||"" };
         });
-        render(); loadCounts();
+        render();
       }, function(){});
   }
   if(SB && SB.auth && SB.auth.getSession){ SB.auth.getSession().then(load, load); } else load();
